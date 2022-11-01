@@ -1,0 +1,75 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--normal-gap);
+
+	color: var(--text-color);
+}
+
+.form__group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--small-gap);
+}
+
+.input__label {
+	color: var(--light);
+	font-size: 1.25em;
+}
+
+.input {
+	padding: 0.25em 0.5em;
+	background-color: var(--text-color);
+	border: none;
+
+	color: var(--dark);
+	font-size: 1.25em;
+	resize: none;
+}
+
+.input:focus {
+	outline: solid 2px var(--light-accent);
+}
+
+.form__group textarea {
+	font-size: 1em;
+}
+
+.form__actions {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: var(--normal-gap);
+}
+
+.form__confirmational {
+	font-size: 2em;
+	text-align: justify;
+}
+
+/**TABLET*/
+@media (min-width: 768px) and (max-width: 1199px) {
+	.form__confirmational {
+		font-size: 1.5em;
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.input__label {
+		font-size: 1em;
+	}
+
+	.input {
+		padding: 0.25em;
+		font-size: 1.15em;
+	}
+
+	.form__group textarea {
+		font-size: 0.95em;
+	}
+
+	.form__confirmational {
+		font-size: 1.25em;
+	}
+}

@@ -1,0 +1,110 @@
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+	background-color: rgba(0, 0, 0, 0.75);
+	display: flex;
+	justify-content: center;
+
+	z-index: 999;
+
+	opacity: 0;
+	transition: all 0.3s ease-in-out;
+	pointer-events: none;
+}
+
+.modal.enter-done {
+	opacity: 1;
+	pointer-events: visible;
+}
+
+.modal.exit {
+	opacity: 0;
+}
+
+.modal__container {
+	width: calc(var(--container-width) + var(--normal-gap));
+	height: fit-content;
+	padding: 2em;
+	margin-top: var(--normal-gap);
+
+	background-color: var(--dark-accent);
+	border-radius: var(--card-radius);
+
+	display: flex;
+	flex-direction: column;
+	gap: var(--normal-gap);
+
+	transform: translateY(-1000px);
+	transition: all 0.3s ease-in-out;
+}
+
+.modal.enter-done .modal__container {
+	transform: translateY(0);
+}
+
+.modal.exit .modal__container {
+	transform: translateY(-1000px);
+}
+
+.modal__title {
+	color: var(--text-color);
+	font-size: 3em;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.modal__message {
+	font-size: 2em;
+	text-align: center;
+}
+
+.modal__message.success {
+	color: var(--light);
+}
+
+.modal__message.fail {
+	color: var(--danger);
+}
+
+/**TABLET*/
+@media (min-width: 768px) and (max-width: 1199px) {
+	.modal {
+		align-items: center;
+	}
+
+	.modal__container {
+		width: var(--container-width);
+	}
+
+	.modal__title {
+		font-size: 2.5em;
+	}
+
+	.modal__message {
+		font-size: 2em;
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.modal {
+		align-items: center;
+	}
+
+	.modal__container {
+		width: var(--container-width);
+		padding: 1em;
+	}
+
+	.modal__title {
+		font-size: 1.5em;
+	}
+
+	.modal__message {
+		font-size: 1em;
+	}
+}

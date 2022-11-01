@@ -1,0 +1,31 @@
+.button {
+	width: 100%;
+	padding: 0.5em 0em;
+
+	outline: none;
+	border: none;
+	background-color: var(--light-accent);
+	border-radius: var(--card-radius);
+
+	color: var(--text-color);
+	font-size: 1.5em;
+	text-align: center;
+
+	cursor: pointer;
+}
+
+.button:hover {
+	opacity: 0.75;
+}
+
+/**TABLET*/
+@media (min-width: 768px) and (max-width: 1199px) {
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.button {
+		padding: 0.25em 0em;
+		font-size: 1.25em;
+	}
+}

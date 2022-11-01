@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,300&display=swap");
+
+:root {
+	/**COLORS*/
+	--dark: #202020;
+	--dark-accent: #333533;
+	--dark-accent-decimal: 51, 53, 51;
+	--light: #adddd0;
+	--light-accent: #607eaa;
+	--danger: #d22b2b;
+
+	/**TEXT*/
+	--main-font: "Open Sans", sans-serif;
+	--base-font-size: 18px;
+	--text-color: #f9f5eb;
+
+	/**WIDTHS, HEIGHTS, GAPS*/
+	--container-width: 1200px;
+	--normal-gap: 1em;
+	--small-gap: 0.25em;
+
+	/**UTILITY*/
+	--card-radius: 0.25em;
+	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
+}
+
+/**TABLET*/
+@media (min-width: 768px) and (max-width: 1199px) {
+	:root {
+		/**WIDTHS, HEIGHTS, GAPS*/
+		--container-width: 95%;
+		--normal-gap: 0.75em;
+		--small-gap: 0.25em;
+	}
+}
+
+/**TABLET*/
+@media (max-width: 767px) {
+	:root {
+		/**WIDTHS, HEIGHTS, GAPS*/
+		--container-width: 90%;
+		--normal-gap: 0.5em;
+		--small-gap: 0.25em;
+	}
+}

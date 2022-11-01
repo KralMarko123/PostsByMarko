@@ -1,0 +1,13 @@
+.home {
+	flex-direction: column;
+}
+
+.posts__list {
+	width: 100%;
+
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--normal-gap);
+}
