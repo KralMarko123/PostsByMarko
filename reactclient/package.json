@@ -5,7 +5,7 @@
 	"main": "index.jsx",
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build"
+		"build": "CI=false && react-scripts build"
 	},
 	"author": "",
 	"license": "ISC",
