@@ -6,6 +6,7 @@ import "../../styles/components/Form.css";
 
 const DeletePostForm = (props) => {
 	const [message, setMessage] = useState(null);
+	const transitionDuration = 0.25;
 
 	const onClose = () => {
 		props.onClose();
@@ -21,10 +22,10 @@ const DeletePostForm = (props) => {
 				});
 				setTimeout(() => {
 					onClose();
-				}, 2000);
+				}, transitionDuration * 1000 + 500);
 				setTimeout(() => {
 					props.onPostDeleted();
-				}, 2300);
+				}, transitionDuration * 2 * 1000 + 500);
 			})
 			.catch((error) => {
 				console.error(error);
@@ -36,7 +37,13 @@ const DeletePostForm = (props) => {
 	};
 
 	return (
-		<Modal isShown={props.isShown} title="Delete Post" message={message} onClose={() => onClose()}>
+		<Modal
+			isShown={props.isShown}
+			title="Delete Post"
+			message={message}
+			onClose={() => onClose()}
+			duration={transitionDuration}
+		>
 			<form className="form">
 				<h1 className="form__confirmational">Are you sure you want to delete this post?</h1>
 				<div className="form__actions">

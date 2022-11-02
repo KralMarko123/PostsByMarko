@@ -8,6 +8,7 @@ const CreatePostForm = (props) => {
 	const titleRef = useRef();
 	const contentRef = useRef();
 	const [message, setMessage] = useState(null);
+	const transitionDuration = 0.25;
 
 	const onClose = () => {
 		props.onClose();
@@ -30,7 +31,7 @@ const CreatePostForm = (props) => {
 					});
 					setTimeout(() => {
 						onClose();
-					}, 2000);
+					}, transitionDuration * 1000 + 500);
 				})
 				.catch((error) => {
 					console.error(error.message);
@@ -48,7 +49,13 @@ const CreatePostForm = (props) => {
 	};
 
 	return (
-		<Modal isShown={props.isShown} title="Create Form" message={message} onClose={() => onClose()}>
+		<Modal
+			isShown={props.isShown}
+			title="Create Form"
+			message={message}
+			onClose={() => onClose()}
+			duration={transitionDuration}
+		>
 			<form className="form">
 				<div className="form__group">
 					<label htmlFor="title" className="input__label">
