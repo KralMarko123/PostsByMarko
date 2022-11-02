@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-using PostsTesting.Utility.Pages;
+﻿using PostsTesting.Utility.Pages;
+using Xunit;
 
 namespace PostsTesting.Tests.TestBase
 {
@@ -10,8 +10,7 @@ namespace PostsTesting.Tests.TestBase
         public async Task VerifyHomepageDefaultState()
         {
             await homePage.Visit();
-            await homePage.title.IsVisibleAsync();
-            Thread.Sleep(5000);
+            await homePage.CheckDefaultState();
         }
     }
 }

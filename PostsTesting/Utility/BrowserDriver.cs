@@ -22,6 +22,15 @@ namespace PostsTesting.Utility
             return browser;
         }
 
+        public async Task<IBrowser> GetFirefoxAsync(bool headless = false)
+        {
+            browser ??= await GetPlaywrightAsync().Result.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = headless
+            });
+            return browser;
+        }
+
         public async Task DestroyPlaywright()
         {
             await Task.Run(() => playwrightInstance.Dispose());

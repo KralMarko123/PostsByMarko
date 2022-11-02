@@ -8,7 +8,7 @@ namespace PostsTesting.Tests.Frontend
         [Fact]
         public async Task VerifyHomepageIsDisplayedCorrectly()
         {
-           await VerifyHomepageDefaultState();
+            await VerifyHomepageDefaultState();
         }
     }
 }
