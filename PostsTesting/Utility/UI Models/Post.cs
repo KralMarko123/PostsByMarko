@@ -22,22 +22,41 @@ namespace PostsTesting.Utility.Pages
         public Modal modal => new Modal(page);
 
 
+        public async Task ClickOnPost()
+        {
+            await post.ClickAsync();
+        }
+
+        public async Task ClickOnUpdateIcon()
+        {
+            await updateIcon.ClickAsync();
+        }
+
+        public async Task ClickOnDeleteIcon()
+        {
+            await deleteIcon.ClickAsync();
+        }
+
         public async Task CheckPost()
         {
             bool postIsDisplayed = await title.IsVisibleAsync() && await content.IsVisibleAsync();
             Assert.True(postIsDisplayed);
 
-            await updateIcon.ClickAsync();
+            await ClickOnUpdateIcon();
             await modal.CheckVisibility("Update Form");
             await modal.CloseModal();
-            await deleteIcon.ClickAsync();
+            await ClickOnDeleteIcon();
             await modal.CheckVisibility("Delete Post");
             await modal.CloseModal();
         }
 
-        public async Task ClickOnPost()
+        public async Task CheckPostTitleAndContent(string expectedTitle, string expectedContent)
         {
-            await post.ClickAsync();
+            var postTitle = await title.TextContentAsync();
+            var contentTitle = await content.TextContentAsync();
+
+            Assert.Equal(expectedTitle, postTitle);
+            Assert.Equal(expectedContent, contentTitle);
         }
     }
 }

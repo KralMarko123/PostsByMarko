@@ -363,5 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # SQLite helper files
-./aspnetserver/Data/AppDB.db-shm
-./aspnetserver/Data/AppDB.db-wal
+aspnetserver/Data/AppDB.db
+aspnetserver/Data/AppDB.db-shm
+aspnetserver/Data/AppDB.db-wal

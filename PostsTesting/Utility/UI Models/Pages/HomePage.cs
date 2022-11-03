@@ -25,6 +25,11 @@ namespace PostsTesting.Utility.Pages
             await page.GotoAsync(url);
         }
 
+        public async Task ClickCreatePostButton()
+        {
+            await createPostButton.ClickAsync();
+        }
+
         public async Task CheckDefaultState()
         {
             var homeElementsAreDisplayed = await title.IsVisibleAsync() && await subtitle.IsVisibleAsync() && await createPostButton.IsVisibleAsync();
@@ -32,14 +37,14 @@ namespace PostsTesting.Utility.Pages
             Assert.True(homeElementsAreDisplayed);
             Assert.Equal("Welcome to our blog!", titleText);
 
-            await createPostButton.ClickAsync();
+            await ClickCreatePostButton();
             await modal.CheckVisibility("Create Form");
             await modal.CloseModal();
 
             var postsArePresent = await WaitForPostsToLoad();
             if (postsArePresent)
             {
-                var postCount = await postCard.CountAsync();
+                var postCount = await GetNumberOfPosts();
                 for (int i = 0; i < postCount; i++)
                 {
                     Post post = new Post(page, postCard.Nth(i));
@@ -63,9 +68,18 @@ namespace PostsTesting.Utility.Pages
             return postsAreVisible;
         }
 
-        public async Task CreateNewPost(string title, string content)
+        public Post FindPostWithTitleAndContent(string titleToFindBy)
         {
+            ILocator newlyCreatedPostCard = page.Locator(".post", new PageLocatorOptions { HasTextString = titleToFindBy });
+            Post newlyCreatedPost = new Post(page, newlyCreatedPostCard);
+        
+            return newlyCreatedPost;
+        }
 
+        public async Task<int> GetNumberOfPosts()
+        {
+            var numberOfPosts = await postCard.CountAsync();
+            return numberOfPosts;
         }
     }
 }

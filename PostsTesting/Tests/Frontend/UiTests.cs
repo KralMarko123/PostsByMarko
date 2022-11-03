@@ -22,5 +22,23 @@ namespace PostsTesting.Tests.Frontend
         {
             await VerifyPostDetailsForNotFoundPost();
         }
+
+        [Fact]
+        public async Task VerifyNewlyCreatedPostIsPresentOnHomePage()
+        { 
+            await VerifyPostCanBeCreated();
+        }
+
+        [Fact]
+        public async Task VerifyPostCanBeEditedFromTheHomepage()
+        {
+            await VerifyPostCanBeUpdated();
+        }
+
+        [Fact]
+        public async Task VerifyPostIsNotPresentAfterBeingDeleted()
+        {
+            await VerifyPostCanBeDeleted();
+        }
     }
 }

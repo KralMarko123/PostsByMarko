@@ -21,24 +21,24 @@ namespace PostsTesting.Utility.Pages
             await page.GotoAsync($"{url}/{postId}");
         }
 
+        public async Task GoBack()
+        {
+            await backButton.ClickAsync();
+        }
+
         public async Task CheckPostDetails(string expectedTitle, string expectedContent)
         {
             await WaitForTitleToAppear();
 
-            bool detailsElementsAreDisplayed = await title.IsVisibleAsync() &&
+            var detailsElementsAreDisplayed = await title.IsVisibleAsync() &&
                 await content.IsVisibleAsync() &&
                 await backButton.IsVisibleAsync();
-            string titleText = await title.TextContentAsync();
-            string contentText = await content.TextContentAsync();
+            var titleText = await title.TextContentAsync();
+            var contentText = await content.TextContentAsync();
 
             Assert.True(detailsElementsAreDisplayed);
             Assert.Equal(expectedTitle, titleText);
             Assert.Equal(expectedContent, contentText);
-        }
-
-        public async Task GoBack()
-        {
-            await backButton.ClickAsync();
         }
 
         public async Task WaitForTitleToAppear()
