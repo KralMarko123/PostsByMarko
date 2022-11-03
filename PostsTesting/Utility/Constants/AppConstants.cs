@@ -9,6 +9,7 @@
         private const string baseUrlPrd = "https://posts-aspnetserver.azurewebsites.net";
         private const string baseUiUrlPrd = "https://posts.markomarkovikj.com";
 
+        public static readonly string browserType = ConfigReader.GetConfigurationEntries().FirstOrDefault(e => e.Key.Equals("Browser")).Value;
         public static string ServerEndpoint
         {
             get

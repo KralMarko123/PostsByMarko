@@ -10,5 +10,17 @@ namespace PostsTesting.Tests.Frontend
         {
             await VerifyHomepageDefaultState();
         }
+
+        [Fact]
+        public async Task VerifyPostDetailsPageIsDisplayedCorrectlyForEachPost()
+        {
+            await VerifyPostDetailsForEachPost();
+        }
+
+        [Fact]
+        public async Task VerifyPostDetailsPageForNonExistentPost()
+        {
+            await VerifyPostDetailsForNotFoundPost();
+        }
     }
 }

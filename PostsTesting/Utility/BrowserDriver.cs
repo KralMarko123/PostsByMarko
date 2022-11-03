@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using PostsTesting.Utility.Constants;
 
 namespace PostsTesting.Utility
 {
@@ -13,22 +14,24 @@ namespace PostsTesting.Utility
             return playwrightInstance;
         }
 
-        public async Task<IBrowser> GetChromeAsync(bool headless = false)
+        public async Task<IBrowser> GetBrowserAsync(bool headless = false)
         {
-            browser ??= await GetPlaywrightAsync().Result.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+            switch (AppConstants.browserType)
             {
-                Headless = headless
-            });
-            return browser;
-        }
-
-        public async Task<IBrowser> GetFirefoxAsync(bool headless = false)
-        {
-            browser ??= await GetPlaywrightAsync().Result.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
-            {
-                Headless = headless
-            });
-            return browser;
+                case "Chrome":
+                    browser ??= await GetPlaywrightAsync().Result.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+                    {
+                        Headless = headless
+                    });
+                    return browser;
+                case "Firefox":
+                    browser ??= await GetPlaywrightAsync().Result.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
+                    {
+                        Headless = headless
+                    });
+                    return browser;
+                default: return browser;
+            }
         }
 
         public async Task DestroyPlaywright()

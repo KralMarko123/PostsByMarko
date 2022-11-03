@@ -13,7 +13,7 @@ namespace PostsTesting.Tests
         public async Task InitializeAsync()
         {
             driver = new BrowserDriver();
-            browser = await driver.GetChromeAsync();
+            browser = await driver.GetBrowserAsync();
             page = await browser.NewPageAsync();
         }
 

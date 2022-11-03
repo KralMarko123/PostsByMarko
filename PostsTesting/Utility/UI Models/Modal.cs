@@ -1,5 +1,4 @@
 ﻿using Microsoft.Playwright;
-using PostsTesting.Utility.Constants;
 using Xunit;
 
 namespace PostsTesting.Utility.Pages
@@ -10,7 +9,7 @@ namespace PostsTesting.Utility.Pages
         private IPage page;
         public ILocator modal => page.Locator(".modal");
         public ILocator title => page.Locator(".modal__title");
-        public ILocator buttons => page.Locator(".form__actions .button");
+        public ILocator cancelButton => page.Locator(".form__actions .button", new PageLocatorOptions { HasTextString = "Cancel" });
 
         public Modal(IPage page) => this.page = page;
 
@@ -20,6 +19,12 @@ namespace PostsTesting.Utility.Pages
             string titleText = await title.TextContentAsync();
             Assert.True(modalIsDisplayed);
             Assert.Equal(expectedTitleText, titleText);
+        }
+
+        public async Task CloseModal()
+        {
+            await cancelButton.ClickAsync();
+            await modal.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
         }
     }
 }
