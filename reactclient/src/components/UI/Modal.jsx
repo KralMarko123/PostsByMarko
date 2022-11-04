@@ -6,7 +6,6 @@ import "../../styles/components/Modal.css";
 const Modal = (props) => {
 	const onClose = () => {
 		props.onClose();
-		console.log("closing", props.duration * 100);
 	};
 
 	useEffect(() => {

@@ -45,5 +45,12 @@ namespace PostsTesting.Utility.Pages
         {
             await title.WaitForAsync();
         }
+
+        public async Task<IResponse> GetResponseForPostDetails(string postId)
+        {
+            IResponse postDetailsResponse = await page.RunAndWaitForResponseAsync(async () => await Visit(postId),
+            r => r.Url.Contains($"get-post-by-id/{postId}"));
+            return postDetailsResponse;
+        }
     }
 }

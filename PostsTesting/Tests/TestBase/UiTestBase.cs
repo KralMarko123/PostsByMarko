@@ -1,6 +1,7 @@
 ﻿using Microsoft.Playwright;
 using PostsTesting.Utility;
 using PostsTesting.Utility.Pages;
+using System.Net;
 using Xunit;
 
 namespace PostsTesting.Tests.TestBase
@@ -39,7 +40,9 @@ namespace PostsTesting.Tests.TestBase
 
         public async Task VerifyPostDetailsForNotFoundPost()
         {
-            await postDetailsPage.Visit("404");
+            IResponse notFoundResponse = await postDetailsPage.GetResponseForPostDetails("404");
+            Assert.True(notFoundResponse.Status == (int)HttpStatusCode.NotFound);
+
             await postDetailsPage.CheckPostDetails("No Post Found", "The post with Id: 404 doesn't seem to exist. Go back to view other posts.");
         }
 

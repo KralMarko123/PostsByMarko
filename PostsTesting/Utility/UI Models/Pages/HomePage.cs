@@ -22,7 +22,7 @@ namespace PostsTesting.Utility.Pages
 
         public async Task Visit()
         {
-            await page.GotoAsync(url);
+           await page.GotoAsync(url);
         }
 
         public async Task ClickCreatePostButton()
@@ -72,7 +72,7 @@ namespace PostsTesting.Utility.Pages
         {
             ILocator newlyCreatedPostCard = page.Locator(".post", new PageLocatorOptions { HasTextString = titleToFindBy });
             Post newlyCreatedPost = new Post(page, newlyCreatedPostCard);
-        
+
             return newlyCreatedPost;
         }
 
