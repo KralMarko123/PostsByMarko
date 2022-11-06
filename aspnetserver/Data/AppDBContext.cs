@@ -1,30 +1,22 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using aspnetserver.Data.Models;
+using aspnetserver.Data.Repos.Posts;
 
 namespace aspnetserver.Data
 {
-    internal sealed class AppDBContext : DbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
         public DbSet<Post> Posts { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder) => dbContextOptionsBuilder.UseSqlite("Data Source=./Data/AppDB.db");
+        public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Post[] postsToSeed = new Post[6];
+            base.OnModelCreating(modelBuilder);
 
-            for (int i = 0; i < postsToSeed.Length; i++)
-            {
-                postsToSeed[i] = new Post
-                {
-                    PostId = i + 1,
-                    Title = $"Post {i + 1}",
-                    Content = $"This is post no. {i + 1}. You are currently seeing its content."
-                };
-            }
-
-            modelBuilder.Entity<Post>().HasData(postsToSeed);
+            modelBuilder.ApplyConfiguration(new PostData());
         }
-
     }
 }

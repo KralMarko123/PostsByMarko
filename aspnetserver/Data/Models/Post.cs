@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace aspnetserver.Data
+namespace aspnetserver.Data.Models
 {
-    internal sealed class Post
+    public class Post
     {
         [Key]
         public int PostId { get; set; }
