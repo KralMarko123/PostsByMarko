@@ -3,21 +3,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace aspnetserver.Data.Repos.Posts
 {
-    internal static class PostsRepository
+    public class PostsRepository : IPostsRepository
     {
-        private static AppDbContext appDbContext;
+        private readonly AppDbContext appDbContext;
 
-        public static async Task<List<Post>> GetPostsAsync()
+        public PostsRepository(AppDbContext appDbContext)
+        {
+            this.appDbContext = appDbContext;
+        }
+
+        public async Task<List<Post>> GetPostsAsync()
         {
             return await appDbContext.Posts.ToListAsync();
         }
 
-        public static async Task<Post> GetPostByIdAsync(int postId)
+        public async Task<Post> GetPostByIdAsync(int postId)
         {
             return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));
         }
 
-        public static async Task<bool> CreatePostAsync(Post postToCreate)
+        public async Task<bool> CreatePostAsync(Post postToCreate)
         {
             try
             {
@@ -32,7 +37,7 @@ namespace aspnetserver.Data.Repos.Posts
         }
 
 
-        public static async Task<bool> UpdatePostAsync(Post postToUpdate)
+        public async Task<bool> UpdatePostAsync(Post postToUpdate)
         {
 
             try
@@ -47,7 +52,7 @@ namespace aspnetserver.Data.Repos.Posts
             }
         }
 
-        public static async Task<bool> DeletePostAsync(int postId)
+        public async Task<bool> DeletePostAsync(int postId)
         {
 
             try

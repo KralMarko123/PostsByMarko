@@ -1,7 +1,6 @@
 using aspnetserver.Data;
 using aspnetserver.Data.Mappings;
 using aspnetserver.Data.Models;
-using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
 using AutoMapper;
@@ -9,15 +8,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 #region ServicesConfiguration
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
+builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IPostsRepository, PostsRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 builder.Services.AddIdentity<User, IdentityRole>(user =>
 {
@@ -80,66 +85,7 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseCors("CORSPolicy");
 
-#endregion
-
-#region APIs
-
-#region PostAPIs
-
-app.MapGet("/get-all-posts", async () => await PostsRepository.GetPostsAsync())
-    .WithTags(tags: "Posts Endpoint").AllowAnonymous();
-
-app.MapGet("/get-post-by-id/{postId}", async (int postId) =>
-{
-    Post postToReturn = await PostsRepository.GetPostByIdAsync(postId);
-
-    if (postToReturn != null) return Results.Ok(postToReturn);
-    else return Results.NotFound($"Post with id: {postId} was not found.");
-
-}).WithTags(tags: "Posts Endpoint").AllowAnonymous();
-
-app.MapPost("/create-post", async (Post postToCreate) =>
-{
-    bool postCreatedSuccessfully = false;
-    if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0) postCreatedSuccessfully = await PostsRepository.CreatePostAsync(postToCreate);
-
-    if (postCreatedSuccessfully) return Results.Ok("Post was created successfully.");
-    else return Results.BadRequest("Error during post creation.");
-
-}).WithTags(tags: "Posts Endpoint");
-
-app.MapPut("/update-post", async (Post postToUpdate) =>
-{
-    bool postUpdatedSuccessfully = await PostsRepository.UpdatePostAsync(postToUpdate);
-
-    if (postUpdatedSuccessfully) return Results.Ok("Post was updated successfully.");
-    else return Results.BadRequest("Error during post update.");
-
-}).WithTags(tags: "Posts Endpoint");
-
-app.MapDelete("/delete-post-by-id/{postId}", async (int postId) =>
-{
-    bool postDeletedSuccessfully = await PostsRepository.DeletePostAsync(postId);
-
-    if (postDeletedSuccessfully) return Results.Ok("Post was deleted successfully.");
-    else return Results.BadRequest("Error during post deletion.");
-
-}).WithTags(tags: "Posts Endpoint");
-
-#endregion
-
-#region AuthAPIs
-
-app.MapPost("/register", async (UserRegistrationDto userToRegister) =>
-{
-    var userCreated = await UsersRepository.RegisterUserAsync(userToRegister);
-
-    if (userCreated.Succeeded) return Results.CreatedAtRoute("User registered successfully");
-    else return Results.BadRequest(new BadRequestObjectResult(userCreated));
-
-}).WithTags("Auth Endpoint").AllowAnonymous();
-
-#endregion
+app.MapControllers();
 
 #endregion
 
