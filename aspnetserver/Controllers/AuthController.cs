@@ -1,6 +1,7 @@
 ﻿using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Repos.Users;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
@@ -17,6 +18,7 @@ public class AuthController : BaseApiController
 
     [HttpPost]
     [Route("/register")]
+    [AllowAnonymous]
     public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
     {
 
@@ -24,13 +26,13 @@ public class AuthController : BaseApiController
         return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode(201);
     }
 
-    //[HttpPost]
-    //[Route("/login")]
-    //public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
-    //{
-    //    return !await _repository.UserAuthentication.ValidateUserAsync(user)
-    //    ? Unauthorized()
-    //        : Ok(new { Token = await _repository.UserAuthentication.CreateTokenAsync() });
-    //}
+    [HttpPost]
+    [Route("/login")]
+    public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
+    {
+        return !await usersRepository.ValidateUserAsync(user)
+            ? Unauthorized()
+            : Ok(new { Token = await usersRepository.CreateTokenAsync() });
+    }
 
 }

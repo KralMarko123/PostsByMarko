@@ -19,7 +19,7 @@ public class PostsController : BaseApiController
     [HttpGet]
     [Route("/get-all-posts")]
     [Tags("Posts Endpoint")]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<List<Post>> GetPostsAsync()
     {
         return await postsRepository.GetPostsAsync();
