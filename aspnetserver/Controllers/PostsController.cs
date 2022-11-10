@@ -1,8 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
@@ -20,7 +18,6 @@ public class PostsController : BaseApiController
     [HttpGet]
     [Route("/get-all-posts")]
     [Tags("Posts Endpoint")]
-    [AllowAnonymous]
     public async Task<List<Post>> GetPostsAsync()
     {
         return await postsRepository.GetPostsAsync();
@@ -29,7 +26,6 @@ public class PostsController : BaseApiController
     [HttpGet]
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
-    [AllowAnonymous]
     public async Task<IActionResult> GetPostByIdAsync(int postId)
     {
         Post postToReturn = await postsRepository.GetPostByIdAsync(postId);

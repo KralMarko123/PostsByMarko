@@ -6,7 +6,7 @@ namespace aspnetserver.Data.Repos.Users
 {
     public interface IUsersRepository
     {
-        Task<User> GetUserByUsernameAsync(string userName);
+        Task<object> GetUserDetailsForUsernameAsync(string userName);
         Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration);
         Task<bool> ValidateUserAsync(UserLoginDto userLogin);
         Task<string> CreateTokenAsync();

@@ -32,7 +32,7 @@ public class AuthController : BaseApiController
     {
         return !await usersRepository.ValidateUserAsync(user)
             ? Unauthorized()
-            : Ok(new { Token = await usersRepository.CreateTokenAsync(), User = await usersRepository.GetUserByUsernameAsync(user.UserName) });
+            : Ok(new { Token = await usersRepository.CreateTokenAsync(), User = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
     }
 
 }

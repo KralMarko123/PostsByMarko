@@ -23,10 +23,10 @@ namespace aspnetserver.Data.Repos.Users
             this.configuration = configuration;
         }
 
-        public async Task<User> GetUserByUsernameAsync(string userName)
+        public async Task<object> GetUserDetailsForUsernameAsync(string userName)
         {
             user = await userManager.FindByNameAsync(userName);
-            return user;
+            return new{ user.UserName, user.Email, user.FirstName, user.LastName};
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)

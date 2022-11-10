@@ -2,10 +2,12 @@ import React, { useRef } from "react";
 import Button from "../components/UI/Button";
 import AuthService from "../api/AuthService";
 import "../styles/pages/Login.css";
+import { useAuth } from "../custom/useAuth";
 
 const Login = () => {
 	const usernameRef = useRef();
 	const passwordRef = useRef();
+	const { login } = useAuth();
 
 	const onLogin = async () => {
 		if (usernameRef.current.value.length > 0 && passwordRef.current.value.length > 0) {
@@ -16,7 +18,7 @@ const Login = () => {
 
 			await AuthService.login(userToLogin)
 				.then((successfulLogin) => {
-					console.log(successfulLogin.token);
+					login(successfulLogin);
 				})
 				.catch((error) => {
 					console.error(error.message);
