@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace StudentTeacher.Controllers;
 
 [Route("/auth")]
-[ApiController]
 public class AuthController : BaseApiController
 {
     private readonly IUsersRepository usersRepository;
@@ -28,6 +27,7 @@ public class AuthController : BaseApiController
 
     [HttpPost]
     [Route("/login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
     {
         return !await usersRepository.ValidateUserAsync(user)

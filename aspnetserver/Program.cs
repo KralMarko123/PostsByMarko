@@ -17,11 +17,24 @@ var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptio
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
+var postsCorsPolicy = "postsCorsPolicy";
+
 
 #region ServicesConfiguration
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(postsCorsPolicy,
+        policy =>
+        {
+            policy
+             .WithOrigins("http://localhost:3000", "https://delightful-stone-08266f803.2.azurestaticapps.net", "https://posts.markomarkovikj.com")
+             .AllowAnyHeader()
+             .AllowAnyMethod();
+        });
+});
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IPostsRepository, PostsRepository>();
@@ -37,20 +50,6 @@ builder.Services.AddIdentity<User, IdentityRole>(user =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
-
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CORSPolicy",
-        builder =>
-        {
-            builder
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithOrigins("http://localhost:3000", "https://delightful-stone-08266f803.2.azurestaticapps.net", "https://posts.markomarkovikj.com");
-        });
-});
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swaggerOptions =>
 {
@@ -99,8 +98,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtConfig["validIssuer"],
-        ValidAudience = jwtConfig["validAudience"],
+        ValidIssuers = jwtConfig.GetSection("validIssuers").Get<List<string>>(),
+        ValidAudiences = jwtConfig.GetSection("validAudiences").Get<List<string>>(),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["secret"]))
     };
 });
@@ -132,8 +131,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-app.UseCors("CORSPolicy");
-
+app.UseCors(postsCorsPolicy);
 app.MapControllers();
 
 #endregion

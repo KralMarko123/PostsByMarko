@@ -2,6 +2,7 @@
 using aspnetserver.Data.Repos.Posts;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
@@ -19,7 +20,7 @@ public class PostsController : BaseApiController
     [HttpGet]
     [Route("/get-all-posts")]
     [Tags("Posts Endpoint")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<List<Post>> GetPostsAsync()
     {
         return await postsRepository.GetPostsAsync();
@@ -40,7 +41,7 @@ public class PostsController : BaseApiController
     [HttpPost]
     [Route("/create-post")]
     [Tags("Posts Endpoint")]
-    public async Task<IActionResult> CreatePostAsync(Post postToCreate)
+    public async Task<IActionResult> CreatePostAsync([FromBody] Post postToCreate)
     {
         bool postCreatedSuccessfully = false;
         if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0) postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
@@ -50,9 +51,9 @@ public class PostsController : BaseApiController
     }
 
     [HttpPut]
-    [Route("/create-post")]
+    [Route("/update-post")]
     [Tags("Posts Endpoint")]
-    public async Task<IActionResult> UpdatePostAsync(Post postToUpdate)
+    public async Task<IActionResult> UpdatePostAsync([FromBody] Post postToUpdate)
     {
         bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
 
