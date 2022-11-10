@@ -7,6 +7,8 @@ const ENDPOINTS = {
 	CREATE_POST: "create-post",
 	UPDATE_POST: "update-post",
 	DELETE_POST_BY_ID: "delete-post-by-id",
+	LOGIN: "login",
+	REGISTER: "register",
 };
 
 const development = {
@@ -15,6 +17,8 @@ const development = {
 	CREATE_POST: `${BASE_URL_DEV}/${ENDPOINTS.CREATE_POST}`,
 	UPDATE_POST: `${BASE_URL_DEV}/${ENDPOINTS.UPDATE_POST}`,
 	DELETE_POST_BY_ID: `${BASE_URL_DEV}/${ENDPOINTS.DELETE_POST_BY_ID}`,
+	LOGIN: `${BASE_URL_DEV}/${ENDPOINTS.LOGIN}`,
+	REGISTER: `${BASE_URL_DEV}/${ENDPOINTS.REGISTER}`,
 };
 
 const production = {
@@ -23,6 +27,8 @@ const production = {
 	CREATE_POST: `${BASE_URL_PRODUCTION}/${ENDPOINTS.CREATE_POST}`,
 	UPDATE_POST: `${BASE_URL_PRODUCTION}/${ENDPOINTS.UPDATE_POST}`,
 	DELETE_POST_BY_ID: `${BASE_URL_PRODUCTION}/${ENDPOINTS.DELETE_POST_BY_ID}`,
+	LOGIN: `${BASE_URL_PRODUCTION}/${ENDPOINTS.LOGIN}`,
+	REGISTER: `${BASE_URL_PRODUCTION}/${ENDPOINTS.REGISTER}`,
 };
 
 const ENDPOINT__URLS = process.env.NODE_ENV === "development" ? development : production;

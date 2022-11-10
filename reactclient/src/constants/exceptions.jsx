@@ -25,3 +25,10 @@ export class DELETE_POST_ERROR extends Error {
 		this.name = "DELETE_POST_ERROR";
 	}
 }
+
+export class LOGIN_ERROR extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "LOGIN_ERROR";
+	}
+}
