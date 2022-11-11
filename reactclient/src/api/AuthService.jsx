@@ -1,5 +1,5 @@
 import ENDPOINT__URLS from "../constants/endpoints";
-import { LOGIN_ERROR } from "../constants/exceptions";
+import { LOGIN_ERROR, REGISTER_ERROR } from "../constants/exceptions";
 
 const AuthService = {
 	async login(userToLogin) {
@@ -14,6 +14,22 @@ const AuthService = {
 			.then((response) => {
 				if (response.ok) return response.json();
 				else throw new LOGIN_ERROR("Error during login.");
+			})
+			.then((responseFromServer) => responseFromServer);
+	},
+
+	async register(userToRegister) {
+		return await fetch(ENDPOINT__URLS.REGISTER, {
+			method: "POST",
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(userToRegister),
+		})
+			.then((response) => {
+				if (response.ok) return true;
+				else throw new REGISTER_ERROR("Error during login.");
 			})
 			.then((responseFromServer) => responseFromServer);
 	},

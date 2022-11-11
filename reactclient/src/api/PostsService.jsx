@@ -7,11 +7,11 @@ import {
 } from "../constants/exceptions";
 
 const PostsService = {
-	async getAllPosts() {
+	async getAllPosts(userToken) {
 		return await fetch(ENDPOINT__URLS.GET_ALL_POSTS, {
 			method: "GET",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
+				Authorization: `Bearer ${userToken}`,
 			},
 		}).then((response) => {
 			if (response.ok) return response.json();
@@ -19,11 +19,11 @@ const PostsService = {
 		});
 	},
 
-	async getPostById(postId) {
+	async getPostById(postId, userToken) {
 		return await fetch(`${ENDPOINT__URLS.GET_POST_BY_ID}/${postId}`, {
 			method: "GET",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
+				Authorization: userToken,
 			},
 		})
 			.then((response) => {
@@ -33,12 +33,12 @@ const PostsService = {
 			.then((postFromServer) => postFromServer);
 	},
 
-	async createPost(postToCreate) {
+	async createPost(postToCreate, userToken) {
 		return await fetch(ENDPOINT__URLS.CREATE_POST, {
 			method: "POST",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
+				Authorization: userToken,
 			},
 			body: JSON.stringify(postToCreate),
 		})
@@ -49,12 +49,12 @@ const PostsService = {
 			.then((responseFromServer) => responseFromServer);
 	},
 
-	async updatePost(postToUpdate) {
+	async updatePost(postToUpdate, userToken) {
 		return await fetch(ENDPOINT__URLS.UPDATE_POST, {
 			method: "PUT",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
+				Authorization: userToken,
 			},
 			body: JSON.stringify(postToUpdate),
 		})
@@ -65,11 +65,11 @@ const PostsService = {
 			.then((responseFromServer) => responseFromServer);
 	},
 
-	async deletePostById(postId) {
+	async deletePostById(postId, userToken) {
 		return await fetch(`${ENDPOINT__URLS.DELETE_POST_BY_ID}/${postId}`, {
 			method: "DELETE",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
+				Authorization: userToken,
 			},
 		})
 			.then((response) => {

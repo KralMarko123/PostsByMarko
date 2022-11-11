@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace StudentTeacher.Controllers;
+namespace Controllers;
 
 [ApiController]
-[EnableCors("postsCorsPolicy")]
-public class BaseApiController : ControllerBase
+public class BaseController : ControllerBase
 {
     protected readonly IMapper _mapper;
-    public BaseApiController(IMapper mapper)
+    public BaseController(IMapper mapper)
     {
         _mapper = mapper;
     }

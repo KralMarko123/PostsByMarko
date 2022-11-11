@@ -32,3 +32,10 @@ export class LOGIN_ERROR extends Error {
 		this.name = "LOGIN_ERROR";
 	}
 }
+
+export class REGISTER_ERROR extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "REGISTER_ERROR";
+	}
+}

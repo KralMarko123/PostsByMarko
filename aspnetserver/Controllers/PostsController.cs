@@ -1,13 +1,17 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
 using AutoMapper;
+using Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
 
 
 [Route("")]
-public class PostsController : BaseApiController
+[Authorize]
+public class PostsController : BaseController
 {
     private readonly IPostsRepository postsRepository;
     public PostsController(IPostsRepository postsRepository, IMapper mapper) : base(mapper)

@@ -3,15 +3,18 @@ import PostsService from "../api/PostsService";
 import Button from "../components/UI/Button";
 import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
+import InfoMessage from "../components/UI/InfoMessage";
+import { useAuth } from "../custom/useAuth";
 import "../styles/pages/Home.css";
 
 const Home = () => {
 	const [posts, setPosts] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [showCreateForm, setShowCreateForm] = useState(false);
+	const { user } = useAuth();
 
 	const getPosts = async () => {
-		await PostsService.getAllPosts()
+		await PostsService.getAllPosts(user?.token)
 			.then((postsFromServer) => setPosts(postsFromServer))
 			.catch((error) => console.error(error))
 			.then(() => setIsLoading(false));
@@ -49,7 +52,7 @@ const Home = () => {
 					Feel free to check out our posts and add one yourself.
 				</p>
 				{isLoading ? (
-					<p className="info__message">Loading Posts...</p>
+					<InfoMessage message={"Loading Posts..."} shouldAnimate />
 				) : (
 					<ul className="posts__list">
 						{posts.length > 0 ? (
@@ -64,7 +67,7 @@ const Home = () => {
 								/>
 							))
 						) : (
-							<p className="info__message no__animation">Seems there are no posts.</p>
+							<InfoMessage message={"Seems there are no posts."} />
 						)}
 					</ul>
 				)}

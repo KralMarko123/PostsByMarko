@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./auth/ProtectedRoute";
 import Home from "./pages/Home";
 import Details from "./pages/Details";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 const App = () => {
 	return (
@@ -26,6 +27,7 @@ const App = () => {
 				}
 			/>
 			<Route path={ROUTES.LOGIN} element={<Login />} />
+			<Route path={ROUTES.REGISTER} element={<Register />} />
 		</Routes>
 	);
 };

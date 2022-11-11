@@ -1,13 +1,14 @@
 ﻿using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Repos.Users;
 using AutoMapper;
+using Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
 
 [Route("/auth")]
-public class AuthController : BaseApiController
+public class AuthController : BaseController
 {
     private readonly IUsersRepository usersRepository;
     public AuthController(IUsersRepository usersRepository, IMapper mapper) : base(mapper)

@@ -14,10 +14,11 @@
 	--base-font-size: 18px;
 	--text-color: #f9f5eb;
 
-	/**WIDTHS, HEIGHTS, GAPS*/
-	--container-width: 1200px;
+	/**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
+	--container-width: 1500px;
 	--normal-gap: 1em;
 	--small-gap: 0.25em;
+	--page-padding: 3em 0em;
 
 	/**UTILITY*/
 	--card-radius: 0.25em;

@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-             .WithOrigins("http://localhost:3000", "https://delightful-stone-08266f803.2.azurestaticapps.net", "https://posts.markomarkovikj.com")
+             .WithOrigins("http://localhost:7171", "http://localhost:3000", "https://delightful-stone-08266f803.2.azurestaticapps.net", "https://posts.markomarkovikj.com")
              .AllowAnyHeader()
              .AllowAnyMethod();
         });
@@ -42,6 +42,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 builder.Services.AddIdentity<User, IdentityRole>(user =>
 {
+    user.Password.RequiredLength = 6;
     user.Password.RequireDigit = true;
     user.Password.RequireLowercase = true;
     user.Password.RequireUppercase = true;
@@ -50,6 +51,7 @@ builder.Services.AddIdentity<User, IdentityRole>(user =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swaggerOptions =>
 {
@@ -127,11 +129,12 @@ app.UseSwaggerUI(swaggerUIOptions =>
     swaggerUIOptions.RoutePrefix = string.Empty;
 });
 
+app.UseCors(postsCorsPolicy);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-app.UseCors(postsCorsPolicy);
 app.MapControllers();
 
 #endregion
