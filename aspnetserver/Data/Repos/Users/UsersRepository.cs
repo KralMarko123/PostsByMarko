@@ -81,9 +81,25 @@ namespace aspnetserver.Data.Repos.Users
 
         private JwtSecurityToken GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
         {
-            var jwtConfig = configuration.GetSection("JwtConfig");
+            var environment = configuration["Environment"];
+            IConfiguration jwtConfig = null;
+
+            switch (environment)
+            {
+                case "DEV":
+                    jwtConfig = configuration.GetSection("DevJwtConfig");
+                    break;
+                case "PRD":
+                    jwtConfig = configuration.GetSection("JwtConfig");
+                    break;
+                default:
+                    break;
+            }
+
             var token = new JwtSecurityToken
             (
+            issuer: jwtConfig.GetSection("validIssuers").Get<List<string>>().FirstOrDefault(),
+            audience: jwtConfig.GetSection("validAudiences").Get<List<string>>().FirstOrDefault(),
             claims: claims,
             expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
             signingCredentials: signingCredentials

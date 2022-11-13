@@ -15,9 +15,25 @@ using System.Text;
 
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
+var environment = builder.Configuration["Environment"];
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var postsCorsPolicy = "postsCorsPolicy";
+string[] policyAllowedOrigins = null;
+IConfigurationSection jwtConfig = null;
+
+switch (environment)
+{
+    case "DEV":
+        policyAllowedOrigins = new string[] { "http://localhost:7171", "http://localhost:3000" };
+        jwtConfig = builder.Configuration.GetSection("DevJwtConfig");
+        break;
+    case "PRD":
+        policyAllowedOrigins = new string[] { "https://posts-aspnetserver.azurewebsites.net/", "https://posts.markomarkovikj.com" };
+        jwtConfig = builder.Configuration.GetSection("JwtConfig");
+        break;
+    default:
+        break;
+}
 
 #region ServicesConfiguration
 
@@ -29,7 +45,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-             .WithOrigins("http://localhost:7171", "http://localhost:3000", "https://delightful-stone-08266f803.2.azurestaticapps.net", "https://posts.markomarkovikj.com")
+             .WithOrigins(policyAllowedOrigins)
              .AllowAnyHeader()
              .AllowAnyMethod();
         });

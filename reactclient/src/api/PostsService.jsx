@@ -44,7 +44,7 @@ const PostsService = {
 		})
 			.then((response) => {
 				if (response.ok) return true;
-				REATE_POST_ERROR("Error during post creation.");
+				CREATE_POST_ERROR("Error during post creation.");
 			})
 			.then((responseFromServer) => responseFromServer);
 	},

@@ -1,0 +1,65 @@
+.nav {
+	width: var(--container-width);
+	padding: 0.25em 0em;
+
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.nav__profile {
+	display: flex;
+	align-items: center;
+	gap: var(--normal-gap);
+}
+
+.profile__name {
+	color: var(--text-color);
+	white-space: nowrap;
+	font-size: 1.5em;
+}
+
+.profile__name span {
+	color: var(--light);
+	font-weight: bold;
+}
+
+.profile__separator {
+	width: 0.5em;
+
+	background-color: var(--text-color);
+	border-radius: var(--card-radius);
+	align-self: stretch;
+}
+
+.nav__profile .button {
+	padding: 0.125em 0.25em;
+
+	background-color: var(--dark-accent);
+	border-radius: var(--card-radius);
+	box-shadow: var(--simple-shadow);
+
+	color: var(--text-color);
+	font-size: 1.25em;
+	text-transform: uppercase;
+
+	cursor: pointer;
+}
+
+@media (max-width: 767px) {
+	.nav__profile {
+		gap: var(--normal-gap);
+	}
+
+	.profile__name {
+		font-size: 1em;
+	}
+
+	.profile__separator {
+		width: 0.35em;
+	}
+
+	.nav__profile .button {
+		font-size: 0.85em;
+	}
+}

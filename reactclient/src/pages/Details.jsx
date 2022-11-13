@@ -1,9 +1,10 @@
 import { React, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
-import PostsService from "../api/PostsService";
-import "../styles/pages/Details.css";
 import { useAuth } from "../custom/useAuth";
+import PostsService from "../api/PostsService";
+import Nav from "../components/Nav";
+import "../styles/pages/Details.css";
 
 const Details = () => {
 	const params = useParams();
@@ -39,6 +40,7 @@ const Details = () => {
 
 	return (
 		<div className="details page">
+			<Nav />
 			<div className="container">
 				<span className="container__back" onClick={() => navigate(ROUTES.HOME)}>
 					Back

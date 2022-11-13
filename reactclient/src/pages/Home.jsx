@@ -5,7 +5,7 @@ import Button from "../components/UI/Button";
 import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
 import InfoMessage from "../components/UI/InfoMessage";
-import ProfileNav from "../components/ProfileNav";
+import Nav from "../components/Nav";
 import "../styles/pages/Home.css";
 
 const Home = () => {
@@ -42,7 +42,7 @@ const Home = () => {
 
 	return (
 		<div className="home page">
-			<ProfileNav />
+			<Nav />
 			<CreatePostForm
 				isShown={showCreateForm}
 				onSubmit={() => getPosts()}
