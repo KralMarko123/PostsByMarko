@@ -23,7 +23,7 @@ const PostsService = {
 		return await fetch(`${ENDPOINT__URLS.GET_POST_BY_ID}/${postId}`, {
 			method: "GET",
 			headers: {
-				Authorization: userToken,
+				Authorization: `Bearer ${userToken}`,
 			},
 		})
 			.then((response) => {
@@ -38,13 +38,13 @@ const PostsService = {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: userToken,
+				Authorization: `Bearer ${userToken}`,
 			},
 			body: JSON.stringify(postToCreate),
 		})
 			.then((response) => {
-				if (response.ok) return response.json();
-				else throw new CREATE_POST_ERROR("Error during post creation.");
+				if (response.ok) return true;
+				REATE_POST_ERROR("Error during post creation.");
 			})
 			.then((responseFromServer) => responseFromServer);
 	},
@@ -54,12 +54,12 @@ const PostsService = {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: userToken,
+				Authorization: `Bearer ${userToken}`,
 			},
 			body: JSON.stringify(postToUpdate),
 		})
 			.then((response) => {
-				if (response.ok) return response.json();
+				if (response.ok) return true;
 				else throw new UPDATE_POST_ERROR(`Error during post update.`);
 			})
 			.then((responseFromServer) => responseFromServer);
@@ -69,11 +69,11 @@ const PostsService = {
 		return await fetch(`${ENDPOINT__URLS.DELETE_POST_BY_ID}/${postId}`, {
 			method: "DELETE",
 			headers: {
-				Authorization: userToken,
+				Authorization: `Bearer ${userToken}`,
 			},
 		})
 			.then((response) => {
-				if (response.ok) return response.json();
+				if (response.ok) return true;
 				else throw new DELETE_POST_ERROR(`Error during post deletion.`);
 			})
 			.then((responseFromServer) => responseFromServer);

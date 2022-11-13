@@ -1,10 +1,11 @@
 import { React, useState, useEffect } from "react";
+import { useAuth } from "../custom/useAuth";
 import PostsService from "../api/PostsService";
 import Button from "../components/UI/Button";
 import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
 import InfoMessage from "../components/UI/InfoMessage";
-import { useAuth } from "../custom/useAuth";
+import ProfileNav from "../components/ProfileNav";
 import "../styles/pages/Home.css";
 
 const Home = () => {
@@ -14,7 +15,7 @@ const Home = () => {
 	const { user } = useAuth();
 
 	const getPosts = async () => {
-		await PostsService.getAllPosts(user?.token)
+		await PostsService.getAllPosts(user.token)
 			.then((postsFromServer) => setPosts(postsFromServer))
 			.catch((error) => console.error(error))
 			.then(() => setIsLoading(false));
@@ -41,6 +42,7 @@ const Home = () => {
 
 	return (
 		<div className="home page">
+			<ProfileNav />
 			<CreatePostForm
 				isShown={showCreateForm}
 				onSubmit={() => getPosts()}

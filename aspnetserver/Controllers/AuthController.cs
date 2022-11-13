@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
 
-[Route("/auth")]
+[Route("")]
 public class AuthController : BaseController
 {
     private readonly IUsersRepository usersRepository;
@@ -33,7 +33,7 @@ public class AuthController : BaseController
     {
         return !await usersRepository.ValidateUserAsync(user)
             ? Unauthorized()
-            : Ok(new { Token = await usersRepository.CreateTokenAsync(), User = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
+            : Ok(new { Token = await usersRepository.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
     }
 
 }

@@ -3,10 +3,12 @@ import PostsService from "../../api/PostsService";
 import Button from "../UI/Button";
 import Modal from "../UI/Modal";
 import "../../styles/components/Form.css";
+import { useAuth } from "../../custom/useAuth";
 
 const DeletePostForm = (props) => {
 	const [message, setMessage] = useState(null);
 	const transitionDuration = 0.25;
+	const { user } = useAuth();
 
 	const onClose = () => {
 		props.onClose();
@@ -14,7 +16,7 @@ const DeletePostForm = (props) => {
 	};
 
 	const onDelete = async () => {
-		await PostsService.deletePostById(props.postId)
+		await PostsService.deletePostById(props.postId, user.token)
 			.then(() => {
 				setMessage({
 					type: "success",

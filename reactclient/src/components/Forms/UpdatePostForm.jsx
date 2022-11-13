@@ -2,6 +2,7 @@ import { React, useState, useRef } from "react";
 import PostsService from "../../api/PostsService";
 import Button from "../UI/Button";
 import Modal from "../UI/Modal";
+import { useAuth } from "../../custom/useAuth";
 import "../../styles/components/Form.css";
 
 const UpdatePostForm = (props) => {
@@ -9,6 +10,7 @@ const UpdatePostForm = (props) => {
 	const contentRef = useRef();
 	const [message, setMessage] = useState(null);
 	const transitionDuration = 0.25;
+	const { user } = useAuth();
 
 	const onClose = () => {
 		props.onClose();
@@ -31,7 +33,7 @@ const UpdatePostForm = (props) => {
 				content: contentRef.current.value,
 			};
 
-			await PostsService.updatePost(postToUpdate)
+			await PostsService.updatePost(postToUpdate, user.token)
 				.then(() => {
 					props.onSubmit(postToUpdate);
 					setMessage({

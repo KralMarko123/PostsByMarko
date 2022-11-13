@@ -19,7 +19,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var postsCorsPolicy = "postsCorsPolicy";
 
-
 #region ServicesConfiguration
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
@@ -102,7 +101,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuers = jwtConfig.GetSection("validIssuers").Get<List<string>>(),
         ValidAudiences = jwtConfig.GetSection("validAudiences").Get<List<string>>(),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["secret"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["secret"])),
     };
 });
 builder.Services.AddAuthorization(options =>
@@ -128,6 +127,7 @@ app.UseSwaggerUI(swaggerUIOptions =>
     swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
     swaggerUIOptions.RoutePrefix = string.Empty;
 });
+
 
 app.UseCors(postsCorsPolicy);
 

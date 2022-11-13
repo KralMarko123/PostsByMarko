@@ -3,7 +3,6 @@ using aspnetserver.Data.Repos.Posts;
 using AutoMapper;
 using Controllers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentTeacher.Controllers;
@@ -61,7 +60,7 @@ public class PostsController : BaseController
         else return BadRequest("Error during post update.");
     }
 
-    [HttpGet]
+    [HttpDelete]
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> DeletePostByIdAsync(int postId)

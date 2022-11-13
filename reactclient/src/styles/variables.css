@@ -15,7 +15,7 @@
 	--text-color: #f9f5eb;
 
 	/**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
-	--container-width: 1500px;
+	--container-width: 75%;
 	--normal-gap: 1em;
 	--small-gap: 0.25em;
 	--page-padding: 3em 0em;

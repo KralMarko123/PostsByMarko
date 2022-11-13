@@ -3,12 +3,14 @@ import PostsService from "../../api/PostsService";
 import Button from "../UI/Button";
 import Modal from "../UI/Modal";
 import "../../styles/components/Form.css";
+import { useAuth } from "../../custom/useAuth";
 
 const CreatePostForm = (props) => {
 	const titleRef = useRef();
 	const contentRef = useRef();
 	const [message, setMessage] = useState(null);
 	const transitionDuration = 0.25;
+	const { user } = useAuth();
 
 	const onClose = () => {
 		props.onClose();
@@ -22,7 +24,7 @@ const CreatePostForm = (props) => {
 				content: contentRef.current.value,
 			};
 
-			await PostsService.createPost(postToCreate)
+			await PostsService.createPost(postToCreate, user.token)
 				.then(() => {
 					props.onSubmit();
 					setMessage({

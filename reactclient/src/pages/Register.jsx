@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "../custom/useAuth";
+import { ROUTES } from "../constants/routes";
 import AuthService from "../api/AuthService";
 import RegisterForm from "../components/Forms/RegisterForm";
 import Button from "../components/UI/Button";
 import InfoMessage from "../components/UI/InfoMessage";
-import { ROUTES } from "../constants/routes";
-import { useAuth } from "../custom/useAuth";
 import "../styles/pages/Login.css";
 
 const Register = () => {

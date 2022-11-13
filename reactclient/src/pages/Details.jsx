@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import PostsService from "../api/PostsService";
 import "../styles/pages/Details.css";
+import { useAuth } from "../custom/useAuth";
 
 const Details = () => {
 	const params = useParams();
@@ -12,11 +13,12 @@ const Details = () => {
 		content: "",
 	});
 	const [isLoading, setIsLoading] = useState(true);
-	let navigate = useNavigate();
+	const navigate = useNavigate();
+	const { user } = useAuth();
 
 	useEffect(() => {
 		const getPost = async () => {
-			await PostsService.getPostById(postId)
+			await PostsService.getPostById(postId, user.token)
 				.then((postFromServer) => {
 					setPostDetails({
 						title: postFromServer.title,

@@ -26,7 +26,7 @@ namespace aspnetserver.Data.Repos.Users
         public async Task<object> GetUserDetailsForUsernameAsync(string userName)
         {
             user = await userManager.FindByNameAsync(userName);
-            return new{ user.UserName, user.Email, user.FirstName, user.LastName};
+            return new { user.UserName, user.Email, user.FirstName, user.LastName };
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)
@@ -49,9 +49,9 @@ namespace aspnetserver.Data.Repos.Users
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await GetClaimsAsync();
-            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+            var token = GenerateToken(signingCredentials, claims);
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -79,19 +79,17 @@ namespace aspnetserver.Data.Repos.Users
             return claims;
         }
 
-        private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
+        private JwtSecurityToken GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
         {
-            var jwtSettings = configuration.GetSection("JwtConfig");
-            var tokenOptions = new JwtSecurityToken
+            var jwtConfig = configuration.GetSection("JwtConfig");
+            var token = new JwtSecurityToken
             (
-            issuer: jwtSettings["validIssuer"],
-            audience: jwtSettings["validAudience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expiresIn"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
             signingCredentials: signingCredentials
             );
 
-            return tokenOptions;
+            return token;
         }
     }
 }
