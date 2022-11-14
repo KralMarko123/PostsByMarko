@@ -1,65 +1,121 @@
-.nav {
+.nav,
+.mobile__nav {
 	width: var(--container-width);
 	padding: 0.25em 0em;
+}
+
+.nav__content {
+	width: 100%;
 
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
-}
-
-.nav__profile {
-	display: flex;
-	align-items: center;
 	gap: var(--normal-gap);
 }
 
-.profile__name {
+.nav__username {
 	color: var(--text-color);
 	white-space: nowrap;
 	font-size: 1.5em;
+	text-transform: capitalize;
 }
 
-.profile__name span {
+.nav__username span {
 	color: var(--light);
 	font-weight: bold;
 }
 
-.profile__separator {
-	width: 0.5em;
+.nav__separator {
+	width: 0.25em;
 
 	background-color: var(--text-color);
 	border-radius: var(--card-radius);
 	align-self: stretch;
 }
 
-.nav__profile .button {
-	padding: 0.125em 0.25em;
+.nav__actions {
+	width: fit-content;
+	display: flex;
+	align-items: center;
+	gap: var(--small-gap);
+}
+
+.nav__actions .button {
+	padding: 0.25em 0.35em;
 
 	background-color: var(--dark-accent);
 	border-radius: var(--card-radius);
 	box-shadow: var(--simple-shadow);
 
 	color: var(--text-color);
-	font-size: 1.25em;
+	font-size: 1.5em;
 	text-transform: uppercase;
 
 	cursor: pointer;
 }
 
-@media (max-width: 767px) {
-	.nav__profile {
-		gap: var(--normal-gap);
+.nav__hamburger {
+	position: absolute;
+
+	display: none;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.hamburger__line {
+	display: block;
+	width: 2em;
+	height: 4px;
+
+	background: var(--text-color);
+	border-radius: var(--card-radius);
+
+	transform-origin: 4px 0px;
+
+	transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1),
+		background 0.5s cubic-bezier(0.77, 0.2, 0.05, 1), opacity 0.55s ease;
+}
+
+.hamburger__line:nth-of-type(1) {
+	transform-origin: 0% 0%;
+}
+
+.hamburger__line:nth-of-type(3) {
+	transform-origin: 0% 100%;
+}
+
+@media (max-width: 1199px) {
+	.mobile__nav {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 2em;
 	}
 
-	.profile__name {
-		font-size: 1em;
+	.nav__hamburger {
+		display: flex;
+		cursor: pointer;
 	}
 
-	.profile__separator {
-		width: 0.35em;
+	.nav__content {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+
+		background-color: rgba(0, 0, 0, 0.75);
+		opacity: 0;
 	}
 
-	.nav__profile .button {
-		font-size: 0.85em;
+	.nav__content > * {
+		transform: translateX(5000px);
+	}
+
+	.mobile__nav.open .nav__content {
+		opacity: 1;
+	}
+
+	.mobile__nav.open .nav__content > * {
+		transform: translateX(0);
 	}
 }
