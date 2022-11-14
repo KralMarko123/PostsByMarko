@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Button from "../UI/Button";
+import Button from "../Helper/Button";
 
 const RegisterForm = ({ onRegister }) => {
 	const firstNameRef = useRef();

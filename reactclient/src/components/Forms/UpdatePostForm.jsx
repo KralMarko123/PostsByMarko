@@ -1,7 +1,7 @@
 import { React, useState, useRef } from "react";
 import PostsService from "../../api/PostsService";
-import Button from "../UI/Button";
-import Modal from "../UI/Modal";
+import Button from "../Helper/Button";
+import Modal from "../Helper/Modal";
 import { useAuth } from "../../custom/useAuth";
 import "../../styles/components/Form.css";
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import AuthService from "../api/AuthService";
 import LoginForm from "../components/Forms/LoginForm";
-import InfoMessage from "../components/UI/InfoMessage";
+import InfoMessage from "../components/Helper/InfoMessage";
 import { ROUTES } from "../constants/routes";
 import { useAuth } from "../custom/useAuth";
 import "../styles/pages/Login.css";

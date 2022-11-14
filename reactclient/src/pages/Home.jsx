@@ -1,10 +1,10 @@
 import { React, useState, useEffect } from "react";
 import { useAuth } from "../custom/useAuth";
 import PostsService from "../api/PostsService";
-import Button from "../components/UI/Button";
+import Button from "../components/Helper/Button";
 import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
-import InfoMessage from "../components/UI/InfoMessage";
+import InfoMessage from "../components/Helper/InfoMessage";
 import Nav from "../components/Layout/Nav";
 import "../styles/pages/Home.css";
 
