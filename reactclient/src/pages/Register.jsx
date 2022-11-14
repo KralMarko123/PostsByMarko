@@ -11,6 +11,7 @@ import "../styles/pages/Login.css";
 const Register = () => {
 	const [hasRegistered, setHasRegistered] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState(null);
 	const navigate = useNavigate();
 	const { user } = useAuth();
 
@@ -22,6 +23,9 @@ const Register = () => {
 				setHasRegistered(true);
 			})
 			.catch((error) => {
+				error.message === "Duplicate Username"
+					? setErrorMessage("The username is already taken. Please use a different one.")
+					: setErrorMessage("Error during register, please try again.");
 				console.error(error.message);
 			})
 			.then(() => setIsLoading(false));
@@ -41,6 +45,7 @@ const Register = () => {
 						<h1 className="container__title">Register</h1>
 						<p className="container__description">Please use the form below to register</p>
 						<RegisterForm onRegister={(userToRegister) => onRegister(userToRegister)} />
+						{errorMessage && <p className="error__message">{errorMessage}</p>}
 					</>
 				) : (
 					<>

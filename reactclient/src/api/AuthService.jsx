@@ -10,12 +10,12 @@ const AuthService = {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(userToLogin),
-		})
-			.then((response) => {
-				if (response.ok) return response.json();
-				else throw new LOGIN_ERROR("Error during login.");
-			})
-			.then((responseFromServer) => responseFromServer);
+		}).then((response) => {
+			if (response.ok) return response.json();
+			else if (response.status === 401) {
+				throw new LOGIN_ERROR("Unauthorized");
+			}
+		});
 	},
 
 	async register(userToRegister) {
@@ -29,9 +29,15 @@ const AuthService = {
 		})
 			.then((response) => {
 				if (response.ok) return true;
-				else throw new REGISTER_ERROR("Error during login.");
+				else if (response.status === 400) return response.json();
 			})
-			.then((responseFromServer) => responseFromServer);
+			.then((responseObject) => {
+				responseObject.errors.forEach((error) => {
+					if (error.code.includes("Duplicate")) {
+						throw new REGISTER_ERROR("Duplicate Username");
+					}
+				});
+			});
 	},
 };
 

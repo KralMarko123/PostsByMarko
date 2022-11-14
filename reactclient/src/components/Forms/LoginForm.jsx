@@ -6,21 +6,29 @@ const LoginForm = ({ onLogin }) => {
 	const passwordRef = useRef();
 
 	const checkForEmptyFields = () => {
-		if (usernameRef.current.value.length === 0)
+		let hasEmptyFields = false;
+
+		if (usernameRef.current.value.length === 0) {
 			usernameRef.current.placeholder = "Please enter your username...";
-		if (passwordRef.current.value.length === 0)
+			hasEmptyFields = true;
+		}
+		if (passwordRef.current.value.length === 0) {
 			passwordRef.current.placeholder = "Please enter your password...";
+			hasEmptyFields = true;
+		}
+
+		return hasEmptyFields;
 	};
 
 	const handleLogin = async () => {
-		if (usernameRef.current.value.length > 0 && passwordRef.current.value.length > 0) {
+		let isValidLogin = !checkForEmptyFields();
+		if (isValidLogin) {
 			const userToLogin = {
 				username: usernameRef.current.value,
 				password: passwordRef.current.value,
 			};
 
 			await onLogin(userToLogin);
-			checkForEmptyFields();
 		}
 	};
 

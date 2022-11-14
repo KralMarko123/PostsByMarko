@@ -9,6 +9,7 @@ import "../styles/pages/Login.css";
 
 const Login = () => {
 	const [isLoading, setIsLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState(null);
 	const { user, login } = useAuth();
 	const navigate = useNavigate();
 
@@ -19,6 +20,9 @@ const Login = () => {
 				login(successfulLogin);
 			})
 			.catch((error) => {
+				error.message === "Unauthorized"
+					? setErrorMessage("Invalid Login, please check your credentials and try again.")
+					: setErrorMessage("Error during login, please try again later");
 				console.error(error.message);
 			})
 			.then(() => setIsLoading(false));
@@ -38,6 +42,8 @@ const Login = () => {
 						<h1 className="container__title">Login</h1>
 						<p className="container__description">Please use the form below to login</p>
 						<LoginForm onLogin={(userToLogin) => onLogin(userToLogin)} />
+
+						{errorMessage && <p className="error__message">{errorMessage}</p>}
 					</>
 				)}
 			</div>
