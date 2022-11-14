@@ -1,6 +1,6 @@
 .button {
 	width: 100%;
-	padding: 0.5em 0em;
+	padding: var(--small-padding) 0em;
 
 	outline: none;
 	border: none;

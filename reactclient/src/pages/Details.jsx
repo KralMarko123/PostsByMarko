@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { useAuth } from "../custom/useAuth";
 import PostsService from "../api/PostsService";
-import Nav from "../components/Nav";
+import Nav from "../components/Layout/Nav";
 import "../styles/pages/Details.css";
 
 const Details = () => {

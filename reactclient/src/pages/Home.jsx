@@ -5,7 +5,7 @@ import Button from "../components/UI/Button";
 import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
 import InfoMessage from "../components/UI/InfoMessage";
-import Nav from "../components/Nav";
+import Nav from "../components/Layout/Nav";
 import "../styles/pages/Home.css";
 
 const Home = () => {

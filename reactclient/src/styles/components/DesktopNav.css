@@ -1,0 +1,56 @@
+.nav {
+	width: var(--container-width);
+	min-height: var(--header-height);
+
+	z-index: 1;
+}
+
+.nav__content {
+	width: 100%;
+
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: var(--normal-gap);
+}
+
+.nav__username {
+	color: var(--text-color);
+	white-space: nowrap;
+	font-size: 1.5em;
+	text-transform: capitalize;
+}
+
+.nav__username span {
+	color: var(--light);
+	font-weight: bold;
+}
+
+.nav__separator {
+	width: 0.25em;
+
+	background-color: var(--text-color);
+	border-radius: var(--card-radius);
+	align-self: stretch;
+}
+
+.nav__actions {
+	width: fit-content;
+	display: flex;
+	align-items: center;
+	gap: var(--small-gap);
+}
+
+.nav__actions .button {
+	padding: 0.25em var(--small-padding);
+
+	background-color: var(--dark-accent);
+	border-radius: var(--card-radius);
+	box-shadow: var(--simple-shadow);
+
+	color: var(--text-color);
+	font-size: 1.5em;
+	text-transform: uppercase;
+
+	cursor: pointer;
+}

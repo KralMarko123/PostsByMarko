@@ -33,7 +33,7 @@
 .modal__container {
 	width: calc(var(--container-width) + var(--normal-gap));
 	height: fit-content;
-	padding: 2em;
+	padding: calc(var(--normal-padding) * 2);
 	margin-top: var(--normal-gap);
 
 	background-color: var(--dark-accent);
@@ -101,7 +101,7 @@
 
 	.modal__container {
 		width: var(--container-width);
-		padding: 1em;
+		padding: var(--normal-padding);
 	}
 
 	.modal__title {

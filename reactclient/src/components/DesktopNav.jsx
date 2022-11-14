@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../custom/useAuth";
-import Button from "./UI/Button";
-import "../styles/components/Nav.css";
+import Button from "./Helper/Button";
+import "../styles/components/DesktopNav.css";
 
-const Nav = () => {
+const DesktopNav = () => {
 	const { user, logout } = useAuth();
 	const [width, setWidth] = useState(window.innerWidth);
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -18,7 +18,7 @@ const Nav = () => {
 	}, []);
 
 	return (
-		<nav className={`${width <= 1199 ? `mobile__nav ${isExpanded ? `open` : ``}` : "nav"}`}>
+		<nav className="nav">
 			<ul className="nav__content">
 				<p className="nav__username">
 					Hello{" "}
@@ -31,14 +31,8 @@ const Nav = () => {
 					<Button onButtonClick={() => logout()} text={"Logout"} />
 				</div>
 			</ul>
-
-			<div className="nav__hamburger" onClick={() => setIsExpanded((prev) => !prev)}>
-				<span className="hamburger__line"></span>
-				<span className="hamburger__line"></span>
-				<span className="hamburger__line"></span>
-			</div>
 		</nav>
 	);
 };
 
-export default Nav;
+export default DesktopNav;

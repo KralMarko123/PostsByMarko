@@ -108,7 +108,7 @@
 @media (max-width: 767px) {
 	.post {
 		width: 100%;
-		padding: 2.5em 1em;
+		padding: 2.5em var(--normal-padding);
 	}
 
 	.post__icon {

@@ -18,18 +18,21 @@
 	--container-width: 75%;
 	--normal-gap: 1em;
 	--small-gap: 0.25em;
-	--page-padding: 1em 0em;
+	--small-padding: 0.5em;
+	--normal-padding: 1em;
 
 	/**UTILITY*/
 	--card-radius: 0.25em;
 	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
+	--page-padding: var(--small-padding) 0em;
+	--header-height: 2em;
 }
 
 /**TABLET*/
 @media (min-width: 768px) and (max-width: 1199px) {
 	:root {
 		/**WIDTHS, HEIGHTS, GAPS*/
-		--container-width: 95%;
+		--container-width: 90%;
 		--normal-gap: 0.75em;
 		--small-gap: 0.25em;
 	}
@@ -39,7 +42,7 @@
 @media (max-width: 767px) {
 	:root {
 		/**WIDTHS, HEIGHTS, GAPS*/
-		--container-width: 90%;
+		--container-width: 85%;
 		--normal-gap: 0.5em;
 		--small-gap: 0.25em;
 	}
