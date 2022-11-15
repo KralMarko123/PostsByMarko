@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useAuth } from "../custom/useAuth";
-import Button from "./Helper/Button";
-import "../styles/components/MobileNav.css";
+import { useAuth } from "../../custom/useAuth";
+import Button from "../Helper/Button";
+import "../../styles/components/MobileNav.css";
 
 const MobileNav = () => {
 	const { user, logout } = useAuth();

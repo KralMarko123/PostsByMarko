@@ -68,7 +68,7 @@
 	font-size: var(--big-text);
 	text-transform: uppercase;
 
-	animation: loading 2s ease-in infinite;
+	animation: fade-in-out 2s ease-in infinite;
 }
 
 .error__message {
@@ -78,20 +78,6 @@
 
 .no__animation {
 	animation: none;
-}
-
-@keyframes loading {
-	0% {
-		opacity: 1;
-	}
-
-	50% {
-		opacity: 0.5;
-	}
-
-	100% {
-		opacity: 1;
-	}
 }
 
 /**MOBILE*/

@@ -67,3 +67,18 @@
 		--huge-text: 2em;
 	}
 }
+
+/**ANIMATIONS*/
+
+@keyframes fade-in-out {
+	50% {
+		opacity: 0.5;
+	}
+}
+
+@keyframes dot-buffer {
+	50% {
+		opacity: 0.25;
+		transform: scale(0.75);
+	}
+}
