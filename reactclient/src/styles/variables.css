@@ -14,6 +14,12 @@
 	--base-font-size: 18px;
 	--text-color: #f9f5eb;
 
+	--s-text: 0.85em;
+	--md-text: 1.25em;
+	--lg-text: 1.5em;
+	--big-text: 2em;
+	--huge-text: 3em;
+
 	/**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
 	--container-width: 75%;
 	--normal-gap: 1em;
@@ -25,7 +31,7 @@
 	--card-radius: 0.5em;
 	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
 	--page-padding: var(--normal-padding) 0em;
-	--header-height: 2em;
+	--header-height: 3em;
 }
 
 /**TABLET*/
@@ -35,6 +41,13 @@
 		--container-width: 90%;
 		--normal-gap: 0.75em;
 		--small-gap: 0.25em;
+
+		/**TEXT*/
+		--s-text: 0.75em;
+		--md-text: 1.15em;
+		--lg-text: 1.35em;
+		--big-text: 2em;
+		--huge-text: 2.5em;
 	}
 }
 
@@ -45,5 +58,12 @@
 		--container-width: 90%;
 		--normal-gap: 0.5em;
 		--small-gap: 0.25em;
+
+		/**TEXT*/
+		--s-text: 0.75em;
+		--md-text: 1em;
+		--lg-text: 1.15em;
+		--big-text: 1.5em;
+		--huge-text: 2em;
 	}
 }

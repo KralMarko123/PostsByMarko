@@ -1,4 +1,4 @@
-.login .form {
+.register .form {
 	width: 100%;
 	align-self: center;
 
@@ -9,13 +9,13 @@
 	box-shadow: var(--simple-shadow);
 }
 
-.login .form__title {
+.register .form__title {
 	font-weight: bold;
 	align-self: center;
 	font-size: var(--huge-text);
 }
 
-.login .input {
+.register .input {
 	background: none;
 	outline: none;
 
@@ -23,11 +23,11 @@
 	color: var(--text-color);
 }
 
-.login .input:focus {
+.register .input:focus{
 	border-color: var(--light-accent);
 }
 
-.login__link {
+.register__link {
 	margin: var(--small-padding) 0em;
 	color: var(--light);
 	font-size: var(--lg-text);
@@ -35,6 +35,6 @@
 	cursor: pointer;
 }
 
-.login__link:hover {
+.register__link:hover {
 	color: var(--text-color);
 }

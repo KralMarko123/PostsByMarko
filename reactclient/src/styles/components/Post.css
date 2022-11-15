@@ -32,7 +32,7 @@
 	justify-content: center;
 	align-items: center;
 
-	font-size: 1em;
+	font-size: var(--md-text);
 }
 
 .post__id {
@@ -45,7 +45,7 @@
 
 .post__delete p {
 	font-weight: bold;
-	font-size: 1.5em;
+	font-size: var(--lg-text);
 }
 
 .post__delete:hover p {
@@ -73,7 +73,7 @@
 
 .post__title {
 	color: var(--light);
-	font-size: 2em;
+	font-size: var(--big-text);
 	font-weight: bold;
 }
 
@@ -88,10 +88,6 @@
 	.post {
 		width: calc((100% / 2) - var(--normal-gap));
 		padding: 2.5em 1.25em;
-	}
-
-	.post__title {
-		font-size: 2em;
 	}
 
 	.post__icon {

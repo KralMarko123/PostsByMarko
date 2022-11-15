@@ -25,18 +25,21 @@ const AuthService = {
 				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify(userToRegister),
+			body: JSON.stringify({ ...userToRegister, email: userToRegister.username }),
 		})
 			.then((response) => {
 				if (response.ok) return true;
 				else if (response.status === 400) return response.json();
 			})
 			.then((responseObject) => {
-				responseObject.errors.forEach((error) => {
-					if (error.code.includes("Duplicate")) {
-						throw new REGISTER_ERROR("Duplicate Username");
-					}
-				});
+				if (responseObject.errors) {
+					responseObject.errors.forEach((error) => {
+						if (error.code.includes("Duplicate")) {
+							throw new REGISTER_ERROR("Duplicate Username");
+						}
+					});
+				}
+				return responseObject;
 			});
 	},
 };

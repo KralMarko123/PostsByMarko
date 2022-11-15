@@ -56,13 +56,13 @@
 
 .modal__title {
 	color: var(--text-color);
-	font-size: 3em;
+	font-size: var(--huge-text);
 	font-weight: bold;
 	text-transform: uppercase;
 }
 
 .modal__message {
-	font-size: 2em;
+	font-size: var(--big-text);
 	text-align: center;
 }
 
@@ -83,14 +83,6 @@
 	.modal__container {
 		width: var(--container-width);
 	}
-
-	.modal__title {
-		font-size: 2.5em;
-	}
-
-	.modal__message {
-		font-size: 2em;
-	}
 }
 
 /**MOBILE*/
@@ -102,13 +94,5 @@
 	.modal__container {
 		width: var(--container-width);
 		padding: var(--normal-padding);
-	}
-
-	.modal__title {
-		font-size: 1.5em;
-	}
-
-	.modal__message {
-		font-size: 1em;
 	}
 }

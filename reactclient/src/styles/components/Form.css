@@ -14,7 +14,7 @@
 
 .input__label {
 	color: var(--light);
-	font-size: 1.25em;
+	font-size: var(--md-text);
 }
 
 .input {
@@ -23,12 +23,12 @@
 	border: none;
 
 	color: var(--dark);
-	font-size: 1.35em;
+	font-size: var(--lg-text);
 	resize: none;
 }
 
 .input::placeholder {
-	font-size: 0.85em;
+	font-size: var(--s-text);
 }
 
 .input:focus {
@@ -36,7 +36,7 @@
 }
 
 .form__group textarea {
-	font-size: 1em;
+	font-size: var(--md-text);
 }
 
 .form__actions {
@@ -47,33 +47,13 @@
 }
 
 .form__confirmational {
-	font-size: 2em;
+	font-size: var(--big-text);
 	text-align: justify;
-}
-
-/**TABLET*/
-@media (min-width: 768px) and (max-width: 1199px) {
-	.form__confirmational {
-		font-size: 1.5em;
-	}
 }
 
 /**MOBILE*/
 @media (max-width: 767px) {
-	.input__label {
-		font-size: 1em;
-	}
-
 	.input {
 		padding: 0.25em;
-		font-size: 1.15em;
-	}
-
-	.form__group textarea {
-		font-size: 0.95em;
-	}
-
-	.form__confirmational {
-		font-size: 1.25em;
 	}
 }

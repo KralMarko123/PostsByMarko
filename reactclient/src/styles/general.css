@@ -23,14 +23,14 @@
 	width: 100%;
 	word-wrap: break-word;
 
-	font-size: 3em;
+	font-size: var(--huge-text);
 	font-weight: bold;
 	line-height: 1;
 }
 
 .container__description {
 	color: var(--light);
-	font-size: 1.5em;
+	font-size: var(--lg-text);
 	line-height: 1.25;
 }
 
@@ -43,7 +43,7 @@
 	box-shadow: var(--simple-shadow);
 
 	color: var(--text-color);
-	font-size: 2em;
+	font-size: var(--big-text);
 	text-transform: uppercase;
 
 	cursor: pointer;
@@ -65,14 +65,14 @@
 	box-shadow: var(--simple-shadow);
 
 	color: var(--text-color);
-	font-size: 2em;
+	font-size: var(--big-text);
 	text-transform: uppercase;
 
 	animation: loading 2s ease-in infinite;
 }
 
 .error__message {
-	font-size: 1.25em;
+	font-size: var(--lg-text);
 	color: var(--danger);
 }
 
@@ -94,31 +94,16 @@
 	}
 }
 
-/**TABLET*/
-@media (min-width: 768px) and (max-width: 1199px) {
-}
-
 /**MOBILE*/
 @media (max-width: 767px) {
-	.container__title {
-		font-size: 2.5em;
-	}
-
-	.container__description {
-		font-size: 1.25em;
-	}
-
 	.container__back {
 		padding: 0.125em 0.25em;
-
-		font-size: 1.5em;
 	}
 
 	.info__message {
 		padding: 0.5em;
 		margin: 0.5em 0em;
 
-		font-size: 1.5em;
 		text-align: center;
 	}
 }
