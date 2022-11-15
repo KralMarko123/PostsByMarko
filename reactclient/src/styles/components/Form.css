@@ -23,8 +23,12 @@
 	border: none;
 
 	color: var(--dark);
-	font-size: 1.25em;
+	font-size: 1.35em;
 	resize: none;
+}
+
+.input::placeholder {
+	font-size: 0.85em;
 }
 
 .input:focus {

@@ -5,11 +5,16 @@
 	outline: none;
 	border: none;
 	background-color: var(--light-accent);
-	border-radius: var(--card-radius);
+	border-radius: 0.25em;
 
 	color: var(--text-color);
 	font-size: 1.5em;
 	text-align: center;
+	text-transform: uppercase;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	cursor: pointer;
 }

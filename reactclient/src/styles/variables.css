@@ -22,9 +22,9 @@
 	--normal-padding: 1em;
 
 	/**UTILITY*/
-	--card-radius: 0.25em;
+	--card-radius: 0.5em;
 	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
-	--page-padding: var(--small-padding) 0em;
+	--page-padding: var(--normal-padding) 0em;
 	--header-height: 2em;
 }
 
@@ -42,7 +42,7 @@
 @media (max-width: 767px) {
 	:root {
 		/**WIDTHS, HEIGHTS, GAPS*/
-		--container-width: 85%;
+		--container-width: 90%;
 		--normal-gap: 0.5em;
 		--small-gap: 0.25em;
 	}

@@ -1,7 +1,8 @@
 import React from "react";
+import Loader from "./Loader";
 import "../../styles/components/Button.css";
 
-const Button = ({ onButtonClick, text }) => {
+const Button = ({ onButtonClick, text, loading }) => {
 	const onClick = (e) => {
 		e.preventDefault();
 		onButtonClick();
@@ -9,7 +10,7 @@ const Button = ({ onButtonClick, text }) => {
 
 	return (
 		<button className="button" onClick={(e) => onClick(e)}>
-			{text}
+			{loading ? <Loader /> : text}
 		</button>
 	);
 };

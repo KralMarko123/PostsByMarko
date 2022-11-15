@@ -1,0 +1,36 @@
+.login .form {
+	width: 100%;
+	align-self: center;
+
+	background-color: var(--dark-accent);
+	padding: calc(var(--normal-padding) * 2);
+	border-radius: var(--card-radius);
+
+	box-shadow: var(--simple-shadow);
+}
+
+.login .form__title {
+	font-weight: bold;
+	align-self: center;
+	font-size: 3em;
+}
+
+.login .input {
+	background: none;
+	outline: none;
+
+	border-bottom: solid 3px var(--light);
+	color: var(--text-color);
+}
+
+.register__link {
+	margin: var(--small-padding) 0em;
+	color: var(--light);
+	font-size: 1.25em;
+
+	cursor: pointer;
+}
+
+.register__link:hover {
+	color: var(--text-color);
+}
