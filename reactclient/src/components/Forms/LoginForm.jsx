@@ -84,7 +84,7 @@ const LoginForm = () => {
 				<Button onButtonClick={() => handleLogin()} text="Login" loading={isLoading} />
 			</div>
 
-			<p className="register__link" onClick={() => navigate(ROUTES.REGISTER)}>
+			<p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
 				Haven't registered yet? Click here to create an account
 			</p>
 

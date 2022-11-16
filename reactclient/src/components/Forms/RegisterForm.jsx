@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../constants/routes";
+import { FORMS } from "../../constants/forms";
 import Button from "../Helper/Button";
 import AuthService from "../../api/AuthService";
 
 const RegisterForm = () => {
+	const registerForm = FORMS.registerForm;
 	const [registerData, setRegisterData] = useState({
 		firstName: "",
 		lastName: "",
@@ -13,8 +15,11 @@ const RegisterForm = () => {
 		confirmPassword: "",
 	});
 	const [isLoading, setIsLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState(null);
-	const [hasRegistered, setHasRegistered] = useState(false);
+	const [errors, setErrors] = useState({
+		title: "",
+		messages: [],
+	});
+	const [isRegistered, setIsRegistered] = useState(false);
 	const navigate = useNavigate();
 
 	const checkForEmptyFields = () => {
@@ -22,27 +27,27 @@ const RegisterForm = () => {
 
 		if (registerData.firstName === "") {
 			hasEmptyFields = true;
-			setErrorMessage("First Name can't be empty");
+			setErrors({ ...errors, title: "First Name can't be empty" });
 		}
 
 		if (registerData.lastName === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Last Name can't be empty");
+			setErrors({ ...errors, title: "Last Name can't be empty" });
 		}
 
 		if (registerData.username === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Username can't be empty");
+			setErrors({ ...errors, title: "Username Name can't be empty" });
 		}
 
 		if (registerData.password === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Password can't be empty");
+			setErrors({ ...errors, title: "Password can't be empty" });
 		}
 
 		if (registerData.confirmPassword === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Confirm Password can't be empty");
+			setErrors({ ...errors, title: "Confirm Password can't be empty" });
 		}
 
 		return hasEmptyFields;
@@ -50,134 +55,123 @@ const RegisterForm = () => {
 
 	const checkUsername = () => {
 		if (!/^\S+@\S+\.\S+$/.test(registerData.username)) {
-			setErrorMessage("Username is invalid");
+			setErrors({
+				title: "Invalid Username",
+				messages: ["Username should be a valid email address"],
+			});
 			return false;
 		} else return true;
 	};
 
 	const checkPassword = () => {
 		if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(registerData.password)) {
-			setErrorMessage("Password does not meet the requirements");
+			setErrors({
+				title: "Password does not meet the requirements",
+				messages: [
+					"Should be at least six characters long",
+					"Have one lowercase letter",
+					"Have one uppercase letter",
+					"Have one digit",
+				],
+			});
 			return false;
 		} else return true;
 	};
 
-	const checkPasswordsMAtching = () => {
+	const checkPasswordsAreMatching = () => {
 		if (registerData.password !== registerData.confirmPassword) {
-			setErrorMessage("Passwords do not match");
+			setErrors({ ...errors, title: "Passwords do not match" });
 			return false;
 		} else return true;
 	};
 
 	const handleRegister = async () => {
 		let isValidRegister =
-			!checkForEmptyFields() && checkUsername() && checkPassword() && checkPasswordsMAtching();
+			!checkForEmptyFields() && checkUsername() && checkPassword() && checkPasswordsAreMatching();
 
 		if (isValidRegister) {
-			setErrorMessage(null);
+			setErrors(null);
 			setIsLoading(true);
 
 			await AuthService.register(registerData)
 				.then((responseFromServer) => {
 					if (responseFromServer) {
-						setHasRegistered(true);
-						setErrorMessage(null);
-					} else setErrorMessage("Error during register, please try again.");
+						setIsRegistered(true);
+						setErrors(null);
+					} else setErrors({ ...errors, title: "Error during register, please try again" });
 				})
 				.catch((error) => {
 					error.message === "Duplicate Username"
-						? setErrorMessage("The username is already taken. Please use a different one.")
-						: setErrorMessage("Error during register, please try again.");
+						? setErrors({
+								...errors,
+								title: "The username is already taken. Please use a different one.",
+						  })
+						: setErrors({ ...errors, title: "Error during register, please try again" });
 					console.error(error.message);
 				})
 				.then(() => setIsLoading(false));
 		}
 	};
 
-	return !hasRegistered ? (
+	return !isRegistered ? (
 		<>
-			<form action="POST" className="form">
-				<h1 className="form__title">Register</h1>
-				<div className="form__group">
-					<label htmlFor="firstName" className="input__label">
-						First Name
-					</label>
-					<input
-						id="firstName"
-						type="text"
-						className="input"
-						placeholder="Enter your first name"
-						onChange={(e) => setRegisterData({ ...registerData, firstName: e.currentTarget.value })}
-					/>
-				</div>
+			<form action={registerForm.action} className="form">
+				<h1 className="form__title">{registerForm.formTitle}</h1>
+				{registerForm.formGroups.map((group) => (
+					<div key={group.id} className="form__group">
+						<label htmlFor={group.id} className="input__label">
+							{group.label}
+						</label>
+						<input
+							id={group.id}
+							type={group.type}
+							className="input"
+							placeholder={group.placeholder}
+							onChange={(e) =>
+								setRegisterData({ ...registerData, [`${group.id}`]: e.currentTarget.value })
+							}
+						/>
 
-				<div className="form__group">
-					<label htmlFor="lastName" className="input__label">
-						Last Name
-					</label>
-					<input
-						id="lastName"
-						type="text"
-						className="input"
-						placeholder="Enter your last name"
-						onChange={(e) => setRegisterData({ ...registerData, lastName: e.currentTarget.value })}
-					/>
-				</div>
-
-				<div className="form__group">
-					<label htmlFor="username" className="input__label">
-						Username
-					</label>
-					<input
-						id="username"
-						type="text"
-						className="input"
-						placeholder="Enter a valid email address"
-						onChange={(e) => setRegisterData({ ...registerData, username: e.currentTarget.value })}
-					/>
-				</div>
-
-				<div className="form__group">
-					<label htmlFor="password" className="input__label">
-						Password
-					</label>
-					<input
-						id="password"
-						type="password"
-						className="input"
-						placeholder="Enter your password"
-						onChange={(e) => setRegisterData({ ...registerData, password: e.currentTarget.value })}
-					/>
-				</div>
-
-				<div className="form__group">
-					<label htmlFor="confirmPassword" className="input__label">
-						Confirm Password
-					</label>
-					<input
-						id="confirmPassword"
-						type="password"
-						className="input"
-						placeholder="Confirm your password"
-						onChange={(e) =>
-							setRegisterData({ ...registerData, confirmPassword: e.currentTarget.value })
-						}
-					/>
-				</div>
+						{group.tooltip && (
+							<div className="form__group-tooltip">
+								<p className="tooltip__message">{group.tooltip}</p>
+								{group.requirements && (
+									<ul className="tooltip__list">
+										{group.requirements.map((r) => (
+											<li key={r} className="tooltip__list-item">
+												{r}
+											</li>
+										))}
+									</ul>
+								)}
+							</div>
+						)}
+					</div>
+				))}
 
 				<div className="form__actions">
 					<Button onButtonClick={() => handleRegister()} text="Register" loading={isLoading} />
 				</div>
 
-				<p className="register__link" onClick={() => navigate(ROUTES.LOGIN)}>
+				<p className="link" onClick={() => navigate(ROUTES.LOGIN)}>
 					Already have an account? Click here to log in
 				</p>
 
-				{errorMessage && <p className="error__message">{errorMessage}</p>}
+				{errors && (
+					<>
+						<p className="error error__message">{errors.title}</p>
+						{errors.messages.length > 0 &&
+							errors.messages.map((m) => (
+								<p key={m} className="error__message">
+									{m}
+								</p>
+							))}
+					</>
+				)}
 			</form>
 		</>
 	) : (
-		<p className="register__link" onClick={() => navigate(ROUTES.LOGIN)}>
+		<p className="link" onClick={() => navigate(ROUTES.LOGIN)}>
 			You have successfully registered. Click here to log in
 		</p>
 	);

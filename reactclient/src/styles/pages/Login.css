@@ -26,15 +26,3 @@
 .login .input:focus {
 	border-color: var(--light-accent);
 }
-
-.login__link {
-	margin: var(--small-padding) 0em;
-	color: var(--light);
-	font-size: var(--lg-text);
-
-	cursor: pointer;
-}
-
-.login__link:hover {
-	color: var(--text-color);
-}

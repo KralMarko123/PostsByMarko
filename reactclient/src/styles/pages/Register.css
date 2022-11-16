@@ -23,18 +23,6 @@
 	color: var(--text-color);
 }
 
-.register .input:focus{
+.register .input:focus {
 	border-color: var(--light-accent);
-}
-
-.register__link {
-	margin: var(--small-padding) 0em;
-	color: var(--light);
-	font-size: var(--lg-text);
-
-	cursor: pointer;
-}
-
-.register__link:hover {
-	color: var(--text-color);
 }

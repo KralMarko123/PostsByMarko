@@ -15,10 +15,10 @@
 	--text-color: #f9f5eb;
 
 	--s-text: 0.85em;
-	--md-text: 1.25em;
-	--lg-text: 1.5em;
-	--big-text: 2em;
-	--huge-text: 3em;
+	--md-text: 1em;
+	--lg-text: 1.25em;
+	--big-text: 1.75em;
+	--huge-text: 2.5em;
 
 	/**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
 	--container-width: 75%;
@@ -44,10 +44,10 @@
 
 		/**TEXT*/
 		--s-text: 0.75em;
-		--md-text: 1.15em;
-		--lg-text: 1.35em;
-		--big-text: 2em;
-		--huge-text: 2.5em;
+		--md-text: 1em;
+		--lg-text: 1.15em;
+		--big-text: 1.5em;
+		--huge-text: 2.15em;
 	}
 }
 
@@ -61,10 +61,10 @@
 
 		/**TEXT*/
 		--s-text: 0.75em;
-		--md-text: 1em;
+		--md-text: 0.95em;
 		--lg-text: 1.15em;
-		--big-text: 1.5em;
-		--huge-text: 2em;
+		--big-text: 1.35em;
+		--huge-text: 1.85em;
 	}
 }
 

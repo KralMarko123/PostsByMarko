@@ -71,13 +71,29 @@
 	animation: fade-in-out 2s ease-in infinite;
 }
 
-.error__message {
+.error {
 	font-size: var(--lg-text);
+	font-weight: bold;
+}
+
+.error__message {
+	font-size: var(--md-text);
 	color: var(--danger);
 }
 
 .no__animation {
 	animation: none;
+}
+
+.link {
+	color: var(--light);
+	font-size: var(--lg-text);
+	cursor: pointer;
+}
+
+.link:hover,
+.link:focus {
+	color: var(--text-color);
 }
 
 /**MOBILE*/
