@@ -30,12 +30,6 @@ export const FORMS = {
 				label: "Password",
 				type: "password",
 				placeholder: "Enter your password",
-				requirements: [
-					"Be atleast six characters long",
-					"Have one uppercase letter",
-					"Have one lowercase letter",
-					"Have one digit",
-				],
 			},
 
 			{
@@ -43,6 +37,26 @@ export const FORMS = {
 				label: "Confirm Password",
 				type: "password",
 				placeholder: "Confirm your password",
+			},
+		],
+	},
+
+	loginForm: {
+		action: "POST",
+		formTitle: "Login",
+		formGroups: [
+			{
+				id: "username",
+				label: "Username",
+				type: "text",
+				placeholder: "Enter your username",
+			},
+
+			{
+				id: "password",
+				label: "Password",
+				type: "password",
+				placeholder: "Enter your password",
 			},
 		],
 	},

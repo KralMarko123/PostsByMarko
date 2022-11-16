@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import Button from "../Helper/Button";
-import AuthService from "../../api/AuthService";
 import { useAuth } from "../../custom/useAuth";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../constants/routes";
+import { FORMS } from "../../constants/forms";
+import Button from "../Helper/Button";
+import AuthService from "../../api/AuthService";
 
 const LoginForm = () => {
+	const loginForm = FORMS.loginForm;
 	const [loginData, setLoginData] = useState({
 		username: "",
 		password: "",
 	});
 	const [isLoading, setIsLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState(null);
+	const [errors, setErrors] = useState({
+		title: "",
+		messages: [],
+	});
 	const { login } = useAuth();
 	const navigate = useNavigate();
 
@@ -20,12 +25,12 @@ const LoginForm = () => {
 
 		if (loginData.username === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Username can't be empty");
+			setErrors({ title: "Username can't be empty", messages: [] });
 		}
 
 		if (loginData.password === "") {
 			hasEmptyFields = true;
-			setErrorMessage("Password can't be empty");
+			setErrors({ title: "Password can't be empty", messages: [] });
 		}
 
 		return hasEmptyFields;
@@ -35,15 +40,20 @@ const LoginForm = () => {
 		let isValidLogin = !checkForEmptyFields();
 
 		if (isValidLogin) {
+			setErrors(null);
 			setIsLoading(true);
+
 			await AuthService.login(loginData)
 				.then((successfulLogin) => {
 					login(successfulLogin);
 				})
 				.catch((error) => {
 					error.message === "Unauthorized"
-						? setErrorMessage("Invalid Login, please check your credentials and try again.")
-						: setErrorMessage("Error during login, please try again later");
+						? setErrors({
+								title: "Invalid Login, please check your credentials and try again.",
+								messages: [],
+						  })
+						: setErrors({ title: "Error during login, please try again later", messages: [] });
 					console.error(error.message);
 				})
 				.then(() => setIsLoading(false));
@@ -52,43 +62,41 @@ const LoginForm = () => {
 	};
 
 	return (
-		<form action="POST" className="form">
-			<h1 className="form__title">Login</h1>
-			<div className="form__group">
-				<label htmlFor="username" className="input__label">
-					Username
-				</label>
-				<input
-					id="username"
-					type="text"
-					className="input"
-					placeholder="Enter your username"
-					onChange={(e) => setLoginData({ ...loginData, username: e.currentTarget.value })}
-				/>
-			</div>
-
-			<div className="form__group">
-				<label htmlFor="password" className="input__label">
-					Password
-				</label>
-				<input
-					id="password"
-					type="password"
-					className="input"
-					placeholder="Enter your password"
-					onChange={(e) => setLoginData({ ...loginData, password: e.currentTarget.value })}
-				/>
-			</div>
+		<form action={loginForm.action} className="form">
+			<h1 className="form__title">{loginForm.formTitle}</h1>
+			{loginForm.formGroups.map((group) => (
+				<div key={group.id} className="form__group">
+					<label htmlFor={group.id} className="input__label">
+						{group.label}
+					</label>
+					<input
+						id={group.id}
+						type={group.type}
+						className="input"
+						placeholder={group.placeholder}
+						onChange={(e) => setLoginData({ ...loginData, [`${group.id}`]: e.currentTarget.value })}
+					/>
+				</div>
+			))}
 
 			<div className="form__actions">
 				<Button onButtonClick={() => handleLogin()} text="Login" loading={isLoading} />
 			</div>
-
 			<p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
 				Haven't registered yet? Click here to create an account
 			</p>
 
-			{errorMessage && <p className="error__message">{errorMessage}</p>}
+			{errors && (
+				<>
+					<p className="error error__message">{errors.title}</p>
+					{errors.messages.length > 0 &&
+						errors.messages.map((m) => (
+							<p key={m} className="error__message">
+								{m}
+							</p>
+						))}
+				</>
+			)}
 		</form>
 	);
 };

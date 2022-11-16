@@ -27,27 +27,27 @@ const RegisterForm = () => {
 
 		if (registerData.firstName === "") {
 			hasEmptyFields = true;
-			setErrors({ ...errors, title: "First Name can't be empty" });
+			setErrors({ title: "First Name can't be empty", messages: [] });
 		}
 
 		if (registerData.lastName === "") {
 			hasEmptyFields = true;
-			setErrors({ ...errors, title: "Last Name can't be empty" });
+			setErrors({ title: "Last Name can't be empty", messages: [] });
 		}
 
 		if (registerData.username === "") {
 			hasEmptyFields = true;
-			setErrors({ ...errors, title: "Username Name can't be empty" });
+			setErrors({ title: "Username can't be empty", messages: [] });
 		}
 
 		if (registerData.password === "") {
 			hasEmptyFields = true;
-			setErrors({ ...errors, title: "Password can't be empty" });
+			setErrors({ title: "Password can't be empty", messages: [] });
 		}
 
 		if (registerData.confirmPassword === "") {
 			hasEmptyFields = true;
-			setErrors({ ...errors, title: "Confirm Password can't be empty" });
+			setErrors({ title: "Confirm Password can't be empty", messages: [] });
 		}
 
 		return hasEmptyFields;
@@ -64,23 +64,29 @@ const RegisterForm = () => {
 	};
 
 	const checkPassword = () => {
-		if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(registerData.password)) {
-			setErrors({
-				title: "Password does not meet the requirements",
-				messages: [
-					"Should be at least six characters long",
-					"Have one lowercase letter",
-					"Have one uppercase letter",
-					"Have one digit",
-				],
-			});
-			return false;
-		} else return true;
+		let passwordIsValid = true;
+		let messages = [];
+
+		if (!/^.{6,}$/.test(registerData.password))
+			messages.push("Should be at least six characters long");
+
+		if (!/(?=.*[a-z])/.test(registerData.password)) messages.push("Have one lowercase letter");
+
+		if (!/(?=.*[A-Z])/.test(registerData.password)) messages.push("Have one uppercase letter");
+
+		if (!/(?=.*\d)/.test(registerData.password)) messages.push("Have one digit");
+
+		if (messages.length > 0) {
+			passwordIsValid = false;
+			setErrors({ title: "Password does not meet the requirements", messages: messages });
+		}
+
+		return passwordIsValid;
 	};
 
 	const checkPasswordsAreMatching = () => {
 		if (registerData.password !== registerData.confirmPassword) {
-			setErrors({ ...errors, title: "Passwords do not match" });
+			setErrors({ title: "Passwords do not match", messages: [] });
 			return false;
 		} else return true;
 	};
@@ -97,16 +103,15 @@ const RegisterForm = () => {
 				.then((responseFromServer) => {
 					if (responseFromServer) {
 						setIsRegistered(true);
-						setErrors(null);
-					} else setErrors({ ...errors, title: "Error during register, please try again" });
+					} else setErrors({ title: "Error during register, please try again", messages: [] });
 				})
 				.catch((error) => {
 					error.message === "Duplicate Username"
 						? setErrors({
-								...errors,
 								title: "The username is already taken. Please use a different one.",
+								messages: [],
 						  })
-						: setErrors({ ...errors, title: "Error during register, please try again" });
+						: setErrors({ title: "Error during register, please try again", messages: [] });
 					console.error(error.message);
 				})
 				.then(() => setIsLoading(false));
@@ -131,21 +136,6 @@ const RegisterForm = () => {
 								setRegisterData({ ...registerData, [`${group.id}`]: e.currentTarget.value })
 							}
 						/>
-
-						{group.tooltip && (
-							<div className="form__group-tooltip">
-								<p className="tooltip__message">{group.tooltip}</p>
-								{group.requirements && (
-									<ul className="tooltip__list">
-										{group.requirements.map((r) => (
-											<li key={r} className="tooltip__list-item">
-												{r}
-											</li>
-										))}
-									</ul>
-								)}
-							</div>
-						)}
 					</div>
 				))}
 
