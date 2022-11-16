@@ -53,51 +53,6 @@
 	text-align: justify;
 }
 
-.form__group-tooltip {
-	padding: var(--small-padding);
-	position: absolute;
-	top: 0%;
-	right: 0;
-
-	background-color: var(--light);
-	border-radius: var(--card-radius);
-
-	color: var(--dark);
-
-	visibility: hidden;
-	opacity: 0;
-	z-index: 2;
-	transition: opacity 0.25s ease-in-out;
-	transform: translateY(-50%);
-}
-
-.input:focus + .form__group-tooltip {
-	visibility: visible;
-	opacity: 1;
-}
-
-.form__group-tooltip::after {
-	content: "";
-	position: absolute;
-	bottom: -0.5em;
-	left: 50%;
-
-	width: 1em;
-	height: 1em;
-	background-color: var(--light);
-
-	transform: translateX(-50%) rotate(45deg);
-}
-
-.tooltip__message {
-	font-size: var(--md-text);
-	margin-bottom: var(--small-gap);
-}
-
-.tooltip__list {
-	font-size: var(--s-text);
-}
-
 /**MOBILE*/
 @media (max-width: 767px) {
 	.input {
