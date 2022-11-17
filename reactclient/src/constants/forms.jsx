@@ -60,4 +60,22 @@ export const FORMS = {
 			},
 		],
 	},
+
+	createPostForm: {
+		action: "POST",
+		formTitle: "Create A Post",
+		formGroups: [
+			{
+				id: "title",
+				label: "Title",
+				type: "text",
+			},
+
+			{
+				id: "content",
+				label: "Content",
+				type: "textarea",
+			},
+		],
+	},
 };

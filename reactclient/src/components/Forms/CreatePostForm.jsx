@@ -1,13 +1,17 @@
-import { React, useState, useRef } from "react";
+import { React, useState } from "react";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
-import "../../styles/components/Form.css";
 import { useAuth } from "../../custom/useAuth";
+import { FORMS } from "../../constants/forms";
+import "../../styles/components/Form.css";
 
 const CreatePostForm = (props) => {
-	const titleRef = useRef();
-	const contentRef = useRef();
+	const createPostForm = FORMS.createPostForm;
+	const [newPostData, setNewPostData] = useState({
+		title: "",
+		content: "",
+	});
 	const [message, setMessage] = useState(null);
 	const transitionDuration = 0.25;
 	const { user } = useAuth();
@@ -15,13 +19,40 @@ const CreatePostForm = (props) => {
 	const onClose = () => {
 		props.onClose();
 		setMessage(null);
+		setNewPostData({
+			title: "",
+			content: "",
+		});
+	};
+
+	const checkForEmptyFields = () => {
+		let hasEmptyField = false;
+
+		if (newPostData.title === "") {
+			hasEmptyField = true;
+			setMessage({
+				type: "fail",
+				message: "Title can't be empty",
+			});
+		}
+
+		if (newPostData.content === "") {
+			hasEmptyField = true;
+			setMessage({
+				type: "fail",
+				message: "Content can't be empty",
+			});
+		}
+
+		return hasEmptyField;
 	};
 
 	const onSubmit = async () => {
-		if (titleRef.current.value.length > 0 && contentRef.current.value.length > 0) {
+		let isValidPost = !checkForEmptyFields();
+		if (isValidPost) {
 			const postToCreate = {
-				title: titleRef.current.value,
-				content: contentRef.current.value,
+				title: newPostData.title,
+				content: newPostData.content,
 			};
 
 			await PostsService.createPost(postToCreate, user.token)
@@ -43,34 +74,42 @@ const CreatePostForm = (props) => {
 					});
 				});
 		}
-
-		if (titleRef.current.value.length === 0)
-			titleRef.current.placeholder = "Please enter a title...";
-		if (contentRef.current.value.length === 0)
-			contentRef.current.placeholder = "Please add some content...";
 	};
 
 	return (
 		<Modal
 			isShown={props.isShown}
-			title="Create Form"
+			title={createPostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}
 			duration={transitionDuration}
 		>
-			<form className="form">
-				<div className="form__group">
-					<label htmlFor="title" className="input__label">
-						Title
-					</label>
-					<input id="title" type="text" className="input" ref={titleRef} />
-				</div>
-				<div className="form__group">
-					<label htmlFor="content" className="input__label">
-						Content
-					</label>
-					<textarea id="content" className="input" ref={contentRef} />
-				</div>
+			<form method={createPostForm.action} className="form">
+				{createPostForm.formGroups.map((group) => (
+					<div key={group.id} className="form__group">
+						<label htmlFor={group.id} className="input__label">
+							{group.label}
+						</label>
+						{group.type === "textarea" ? (
+							<textarea
+								id={group.id}
+								className="input"
+								onChange={(e) =>
+									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
+								}
+							/>
+						) : (
+							<input
+								id={group.id}
+								type={group.type}
+								className="input"
+								onChange={(e) =>
+									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
+								}
+							/>
+						)}
+					</div>
+				))}
 
 				<div className="form__actions">
 					<Button onButtonClick={() => onSubmit()} text="Submit" />
@@ -80,5 +119,4 @@ const CreatePostForm = (props) => {
 		</Modal>
 	);
 };
-
 export default CreatePostForm;
