@@ -1,9 +1,9 @@
 import { React, useState } from "react";
+import { useAuth } from "../../custom/useAuth";
+import { FORMS } from "../../constants/forms";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
-import { useAuth } from "../../custom/useAuth";
-import { FORMS } from "../../constants/forms";
 import "../../styles/components/Form.css";
 
 const CreatePostForm = (props) => {

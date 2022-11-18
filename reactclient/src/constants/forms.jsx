@@ -78,4 +78,22 @@ export const FORMS = {
 			},
 		],
 	},
+
+	updatePostForm: {
+		action: "POST",
+		formTitle: "Update Post",
+		formGroups: [
+			{
+				id: "title",
+				label: "Title",
+				type: "text",
+			},
+
+			{
+				id: "content",
+				label: "Content",
+				type: "textarea",
+			},
+		],
+	},
 };

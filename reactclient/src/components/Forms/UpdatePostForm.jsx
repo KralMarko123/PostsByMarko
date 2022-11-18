@@ -1,13 +1,17 @@
 import { React, useState, useRef } from "react";
+import { useAuth } from "../../custom/useAuth";
+import { FORMS } from "../../constants/forms";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
-import { useAuth } from "../../custom/useAuth";
 import "../../styles/components/Form.css";
 
 const UpdatePostForm = (props) => {
-	const titleRef = useRef();
-	const contentRef = useRef();
+	const updatePostForm = FORMS.updatePostForm;
+	const [postData, setPostData] = useState({
+		title: props.title,
+		content: props.content,
+	});
 	const [message, setMessage] = useState(null);
 	const transitionDuration = 0.25;
 	const { user } = useAuth();
@@ -17,20 +21,50 @@ const UpdatePostForm = (props) => {
 		setMessage(null);
 	};
 
-	const onSubmit = async () => {
-		if (titleRef.current.value === props.title && contentRef.current.value === props.content) {
+	const checkForSameData = () => {
+		let hasSameData = false;
+
+		if (postData.title === props.title && postData.content === props.content) {
 			setMessage({
-				message: "Can't update with same data.",
+				message: "Can't update with same data",
 				type: "fail",
 			});
-			return;
+			hasSameData = true;
 		}
 
-		if (titleRef.current.value.length > 0 && contentRef.current.value.length > 0) {
+		return hasSameData;
+	};
+
+	const checkForEmptyFields = () => {
+		let hasEmptyField = false;
+
+		if (postData.title === "") {
+			hasEmptyField = true;
+			setMessage({
+				type: "fail",
+				message: "Title can't be empty",
+			});
+		}
+
+		if (postData.content === "") {
+			hasEmptyField = true;
+			setMessage({
+				type: "fail",
+				message: "Content can't be empty",
+			});
+		}
+
+		return hasEmptyField;
+	};
+
+	const onSubmit = async () => {
+		let isValidUpdate = !checkForEmptyFields() && !checkForSameData();
+
+		if (isValidUpdate) {
 			const postToUpdate = {
 				postId: props.postId,
-				title: titleRef.current.value,
-				content: contentRef.current.value,
+				title: postData.title,
+				content: postData.content,
 			};
 
 			await PostsService.updatePost(postToUpdate, user.token)
@@ -38,7 +72,7 @@ const UpdatePostForm = (props) => {
 					props.onSubmit(postToUpdate);
 					setMessage({
 						type: "success",
-						message: "Post updated successfully.",
+						message: "Post updated successfully",
 					});
 					setTimeout(() => {
 						onClose();
@@ -48,45 +82,48 @@ const UpdatePostForm = (props) => {
 					console.error(error);
 					setMessage({
 						type: "fail",
-						message: "Error during post update.",
+						message: "Error during post update",
 					});
 				});
 		}
-
-		if (titleRef.current.value.length === 0)
-			titleRef.current.placeholder = "Please enter a title...";
-
-		if (contentRef.current.value.length === 0)
-			contentRef.current.placeholder = "Please add some content...";
 	};
 
 	return (
 		<Modal
 			isShown={props.isShown}
-			title="Update Form"
+			title={updatePostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}
 			duration={transitionDuration}
 		>
-			<form className="form">
-				<div className="form__group">
-					<label htmlFor="title" className="input__label">
-						Title
-					</label>
-					<input
-						id="title"
-						type="text"
-						className="input"
-						ref={titleRef}
-						defaultValue={props.title}
-					/>
-				</div>
-				<div className="form__group">
-					<label htmlFor="content" className="input__label">
-						Content
-					</label>
-					<textarea id="content" className="input" ref={contentRef} defaultValue={props.content} />
-				</div>
+			<form method={updatePostForm.action} className="form">
+				{updatePostForm.formGroups.map((group) => (
+					<div key={group.id} className="form__group">
+						<label htmlFor={group.id} className="input__label">
+							{group.label}
+						</label>
+						{group.type === "textarea" ? (
+							<textarea
+								id={group.id}
+								className="input"
+								onChange={(e) =>
+									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
+								}
+								defaultValue={props.content}
+							/>
+						) : (
+							<input
+								id={group.id}
+								type={group.type}
+								className="input"
+								onChange={(e) =>
+									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
+								}
+								defaultValue={props.title}
+							/>
+						)}
+					</div>
+				))}
 
 				<div className="form__actions">
 					<Button onButtonClick={() => onSubmit()} text="Submit" />
