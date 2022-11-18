@@ -2,7 +2,7 @@
 using PostsTesting.Utility.Constants;
 using Xunit;
 
-namespace PostsTesting.Utility.Pages
+namespace PostsTesting.Utility.UI_Models.Pages
 {
     public class PostDetailsPage
     {

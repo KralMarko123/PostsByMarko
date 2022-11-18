@@ -1,8 +1,9 @@
 ﻿using Microsoft.Playwright;
 using PostsTesting.Utility.Constants;
+using PostsTesting.Utility.Pages;
 using Xunit;
 
-namespace PostsTesting.Utility.Pages
+namespace PostsTesting.Utility.UI_Models.Pages
 {
     public class HomePage
     {

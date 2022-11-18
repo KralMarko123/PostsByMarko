@@ -1,4 +1,6 @@
-﻿namespace PostsTesting.Utility.Constants
+﻿using PostsTesting.Utility.Models;
+
+namespace PostsTesting.Utility.Constants
 {
     public static class AppConstants
     {
@@ -45,5 +47,13 @@
                 }
             }
         }
+
+        public static User TestUser = new User
+        {
+            FirstName = "Test",
+            LastName = "Testerson",
+            Username = "test@test.com",
+            Password = "Test123"
+        };
     }
 }

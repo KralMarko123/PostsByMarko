@@ -1,6 +1,9 @@
 ﻿using Microsoft.Playwright;
 using PostsTesting.Utility;
+using PostsTesting.Utility.Constants;
+using PostsTesting.Utility.Models;
 using PostsTesting.Utility.Pages;
+using PostsTesting.Utility.UI_Models.Pages;
 using System.Net;
 using Xunit;
 
@@ -8,8 +11,61 @@ namespace PostsTesting.Tests.TestBase
 {
     public class UiTestBase : Base
     {
+        RegisterPage registerPage => new RegisterPage(page);
         HomePage homePage => new HomePage(page);
         PostDetailsPage postDetailsPage => new PostDetailsPage(page);
+
+
+        public async Task VerifyUserCanBeRegistered()
+        {
+            User testUser = AppConstants.TestUser;
+
+            await registerPage.Visit();
+            await registerPage.Register(testUser.FirstName, testUser.LastName, testUser.Username, testUser.Password);
+            await registerPage.loginLink.WaitForAsync();
+
+            var hasSuccessfullyRegistered = await registerPage.successfullyRegisteredLink.IsVisibleAsync();
+            var linkText = await registerPage.successfullyRegisteredLink.TextContentAsync();
+
+            Assert.True(hasSuccessfullyRegistered);
+            Assert.Equal(linkText, "You have successfully registered. Click here to log in");
+        }
+
+        public async Task VerifyErrorMessagesWhenRegistering()
+        {
+            var randomTestText = RandomDataGenerator.GetRandomTextWithLength(10);
+
+            await registerPage.Visit();
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Confirm Password can't be empty");
+            await registerPage.FillInConfirmPasswordInput(randomTestText);
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Password can't be empty");
+            await registerPage.FillInPasswordInput("@");
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Username can't be empty");
+            await registerPage.FillInUsernameInput(randomTestText);
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Last Name can't be empty");
+            await registerPage.FillInLastNameInput(randomTestText);
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("First Name can't be empty");
+            await registerPage.FillInFirstNameInput(randomTestText);
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Invalid Username", new List<string> { "Username should be a valid email address" });
+            await registerPage.FillInUsernameInput($"{randomTestText}@{randomTestText}.com");
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Password does not meet the requirements", new List<string>
+            {
+                "Should be at least six characters long",
+                "Have one lowercase letter",
+                "Have one uppercase letter",
+                "Have one digit"
+            });
+            await registerPage.FillInPasswordInput($"{randomTestText}test123");
+            await registerPage.ClickRegisterButton();
+            await registerPage.CheckForErrors("Passwords do not match");
+        }
 
         public async Task VerifyHomepageDefaultState()
         {
@@ -54,7 +110,6 @@ namespace PostsTesting.Tests.TestBase
             await homePage.Visit();
             await homePage.ClickCreatePostButton();
             await homePage.modal.ClickSubmit();
-            await homePage.modal.CheckPlaceholderErrorMessages();
             await homePage.modal.FillInFormAndSubmit(randomTitle, randomContent, "Post created successfully.");
 
             var newlyCreatedPost = homePage.FindPostWithTitleAndContent(randomTitle);

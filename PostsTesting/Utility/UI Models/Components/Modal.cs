@@ -7,8 +7,6 @@ namespace PostsTesting.Utility.Pages
     {
 
         private IPage page;
-        private string titlePlaceholder = "Please enter a title...";
-        private string contentPlaceholder = "Please add some content...";
         public Modal(IPage page) => this.page = page;
 
 
@@ -31,12 +29,12 @@ namespace PostsTesting.Utility.Pages
 
         public async Task FillInTitleInput(string titleToBeEntered)
         {
-            await titleInput.FillAsync($"{titleToBeEntered}");
+            await titleInput.FillAsync(titleToBeEntered);
         }
 
         public async Task FillInContentInput(string contentToBeEntered)
         {
-            await contentInput.FillAsync($"{contentToBeEntered}");
+            await contentInput.FillAsync(contentToBeEntered);
         }
 
         public async Task ClickSubmit()
@@ -71,15 +69,6 @@ namespace PostsTesting.Utility.Pages
 
             Assert.True(modalIsDisplayed);
             Assert.Equal(expectedTitleText, titleText);
-        }
-
-        public async Task CheckPlaceholderErrorMessages()
-        {
-            ILocator emptyTitle = page.GetByPlaceholder(titlePlaceholder);
-            ILocator emptyContent = page.GetByPlaceholder(contentPlaceholder);
-
-            var inputsAreEmpty = await emptyTitle.IsVisibleAsync() && await emptyContent.IsVisibleAsync();
-            Assert.True(inputsAreEmpty);
         }
 
         public async Task CheckSuccessMessage(string expectedSuccessMessage)
