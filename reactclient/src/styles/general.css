@@ -71,6 +71,11 @@
 	animation: fade-in-out 2s ease-in infinite;
 }
 
+.error,
+.error__message {
+	color: var(--danger);
+}
+
 .error {
 	font-size: var(--lg-text);
 	font-weight: bold;
@@ -78,7 +83,6 @@
 
 .error__message {
 	font-size: var(--md-text);
-	color: var(--danger);
 }
 
 .no__animation {
