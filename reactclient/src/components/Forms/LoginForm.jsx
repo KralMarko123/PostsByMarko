@@ -91,7 +91,7 @@ const LoginForm = () => {
 
 			{errors.title && (
 				<>
-					<p className="error error__message">{errors.title}</p>
+					<p className="error">{errors.title}</p>
 					{errors.messages.length > 0 &&
 						errors.messages.map((m) => (
 							<p key={m} className="error__message">
