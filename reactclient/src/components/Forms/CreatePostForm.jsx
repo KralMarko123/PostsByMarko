@@ -1,6 +1,7 @@
 import { React, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
+import { modalTransitionDuration } from "../../constants/misc";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
@@ -13,16 +14,14 @@ const CreatePostForm = (props) => {
 		content: "",
 	});
 	const [message, setMessage] = useState(null);
-	const transitionDuration = 0.25;
 	const { user } = useAuth();
 
 	const onClose = () => {
 		props.onClose();
-		setMessage(null);
-		setNewPostData({
-			title: "",
-			content: "",
-		});
+		setTimeout(() => {
+			setMessage(null);
+			setNewPostData({ title: "", content: "" });
+		}, modalTransitionDuration);
 	};
 
 	const checkForEmptyFields = () => {
@@ -64,7 +63,7 @@ const CreatePostForm = (props) => {
 					});
 					setTimeout(() => {
 						onClose();
-					}, transitionDuration * 1000 + 500);
+					}, 1000);
 				})
 				.catch((error) => {
 					console.error(error.message);
@@ -82,7 +81,6 @@ const CreatePostForm = (props) => {
 			title={createPostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}
-			duration={transitionDuration}
 		>
 			<form method={createPostForm.action} className="form">
 				{createPostForm.formGroups.map((group) => (

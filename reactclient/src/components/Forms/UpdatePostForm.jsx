@@ -1,6 +1,7 @@
-import { React, useState, useRef } from "react";
+import { React, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
+import { modalTransitionDuration } from "../../constants/misc";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
@@ -13,12 +14,13 @@ const UpdatePostForm = (props) => {
 		content: props.content,
 	});
 	const [message, setMessage] = useState(null);
-	const transitionDuration = 0.25;
 	const { user } = useAuth();
 
 	const onClose = () => {
 		props.onClose();
-		setMessage(null);
+		setTimeout(() => {
+			setMessage(null);
+		}, modalTransitionDuration);
 	};
 
 	const checkForSameData = () => {
@@ -76,7 +78,7 @@ const UpdatePostForm = (props) => {
 					});
 					setTimeout(() => {
 						onClose();
-					}, transitionDuration * 1000 + 500);
+					}, 1000);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -94,7 +96,6 @@ const UpdatePostForm = (props) => {
 			title={updatePostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}
-			duration={transitionDuration}
 		>
 			<form method={updatePostForm.action} className="form">
 				{updatePostForm.formGroups.map((group) => (
