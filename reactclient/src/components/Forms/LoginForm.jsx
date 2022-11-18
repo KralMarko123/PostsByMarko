@@ -40,7 +40,10 @@ const LoginForm = () => {
 		let isValidLogin = !checkForEmptyFields();
 
 		if (isValidLogin) {
-			setErrors(null);
+			setErrors({
+				title: "",
+				messages: [],
+			});
 			setIsLoading(true);
 
 			await AuthService.login(loginData)
@@ -86,7 +89,7 @@ const LoginForm = () => {
 				Haven't registered yet? Click here to create an account
 			</p>
 
-			{errors && (
+			{errors.title && (
 				<>
 					<p className="error error__message">{errors.title}</p>
 					{errors.messages.length > 0 &&

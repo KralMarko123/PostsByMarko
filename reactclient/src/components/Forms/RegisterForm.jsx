@@ -96,7 +96,10 @@ const RegisterForm = () => {
 			!checkForEmptyFields() && checkUsername() && checkPassword() && checkPasswordsAreMatching();
 
 		if (isValidRegister) {
-			setErrors(null);
+			setErrors({
+				title: "",
+				messages: [],
+			});
 			setIsLoading(true);
 
 			await AuthService.register(registerData)
@@ -147,7 +150,7 @@ const RegisterForm = () => {
 					Already have an account? Click here to log in
 				</p>
 
-				{errors && (
+				{errors.title && (
 					<>
 						<p className="error error__message">{errors.title}</p>
 						{errors.messages.length > 0 &&
@@ -161,7 +164,7 @@ const RegisterForm = () => {
 			</form>
 		</>
 	) : (
-		<p className="link" onClick={() => navigate(ROUTES.LOGIN)}>
+		<p className="link success" onClick={() => navigate(ROUTES.LOGIN)}>
 			You have successfully registered. Click here to log in
 		</p>
 	);
