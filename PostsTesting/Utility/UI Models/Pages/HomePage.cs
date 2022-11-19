@@ -12,11 +12,13 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public HomePage(IPage page) => this.page = page;
 
 
+        public ILocator home => page.Locator(".home");
+        public ILocator username => page.Locator(".nav__username");
         public ILocator title => page.Locator(".container__title");
         public ILocator subtitle => page.Locator(".container__description");
         public ILocator postCard => page.Locator(".post");
         public ILocator postList => page.Locator(".posts__list");
-        public ILocator createPostButton => page.Locator(".button");
+        public ILocator createPostButton => page.Locator(".button", new PageLocatorOptions { HasTextString = "Create Post"});
         public ILocator infoMessage => page.Locator(".info__message");
         public Modal modal => new Modal(page);
 
@@ -33,13 +35,13 @@ namespace PostsTesting.Utility.UI_Models.Pages
 
         public async Task CheckDefaultState()
         {
-            var homeElementsAreDisplayed = await title.IsVisibleAsync() && await subtitle.IsVisibleAsync() && await createPostButton.IsVisibleAsync();
+            var homeElementsAreDisplayed = await title.IsVisibleAsync() && await subtitle.IsVisibleAsync();
             var titleText = await title.TextContentAsync();
             Assert.True(homeElementsAreDisplayed);
             Assert.Equal("Welcome to our blog!", titleText);
 
             await ClickCreatePostButton();
-            await modal.CheckVisibility("Create Form");
+            await modal.CheckVisibility("Create A Post");
             await modal.CloseModal();
 
             var postsArePresent = await WaitForPostsToLoad();

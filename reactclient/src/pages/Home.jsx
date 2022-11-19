@@ -51,7 +51,7 @@ const Home = () => {
 			<div className="container">
 				<h1 className="container__title">Welcome to our blog!</h1>
 				<p className="container__description">
-					Feel free to check out our posts and add one yourself.
+					Feel free to check out our posts and add one yourself
 				</p>
 				{isLoading ? (
 					<InfoMessage message={"Loading Posts..."} shouldAnimate />
@@ -69,7 +69,7 @@ const Home = () => {
 								/>
 							))
 						) : (
-							<InfoMessage message={"Seems there are no posts."} />
+							<InfoMessage message={"Seems there are no posts"} />
 						)}
 					</ul>
 				)}

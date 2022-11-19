@@ -55,5 +55,13 @@ namespace PostsTesting.Utility.Constants
             Username = "test@test.com",
             Password = "Test123"
         };
+
+        public static User RandomTestUser = new User
+        {
+            FirstName = $"{RandomDataGenerator.GetRandomTextWithLength(5)}",
+            LastName = $"{RandomDataGenerator.GetRandomTextWithLength(5)}",
+            Username = $"{RandomDataGenerator.GetRandomTextWithLength(5)}@{RandomDataGenerator.GetRandomTextWithLength(5)}.com",
+            Password = $"{RandomDataGenerator.GetRandomTextWithLength(5)}test123"
+        };
     }
 }

@@ -59,7 +59,7 @@ const CreatePostForm = (props) => {
 					props.onSubmit();
 					setMessage({
 						type: "success",
-						message: "Post created successfully.",
+						message: "Post created successfully",
 					});
 					setTimeout(() => {
 						onClose();
@@ -69,7 +69,7 @@ const CreatePostForm = (props) => {
 					console.error(error.message);
 					setMessage({
 						type: "fail",
-						message: "Error during post creation.",
+						message: "Error during post creation",
 					});
 				});
 		}

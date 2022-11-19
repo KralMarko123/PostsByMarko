@@ -43,7 +43,7 @@ namespace PostsTesting.Utility.Pages
             Assert.True(postIsDisplayed);
 
             await ClickOnUpdateIcon();
-            await modal.CheckVisibility("Update Form");
+            await modal.CheckVisibility("Update Post");
             await modal.CloseModal();
             await ClickOnDeleteIcon();
             await modal.CheckVisibility("Delete Post");

@@ -111,7 +111,7 @@ const RegisterForm = () => {
 				.catch((error) => {
 					error.message === "Duplicate Username"
 						? setErrors({
-								title: "The username is already taken. Please use a different one.",
+								title: "The username is already taken. Please use a different one",
 								messages: [],
 						  })
 						: setErrors({ title: "Error during register, please try again", messages: [] });

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace PostsTesting.Tests.Frontend.Posts
 {
-    public class PostsTests : UiTestBase
+    public class PostsTests : PostsUiTestBase
     {
         [Fact]
         public async Task VerifyPostDetailsPageIsDisplayedCorrectlyForEachPost()

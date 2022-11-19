@@ -53,7 +53,7 @@ const LoginForm = () => {
 				.catch((error) => {
 					error.message === "Unauthorized"
 						? setErrors({
-								title: "Invalid Login, please check your credentials and try again.",
+								title: "Invalid Login, please check your credentials and try again",
 								messages: [],
 						  })
 						: setErrors({ title: "Error during login, please try again later", messages: [] });

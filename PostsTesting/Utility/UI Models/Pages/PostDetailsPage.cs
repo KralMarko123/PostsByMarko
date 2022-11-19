@@ -21,14 +21,14 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await page.GotoAsync($"{url}/{postId}");
         }
 
-        public async Task GoBack()
+        public async Task ClickOnBackButton()
         {
             await backButton.ClickAsync();
         }
 
         public async Task CheckPostDetails(string expectedTitle, string expectedContent)
         {
-            await WaitForTitleToAppear();
+            await title.WaitForAsync();
 
             var detailsElementsAreDisplayed = await title.IsVisibleAsync() &&
                 await content.IsVisibleAsync() &&
@@ -40,12 +40,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
             Assert.Equal(expectedTitle, titleText);
             Assert.Equal(expectedContent, contentText);
         }
-
-        public async Task WaitForTitleToAppear()
-        {
-            await title.WaitForAsync();
-        }
-
+                
         public async Task<IResponse> GetResponseForPostDetails(string postId)
         {
             IResponse postDetailsResponse = await page.RunAndWaitForResponseAsync(async () => await Visit(postId),

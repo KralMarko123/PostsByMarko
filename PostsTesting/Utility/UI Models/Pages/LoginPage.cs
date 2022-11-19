@@ -4,23 +4,19 @@ using Xunit;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
-    public class RegisterPage
+    public class LoginPage
     {
         private IPage page;
-        private static string url => $"{AppConstants.UiEndpoint}/register";
-        public RegisterPage(IPage page) => this.page = page;
+        private static string url => $"{AppConstants.UiEndpoint}/login";
+        public LoginPage(IPage page) => this.page = page;
 
 
-        public ILocator firstName => page.Locator("#firstName");
-        public ILocator lastName => page.Locator("#lastName");
         public ILocator username => page.Locator("#username");
         public ILocator password => page.Locator("#password");
-        public ILocator confirmPassword => page.Locator("#confirmPassword");
-        public ILocator registerButton => page.Locator(".button");
-        public ILocator loginLink => page.Locator(".link");
+        public ILocator loginButton => page.Locator(".button");
+        public ILocator registerLink => page.Locator(".link");
         public ILocator errorTitle => page.Locator(".error");
         public ILocator errorMessage => page.Locator(".error__message");
-        public ILocator successfullyRegisteredLink => page.Locator(".success");
 
 
         public async Task Visit()
@@ -28,23 +24,14 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await page.GotoAsync(url);
         }
 
-        public async Task ClickRegisterButton()
+        public async Task ClickLoginButton()
         {
-            await registerButton.ClickAsync();
+            await loginButton.ClickAsync();
         }
 
-        public async Task ClickLoginLink()
+        public async Task ClickRegisterLink()
         {
-            await loginLink.ClickAsync();
-        }
-
-        public async Task FillInFirstNameInput(string firstNameToBeEntered)
-        {
-            await firstName.FillAsync(firstNameToBeEntered);
-        }
-        public async Task FillInLastNameInput(string lastNameToBeEntered)
-        {
-            await lastName.FillAsync(lastNameToBeEntered);
+            await registerLink.ClickAsync();
         }
 
         public async Task FillInUsernameInput(string usernameToBeEntered)
@@ -57,19 +44,11 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await password.FillAsync(passwordToBeEntered);
         }
 
-        public async Task FillInConfirmPasswordInput(string passwordToBeEntered)
+        public async Task Login(string username, string password)
         {
-            await confirmPassword.FillAsync(passwordToBeEntered);
-        }
-
-        public async Task Register(string firstName, string lastName, string username, string password)
-        {
-            await FillInFirstNameInput(firstName);
-            await FillInLastNameInput(lastName);
             await FillInUsernameInput(username);
             await FillInPasswordInput(password);
-            await FillInConfirmPasswordInput(password);
-            await ClickRegisterButton();
+            await ClickLoginButton();
         }
 
         public async Task CheckForErrors(string expectedErrorTitle, List<string> expectedErrorMessages = null)
@@ -89,6 +68,5 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 }
             }
         }
-
     }
 }

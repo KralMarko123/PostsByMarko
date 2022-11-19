@@ -30,7 +30,7 @@ const Details = () => {
 					console.error(error);
 					setPostDetails({
 						title: "No Post Found",
-						content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts.`,
+						content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
 					});
 				})
 				.then(() => setIsLoading(false));
