@@ -1,6 +1,6 @@
-﻿using aspnetserver.Data.Models;
-using aspnetserver.Data.Models.Dtos;
+﻿using aspnetserver.Data.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace aspnetserver.Data.Repos.Users
 {
@@ -9,6 +9,6 @@ namespace aspnetserver.Data.Repos.Users
         Task<object> GetUserDetailsForUsernameAsync(string userName);
         Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration);
         Task<bool> ValidateUserAsync(UserLoginDto userLogin);
-        Task<string> CreateTokenAsync();
+        Task<List<Claim>> GetClaimsAsync();
     }
 }

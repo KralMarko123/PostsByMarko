@@ -2,25 +2,20 @@
 using aspnetserver.Data.Models.Dtos;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace aspnetserver.Data.Repos.Users
 {
     public class UsersRepository : IUsersRepository
     {
         private readonly UserManager<User> userManager;
-        private readonly IConfiguration configuration;
         private readonly IMapper mapper;
         private User? user;
 
-        public UsersRepository(UserManager<User> userManager, IMapper mapper, IConfiguration configuration)
+        public UsersRepository(UserManager<User> userManager, IMapper mapper)
         {
             this.userManager = userManager;
             this.mapper = mapper;
-            this.configuration = configuration;
         }
 
         public async Task<object> GetUserDetailsForUsernameAsync(string userName)
@@ -45,25 +40,7 @@ namespace aspnetserver.Data.Repos.Users
             return result;
         }
 
-        public async Task<string> CreateTokenAsync()
-        {
-            var signingCredentials = GetSigningCredentials();
-            var claims = await GetClaimsAsync();
-            var token = GenerateToken(signingCredentials, claims);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private SigningCredentials GetSigningCredentials()
-        {
-            var jwtConfig = configuration.GetSection("JwtConfig");
-            var key = Encoding.UTF8.GetBytes(jwtConfig["secret"]);
-            var secret = new SymmetricSecurityKey(key);
-
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        }
-
-        private async Task<List<Claim>> GetClaimsAsync()
+        public async Task<List<Claim>> GetClaimsAsync()
         {
             var claims = new List<Claim>
             {
@@ -77,35 +54,6 @@ namespace aspnetserver.Data.Repos.Users
             }
 
             return claims;
-        }
-
-        private JwtSecurityToken GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
-        {
-            var environment = configuration["Environment"];
-            IConfiguration jwtConfig = null;
-
-            switch (environment)
-            {
-                case "DEV":
-                    jwtConfig = configuration.GetSection("DevJwtConfig");
-                    break;
-                case "PRD":
-                    jwtConfig = configuration.GetSection("JwtConfig");
-                    break;
-                default:
-                    break;
-            }
-
-            var token = new JwtSecurityToken
-            (
-            issuer: jwtConfig.GetSection("validIssuers").Get<List<string>>().FirstOrDefault(),
-            audience: jwtConfig.GetSection("validAudiences").Get<List<string>>().FirstOrDefault(),
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
-            signingCredentials: signingCredentials
-            );
-
-            return token;
         }
     }
 }

@@ -3,6 +3,7 @@ using aspnetserver.Data.Mappings;
 using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
+using aspnetserver.Helper;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -54,6 +55,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IPostsRepository, PostsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
 builder.Services.AddIdentity<User, IdentityRole>(user =>
 {

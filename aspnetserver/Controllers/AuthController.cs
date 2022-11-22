@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Repos.Users;
+using aspnetserver.Helper;
 using AutoMapper;
 using Controllers;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +12,12 @@ namespace StudentTeacher.Controllers;
 public class AuthController : BaseController
 {
     private readonly IUsersRepository usersRepository;
-    public AuthController(IUsersRepository usersRepository, IMapper mapper) : base(mapper)
+    private readonly IJwtHelper jwtHelper;
+
+    public AuthController(IUsersRepository usersRepository, IJwtHelper jwtHelper, IMapper mapper) : base(mapper)
     {
         this.usersRepository = usersRepository;
+        this.jwtHelper = jwtHelper;
     }
 
     [HttpPost]
@@ -33,7 +37,6 @@ public class AuthController : BaseController
     {
         return !await usersRepository.ValidateUserAsync(user)
             ? Unauthorized()
-            : Ok(new { Token = await usersRepository.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
+            : Ok(new { Token = await jwtHelper.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
     }
-
 }
