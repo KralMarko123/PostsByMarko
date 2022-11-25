@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using aspnetserver.Data.Models;
-using aspnetserver.Data.Repos.Posts;
+using aspnetserver.Helper;
 
 namespace aspnetserver.Data
 {
@@ -14,9 +14,8 @@ namespace aspnetserver.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Seed();
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.ApplyConfiguration(new PostData());
         }
     }
 }

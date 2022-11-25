@@ -368,4 +368,3 @@ aspnetserver/Data/AppDB.db-wal
 aspnetserver/Data/AppDB.db
 *.db
 
-aspnetserver/appsettings.json

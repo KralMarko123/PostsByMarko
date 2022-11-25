@@ -21,7 +21,9 @@ namespace aspnetserver.Data.Repos.Users
         public async Task<object> GetUserDetailsForUsernameAsync(string userName)
         {
             user = await userManager.FindByNameAsync(userName);
-            return new { user.UserName, user.Email, user.FirstName, user.LastName };
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            return new { user.UserName, user.Email, user.FirstName, user.LastName, userRoles };
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)
