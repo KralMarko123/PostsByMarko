@@ -40,6 +40,7 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/create-post")]
     [Tags("Posts Endpoint")]
+    [Authorize(Roles = "Editor, Admin")]
     public async Task<IActionResult> CreatePostAsync([FromBody] Post postToCreate)
     {
         bool postCreatedSuccessfully = false;
@@ -52,6 +53,7 @@ public class PostsController : BaseController
     [HttpPut]
     [Route("/update-post")]
     [Tags("Posts Endpoint")]
+    [Authorize(Roles = "Editor, Admin")]
     public async Task<IActionResult> UpdatePostAsync([FromBody] Post postToUpdate)
     {
         bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
@@ -63,6 +65,7 @@ public class PostsController : BaseController
     [HttpDelete]
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
+    [Authorize(Roles = "Editor, Admin")]
     public async Task<IActionResult> DeletePostByIdAsync(int postId)
     {
         bool postDeletedSuccessfully = await postsRepository.DeletePostAsync(postId);

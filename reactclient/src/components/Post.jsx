@@ -1,5 +1,6 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../custom/useAuth";
 import DeletePostForm from "./Forms/DeletePostForm";
 import UpdatePostForm from "./Forms/UpdatePostForm";
 import * as ROUTES from "../constants/routes";
@@ -9,6 +10,9 @@ const Post = ({ postId, title, content, onPostDeleted, onPostUpdated }) => {
 	let navigate = useNavigate();
 	const [showDeleteForm, setShowDeleteForm] = useState(false);
 	const [showUpdateForm, setShowUpdateForm] = useState(false);
+	const { user } = useAuth();
+	const isAdmin = user.userDetails.userRoles.includes("Admin");
+	const isEditor = user.userDetails.userRoles.includes("Editor");
 
 	const handlePostClick = () => {
 		navigate(`.${ROUTES.DETAILS_PREFIX}/${postId}`);
@@ -27,12 +31,16 @@ const Post = ({ postId, title, content, onPostDeleted, onPostUpdated }) => {
 	return (
 		<>
 			<div className="post" onClick={() => handlePostClick()}>
-				<span className="post__icon post__update" onClick={(e) => handlePostUpdate(e)}>
-					<p>&#9998;</p>
-				</span>
-				<span className="post__icon post__delete" onClick={(e) => handlePostDelete(e)}>
-					<p>&times;</p>
-				</span>
+				{(isAdmin || isEditor) && (
+					<span className="post__icon post__update" onClick={(e) => handlePostUpdate(e)}>
+						<p>&#9998;</p>
+					</span>
+				)}
+				{isAdmin && (
+					<span className="post__icon post__delete" onClick={(e) => handlePostDelete(e)}>
+						<p>&times;</p>
+					</span>
+				)}
 				<span className="post__icon post__id">{postId}</span>
 				<h1 className="post__title">{title}</h1>
 				<p className="post__content">{content}</p>
