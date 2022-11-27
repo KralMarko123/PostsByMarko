@@ -12,7 +12,6 @@ namespace aspnetserver.Data.Models
             {
                 new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
                 new IdentityRole { Name = "Editor", NormalizedName = "EDITOR" },
-                new IdentityRole { Name = "User", NormalizedName = "USER" }
             };
 
             builder.Entity<IdentityRole>().HasData(roles);
@@ -61,12 +60,6 @@ namespace aspnetserver.Data.Models
                 {
                     UserId = u.Id,
                     RoleId = roles.First(q => q.Name == "Editor").Id
-                });
-
-                userRoles.Add(new IdentityUserRole<string>
-                {
-                    UserId = u.Id,
-                    RoleId = roles.First(q => q.Name == "User").Id
                 });
             });
 

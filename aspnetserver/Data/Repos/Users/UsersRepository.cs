@@ -30,7 +30,7 @@ namespace aspnetserver.Data.Repos.Users
         {
             var user = mapper.Map<User>(userRegistration);
             var result = await userManager.CreateAsync(user, userRegistration.Password);
-
+           
             return result;
         }
 
