@@ -12,8 +12,8 @@ using aspnetserver.Data;
 namespace aspnetserver.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221110213455_removedRolesEnum")]
-    partial class removedRolesEnum
+    [Migration("20221128194759_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,34 +37,26 @@ namespace aspnetserver.Data.Migrations
                         .HasMaxLength(100000)
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastUpdatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("PostId");
 
-                    b.ToTable("Posts");
+                    b.HasIndex("UserId");
 
-                    b.HasData(
-                        new
-                        {
-                            PostId = 1,
-                            Content = "Post No.1's content.",
-                            Title = "Post 1"
-                        },
-                        new
-                        {
-                            PostId = 2,
-                            Content = "Post No.2's content.",
-                            Title = "Post 2"
-                        },
-                        new
-                        {
-                            PostId = 3,
-                            Content = "Post No.3's content.",
-                            Title = "Post 3"
-                        });
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("aspnetserver.Data.Models.User", b =>
@@ -136,6 +128,44 @@ namespace aspnetserver.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "9dfedc17-e971-4980-b7cf-6be254b6a894",
+                            Email = "kralmarko123@gmail.com",
+                            EmailConfirmed = false,
+                            FirstName = "Marko",
+                            LastName = "Markovikj",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "KRALMARKO123@GMAIL.COM",
+                            NormalizedUserName = "KRALMARKO123@GMAIL.COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAEOycuYzKUx63q2Uc/jLyc/sSxzCMJP6Zq+1t7/MkG5b94vq8/toPFWI9YYhGa+/wMg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "64e94ff4-c658-4ede-bf24-3708cc1741e6",
+                            TwoFactorEnabled = false,
+                            UserName = "kralmarko123@gmail.com"
+                        },
+                        new
+                        {
+                            Id = "ca05c5bb-921d-40e8-ae2a-2e3785aeb602",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "1af177a0-4848-4cd0-9b48-b48ad0d0edd8",
+                            Email = "test@test.com",
+                            EmailConfirmed = false,
+                            FirstName = "Test",
+                            LastName = "Testerson",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TEST@TEST.COM",
+                            NormalizedUserName = "TEST@TEST.COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAENOAJsX7oDD5bcEgPQ+qm6MUbk901qkxMe9FULkDfBFO2js2l8S9ItC4F/cAvWHDiQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "0f8dea4f-b1b1-4eb1-9584-03e6301a89d5",
+                            TwoFactorEnabled = false,
+                            UserName = "test@test.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -163,6 +193,22 @@ namespace aspnetserver.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "500b26ff-74a9-4a2c-b3f7-587f1d6f247f",
+                            ConcurrencyStamp = "1a494aa0-8be2-43dd-965f-6867a6ef23e6",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7",
+                            ConcurrencyStamp = "397ecdda-3c1e-4d2e-867c-b0201f9dbac8",
+                            Name = "Editor",
+                            NormalizedName = "EDITOR"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -250,6 +296,28 @@ namespace aspnetserver.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24",
+                            RoleId = "500b26ff-74a9-4a2c-b3f7-587f1d6f247f"
+                        },
+                        new
+                        {
+                            UserId = "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24",
+                            RoleId = "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7"
+                        },
+                        new
+                        {
+                            UserId = "ca05c5bb-921d-40e8-ae2a-2e3785aeb602",
+                            RoleId = "500b26ff-74a9-4a2c-b3f7-587f1d6f247f"
+                        },
+                        new
+                        {
+                            UserId = "ca05c5bb-921d-40e8-ae2a-2e3785aeb602",
+                            RoleId = "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -269,6 +337,15 @@ namespace aspnetserver.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("aspnetserver.Data.Models.Post", b =>
+                {
+                    b.HasOne("aspnetserver.Data.Models.User", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -320,6 +397,11 @@ namespace aspnetserver.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("aspnetserver.Data.Models.User", b =>
+                {
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

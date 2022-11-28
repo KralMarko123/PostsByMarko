@@ -10,8 +10,20 @@ const Details = () => {
 	const params = useParams();
 	const postId = params.id;
 	const [postDetails, setPostDetails] = useState({
-		title: "",
-		content: "",
+		post: {
+			postId: "",
+			title: "",
+			content: "",
+			userId: "",
+			createdDate: "",
+			lastUpdatedDate: "",
+		},
+		profile: {
+			username: "",
+			firstName: "",
+			lastName: "",
+			roles: [],
+		},
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
@@ -21,16 +33,17 @@ const Details = () => {
 		const getPost = async () => {
 			await PostsService.getPostById(postId, user.token)
 				.then((postFromServer) => {
-					setPostDetails({
-						title: postFromServer.title,
-						content: postFromServer.content,
-					});
+					setPostDetails(postFromServer);
 				})
 				.catch((error) => {
 					console.error(error);
 					setPostDetails({
-						title: "No Post Found",
-						content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
+						post: {
+							...postDetails.post,
+							title: "No Post Found",
+							content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
+						},
+						profile: { ...postDetails.profile },
 					});
 				})
 				.then(() => setIsLoading(false));
@@ -49,8 +62,16 @@ const Details = () => {
 					<p className="info__message">Loading Post Details...</p>
 				) : (
 					<>
-						<h1 className="container__title">{postDetails.title}</h1>
-						<p className="container__description">{postDetails.content}</p>{" "}
+						<h1 className="container__title">{postDetails.post.title}</h1>
+						<p className="container__description">{postDetails.post.content}</p>
+						<div className="container__footer">
+							<p className="footer__author">
+								BY {`${postDetails.profile.firstName} ${postDetails.profile.lastName}`}
+							</p>
+							<span className="footer__date">
+								Created on {new Date(Date.parse(postDetails.post.createdDate)).toDateString()}
+							</span>
+						</div>
 					</>
 				)}
 			</div>

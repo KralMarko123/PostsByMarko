@@ -1,13 +1,12 @@
 ﻿using aspnetserver.Data.Models;
+using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
 using AutoMapper;
-using Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace StudentTeacher.Controllers;
-
+namespace Controllers;
 
 [Route("")]
 [Authorize]
@@ -28,16 +27,38 @@ public class PostsController : BaseController
     {
         return await postsRepository.GetPostsAsync();
     }
-        
+
     [HttpGet]
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> GetPostByIdAsync(int postId)
     {
-        Post postToReturn = await postsRepository.GetPostByIdAsync(postId);
+        Post post = await postsRepository.GetPostByIdAsync(postId);
+        User postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
 
-        if (postToReturn != null) return Ok(postToReturn);
+
+        if (post != null)
+        {
+            return Ok(new PostResponse()
+            {
+                Post = post,
+                Profile = await usersRepository.GetUserProfileByUsername(postAuthor.UserName)
+            });
+        }
         else return NotFound($"Post with id: {postId} was not found.");
+    }
+
+    [HttpGet]
+    [Route("/get-my-posts")]
+    [Tags("Posts Endpoint")]
+    public async Task<List<Post>> GetPostsForUser()
+    {
+        await SetExecutingRequestUser();
+
+        var userPosts = await postsRepository.GetPostsAsync();
+        userPosts = userPosts.Where(p => p.UserId == user.Id).ToList();
+
+        return userPosts;
     }
 
     [HttpPost]
@@ -49,20 +70,16 @@ public class PostsController : BaseController
 
         if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
         {
-            postToCreate.Author = user;
-            postToCreate.AuthorId = user.Id;
-            postToCreate.CreatedDate = DateTime.UtcNow;
-            postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
-
+            postToCreate.UserId = user.Id;
+           
             bool postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
 
             if (postCreatedSuccessfully)
             {
-                bool postAddedSuccessfully = await usersRepository.AddPostToUserAsync(user.UserName, postToCreate);
+                var postAddedToUser = await usersRepository.AddPostToUserAsync(user.UserName, postToCreate);
 
-                if (postAddedSuccessfully) return Ok("Post was created successfully.");
+                if (postAddedToUser.Succeeded) return Ok("Post was created successfully.");
                 else return BadRequest("Error during post creation.");
-
             }
             else return BadRequest("Error during post creation.");
         }
@@ -73,10 +90,9 @@ public class PostsController : BaseController
     [HttpPut]
     [Route("/update-post")]
     [Tags("Posts Endpoint")]
-    public async Task<IActionResult> UpdatePostAsync([FromBody] Post postToUpdate)
+    public async Task<IActionResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
-        postToUpdate.LastUpdatedDate = DateTime.UtcNow;
-        bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
+        bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(updatedPost);
 
         if (postUpdatedSuccessfully) return Ok("Post was updated successfully.");
         else return BadRequest("Error during post update.");

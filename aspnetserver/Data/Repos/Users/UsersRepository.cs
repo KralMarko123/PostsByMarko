@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Dtos;
+using aspnetserver.Data.Models.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -10,30 +11,19 @@ namespace aspnetserver.Data.Repos.Users
     {
         private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
-        private readonly AppDbContext appDbContext;
         private User? user;
 
-        public UsersRepository(UserManager<User> userManager, IMapper mapper, AppDbContext appDbContext)
+        public UsersRepository(UserManager<User> userManager, IMapper mapper)
         {
             this.userManager = userManager;
             this.mapper = mapper;
-            this.appDbContext = appDbContext;
-        }
-
-        public async Task<object> GetUserDetailsByUsernameAsync(string username)
-        {
-            user = await GetUserByUsernameAsync(username);
-            var userRoles = await userManager.GetRolesAsync(user);
-
-            return new { user.UserName, user.Email, user.FirstName, user.LastName, userRoles };
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)
         {
             var user = mapper.Map<User>(userRegistration);
-            var result = await userManager.CreateAsync(user, userRegistration.Password);
 
-            return result;
+            return await userManager.CreateAsync(user, userRegistration.Password);
         }
 
         public async Task<bool> ValidateUserAsync(UserLoginDto userLogin)
@@ -66,22 +56,39 @@ namespace aspnetserver.Data.Repos.Users
             return user;
         }
 
-        public async Task<bool> AddPostToUserAsync(string username, Post postToAdd)
+        public async Task<List<string>> GetUserRolesByUsername(string username)
+        {
+            user = await GetUserByUsernameAsync(username);
+            var roles = await userManager.GetRolesAsync(user);
+
+            return roles.ToList();
+        }
+
+        public async Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd)
         {
             user = await GetUserByUsernameAsync(username);
             user.Posts.Add(postToAdd);
 
-            try
-            {
-                appDbContext.Users.Update(user);
-
-                return await appDbContext.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            return await userManager.UpdateAsync(user);
         }
 
+        public async Task<ProfileResponse> GetUserProfileByUsername(string username)
+        {
+            user = await GetUserByUsernameAsync(username);
+
+            return new ProfileResponse()
+            {
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Roles = await GetUserRolesByUsername(user.UserName)
+            };
+        }
+
+        public async Task<User> GetUserByIdAsync(string id)
+        {
+            user = await userManager.FindByIdAsync(id);
+            return user;
+        }
     }
 }

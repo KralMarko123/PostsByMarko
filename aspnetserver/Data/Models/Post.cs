@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace aspnetserver.Data.Models
 {
@@ -15,8 +16,8 @@ namespace aspnetserver.Data.Models
         [MaxLength(100000)]
         public string Content { get; set; } = string.Empty;
 
-        public string AuthorId { get; set; }
-        public User? Author { get; set; }
+        [ForeignKey("User")]
+        public string UserId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? LastUpdatedDate { get; set; }
     }

@@ -1,12 +1,12 @@
 ﻿using aspnetserver.Data.Models.Dtos;
+using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Users;
 using aspnetserver.Helper;
 using AutoMapper;
-using Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace StudentTeacher.Controllers;
+namespace Controllers;
 
 [Route("")]
 public class AuthController : BaseController
@@ -33,10 +33,16 @@ public class AuthController : BaseController
     [HttpPost]
     [Route("/login")]
     [AllowAnonymous]
-    public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
+    public async Task<IActionResult> Authenticate([FromBody] UserLoginDto userLogin)
     {
-        return !await usersRepository.ValidateUserAsync(user)
-            ? Unauthorized()
-            : Ok(new { Token = await jwtHelper.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsByUsernameAsync(user.UserName) });
+        if (!await usersRepository.ValidateUserAsync(userLogin)) return Unauthorized();
+        else
+        {
+            return Ok(new LoginResponse()
+            {
+                Token = await jwtHelper.CreateTokenAsync(),
+                Profile = await usersRepository.GetUserProfileByUsername(userLogin.UserName)
+            });
+        }
     }
 }
