@@ -17,6 +17,11 @@ namespace aspnetserver.Data.Repos.Posts
             return await appDbContext.Posts.ToListAsync();
         }
 
+        public async Task<List<Post>> GetUserPostsAsync()
+        {
+            return await appDbContext.Posts.ToListAsync();
+        }
+
         public async Task<Post> GetPostByIdAsync(int postId)
         {
             return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));

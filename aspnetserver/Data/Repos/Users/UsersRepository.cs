@@ -10,17 +10,19 @@ namespace aspnetserver.Data.Repos.Users
     {
         private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
+        private readonly AppDbContext appDbContext;
         private User? user;
 
-        public UsersRepository(UserManager<User> userManager, IMapper mapper)
+        public UsersRepository(UserManager<User> userManager, IMapper mapper, AppDbContext appDbContext)
         {
             this.userManager = userManager;
             this.mapper = mapper;
+            this.appDbContext = appDbContext;
         }
 
-        public async Task<object> GetUserDetailsForUsernameAsync(string userName)
+        public async Task<object> GetUserDetailsByUsernameAsync(string username)
         {
-            user = await userManager.FindByNameAsync(userName);
+            user = await GetUserByUsernameAsync(username);
             var userRoles = await userManager.GetRolesAsync(user);
 
             return new { user.UserName, user.Email, user.FirstName, user.LastName, userRoles };
@@ -30,7 +32,7 @@ namespace aspnetserver.Data.Repos.Users
         {
             var user = mapper.Map<User>(userRegistration);
             var result = await userManager.CreateAsync(user, userRegistration.Password);
-           
+
             return result;
         }
 
@@ -57,5 +59,29 @@ namespace aspnetserver.Data.Repos.Users
 
             return claims;
         }
+
+        public async Task<User> GetUserByUsernameAsync(string username)
+        {
+            user = await userManager.FindByNameAsync(username);
+            return user;
+        }
+
+        public async Task<bool> AddPostToUserAsync(string username, Post postToAdd)
+        {
+            user = await GetUserByUsernameAsync(username);
+            user.Posts.Add(postToAdd);
+
+            try
+            {
+                appDbContext.Users.Update(user);
+
+                return await appDbContext.SaveChangesAsync() >= 1;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
     }
 }

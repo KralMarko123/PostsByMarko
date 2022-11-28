@@ -22,21 +22,23 @@ namespace aspnetserver.Data.Models
             List<User> users = new List<User>()
             {
                  new User {
-                     FirstName ="Marko",
-                     LastName = "Markovikj",
-                                         UserName = "kralmarko123@gmail.com",
+                    FirstName ="Marko",
+                    LastName = "Markovikj",
+                    UserName = "kralmarko123@gmail.com",
                     NormalizedUserName = "KRALMARKO123@GMAIL.COM",
                     Email = "kralmarko123@gmail.com",
                     NormalizedEmail = "KRALMARKO123@GMAIL.COM",
+                    Posts = new List<Post>()
                 },
 
                 new User {
                     FirstName = "Test",
                     LastName = "Testerson",
-                                        UserName = "test@test.com",
+                    UserName = "test@test.com",
                     NormalizedUserName = "TEST@TEST.COM",
                     Email = "test@test.com",
                     NormalizedEmail = "TEST@TEST.COM",
+                    Posts = new List<Post>()
                 }
             };
 
@@ -64,20 +66,6 @@ namespace aspnetserver.Data.Models
             });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
-
-            //seed posts
-            List<Post> posts = new List<Post>();
-            for (int i = 1; i <= 3; i++)
-            {
-                posts.Add(new Post
-                {
-                    PostId = i,
-                    Title = $"Post No.{i}",
-                    Content = $"This is Post No.{i}'s content."
-                });
-            }
-
-            builder.Entity<Post>().HasData(posts);
         }
     }
 }

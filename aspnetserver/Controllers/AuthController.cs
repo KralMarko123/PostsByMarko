@@ -14,7 +14,7 @@ public class AuthController : BaseController
     private readonly IUsersRepository usersRepository;
     private readonly IJwtHelper jwtHelper;
 
-    public AuthController(IUsersRepository usersRepository, IJwtHelper jwtHelper, IMapper mapper) : base(mapper)
+    public AuthController(IUsersRepository usersRepository, IJwtHelper jwtHelper, IMapper mapper) : base(usersRepository, mapper)
     {
         this.usersRepository = usersRepository;
         this.jwtHelper = jwtHelper;
@@ -37,6 +37,6 @@ public class AuthController : BaseController
     {
         return !await usersRepository.ValidateUserAsync(user)
             ? Unauthorized()
-            : Ok(new { Token = await jwtHelper.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsForUsernameAsync(user.UserName) });
+            : Ok(new { Token = await jwtHelper.CreateTokenAsync(), UserDetails = await usersRepository.GetUserDetailsByUsernameAsync(user.UserName) });
     }
 }

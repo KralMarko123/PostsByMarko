@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
+using aspnetserver.Data.Repos.Users;
 using AutoMapper;
 using Controllers;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,11 @@ namespace StudentTeacher.Controllers;
 public class PostsController : BaseController
 {
     private readonly IPostsRepository postsRepository;
-    public PostsController(IPostsRepository postsRepository, IMapper mapper) : base(mapper)
+    private readonly IUsersRepository usersRepository;
+    public PostsController(IPostsRepository postsRepository, IUsersRepository usersRepository, IMapper mapper) : base(usersRepository, mapper)
     {
         this.postsRepository = postsRepository;
+        this.usersRepository = usersRepository;
     }
 
     [HttpGet]
@@ -25,7 +28,7 @@ public class PostsController : BaseController
     {
         return await postsRepository.GetPostsAsync();
     }
-
+        
     [HttpGet]
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
@@ -42,11 +45,29 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> CreatePostAsync([FromBody] Post postToCreate)
     {
-        bool postCreatedSuccessfully = false;
-        if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0) postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
+        await SetExecutingRequestUser();
 
-        if (postCreatedSuccessfully) return Ok("Post was created successfully.");
+        if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
+        {
+            postToCreate.Author = user;
+            postToCreate.AuthorId = user.Id;
+            postToCreate.CreatedDate = DateTime.UtcNow;
+            postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
+
+            bool postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
+
+            if (postCreatedSuccessfully)
+            {
+                bool postAddedSuccessfully = await usersRepository.AddPostToUserAsync(user.UserName, postToCreate);
+
+                if (postAddedSuccessfully) return Ok("Post was created successfully.");
+                else return BadRequest("Error during post creation.");
+
+            }
+            else return BadRequest("Error during post creation.");
+        }
         else return BadRequest("Error during post creation.");
+
     }
 
     [HttpPut]
@@ -54,6 +75,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> UpdatePostAsync([FromBody] Post postToUpdate)
     {
+        postToUpdate.LastUpdatedDate = DateTime.UtcNow;
         bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
 
         if (postUpdatedSuccessfully) return Ok("Post was updated successfully.");
