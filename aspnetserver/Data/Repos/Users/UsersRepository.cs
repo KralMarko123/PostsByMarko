@@ -72,11 +72,11 @@ namespace aspnetserver.Data.Repos.Users
             return await userManager.UpdateAsync(user);
         }
 
-        public async Task<ProfileResponse> GetUserProfileByUsername(string username)
+        public async Task<UserResponse> GetUserProfileByUsername(string username)
         {
             user = await GetUserByUsernameAsync(username);
 
-            return new ProfileResponse()
+            return new UserResponse()
             {
                 UserId = user.Id,
                 Username = user.UserName,

@@ -13,7 +13,7 @@ namespace aspnetserver.Data.Repos.Users
         Task<List<Claim>> GetClaimsAsync();
         Task<User> GetUserByUsernameAsync(string username);
         Task<List<string>> GetUserRolesByUsername(string username);
-        Task<ProfileResponse> GetUserProfileByUsername(string username);
+        Task<UserResponse> GetUserProfileByUsername(string username);
         Task<User> GetUserByIdAsync(string id);
         Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd);
     }

@@ -35,8 +35,8 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> GetPostByIdAsync(int postId)
     {
-        Post post = await postsRepository.GetPostByIdAsync(postId);
-        User postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+        var post = await postsRepository.GetPostByIdAsync(postId);
+        var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
 
 
         if (post != null)
@@ -44,7 +44,7 @@ public class PostsController : BaseController
             return Ok(new PostResponse()
             {
                 Post = post,
-                Profile = await usersRepository.GetUserProfileByUsername(postAuthor.UserName)
+                Author = await usersRepository.GetUserProfileByUsername(postAuthor.UserName)
             });
         }
         else return NotFound($"Post with id: {postId} was not found.");

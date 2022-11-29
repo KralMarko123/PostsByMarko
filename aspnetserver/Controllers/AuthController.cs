@@ -41,7 +41,7 @@ public class AuthController : BaseController
             return Ok(new LoginResponse()
             {
                 Token = await jwtHelper.CreateTokenAsync(),
-                Profile = await usersRepository.GetUserProfileByUsername(userLogin.UserName)
+                UserProfile = await usersRepository.GetUserProfileByUsername(userLogin.UserName)
             });
         }
     }

@@ -3,6 +3,6 @@
     public class LoginResponse
     {
         public string Token { get; set; }
-        public ProfileResponse Profile { get; set; }
+        public UserResponse UserProfile { get; set; }
     }
 }

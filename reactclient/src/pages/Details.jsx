@@ -19,7 +19,7 @@ const Details = () => {
 			createdDate: "",
 			lastUpdatedDate: "",
 		},
-		profile: {
+		author: {
 			username: "",
 			firstName: "",
 			lastName: "",
@@ -44,7 +44,7 @@ const Details = () => {
 							title: "No Post Found",
 							content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
 						},
-						profile: { ...postDetails.profile, firstName: "Yours", lastName: "Truly" },
+						author: { ...postDetails.author, firstName: "Yours", lastName: "Truly" },
 					});
 				})
 				.then(() => setIsLoading(false));
@@ -67,7 +67,7 @@ const Details = () => {
 						<p className="container__description">{postDetails.post.content}</p>
 						<div className="container__footer">
 							<p className="footer__author">
-								BY {`${postDetails.profile.firstName} ${postDetails.profile.lastName}`}
+								BY {`${postDetails.author.firstName} ${postDetails.author.lastName}`}
 							</p>
 							<span className="footer__date">
 								Created on {HelperFunctions.getDateAsReadablestring(postDetails.post.createdDate)}

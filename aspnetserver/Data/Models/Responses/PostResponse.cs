@@ -3,6 +3,6 @@
     public class PostResponse
     {
         public Post Post { get; set; }
-        public ProfileResponse Profile { get; set; }
+        public UserResponse Author { get; set; }
     }
 }

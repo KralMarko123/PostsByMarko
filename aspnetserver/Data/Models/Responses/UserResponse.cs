@@ -1,6 +1,6 @@
 ﻿namespace aspnetserver.Data.Models.Responses
 {
-    public class ProfileResponse
+    public class UserResponse
     {
         public string UserId { get; set; }
         public string Username { get; set; }

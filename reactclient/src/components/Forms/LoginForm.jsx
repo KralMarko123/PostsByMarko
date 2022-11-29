@@ -47,8 +47,8 @@ const LoginForm = () => {
 			setIsLoading(true);
 
 			await AuthService.login(loginData)
-				.then((successfulLogin) => {
-					login(successfulLogin);
+				.then((loginResponse) => {
+					login(loginResponse);
 				})
 				.catch((error) => {
 					error.message === "Unauthorized"

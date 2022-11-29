@@ -12,7 +12,7 @@ const DesktopNav = () => {
 				<p className="nav__username">
 					Hello{" "}
 					<span>
-						{user.profile.firstName} {user.profile.lastName}
+						{user.userProfile.firstName} {user.userProfile.lastName}
 					</span>
 				</p>
 				<span className="nav__separator"></span>
