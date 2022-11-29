@@ -78,6 +78,7 @@ namespace aspnetserver.Data.Repos.Users
 
             return new ProfileResponse()
             {
+                UserId = user.Id,
                 Username = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

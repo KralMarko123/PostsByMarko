@@ -6,11 +6,12 @@ import UpdatePostForm from "./Forms/UpdatePostForm";
 import * as ROUTES from "../constants/routes";
 import "../styles/components/Post.css";
 
-const Post = ({ postId, title, content, onPostDeleted, onPostUpdated }) => {
+const Post = ({ postId, authorId, title, content, onPostDeleted, onPostUpdated }) => {
 	let navigate = useNavigate();
 	const [showDeleteForm, setShowDeleteForm] = useState(false);
 	const [showUpdateForm, setShowUpdateForm] = useState(false);
 	const { user } = useAuth();
+	const isAuthor = authorId === user.profile;
 	const isAdmin = user.profile.roles.includes("Admin");
 	const isEditor = user.profile.roles.includes("Editor");
 

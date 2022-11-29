@@ -1,6 +1,4 @@
 ﻿using aspnetserver.Data.Models;
-using System;
-
 namespace aspnetserver.Data.Repos.Posts
 {
     public interface IPostsRepository
@@ -13,6 +11,6 @@ namespace aspnetserver.Data.Repos.Posts
 
         Task<bool> UpdatePostAsync(Post postToUpdate);
 
-        Task<bool> DeletePostAsync(int postId);
+        Task<bool> DeletePostAsync(Post postToDelete);
     }
 }

@@ -7,19 +7,17 @@ namespace aspnetserver.Data.Repos.Posts
     public class PostsRepository : IPostsRepository
     {
         private readonly AppDbContext appDbContext;
-        private readonly IUsersRepository usersRepository;
 
-        public PostsRepository(AppDbContext appDbContext, IUsersRepository usersRepository)
+        public PostsRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
-            this.usersRepository = usersRepository;
         }
 
         public async Task<List<Post>> GetPostsAsync()
         {
             return await appDbContext.Posts.ToListAsync();
         }
-             
+
         public async Task<Post> GetPostByIdAsync(int postId)
         {
             return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));
@@ -43,16 +41,12 @@ namespace aspnetserver.Data.Repos.Posts
         }
 
 
-        public async Task<bool> UpdatePostAsync(Post updatedPost)
+        public async Task<bool> UpdatePostAsync(Post postToUpdate)
         {
 
             try
             {
-                var postToUpdate = await GetPostByIdAsync(updatedPost.PostId);
-
                 postToUpdate.LastUpdatedDate = DateTime.UtcNow;
-                postToUpdate.Title = updatedPost.Title;
-                postToUpdate.Content = updatedPost.Content;
 
                 appDbContext.Posts.Update(postToUpdate);
 
@@ -64,12 +58,11 @@ namespace aspnetserver.Data.Repos.Posts
             }
         }
 
-        public async Task<bool> DeletePostAsync(int postId)
+        public async Task<bool> DeletePostAsync(Post postToDelete)
         {
 
             try
             {
-                Post postToDelete = await GetPostByIdAsync(postId);
                 appDbContext.Remove(postToDelete);
 
                 return await appDbContext.SaveChangesAsync() >= 1;

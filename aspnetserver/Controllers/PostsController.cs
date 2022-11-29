@@ -1,10 +1,12 @@
-﻿using aspnetserver.Data.Models;
+﻿using aspnetserver.Constants;
+using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Controllers;
 
@@ -71,7 +73,7 @@ public class PostsController : BaseController
         if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
         {
             postToCreate.UserId = user.Id;
-           
+
             bool postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
 
             if (postCreatedSuccessfully)
@@ -92,9 +94,21 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<IActionResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
-        bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(updatedPost);
+        await SetExecutingRequestUser();
 
-        if (postUpdatedSuccessfully) return Ok("Post was updated successfully.");
+        var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.PostId);
+        var userRoles = await usersRepository.GetUserRolesByUsername(user.UserName);
+
+        if (postToUpdate != null && (user.Id == postToUpdate.UserId || userRoles.Any(x => AppConstants.appRoles.Any(y => y.Name == x))))
+        {
+            postToUpdate.Title = updatedPost.Title;
+            postToUpdate.Content = updatedPost.Content;
+
+            bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
+
+            if (postUpdatedSuccessfully) return Ok("Post was updated successfully.");
+            else return BadRequest("Error during post update.");
+        }
         else return BadRequest("Error during post update.");
     }
 
@@ -104,9 +118,18 @@ public class PostsController : BaseController
     [Authorize(Roles = "Editor, Admin")]
     public async Task<IActionResult> DeletePostByIdAsync(int postId)
     {
-        bool postDeletedSuccessfully = await postsRepository.DeletePostAsync(postId);
+        await SetExecutingRequestUser();
 
-        if (postDeletedSuccessfully) return Ok("Post was deleted successfully.");
+        var postToDelete = await postsRepository.GetPostByIdAsync(postId);
+        var userRoles = await usersRepository.GetUserRolesByUsername(user.UserName);
+
+        if (postToDelete != null && (user.Id == postToDelete.UserId || userRoles.Contains("Admin")))
+        {
+            bool postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
+
+            if (postDeletedSuccessfully) return Ok("Post was deleted successfully.");
+            else return BadRequest("Error during post deletion.");
+        }
         else return BadRequest("Error during post deletion.");
     }
 }

@@ -1,3 +1,16 @@
 .details .container__title {
 	margin-top: var(--small-gap);
 }
+
+
+.footer__author{
+	font-size: var(--md-text);
+	text-transform: uppercase;
+	font-weight: bold;
+	color: var(--light-accent);
+}
+
+.footer__date{
+	font-size: var(--s-text);
+	font-style: italic;
+}

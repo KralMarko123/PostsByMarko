@@ -5,6 +5,7 @@ import { useAuth } from "../custom/useAuth";
 import PostsService from "../api/PostsService";
 import Nav from "../components/Layout/Nav";
 import "../styles/pages/Details.css";
+import { HelperFunctions } from "../util/helperFunctions";
 
 const Details = () => {
 	const params = useParams();
@@ -43,7 +44,7 @@ const Details = () => {
 							title: "No Post Found",
 							content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
 						},
-						profile: { ...postDetails.profile },
+						profile: { ...postDetails.profile, firstName: "Yours", lastName: "Truly" },
 					});
 				})
 				.then(() => setIsLoading(false));
@@ -69,7 +70,7 @@ const Details = () => {
 								BY {`${postDetails.profile.firstName} ${postDetails.profile.lastName}`}
 							</p>
 							<span className="footer__date">
-								Created on {new Date(Date.parse(postDetails.post.createdDate)).toDateString()}
+								Created on {HelperFunctions.getDateAsReadablestring(postDetails.post.createdDate)}
 							</span>
 						</div>
 					</>

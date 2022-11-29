@@ -53,6 +53,10 @@
 	opacity: 0.75;
 }
 
+.container__footer {
+	padding-top: var(--small-padding);
+}
+
 .info__message {
 	width: fit-content;
 	padding: 1em;

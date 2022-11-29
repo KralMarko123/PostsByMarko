@@ -62,6 +62,7 @@ const Home = () => {
 								<Post
 									key={p.postId}
 									postId={p.postId}
+									authorId={p.userId}
 									title={p.title}
 									content={p.content}
 									onPostDeleted={(postId) => onPostDeleted(postId)}
