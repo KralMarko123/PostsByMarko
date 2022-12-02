@@ -37,5 +37,11 @@ namespace aspnetserver.Constants
                     Posts = new List<Post>(),
                  }
         };
-    }
+
+        public static string corsPolicyName = "postsCorsPolicy";
+        public static List<string> allowedDevOrigins = new List<string> { "http://localhost:7171", "http://localhost:3000", "https://localhost:7171", "https://localhost:3000" };
+        public static List<string> allowedPrdOrigins = new List<string> { "https://posts-aspnetserver.azurewebsites.net/", "https://posts.markomarkovikj.com" };
+
+
+}
 }

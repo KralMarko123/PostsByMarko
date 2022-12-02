@@ -9,6 +9,7 @@ const ENDPOINTS = {
 	DELETE_POST_BY_ID: "delete-post-by-id",
 	LOGIN: "login",
 	REGISTER: "register",
+	HUB: "postHub",
 };
 
 const development = {
@@ -19,6 +20,7 @@ const development = {
 	DELETE_POST_BY_ID: `${BASE_URL_DEV}/${ENDPOINTS.DELETE_POST_BY_ID}`,
 	LOGIN: `${BASE_URL_DEV}/${ENDPOINTS.LOGIN}`,
 	REGISTER: `${BASE_URL_DEV}/${ENDPOINTS.REGISTER}`,
+	HUB: `${BASE_URL_DEV}/${ENDPOINTS.HUB}`,
 };
 
 const production = {
@@ -29,6 +31,7 @@ const production = {
 	DELETE_POST_BY_ID: `${BASE_URL_PRODUCTION}/${ENDPOINTS.DELETE_POST_BY_ID}`,
 	LOGIN: `${BASE_URL_PRODUCTION}/${ENDPOINTS.LOGIN}`,
 	REGISTER: `${BASE_URL_PRODUCTION}/${ENDPOINTS.REGISTER}`,
+	HUB: `${BASE_URL_PRODUCTION}/${ENDPOINTS.HUB}`,
 };
 
 const ENDPOINT__URLS = process.env.NODE_ENV === "development" ? development : production;

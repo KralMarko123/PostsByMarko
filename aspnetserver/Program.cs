@@ -1,9 +1,11 @@
+using aspnetserver.Constants;
 using aspnetserver.Data;
 using aspnetserver.Data.Mappings;
 using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
 using aspnetserver.Helper;
+using aspnetserver.Hubs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -14,23 +16,24 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using static aspnetserver.Constants.AppConstants;
 
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Configuration["Environment"];
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var postsCorsPolicy = "postsCorsPolicy";
-string[] policyAllowedOrigins = null;
+var allowedOrigins = new List<string>();
 IConfigurationSection jwtConfig = null;
+
 
 switch (environment)
 {
     case "DEV":
-        policyAllowedOrigins = new string[] { "http://localhost:7171", "http://localhost:3000" };
+        allowedOrigins = allowedDevOrigins;
         jwtConfig = builder.Configuration.GetSection("DevJwtConfig");
         break;
     case "PRD":
-        policyAllowedOrigins = new string[] { "https://posts-aspnetserver.azurewebsites.net/", "https://posts.markomarkovikj.com" };
+        allowedOrigins = allowedPrdOrigins;
         jwtConfig = builder.Configuration.GetSection("JwtConfig");
         break;
     default:
@@ -43,15 +46,18 @@ builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelS
 builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(postsCorsPolicy,
+    options.AddPolicy(name: corsPolicyName,
         policy =>
         {
             policy
-             .WithOrigins(policyAllowedOrigins)
+             .WithOrigins(allowedOrigins.ToArray())
              .AllowAnyHeader()
-             .AllowAnyMethod();
+             .AllowAnyMethod()
+             .AllowCredentials();
         });
 });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -153,13 +159,13 @@ app.UseSwaggerUI(swaggerUIOptions =>
     swaggerUIOptions.RoutePrefix = string.Empty;
 });
 
-
-app.UseCors(postsCorsPolicy);
+app.UseCors(corsPolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
+app.MapHub<PostHub>("/postHub");
 app.MapControllers();
 
 #endregion
