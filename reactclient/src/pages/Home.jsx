@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { useAuth } from "../custom/useAuth";
-import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import ENDPOINT__URLS from "../constants/endpoints";
 import PostsService from "../api/PostsService";
 import Button from "../components/Helper/Button";
@@ -30,6 +30,7 @@ const Home = () => {
 				accessTokenFactory: () => user.token,
 			})
 			.withAutomaticReconnect()
+			.configureLogging(LogLevel.Information)
 			.build();
 
 		setConnection(newConnection);
@@ -40,25 +41,30 @@ const Home = () => {
 		if (connection) {
 			connection
 				.start()
-				.then((result) => {
-					console.log("connected!");
+				.then(() => {
+					connection.on("ReceiveMessage", (message) => {
+						switch (message) {
+							case "Modified Post":
+								getPosts();
+								break;
 
-					connection.on("ReceiveMessage", (message) => console.log(message));
+							default:
+								break;
+						}
+					});
 				})
 				.catch((error) => console.error(`Connection failed with error: ${error}`));
 		}
 	}, [connection]);
 
-	const sendUpdatedPostMessage = async () => {
-		if (connection.connectionStarted) {
+	const sendModifiedPost = async () => {
+		if (connection) {
 			try {
-				await connection.send("SendMessageToAll", "A Post has been updated!");
-			} catch (e) {
-				console.log(e);
+				await connection.send("SendMessageToAll", "Modified Post");
+			} catch (error) {
+				console.error(error);
 			}
-		} else {
-			alert("No connection to server yet.");
-		}
+		} else console.log("A connection to the server hasn't been established yet!");
 	};
 
 	const onPostDeleted = (postId) => {
@@ -67,6 +73,8 @@ const Home = () => {
 				return p.postId !== postId;
 			})
 		);
+
+		sendModifiedPost();
 	};
 
 	const onPostUpdated = (updatedPost) => {
@@ -75,7 +83,7 @@ const Home = () => {
 		updatedPosts[postIndex] = updatedPost;
 		setPosts(updatedPosts);
 
-		sendUpdatedPostMessage();
+		sendModifiedPost();
 	};
 
 	return (
