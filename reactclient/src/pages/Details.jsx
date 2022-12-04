@@ -70,7 +70,7 @@ const Details = () => {
 								BY {`${postDetails.author.firstName} ${postDetails.author.lastName}`}
 							</p>
 							<span className="footer__date">
-								Created on {HelperFunctions.getDateAsReadablestring(postDetails.post.createdDate)}
+								Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
 							</span>
 						</div>
 					</>

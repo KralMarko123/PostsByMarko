@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../constants/routes";
 import { FORMS } from "../../constants/forms";
+import { HelperFunctions } from "../../util/helperFunctions";
 import Button from "../Helper/Button";
 import AuthService from "../../api/AuthService";
 
@@ -23,34 +24,10 @@ const RegisterForm = () => {
 	const navigate = useNavigate();
 
 	const checkForEmptyFields = () => {
-		let hasEmptyFields = false;
-
-		if (registerData.firstName === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "First Name can't be empty", messages: [] });
-		}
-
-		if (registerData.lastName === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Last Name can't be empty", messages: [] });
-		}
-
-		if (registerData.username === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Username can't be empty", messages: [] });
-		}
-
-		if (registerData.password === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Password can't be empty", messages: [] });
-		}
-
-		if (registerData.confirmPassword === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Confirm Password can't be empty", messages: [] });
-		}
-
-		return hasEmptyFields;
+		if (!HelperFunctions.checkForEmptyFields(registerData)) {
+			setErrors({ title: "Fields can't be empty", messages: [] });
+			return true;
+		} else return false;
 	};
 
 	const checkUsername = () => {
@@ -64,24 +41,16 @@ const RegisterForm = () => {
 	};
 
 	const checkPassword = () => {
-		let passwordIsValid = true;
-		let messages = [];
+		const passwordValidator = HelperFunctions.checkPasswordRequirements(registerData.password);
 
-		if (!/^.{6,}$/.test(registerData.password))
-			messages.push("Should be at least six characters long");
-
-		if (!/(?=.*[a-z])/.test(registerData.password)) messages.push("Have one lowercase letter");
-
-		if (!/(?=.*[A-Z])/.test(registerData.password)) messages.push("Have one uppercase letter");
-
-		if (!/(?=.*\d)/.test(registerData.password)) messages.push("Have one digit");
-
-		if (messages.length > 0) {
-			passwordIsValid = false;
-			setErrors({ title: "Password does not meet the requirements", messages: messages });
+		if (!passwordValidator.isValid) {
+			setErrors({
+				title: "Password does not meet the requirements",
+				messages: passwordValidator.messages,
+			});
 		}
 
-		return passwordIsValid;
+		return passwordValidator.isValid;
 	};
 
 	const checkPasswordsAreMatching = () => {

@@ -3,6 +3,7 @@ import { useAuth } from "../../custom/useAuth";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../constants/routes";
 import { FORMS } from "../../constants/forms";
+import { HelperFunctions } from "../../util/helperFunctions";
 import Button from "../Helper/Button";
 import AuthService from "../../api/AuthService";
 
@@ -21,19 +22,10 @@ const LoginForm = () => {
 	const navigate = useNavigate();
 
 	const checkForEmptyFields = () => {
-		let hasEmptyFields = false;
-
-		if (loginData.username === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Username can't be empty", messages: [] });
-		}
-
-		if (loginData.password === "") {
-			hasEmptyFields = true;
-			setErrors({ title: "Password can't be empty", messages: [] });
-		}
-
-		return hasEmptyFields;
+		if (!HelperFunctions.checkForEmptyFields(loginData)) {
+			setErrors({ title: "Fields can't be empty", messages: [] });
+			return true;
+		} else return false;
 	};
 
 	const handleLogin = async () => {
