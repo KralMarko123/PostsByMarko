@@ -7,7 +7,7 @@ namespace aspnetserver.Hubs
     {
         public async Task SendMessageToAll(string message)
         {
-            await Clients.All.ReceiveMessage(message);
+            await Clients.All.ReceiveMessage($"Received Message: {message} with Message Id: {Guid.NewGuid()}");
         }
     }
 }

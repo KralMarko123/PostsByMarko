@@ -115,7 +115,6 @@ public class PostsController : BaseController
     [HttpDelete]
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
-    [Authorize(Roles = "Editor, Admin")]
     public async Task<IActionResult> DeletePostByIdAsync(int postId)
     {
         await SetExecutingRequestUser();
