@@ -41,7 +41,7 @@ namespace PostsTesting.Tests.TestBase
 
         public async Task VerifyPostDetailsForNotFoundPost()
         {
-            IResponse notFoundResponse = await postDetailsPage.GetResponseForPostDetails("404");
+            var notFoundResponse = await postDetailsPage.GetResponseForPostDetails("404");
             Assert.True(notFoundResponse.Status == (int)HttpStatusCode.NotFound);
 
             await postDetailsPage.CheckPostDetails("No Post Found", "The post with Id: 404 doesn't seem to exist. Go back to view other posts");

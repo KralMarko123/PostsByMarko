@@ -20,7 +20,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public ILocator loginLink => page.Locator(".link");
         public ILocator errorTitle => page.Locator(".error");
         public ILocator errorMessage => page.Locator(".error__message");
-        public ILocator successfullyRegisteredLink => page.Locator(".success");
+        public ILocator successfullyRegisteredLink => page.Locator(".success.link");
 
 
         public async Task Visit()

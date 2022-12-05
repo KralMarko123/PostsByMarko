@@ -31,7 +31,7 @@ namespace PostsTesting.Tests.TestBase
 
             await registerPage.Visit();
             await registerPage.Register(randomlyGeneratedTestUser.FirstName, randomlyGeneratedTestUser.LastName, randomlyGeneratedTestUser.Username, randomlyGeneratedTestUser.Password);
-            await registerPage.loginLink.WaitForAsync();
+            await registerPage.successfullyRegisteredLink.WaitForAsync();
 
             var hasSuccessfullyRegistered = await registerPage.successfullyRegisteredLink.IsVisibleAsync();
             var linkText = await registerPage.successfullyRegisteredLink.TextContentAsync();
@@ -46,10 +46,8 @@ namespace PostsTesting.Tests.TestBase
 
             await loginPage.Visit();
             await loginPage.ClickLoginButton();
-            await loginPage.CheckForErrors("Password can't be empty");
+            await loginPage.CheckForErrors("Fields can't be empty");
             await loginPage.FillInPasswordInput(randomTestText);
-            await loginPage.ClickLoginButton();
-            await loginPage.CheckForErrors("Username can't be empty");
             await loginPage.FillInUsernameInput(randomTestText);
             await loginPage.ClickLoginButton();
             await loginPage.CheckForErrors("Invalid Login, please check your credentials and try again");
@@ -61,19 +59,11 @@ namespace PostsTesting.Tests.TestBase
 
             await registerPage.Visit();
             await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("Confirm Password can't be empty");
+            await registerPage.CheckForErrors("Fields can't be empty");
             await registerPage.FillInConfirmPasswordInput(randomTestText);
-            await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("Password can't be empty");
             await registerPage.FillInPasswordInput("@");
-            await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("Username can't be empty");
             await registerPage.FillInUsernameInput(randomTestText);
-            await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("Last Name can't be empty");
             await registerPage.FillInLastNameInput(randomTestText);
-            await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("First Name can't be empty");
             await registerPage.FillInFirstNameInput(randomTestText);
             await registerPage.ClickRegisterButton();
             await registerPage.CheckForErrors("Invalid Username", new List<string> { "Username should be a valid email address" });

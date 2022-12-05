@@ -36,18 +36,18 @@ public class PostsController : BaseController
     public async Task<IActionResult> GetPostByIdAsync(int postId)
     {
         var post = await postsRepository.GetPostByIdAsync(postId);
-        var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
 
-
-        if (post != null)
+        if (post == null) return NotFound($"Post with id: {postId} was not found.");
+        else
         {
+            var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+
             return Ok(new PostResponse()
             {
                 Post = post,
                 Author = await usersRepository.GetUserProfileByUsername(postAuthor.UserName)
             });
         }
-        else return NotFound($"Post with id: {postId} was not found.");
     }
 
     [HttpGet]
