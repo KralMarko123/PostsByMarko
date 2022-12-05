@@ -21,7 +21,7 @@ using static aspnetserver.Constants.AppConstants;
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Configuration["Environment"];
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = "";
 var allowedOrigins = new List<string>();
 IConfigurationSection jwtConfig = null;
 
@@ -31,10 +31,12 @@ switch (environment)
     case "DEV":
         allowedOrigins = allowedDevOrigins;
         jwtConfig = builder.Configuration.GetSection("DevJwtConfig");
+        connectionString = builder.Configuration.GetConnectionString("DevConnection");
         break;
     case "PRD":
         allowedOrigins = allowedPrdOrigins;
         jwtConfig = builder.Configuration.GetSection("JwtConfig");
+        connectionString = builder.Configuration.GetConnectionString("PrdConnection");
         break;
     default:
         break;
