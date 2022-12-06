@@ -1,7 +1,4 @@
-﻿using aspnetserver.Data.Models;
-using aspnetserver.Data.Repos.Users;
-using aspnetserver.Helper.Exceptions;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -10,24 +7,20 @@ namespace Controllers;
 [ApiController]
 public class BaseController : ControllerBase
 {
-    private readonly IUsersRepository usersRepository;
     protected readonly IMapper mapper;
-    protected User? user;
+    protected string? username;
+    protected string? userId;
+    protected List<string>? userRoles;
 
-    public BaseController(IUsersRepository usersRepository, IMapper mapper)
+    public BaseController(IMapper mapper)
     {
-        this.usersRepository = usersRepository;
         this.mapper = mapper;
     }
 
-    protected async Task SetExecutingRequestUser()
+    protected void LoadUserInfoForRequestBeingExecuted()
     {
-        var username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
-        user = await usersRepository.GetUserByUsernameAsync(username);
-
-        if(user == null)
-        {
-            throw new UserNotFoundException($"User with username: {username} was not found.");
-        }
+        username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+        userId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+        userRoles = HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
     }
 }

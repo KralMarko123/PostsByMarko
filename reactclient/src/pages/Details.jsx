@@ -19,12 +19,8 @@ const Details = () => {
 			createdDate: "",
 			lastUpdatedDate: "",
 		},
-		author: {
-			username: "",
-			firstName: "",
-			lastName: "",
-			roles: [],
-		},
+		authorFirstName: "",
+		authorLastName: "",
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
@@ -67,7 +63,7 @@ const Details = () => {
 						<p className="container__description">{postDetails.post.content}</p>
 						<div className="container__footer">
 							<p className="footer__author">
-								BY {`${postDetails.author.firstName} ${postDetails.author.lastName}`}
+								BY {`${postDetails.authorLastName} ${postDetails.authorFirstName}`}
 							</p>
 							<span className="footer__date">
 								Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}

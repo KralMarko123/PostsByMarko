@@ -1,8 +1,6 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using aspnetserver.Data.Models;
-using aspnetserver.Helper;
 
 namespace aspnetserver.Data
 {

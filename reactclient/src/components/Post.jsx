@@ -11,9 +11,9 @@ const Post = ({ postId, authorId, title, content, onPostDeleted, onPostUpdated }
 	const [showDeleteForm, setShowDeleteForm] = useState(false);
 	const [showUpdateForm, setShowUpdateForm] = useState(false);
 	const { user } = useAuth();
-	const isAuthor = authorId === user.userProfile.userId;
-	const isAdmin = user.userProfile.roles.includes("Admin");
-	const isEditor = user.userProfile.roles.includes("Editor");
+	const isAuthor = authorId === user.userId;
+	const isAdmin = user.roles.includes("Admin");
+	const isEditor = user.roles.includes("Editor");
 
 	const handlePostClick = () => {
 		navigate(`.${ROUTES.DETAILS_PREFIX}/${postId}`);

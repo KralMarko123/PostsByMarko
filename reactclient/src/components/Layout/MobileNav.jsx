@@ -19,7 +19,7 @@ const MobileNav = () => {
 				<p className="nav__username">
 					Hello{" "}
 					<span>
-						{user.userProfile.firstName} {user.userProfile.lastName}
+						{user.firstName} {user.lastName}
 					</span>
 				</p>
 				<span className="nav__separator"></span>

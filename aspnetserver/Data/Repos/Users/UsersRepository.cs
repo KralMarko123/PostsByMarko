@@ -1,6 +1,5 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Dtos;
-using aspnetserver.Data.Models.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -38,6 +37,7 @@ namespace aspnetserver.Data.Repos.Users
         {
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.PrimarySid, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName)
             };
 
@@ -70,20 +70,6 @@ namespace aspnetserver.Data.Repos.Users
             user.Posts.Add(postToAdd);
 
             return await userManager.UpdateAsync(user);
-        }
-
-        public async Task<UserResponse> GetUserProfileByUsername(string username)
-        {
-            user = await GetUserByUsernameAsync(username);
-
-            return new UserResponse()
-            {
-                UserId = user.Id,
-                Username = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Roles = await GetUserRolesByUsername(user.UserName)
-            };
         }
 
         public async Task<User> GetUserByIdAsync(string id)
