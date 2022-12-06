@@ -2,12 +2,12 @@
 
 :root {
 	/**COLORS*/
-	--dark: #202020;
-	--dark-accent: #333533;
+	--dark: rgb(32, 32, 32);
+	--dark-accent: rgb(51, 53, 51);
 	--dark-accent-decimal: 51, 53, 51;
-	--light: #adddd0;
-	--light-accent: #607eaa;
-	--danger: #d22b2b;
+	--light: rgb(173, 221, 208);
+	--light-accent: rgb(96, 126, 170);
+	--danger: rgb(210, 43, 43);
 
 	/**TEXT*/
 	--main-font: "Open Sans", sans-serif;
