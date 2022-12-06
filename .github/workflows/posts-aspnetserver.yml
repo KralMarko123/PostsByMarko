@@ -3,6 +3,9 @@ on:
   push:
     branches:
     - main
+    paths:
+      - "aspnetserver/**"
+      - ".github/workflows/**"  
 env:
   AZURE_WEBAPP_NAME: posts-aspnetserver
   AZURE_WEBAPP_PACKAGE_PATH: aspnetserver/publish
