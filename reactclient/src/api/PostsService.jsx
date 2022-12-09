@@ -1,10 +1,4 @@
 import ENDPOINT__URLS from "../constants/endpoints";
-import {
-	CREATE_POST_ERROR,
-	DELETE_POST_ERROR,
-	POST_NOT_FOUND_ERROR,
-	UPDATE_POST_ERROR,
-} from "../constants/exceptions";
 
 const PostsService = {
 	async getAllPosts(userToken) {
@@ -28,7 +22,7 @@ const PostsService = {
 		})
 			.then((response) => {
 				if (response.ok) return response.json();
-				else throw new POST_NOT_FOUND_ERROR(`Post with id: ${postId} was not found.`);
+				else throw new Error(`Post with id: ${postId} was not found.`);
 			})
 			.then((postFromServer) => postFromServer);
 	},
@@ -44,7 +38,7 @@ const PostsService = {
 		})
 			.then((response) => {
 				if (response.ok) return true;
-				CREATE_POST_ERROR("Error during post creation.");
+				Error("Error during post creation.");
 			})
 			.then((responseFromServer) => responseFromServer);
 	},
@@ -60,7 +54,7 @@ const PostsService = {
 		})
 			.then((response) => {
 				if (response.ok) return true;
-				else throw new UPDATE_POST_ERROR(`Error during post update.`);
+				else throw new Error(`Error during post update.`);
 			})
 			.then((responseFromServer) => responseFromServer);
 	},
@@ -74,7 +68,7 @@ const PostsService = {
 		})
 			.then((response) => {
 				if (response.ok) return true;
-				else throw new DELETE_POST_ERROR(`Error during post deletion.`);
+				else throw new Error(`Error during post deletion.`);
 			})
 			.then((responseFromServer) => responseFromServer);
 	},

@@ -24,4 +24,19 @@ export const HelperFunctions = {
 
 		return passwordValidator;
 	},
+
+	getErrorMessageForFailingResponse(responseMessage) {
+		switch (responseMessage) {
+			case "NO ACCOUNT":
+				return "No account found, please check your credentials and try again";
+			case "NOT CONFIRMED":
+				return "Please check your email and confirm your account before logging in";
+			case "INVALID PASSWORD":
+				return "Invalid password for the given account";
+			case "DUPLICATEUSERNAME":
+				return "Username has already been taken, please try again with a different one";
+			default:
+				return "Error during submission, please try again later";
+		}
+	},
 };

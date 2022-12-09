@@ -1,5 +1,4 @@
 import ENDPOINT__URLS from "../constants/endpoints";
-import { LOGIN_ERROR, REGISTER_ERROR } from "../constants/exceptions";
 
 const AuthService = {
 	async login(userToLogin) {
@@ -12,9 +11,7 @@ const AuthService = {
 			body: JSON.stringify(userToLogin),
 		}).then((response) => {
 			if (response.ok) return response.json();
-			else if (response.status === 401) {
-				throw new LOGIN_ERROR("Unauthorized");
-			}
+			else return response.text();
 		});
 	},
 
@@ -26,21 +23,10 @@ const AuthService = {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ ...userToRegister, email: userToRegister.username }),
-		})
-			.then((response) => {
-				if (response.ok) return true;
-				else if (response.status === 400) return response.json();
-			})
-			.then((responseObject) => {
-				if (responseObject.errors) {
-					responseObject.errors.forEach((error) => {
-						if (error.code.includes("Duplicate")) {
-							throw new REGISTER_ERROR("Duplicate Username");
-						}
-					});
-				}
-				return responseObject;
-			});
+		}).then((response) => {
+			if (response.ok) return response.status;
+			else return response.text();
+		});
 	},
 };
 

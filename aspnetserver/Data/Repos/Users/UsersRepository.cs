@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Dtos;
+using aspnetserver.Data.Models.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -18,19 +19,39 @@ namespace aspnetserver.Data.Repos.Users
             this.mapper = mapper;
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)
+        public async Task<UserValidationResponse> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
-            var user = mapper.Map<User>(userRegistration);
+            user = mapper.Map<User>(userRegistration);
+            var result = await userManager.CreateAsync(user, userRegistration.Password);
 
-            return await userManager.CreateAsync(user, userRegistration.Password);
+            if (result.Succeeded) return new UserValidationResponse { IsValid = true };
+            else return new UserValidationResponse { IsValid = false, Reason = result.Errors.Select(e => e.Code.ToUpper()).ToList().First() };
         }
 
-        public async Task<bool> ValidateUserAsync(UserLoginDto userLogin)
+        public async Task<UserValidationResponse> ValidateUserAsync(UserLoginDto userLogin)
         {
             user = await userManager.FindByNameAsync(userLogin.UserName);
-            var result = user != null && await userManager.CheckPasswordAsync(user, userLogin.Password);
 
-            return result;
+            if (user == null) return new UserValidationResponse
+            {
+                IsValid = false,
+                Reason = "NO ACCOUNT"
+            };
+
+            if (!await userManager.CheckPasswordAsync(user, userLogin.Password)) return new UserValidationResponse
+            {
+                IsValid = false,
+                Reason = "INVALID PASSWORD"
+            };
+
+            if (!await userManager.IsEmailConfirmedAsync(user)) return new UserValidationResponse
+            {
+                IsValid = false,
+                Reason = "NOT CONFIRMED"
+            };
+
+
+            return new UserValidationResponse { IsValid = true };
         }
 
         public async Task<List<Claim>> GetClaimsAsync()

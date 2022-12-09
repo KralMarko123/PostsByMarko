@@ -72,21 +72,16 @@ const RegisterForm = () => {
 			setIsLoading(true);
 
 			await AuthService.register(registerData)
-				.then((responseFromServer) => {
-					if (responseFromServer) {
+				.then((response) => {
+					if (response === 201) {
 						setIsRegistered(true);
-					} else setErrors({ title: "Error during register, please try again", messages: [] });
+					} else
+						setErrors({
+							title: HelperFunctions.getErrorMessageForFailingResponse(response),
+							messages: [],
+						});
 				})
-				.catch((error) => {
-					error.message === "Duplicate Username"
-						? setErrors({
-								title: "The username is already taken. Please use a different one",
-								messages: [],
-						  })
-						: setErrors({ title: "Error during register, please try again", messages: [] });
-					console.error(error.message);
-				})
-				.then(() => setIsLoading(false));
+				.finally(() => setIsLoading(false));
 		}
 	};
 
@@ -133,9 +128,14 @@ const RegisterForm = () => {
 			</form>
 		</>
 	) : (
-		<p className="link success" onClick={() => navigate(ROUTES.LOGIN)}>
-			You have successfully registered. Click here to log in
-		</p>
+		<>
+			<h1 className="container__title">Successfully Registered!</h1>
+			<p className="container__description">
+				Please check your email to confirm your account first. You can click on the button below to
+				login
+			</p>
+			<Button text={"Log In"} onButtonClick={() => navigate(ROUTES.LOGIN)} />
+		</>
 	);
 };
 

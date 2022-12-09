@@ -184,8 +184,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7", "397ecdda-3c1e-4d2e-867c-b0201f9dbac8", "Editor", "EDITOR" },
-                    { "500b26ff-74a9-4a2c-b3f7-587f1d6f247f", "1a494aa0-8be2-43dd-965f-6867a6ef23e6", "Admin", "ADMIN" }
+                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "21891ff9-ce87-418f-88d8-9d2a11161b9c", "Admin", "ADMIN" },
+                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "c5ae9578-3287-4439-a310-0686ad41218b", "Editor", "EDITOR" }
                 });
 
             migrationBuilder.InsertData(
@@ -193,8 +193,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24", 0, "9dfedc17-e971-4980-b7cf-6be254b6a894", "kralmarko123@gmail.com", false, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAEOycuYzKUx63q2Uc/jLyc/sSxzCMJP6Zq+1t7/MkG5b94vq8/toPFWI9YYhGa+/wMg==", null, false, "64e94ff4-c658-4ede-bf24-3708cc1741e6", false, "kralmarko123@gmail.com" },
-                    { "ca05c5bb-921d-40e8-ae2a-2e3785aeb602", 0, "1af177a0-4848-4cd0-9b48-b48ad0d0edd8", "test@test.com", false, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAENOAJsX7oDD5bcEgPQ+qm6MUbk901qkxMe9FULkDfBFO2js2l8S9ItC4F/cAvWHDiQ==", null, false, "0f8dea4f-b1b1-4eb1-9584-03e6301a89d5", false, "test@test.com" }
+                    { "7fb99ea5-38ae-4323-832f-4af81a7cd4da", 0, "26415fb4-57ef-4aad-80d9-731b4fa8b937", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAEBmDolRzcDwzVB3CRlhXBF4cRoXvi7gkPfWE3uyfLGXTG1aRFPhOsR8K+G3ghVey5Q==", null, false, "72e9bf55-aebe-44fe-82b3-f1097acc18fb", false, "kralmarko123@gmail.com" },
+                    { "b267308d-534f-4263-891e-cf3321b95f05", 0, "fdea298d-f16f-4bd2-9340-8b75c589f1d1", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEIMqvcSEed9RC2PO4kUIbRSZdmZfHa20Pv9Q7PBthZOcQwC1mBKTykSTAtQKglxpqw==", null, false, "2b34529f-d97a-4bac-b633-821543278e2c", false, "test@test.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -202,10 +202,10 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7", "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24" },
-                    { "500b26ff-74a9-4a2c-b3f7-587f1d6f247f", "c57f32af-0c5a-4b8c-8276-bcfc0af3cc24" },
-                    { "3d4a4855-5134-48a1-a5a7-5cb023f5e5d7", "ca05c5bb-921d-40e8-ae2a-2e3785aeb602" },
-                    { "500b26ff-74a9-4a2c-b3f7-587f1d6f247f", "ca05c5bb-921d-40e8-ae2a-2e3785aeb602" }
+                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "7fb99ea5-38ae-4323-832f-4af81a7cd4da" },
+                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "7fb99ea5-38ae-4323-832f-4af81a7cd4da" },
+                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "b267308d-534f-4263-891e-cf3321b95f05" },
+                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "b267308d-534f-4263-891e-cf3321b95f05" }
                 });
 
             migrationBuilder.CreateIndex(

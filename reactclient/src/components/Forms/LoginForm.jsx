@@ -39,20 +39,15 @@ const LoginForm = () => {
 			setIsLoading(true);
 
 			await AuthService.login(loginData)
-				.then((loginResponse) => {
-					login(loginResponse);
+				.then((response) => {
+					if (response.token) login(response);
+					else
+						setErrors({
+							title: HelperFunctions.getErrorMessageForFailingResponse(response),
+							messages: [],
+						});
 				})
-				.catch((error) => {
-					error.message === "Unauthorized"
-						? setErrors({
-								title: "Invalid Login, please check your credentials and try again",
-								messages: [],
-						  })
-						: setErrors({ title: "Error during login, please try again later", messages: [] });
-					console.error(error.message);
-				})
-				.then(() => setIsLoading(false));
-		} else {
+				.finally(() => setIsLoading(false));
 		}
 	};
 

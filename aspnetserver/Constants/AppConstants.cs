@@ -5,7 +5,7 @@ namespace aspnetserver.Constants
 {
     public static class AppConstants
     {
-
+        #region Static
         public static List<IdentityRole> appRoles = new List<IdentityRole>()
         {
                 new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
@@ -23,6 +23,7 @@ namespace aspnetserver.Constants
                     NormalizedUserName = "KRALMARKO123@GMAIL.COM",
                     Email = "kralmarko123@gmail.com",
                     NormalizedEmail = "KRALMARKO123@GMAIL.COM",
+                    EmailConfirmed = true,
                     Posts = new List<Post>(),
                  },
 
@@ -34,14 +35,22 @@ namespace aspnetserver.Constants
                     NormalizedUserName = "TEST@TEST.COM",
                     Email = "test@test.com",
                     NormalizedEmail = "TEST@TEST.COM",
+                    EmailConfirmed = true,
                     Posts = new List<Post>(),
                  }
         };
 
-        public static string corsPolicyName = "postsCorsPolicy";
-        public static List<string> allowedDevOrigins = new List<string> { "http://localhost:7171", "http://localhost:3000", "https://localhost:7171", "https://localhost:3000" };
-        public static List<string> allowedPrdOrigins = new List<string> { "https://posts-aspnetserver.azurewebsites.net/", "https://posts.markomarkovikj.com" };
+        public static List<string> allowedDevOrigins = new List<string> { devServerUrl, devClientUrl };
+        public static List<string> allowedPrdOrigins = new List<string> { prdServerUrl, prdClientUrl };
+        #endregion
 
-
-}
+        #region Const
+        public const string corsPolicyName = "postsCorsPolicy";
+        public const string webserverAdminEmail = "posts@markomarkovikj.com";
+        public const string devServerUrl = "http://localhost:7171";
+        public const string prdServerUrl = "https://posts-aspnetserver.azurewebsites.net";
+        public const string devClientUrl = "http://localhost:3000";
+        public const string prdClientUrl = "https://posts.markomarkovikj.com";
+        #endregion
+    }
 }

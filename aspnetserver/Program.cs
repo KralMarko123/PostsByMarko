@@ -80,6 +80,7 @@ builder.Services.AddIdentity<User, IdentityRole>(user =>
     user.Password.RequireUppercase = true;
     user.Password.RequireNonAlphanumeric = false;
     user.User.RequireUniqueEmail = true;
+    user.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
