@@ -1,7 +1,9 @@
-﻿namespace aspnetserver.Helper
+﻿using aspnetserver.Data.Models;
+
+namespace aspnetserver.Helper
 {
     public interface IJwtHelper
     {
-        Task<string> CreateTokenAsync();
+        Task<string> CreateTokenAsync(User user);
     }
 }

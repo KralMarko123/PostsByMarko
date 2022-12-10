@@ -73,7 +73,7 @@ public class AuthController : BaseController
 
             return Ok(new LoginResponse()
             {
-                Token = await jwtHelper.CreateTokenAsync(),
+                Token = await jwtHelper.CreateTokenAsync(loggedInUser),
                 UserId = loggedInUser.Id,
                 FirstName = loggedInUser.FirstName,
                 LastName = loggedInUser.LastName,

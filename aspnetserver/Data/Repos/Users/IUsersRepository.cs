@@ -10,7 +10,7 @@ namespace aspnetserver.Data.Repos.Users
     {
         Task<UserValidationResponse> MapAndCreateUserAsync(UserRegistrationDto userRegistration);
         Task<UserValidationResponse> ValidateUserAsync(UserLoginDto userLogin);
-        Task<List<Claim>> GetClaimsAsync();
+        Task<List<Claim>> GetClaimsAsync(User user);
         Task<User> GetUserByUsernameAsync(string username);
         Task<List<string>> GetUserRolesByUsername(string username);
         Task<User> GetUserByIdAsync(string id);

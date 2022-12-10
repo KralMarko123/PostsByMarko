@@ -54,7 +54,7 @@ namespace aspnetserver.Data.Repos.Users
             return new UserValidationResponse { IsValid = true };
         }
 
-        public async Task<List<Claim>> GetClaimsAsync()
+        public async Task<List<Claim>> GetClaimsAsync(User user)
         {
             var claims = new List<Claim>
             {

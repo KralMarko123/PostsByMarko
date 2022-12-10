@@ -1,4 +1,5 @@
-﻿using aspnetserver.Data.Repos.Users;
+﻿using aspnetserver.Data.Models;
+using aspnetserver.Data.Repos.Users;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,10 +18,10 @@ namespace aspnetserver.Helper
             this.configuration = configuration;
         }
 
-        public async Task<string> CreateTokenAsync()
+        public async Task<string> CreateTokenAsync(User user)
         {
             var signingCredentials = GetSigningCredentials();
-            var claims = await usersRepository.GetClaimsAsync();
+            var claims = await usersRepository.GetClaimsAsync(user);
             var token = GenerateToken(signingCredentials, claims);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
