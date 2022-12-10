@@ -19,7 +19,7 @@ namespace PostsTesting.Tests
             driver = new BrowserDriver();
             browser = await driver.GetBrowserAsync();
             page = await browser.NewPageAsync();
-            client = new RestClient();
+            client = new RestClient(TestingConstants.ServerEndpoint);
         }
 
         public async Task DisposeAsync()
