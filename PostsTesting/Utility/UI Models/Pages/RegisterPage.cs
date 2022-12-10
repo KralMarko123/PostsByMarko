@@ -1,14 +1,12 @@
 ﻿using Microsoft.Playwright;
-using PostsTesting.Utility.Constants;
 using Xunit;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
-    public class RegisterPage
+    public class RegisterPage : Page
     {
-        private IPage page;
-        private static string url => $"{AppConstants.UiEndpoint}/register";
-        public RegisterPage(IPage page) => this.page = page;
+        private static string url => $"{baseUrl}/register";
+        public RegisterPage(IPage page) : base(page) { }
 
 
         public ILocator firstName => page.Locator("#firstName");
@@ -16,11 +14,8 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public ILocator username => page.Locator("#username");
         public ILocator password => page.Locator("#password");
         public ILocator confirmPassword => page.Locator("#confirmPassword");
-        public ILocator registerButton => page.Locator(".button");
-        public ILocator loginLink => page.Locator(".link");
-        public ILocator errorTitle => page.Locator(".error");
-        public ILocator errorMessage => page.Locator(".error__message");
-        public ILocator successfullyRegisteredLink => page.Locator(".success.link");
+        public ILocator registerButton => button;
+        public ILocator loginLink => link;
 
 
         public async Task Visit()
@@ -74,20 +69,31 @@ namespace PostsTesting.Utility.UI_Models.Pages
 
         public async Task CheckForErrors(string expectedErrorTitle, List<string> expectedErrorMessages = null)
         {
-            await errorTitle.WaitForAsync();
+            await errorMessage.WaitForAsync();
 
-            var errorTitleText = await errorTitle.TextContentAsync();
+            var errorTitleText = await errorMessage.TextContentAsync();
             Assert.Equal(errorTitleText, expectedErrorTitle);
 
             if (expectedErrorMessages != null)
             {
-                var numberOfErrorMessages = await errorMessage.CountAsync();
+                var numberOfErrorMessages = await errorSubmessage.CountAsync();
                 for (int i = 0; i < numberOfErrorMessages; i++)
                 {
-                    var errorMessageText = await errorMessage.Nth(i).TextContentAsync();
+                    var errorMessageText = await errorSubmessage.Nth(i).TextContentAsync();
                     Assert.Equal(errorMessageText, expectedErrorMessages.ElementAt(i));
                 }
             }
+        }
+
+        public async Task CheckForSuccessfulRegistration()
+        {
+            await title.WaitForAsync();
+        
+            var titleText = await title.TextContentAsync();
+            var descriptionText = await description.TextContentAsync();
+
+            Assert.Equal("Successfully Registered!", titleText);
+            Assert.Equal("Please check your email to confirm your account first. You can click on the button below to login", descriptionText);
         }
 
     }

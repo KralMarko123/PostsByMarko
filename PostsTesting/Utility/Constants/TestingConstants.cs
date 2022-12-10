@@ -1,8 +1,9 @@
-﻿using PostsTesting.Utility.Models;
+﻿using aspnetserver.Constants;
+using aspnetserver.Data.Models;
 
 namespace PostsTesting.Utility.Constants
 {
-    public static class AppConstants
+    public static class TestingConstants
     {
         private static readonly string environment = ConfigReader.GetConfigurationEntries().FirstOrDefault(e => e.Key.Equals("Environment")).Value;
 
@@ -48,20 +49,6 @@ namespace PostsTesting.Utility.Constants
             }
         }
 
-        public static User TestUser = new User
-        {
-            FirstName = "Test",
-            LastName = "Testerson",
-            Username = "test@test.com",
-            Password = "Test123"
-        };
-
-        public static User RandomTestUser = new User
-        {
-            FirstName = $"{RandomDataGenerator.GetRandomTextWithLength(5)}",
-            LastName = $"{RandomDataGenerator.GetRandomTextWithLength(5)}",
-            Username = $"{RandomDataGenerator.GetRandomTextWithLength(5)}@{RandomDataGenerator.GetRandomTextWithLength(5)}.com",
-            Password = $"{RandomDataGenerator.GetRandomTextWithLength(5)}test123"
-        };
+        public static User TestUser = AppConstants.appUsers.Last();
     }
 }

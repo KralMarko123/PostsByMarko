@@ -16,7 +16,7 @@ namespace PostsTesting.Utility
 
         public async Task<IBrowser> GetBrowserAsync(bool headless = false)
         {
-            switch (AppConstants.browserType)
+            switch (TestingConstants.browserType)
             {
                 case "Chrome":
                     browser ??= await GetPlaywrightAsync().Result.Chromium.LaunchAsync(new BrowserTypeLaunchOptions

@@ -28,7 +28,7 @@ namespace PostsTesting.Tests.TestBase
                 var postCount = await homePage.GetNumberOfPosts();
                 for (int i = 0; i < postCount; i++)
                 {
-                    Post post = new Post(page, homePage.postCard.Nth(i));
+                    var post = new Post(page, homePage.postCard.Nth(i));
                     var postTitle = await post.title.TextContentAsync();
                     var postContent = await post.content.TextContentAsync();
 
@@ -41,9 +41,7 @@ namespace PostsTesting.Tests.TestBase
 
         public async Task VerifyPostDetailsForNotFoundPost()
         {
-            var notFoundResponse = await postDetailsPage.GetResponseForPostDetails("404");
-            Assert.True(notFoundResponse.Status == (int)HttpStatusCode.NotFound);
-
+            await postDetailsPage.Visit("404");
             await postDetailsPage.CheckPostDetails("No Post Found", "The post with Id: 404 doesn't seem to exist. Go back to view other posts");
         }
 

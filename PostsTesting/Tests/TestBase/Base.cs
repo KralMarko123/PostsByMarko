@@ -1,7 +1,8 @@
-﻿using Microsoft.Playwright;
+﻿using aspnetserver.Data.Models;
+using Microsoft.Playwright;
 using PostsTesting.Utility;
 using PostsTesting.Utility.Constants;
-using PostsTesting.Utility.Models;
+using RestSharp;
 using Xunit;
 
 namespace PostsTesting.Tests
@@ -11,12 +12,14 @@ namespace PostsTesting.Tests
         protected BrowserDriver driver;
         protected IBrowser browser;
         protected IPage page;
-        protected User testUser = AppConstants.TestUser;
+        protected User testUser = TestingConstants.TestUser;
+        protected RestClient client;
         public async Task InitializeAsync()
         {
             driver = new BrowserDriver();
             browser = await driver.GetBrowserAsync();
             page = await browser.NewPageAsync();
+            client = new RestClient();
         }
 
         public async Task DisposeAsync()

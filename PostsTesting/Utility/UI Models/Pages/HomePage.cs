@@ -1,31 +1,31 @@
 ﻿using Microsoft.Playwright;
-using PostsTesting.Utility.Constants;
 using PostsTesting.Utility.Pages;
 using Xunit;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
-    public class HomePage
+    public class HomePage : Page
     {
-        private IPage page;
-        private static string url => $"{AppConstants.UiEndpoint}/";
-        public HomePage(IPage page) => this.page = page;
+        private static string url => $"{baseUrl}/";
+        public readonly Modal modal;
+
+        public HomePage(IPage page) : base(page)
+        {
+            modal = new Modal(page);
+        }
 
 
         public ILocator home => page.Locator(".home");
         public ILocator username => page.Locator(".nav__username");
-        public ILocator title => page.Locator(".container__title");
-        public ILocator subtitle => page.Locator(".container__description");
         public ILocator postCard => page.Locator(".post");
         public ILocator postList => page.Locator(".posts__list");
-        public ILocator createPostButton => page.Locator(".button", new PageLocatorOptions { HasTextString = "Create Post"});
+        public ILocator createPostButton => page.Locator(".button", new PageLocatorOptions { HasTextString = "Create Post" });
         public ILocator infoMessage => page.Locator(".info__message");
-        public Modal modal => new Modal(page);
 
 
         public async Task Visit()
         {
-           await page.GotoAsync(url);
+            await page.GotoAsync(url);
         }
 
         public async Task ClickCreatePostButton()
@@ -35,10 +35,9 @@ namespace PostsTesting.Utility.UI_Models.Pages
 
         public async Task CheckDefaultState()
         {
-            var homeElementsAreDisplayed = await title.IsVisibleAsync() && await subtitle.IsVisibleAsync();
-            var titleText = await title.TextContentAsync();
+            await title.WaitForAsync();
+            var homeElementsAreDisplayed = await title.IsVisibleAsync() && await description.IsVisibleAsync();
             Assert.True(homeElementsAreDisplayed);
-            Assert.Equal("Welcome to our blog!", titleText);
 
             await ClickCreatePostButton();
             await modal.CheckVisibility("Create A Post");

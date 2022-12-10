@@ -13,7 +13,7 @@ namespace PostsTesting.Tests.TestBase
         public async Task LoginAsTestUser()
         {
             await loginPage.Visit();
-            await loginPage.Login(testUser.Username, testUser.Password);
+            await loginPage.Login(testUser.UserName, "Test123");
             await homePage.home.WaitForAsync();
         }
 

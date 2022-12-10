@@ -1,16 +1,18 @@
 ﻿using Microsoft.Playwright;
+using PostsTesting.Utility.UI_Models.Components;
 using Xunit;
 
 namespace PostsTesting.Utility.Pages
 {
-    public class Post
+    public class Post : Component
     {
-        private IPage page;
         private ILocator post;
-        public Post(IPage page, ILocator post)
+        public readonly Modal modal;
+
+        public Post(IPage page, ILocator post) : base(page)
         {
-            this.page = page;
             this.post = post;
+            modal = new Modal(page);
         }
 
 
@@ -19,7 +21,6 @@ namespace PostsTesting.Utility.Pages
         public ILocator idIcon => post.Locator(".post__id");
         public ILocator updateIcon => post.Locator(".post__update");
         public ILocator deleteIcon => post.Locator(".post__delete");
-        public Modal modal => new Modal(page);
 
 
         public async Task ClickOnPost()

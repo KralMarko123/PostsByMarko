@@ -1,6 +1,4 @@
 ﻿using PostsTesting.Utility;
-using PostsTesting.Utility.Constants;
-using PostsTesting.Utility.Models;
 using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
@@ -27,17 +25,11 @@ namespace PostsTesting.Tests.TestBase
 
         public async Task VerifyUserCanBeRegistered()
         {
-            User randomlyGeneratedTestUser = AppConstants.RandomTestUser;
+            var randomlyGeneratedTestUser = RandomDataGenerator.GetRandomTestUser();
 
             await registerPage.Visit();
-            await registerPage.Register(randomlyGeneratedTestUser.FirstName, randomlyGeneratedTestUser.LastName, randomlyGeneratedTestUser.Username, randomlyGeneratedTestUser.Password);
-            await registerPage.successfullyRegisteredLink.WaitForAsync();
-
-            var hasSuccessfullyRegistered = await registerPage.successfullyRegisteredLink.IsVisibleAsync();
-            var linkText = await registerPage.successfullyRegisteredLink.TextContentAsync();
-
-            Assert.True(hasSuccessfullyRegistered);
-            Assert.Equal(linkText, "You have successfully registered. Click here to log in");
+            await registerPage.Register(randomlyGeneratedTestUser.FirstName, randomlyGeneratedTestUser.LastName, randomlyGeneratedTestUser.UserName, "Random123");
+            await registerPage.CheckForSuccessfulRegistration();
         }
 
         public async Task VerifyErrorMessagesWhenLoggingIn()
@@ -50,7 +42,7 @@ namespace PostsTesting.Tests.TestBase
             await loginPage.FillInPasswordInput(randomTestText);
             await loginPage.FillInUsernameInput(randomTestText);
             await loginPage.ClickLoginButton();
-            await loginPage.CheckForErrors("Invalid Login, please check your credentials and try again");
+            await loginPage.CheckForErrors("No account found, please check your credentials and try again");
         }
 
         public async Task VerifyErrorMessagesWhenRegistering()
@@ -80,9 +72,9 @@ namespace PostsTesting.Tests.TestBase
             await registerPage.ClickRegisterButton();
             await registerPage.CheckForErrors("Passwords do not match");
             await registerPage.FillInConfirmPasswordInput($"{randomTestText}test123");
-            await registerPage.FillInUsernameInput(testUser.Username);
+            await registerPage.FillInUsernameInput(testUser.UserName);
             await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("The username is already taken. Please use a different one");
+            await registerPage.CheckForErrors("Username has already been taken, please try again with a different one");
         }
     }
 }
