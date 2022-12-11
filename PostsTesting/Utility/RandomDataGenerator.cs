@@ -12,6 +12,11 @@ namespace PostsTesting.Utility
             return new string(Enumerable.Repeat(characters, length).Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+        public static int GetRandomNumberWithMax(int max)
+        {
+            return random.Next(max);
+        }
+
         public static User GetRandomTestUser()
         {
             return new User

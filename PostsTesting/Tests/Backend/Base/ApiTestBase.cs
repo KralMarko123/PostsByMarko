@@ -3,9 +3,9 @@ using aspnetserver.Data.Models.Responses;
 using RestSharp;
 using Xunit;
 
-namespace PostsTesting.Tests.TestBase
+namespace PostsTesting.Tests.Backend.Base
 {
-    public class ApiTestBase : Base, IAsyncLifetime
+    public class ApiTestBase : BackendBase, IAsyncLifetime
     {
         public async Task InitializeAsync()
         {

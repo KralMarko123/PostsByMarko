@@ -1,4 +1,4 @@
-using PostsTesting.Tests.TestBase;
+using PostsTesting.Tests.Frontend.Base;
 using Xunit;
 
 namespace PostsTesting.Tests.Frontend

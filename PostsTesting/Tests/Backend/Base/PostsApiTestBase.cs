@@ -3,7 +3,7 @@ using aspnetserver.Data.Models.Responses;
 using PostsTesting.Utility.Constants;
 using RestSharp;
 
-namespace PostsTesting.Tests.TestBase
+namespace PostsTesting.Tests.Backend.Base
 {
     public class PostsApiTestBase : ApiTestBase
     {
@@ -22,6 +22,11 @@ namespace PostsTesting.Tests.TestBase
         public async Task<PostDetailsResponse?> GetPostById(string postId)
         {
             return await GetAsJson<PostDetailsResponse>($"{BASE_URL}{GET_POST}/{postId}");
+        }
+
+        public async Task<RestResponse?> GetPostByIdResponse(string postId)
+        {
+            return await Get($"{BASE_URL}{GET_POST}/{postId}");
         }
 
         public async Task<RestResponse?> CreatePost(object postToCreate)

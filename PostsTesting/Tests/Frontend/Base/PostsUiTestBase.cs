@@ -5,7 +5,7 @@ using PostsTesting.Utility.UI_Models.Pages;
 using System.Net;
 using Xunit;
 
-namespace PostsTesting.Tests.TestBase
+namespace PostsTesting.Tests.Frontend.Base
 {
     public class PostsUiTestBase : UiTestBase, IAsyncLifetime
     {

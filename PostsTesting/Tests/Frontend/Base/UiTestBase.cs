@@ -1,9 +1,9 @@
 ﻿using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
-namespace PostsTesting.Tests.TestBase
+namespace PostsTesting.Tests.Frontend.Base
 {
-    public class UiTestBase : Base, IAsyncLifetime
+    public class UiTestBase : FrontendBase, IAsyncLifetime
     {
         LoginPage loginPage => new LoginPage(page);
         HomePage homePage => new HomePage(page);

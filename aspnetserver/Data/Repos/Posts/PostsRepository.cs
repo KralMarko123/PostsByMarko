@@ -1,5 +1,4 @@
 ﻿using aspnetserver.Data.Models;
-using aspnetserver.Data.Repos.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace aspnetserver.Data.Repos.Posts

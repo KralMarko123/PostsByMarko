@@ -2,7 +2,7 @@
 using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
-namespace PostsTesting.Tests.TestBase
+namespace PostsTesting.Tests.Frontend.Base
 {
     public class AuthUiTestBase : UiTestBase, IAsyncLifetime
     {
