@@ -31,5 +31,17 @@ namespace PostsTesting.Utility
                 Posts = new List<Post>(),
             };
         }
+
+        public static Post GetRandomPost()
+        {
+            return new Post
+            {
+                Title = $"Test Title: {GetRandomTextWithLength(5)}",
+                Content = $"Test Content: {GetRandomTextWithLength(20)}",
+                UserId = new Guid().ToString(),
+                CreatedDate = DateTime.UtcNow,
+                LastUpdatedDate = DateTime.UtcNow
+            };
+        }
     }
 }

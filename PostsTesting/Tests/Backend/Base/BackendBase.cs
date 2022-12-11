@@ -1,4 +1,5 @@
 ﻿using aspnetserver.Data.Models;
+using PostsTesting.Tests.Backend.Base;
 using PostsTesting.Utility.Constants;
 using RestSharp;
 using Xunit;
@@ -18,6 +19,7 @@ namespace PostsTesting.Tests
         public async Task DisposeAsync()
         {
             client.Dispose();
+            await PostsDbTestBase.DeleteAllTestPosts();
         }
     }
 }

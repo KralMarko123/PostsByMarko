@@ -11,6 +11,7 @@ namespace PostsTesting.Utility.Constants
         private const string baseUiUrlDev = "http://localhost:3000";
         private const string baseUrlPrd = "https://posts-aspnetserver.azurewebsites.net";
         private const string baseUiUrlPrd = "https://posts.markomarkovikj.com";
+        public const string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PostsDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         public static readonly string browserType = ConfigReader.GetConfigurationEntries().FirstOrDefault(e => e.Key.Equals("Browser")).Value;
         public static string ServerEndpoint

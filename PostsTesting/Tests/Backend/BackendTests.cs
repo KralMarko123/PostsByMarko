@@ -1,5 +1,4 @@
 ﻿using PostsTesting.Tests.Backend.Base;
-using PostsTesting.Utility;
 using PostsTesting.Utility.Builders;
 using PostsTesting.Utility.Extensions;
 using System.Net;
@@ -7,12 +6,16 @@ using Xunit;
 
 namespace PostsTesting.Tests.Backend
 {
-    public class ApiTests : PostsApiTestBase
+    public class BackendTests : PostsApiTestBase
     {
+
         [Fact]
         public async Task VerifyPostsCanBeFetched()
         {
             var posts = await GetAllPosts();
+            var postsFromDb = await PostsDbTestBase.GetAllPosts();
+
+            Assert.Equal(posts.Count, postsFromDb.Count);
 
             for (int i = 0; i < posts.Count; i++)
             {
@@ -33,8 +36,8 @@ namespace PostsTesting.Tests.Backend
         public async Task VerifyPostCanBeCreated()
         {
             var postToCreate = new ObjectBuilder()
-                .WithTitle($"New Post No. {RandomDataGenerator.GetRandomNumberWithMax(100)}")
-                .WithContent($"New Content No. {RandomDataGenerator.GetRandomNumberWithMax(100)}")
+                .WithTitle($"Test Post")
+                .WithContent($"Test Content")
                 .Build();
             var allPosts = await GetAllPosts();
             var allPostsCount = allPosts.Count;
@@ -55,12 +58,12 @@ namespace PostsTesting.Tests.Backend
         [Fact]
         public async Task VerifyPostCanBeUpdated()
         {
-            var updatedTitle = $"Updated Post No. {RandomDataGenerator.GetRandomNumberWithMax(100)}";
-            var updatedContent = $"Updated Content No. {RandomDataGenerator.GetRandomNumberWithMax(100)}";
+            var updatedTitle = $"Updated Test Post";
+            var updatedContent = $"Updated Test Content";
 
             var payload = new ObjectBuilder()
-                .WithTitle("New Post")
-                .WithContent("New Content")
+                .WithTitle("Test Post")
+                .WithContent("Test Content")
                 .Build();
 
             await CreatePost(payload);
@@ -107,5 +110,6 @@ namespace PostsTesting.Tests.Backend
             allPosts = await GetAllPosts();
             Assert.Null(allPosts.Find(p => p.PostId.ToString() == postToDeleteId));
         }
+
     }
 }
