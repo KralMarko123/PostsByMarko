@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Controllers;
 
 [Route("")]
+[AllowAnonymous]
 public class AuthController : BaseController
 {
     private readonly IUsersRepository usersRepository;
@@ -27,7 +28,6 @@ public class AuthController : BaseController
     [HttpPost]
     [Route("/register")]
     [Tags("Auth Endpoint")]
-    [AllowAnonymous]
     public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
     {
 
@@ -50,7 +50,6 @@ public class AuthController : BaseController
     [HttpPost]
     [Route("/login")]
     [Tags("Auth Endpoint")]
-    [AllowAnonymous]
     public async Task<IActionResult> Authenticate([FromBody] UserLoginDto userLogin)
     {
         var result = await usersRepository.ValidateUserAsync(userLogin);

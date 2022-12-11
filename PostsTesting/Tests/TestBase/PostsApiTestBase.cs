@@ -1,7 +1,7 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Responses;
-using PostsTesting.Utility;
 using PostsTesting.Utility.Constants;
+using RestSharp;
 
 namespace PostsTesting.Tests.TestBase
 {
@@ -14,34 +14,29 @@ namespace PostsTesting.Tests.TestBase
         private const string UPDATE_POST = "/update-post";
         private const string DELETE_POST = "/delete-post-by-id";
 
-        public async Task<List<Post>> GetAllPosts()
+        public async Task<List<Post>?> GetAllPosts()
         {
-            var response = await Get($"{BASE_URL}{GET_ALL_POSTS}");
-            return SimpleJsonSerializer.Deserialize<List<Post>>(response);
+            return await GetAsJson<List<Post>>($"{BASE_URL}{GET_ALL_POSTS}");
         }
 
-        public async Task<PostDetailsResponse> GetPostById(string postId)
+        public async Task<PostDetailsResponse?> GetPostById(string postId)
         {
-            var response = await Get($"{BASE_URL}{GET_POST}/{postId}");
-            return SimpleJsonSerializer.Deserialize<PostDetailsResponse>(response);
+            return await GetAsJson<PostDetailsResponse>($"{BASE_URL}{GET_POST}/{postId}");
         }
 
-        public async Task<string> CreatePost(object? postToCreate)
+        public async Task<RestResponse?> CreatePost(object postToCreate)
         {
-            var response = await Post($"{BASE_URL}{CREATE_POST}", postToCreate);
-            return SimpleJsonSerializer.Deserialize<string>(response);
+            return await Post($"{BASE_URL}{CREATE_POST}", postToCreate);
         }
 
-        public async Task<string> UpdatePost(object? updatedPost)
+        public async Task<RestResponse?> UpdatePost(object updatedPost)
         {
-            var response = await Put($"{BASE_URL}{UPDATE_POST}", updatedPost);
-            return SimpleJsonSerializer.Deserialize<string>(response);
+            return await Put($"{BASE_URL}{UPDATE_POST}", updatedPost);
         }
 
-        public async Task<string> DeletePostById(string postId)
+        public async Task<RestResponse?> DeletePostById(string postId)
         {
-            var response = await Delete($"{BASE_URL}{DELETE_POST}/{postId}");
-            return SimpleJsonSerializer.Deserialize<string>(response);
+            return await Delete($"{BASE_URL}{DELETE_POST}/{postId}");
         }
     }
 }

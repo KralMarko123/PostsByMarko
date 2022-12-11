@@ -7,20 +7,16 @@ namespace PostsTesting.Tests.TestBase
 {
     public class ApiTestBase : Base, IAsyncLifetime
     {
-        public async Task InitializeAsync() => await base.InitializeAsync();
-
+        public async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+            await AddAuthenticationTokenToClient();
+        }
 
         public async Task<string?> GetAuthenticationToken()
         {
-            var request = new RestRequest()
-            {
-
-                Resource = "/login",
-                Method = Method.Post,
-            };
-            request.AddBody(new UserLoginDto { UserName = testUser.UserName, Password = "Test123" }, "application/json");
-
-            var response = await client.PostAsync<LoginResponse>(request);
+            var request = new UserLoginDto { UserName = testUser.UserName, Password = "Test123" };
+            var response = await client.PostJsonAsync<UserLoginDto, LoginResponse>("/login", request);
 
             return response?.Token;
         }
@@ -33,58 +29,45 @@ namespace PostsTesting.Tests.TestBase
 
         public async Task<RestResponse> Get(string url)
         {
-            await AddAuthenticationTokenToClient();
-
-            var request = new RestRequest()
-            {
-                Resource = url,
-                Method = Method.Get,
-            };
+            var request = new RestRequest(url, Method.Get);
 
             return await client.GetAsync(request);
         }
 
-        public async Task<RestResponse> Post(string url, object? payload)
+        public async Task<T?> GetAsJson<T>(string url)
         {
-            await AddAuthenticationTokenToClient();
+            return await client.GetJsonAsync<T>(url);
+        }
 
-            var request = new RestRequest()
-            {
-                Resource = url,
-                Method = Method.Post,
-
-            };
-            request.AddHeader("Content-type", "application-json");
+        public async Task<RestResponse> Post(string url, object payload)
+        {
+            var request = new RestRequest(url, Method.Post);
             request.AddBody(payload);
 
             return await client.PostAsync(request);
         }
 
+        public async Task<T?> PostAsJson<T>(string url, object payload)
+        {
+            return await client.PostJsonAsync<object, T>(url, payload);
+        }
+
         public async Task<RestResponse> Put(string url, object? payload)
         {
-            await AddAuthenticationTokenToClient();
-
-            var request = new RestRequest()
-            {
-                Resource = url,
-                Method = Method.Put,
-
-            };
-            request.AddHeader("Content-type", "application-json");
+            var request = new RestRequest(url, Method.Put);
             request.AddBody(payload);
 
             return await client.PutAsync(request);
         }
 
+        public async Task<T?> PutAsJson<T>(string url, object payload)
+        {
+            return await client.PutJsonAsync<object, T>(url, payload);
+        }
+
         public async Task<RestResponse> Delete(string url)
         {
-            await AddAuthenticationTokenToClient();
-
-            var request = new RestRequest()
-            {
-                Resource = url,
-                Method = Method.Delete,
-            };
+            var request = new RestRequest(url, Method.Delete);
 
             return await client.DeleteAsync(request);
         }
