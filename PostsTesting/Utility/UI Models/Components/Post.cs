@@ -1,6 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 using PostsTesting.Utility.UI_Models.Components;
-using Xunit;
 
 namespace PostsTesting.Utility.Pages
 {
@@ -40,8 +40,10 @@ namespace PostsTesting.Utility.Pages
 
         public async Task CheckPost()
         {
-            bool postIsDisplayed = await title.IsVisibleAsync() && await content.IsVisibleAsync();
-            Assert.True(postIsDisplayed);
+            await post.WaitForAsync();
+
+            var postIsDisplayed = await title.IsVisibleAsync() && await content.IsVisibleAsync();
+            postIsDisplayed.Should().BeTrue();
 
             await ClickOnUpdateIcon();
             await modal.CheckVisibility("Update Post");
@@ -56,8 +58,8 @@ namespace PostsTesting.Utility.Pages
             var postTitle = await title.TextContentAsync();
             var contentTitle = await content.TextContentAsync();
 
-            Assert.Equal(expectedTitle, postTitle);
-            Assert.Equal(expectedContent, contentTitle);
+            postTitle.Should().Be(expectedTitle);
+            contentTitle.Should().Be(expectedContent);
         }
     }
 }

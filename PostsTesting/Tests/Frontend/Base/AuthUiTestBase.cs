@@ -1,4 +1,5 @@
-﻿using PostsTesting.Utility;
+﻿using FluentAssertions;
+using PostsTesting.Utility;
 using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
@@ -19,8 +20,8 @@ namespace PostsTesting.Tests.Frontend.Base
             var userDisplayed = await homePage.username.IsVisibleAsync();
             var userDetails = await homePage.username.TextContentAsync();
 
-            Assert.True(userDisplayed);
-            Assert.Contains($"{testUser.FirstName} {testUser.LastName}", userDetails);
+            userDisplayed.Should().BeTrue();
+            userDetails.Should().Contain($"{testUser.FirstName} {testUser.LastName}");
         }
 
         public async Task VerifyUserCanBeRegistered()

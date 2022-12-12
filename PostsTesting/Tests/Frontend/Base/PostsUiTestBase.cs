@@ -1,8 +1,8 @@
-﻿using Microsoft.Playwright;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 using PostsTesting.Utility;
 using PostsTesting.Utility.Pages;
 using PostsTesting.Utility.UI_Models.Pages;
-using System.Net;
 using Xunit;
 
 namespace PostsTesting.Tests.Frontend.Base
@@ -11,7 +11,6 @@ namespace PostsTesting.Tests.Frontend.Base
     {
         HomePage homePage => new HomePage(page);
         PostDetailsPage postDetailsPage => new PostDetailsPage(page);
-
 
         public async Task InitializeAsync()
         {
@@ -103,10 +102,10 @@ namespace PostsTesting.Tests.Frontend.Base
             await newlyCreatedPost.modal.ClickDelete("Post deleted successfully");
 
             var isPostVisible = await page.Locator(".post", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
-            Assert.False(isPostVisible);
+            isPostVisible.Should().BeFalse();
 
             var numberOfPostsAfterDelete = await homePage.GetNumberOfPosts();
-            Assert.Equal(numberOfPostsAfterDelete, numberOfPostsPriorDelete - 1);
+            numberOfPostsAfterDelete.Should().Be(numberOfPostsPriorDelete - 1);
         }
     }
 }

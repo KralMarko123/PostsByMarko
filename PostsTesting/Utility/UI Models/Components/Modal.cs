@@ -1,6 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 using PostsTesting.Utility.UI_Models.Components;
-using Xunit;
 
 namespace PostsTesting.Utility.Pages
 {
@@ -64,8 +64,8 @@ namespace PostsTesting.Utility.Pages
             var modalIsDisplayed = await modal.IsVisibleAsync() && await title.IsVisibleAsync();
             var titleText = await title.TextContentAsync();
 
-            Assert.True(modalIsDisplayed);
-            Assert.Equal(expectedTitleText, titleText);
+            modalIsDisplayed.Should().BeTrue();
+            titleText.Should().Be(expectedTitleText);
         }
 
         public async Task CheckSuccessMessage(string expectedSuccessMessage)
@@ -73,7 +73,7 @@ namespace PostsTesting.Utility.Pages
             await WaitForSuccessMessage();
 
             var successMessage = await messageSuccess.TextContentAsync();
-            Assert.Equal(expectedSuccessMessage, successMessage);
+            successMessage.Should().Be(expectedSuccessMessage);
         }
 
         public async Task CheckFailureMessage(string expectedErrorMessage)
@@ -81,7 +81,7 @@ namespace PostsTesting.Utility.Pages
             await WaitForFailureMessage();
 
             var errorMessage = await messageFailure.TextContentAsync();
-            Assert.Equal(expectedErrorMessage, errorMessage);
+            errorMessage.Should().Be(expectedErrorMessage);
         }
 
         public async Task WaitForModalToBeRemoved()

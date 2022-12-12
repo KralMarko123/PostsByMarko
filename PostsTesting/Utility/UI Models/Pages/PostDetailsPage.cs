@@ -1,5 +1,5 @@
-﻿using Microsoft.Playwright;
-using Xunit;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
@@ -27,9 +27,10 @@ namespace PostsTesting.Utility.UI_Models.Pages
             var titleText = await title.TextContentAsync();
             var descriptionText = await description.TextContentAsync();
 
-            Assert.True(detailsElementsAreDisplayed);
-            Assert.Equal(expectedTitle, titleText);
-            Assert.Equal(expectedContent, descriptionText);
+            detailsElementsAreDisplayed.Should().BeTrue();
+
+            titleText.Should().Be(expectedTitle);
+            descriptionText.Should().Be(expectedContent);
         }
     }
 }

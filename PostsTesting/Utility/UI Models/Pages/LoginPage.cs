@@ -1,5 +1,5 @@
-﻿using Microsoft.Playwright;
-using Xunit;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
@@ -52,7 +52,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await errorMessage.WaitForAsync();
 
             var errorTitleText = await errorMessage.TextContentAsync();
-            Assert.Equal(errorTitleText, expectedErrorTitle);
+            errorTitleText.Should().Be(expectedErrorTitle);
 
             if (expectedErrorMessages != null)
             {
@@ -60,7 +60,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 for (int i = 0; i < numberOfErrorMessages; i++)
                 {
                     var errorMessageText = await errorSubmessage.Nth(i).TextContentAsync();
-                    Assert.Equal(errorMessageText, expectedErrorMessages.ElementAt(i));
+                    errorMessageText.Should().Be(expectedErrorMessages[i]);
                 }
             }
         }

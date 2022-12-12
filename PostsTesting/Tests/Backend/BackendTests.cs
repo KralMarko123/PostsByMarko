@@ -3,6 +3,7 @@ using PostsTesting.Utility.Builders;
 using PostsTesting.Utility.Extensions;
 using System.Net;
 using Xunit;
+using FluentAssertions;
 
 namespace PostsTesting.Tests.Backend
 {
@@ -15,44 +16,36 @@ namespace PostsTesting.Tests.Backend
             var posts = await GetAllPosts();
             var postsFromDb = await PostsDbTestBase.GetAllPosts();
 
-            Assert.Equal(posts.Count, postsFromDb.Count);
+            posts.Should().BeEquivalentTo(postsFromDb);
 
             for (int i = 0; i < posts.Count; i++)
             {
                 var post = posts[i];
                 var postFetchedSeparately = await GetPostById(post.PostId.ToString());
 
-                Assert.Multiple(() =>
-                {
-                    Assert.NotNull(postFetchedSeparately);
-                    Assert.Equal(post.Title, postFetchedSeparately.Post.Title);
-                    Assert.Equal(post.Content, postFetchedSeparately.Post.Content);
-                    Assert.Equal(post.UserId, postFetchedSeparately.Post.UserId);
-                });
+                postFetchedSeparately.Should().NotBeNull();
+                postFetchedSeparately.Post.Should().BeEquivalentTo(post);
             }
         }
 
         [Fact]
         public async Task VerifyPostCanBeCreated()
         {
-            var postToCreate = new ObjectBuilder()
+            var postsFromDb = await PostsDbTestBase.GetAllPosts();
+            var postsCount = postsFromDb.Count();
+            var payload = new ObjectBuilder()
                 .WithTitle($"Test Post")
                 .WithContent($"Test Content")
                 .Build();
-            var allPosts = await GetAllPosts();
-            var allPostsCount = allPosts.Count;
-            var createdPostResponse = await CreatePost(postToCreate);
+            var createdPostResponse = await CreatePost(payload);
 
-            Assert.Equal(HttpStatusCode.OK, createdPostResponse.StatusCode);
-            Assert.Contains("Post was created successfully.", createdPostResponse.Content);
+            createdPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            createdPostResponse.Content.Should().Contain("Post was created successfully.");
 
-            allPosts = await GetAllPosts();
-            Assert.Multiple(() =>
-            {
-                Assert.True(allPosts.Count == allPostsCount + 1);
-                Assert.Equal(postToCreate.GetProperty("Title"), allPosts.Last().Title);
-                Assert.Equal(postToCreate.GetProperty("Content"), allPosts.Last().Content);
-            });
+            postsFromDb = await PostsDbTestBase.GetAllPosts();
+            postsFromDb.Count.Should().Be(postsCount + 1);
+            postsFromDb.Last().Title.Should().Be(payload.GetProperty("Title").ToString());
+            postsFromDb.Last().Content.Should().Be(payload.GetProperty("Content").ToString());
         }
 
         [Fact]
@@ -60,7 +53,6 @@ namespace PostsTesting.Tests.Backend
         {
             var updatedTitle = $"Updated Test Post";
             var updatedContent = $"Updated Test Content";
-
             var payload = new ObjectBuilder()
                 .WithTitle("Test Post")
                 .WithContent("Test Content")
@@ -69,46 +61,48 @@ namespace PostsTesting.Tests.Backend
             await CreatePost(payload);
 
             var allPosts = await GetAllPosts();
-            var postToUpdateId = allPosts.Last().PostId.ToString();
+            var postToUpdateId = allPosts.Last().PostId;
 
             payload = new ObjectBuilder()
-                .WithPostId(postToUpdateId)
+                .WithPostId(postToUpdateId.ToString())
                 .WithTitle(updatedTitle)
                 .WithContent(updatedContent)
                 .Build();
 
             var updatedPostResponse = await UpdatePost(payload);
-            Assert.Equal(HttpStatusCode.OK, updatedPostResponse.StatusCode);
-            Assert.Contains("Post was updated successfully.", updatedPostResponse.Content);
+            updatedPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            updatedPostResponse.Content.Should().Contain("Post was updated successfully.");
 
-            var updatedPost = await GetPostById(postToUpdateId);
-            Assert.Equal(updatedTitle, updatedPost.Post.Title);
-            Assert.Equal(updatedContent, updatedPost.Post.Content);
+
+            var updatedPost = await PostsDbTestBase.GetPostById(postToUpdateId);
+            updatedPost.Title.Should().Be(updatedTitle);
+            updatedPost.Content.Should().Be(updatedContent);
+            updatedPost.LastUpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 
         [Fact]
         public async Task VerifyPostCanBeDeleted()
         {
             var payload = new ObjectBuilder()
-                 .WithTitle("New Post")
-                 .WithContent("New Content")
+                 .WithTitle("Test Post")
+                 .WithContent("Test Content")
                  .Build();
 
             await CreatePost(payload);
 
-            var allPosts = await GetAllPosts();
-            var postToDeleteId = allPosts.Last().PostId.ToString();
+            var postsFromDb = await PostsDbTestBase.GetAllPosts();
+            var postToDeleteId = postsFromDb.Last().PostId;
 
-            var deletedPostResponse = await DeletePostById(postToDeleteId);
-            Assert.Equal(HttpStatusCode.OK, deletedPostResponse.StatusCode);
-            Assert.Contains("Post was deleted successfully.", deletedPostResponse.Content);
+            var deletedPostResponse = await DeletePostById(postToDeleteId.ToString());
+            deletedPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            deletedPostResponse.Content.Should().Contain("Post was deleted successfully.");
 
-            var findPostByIdResponse = await GetPostByIdResponse(postToDeleteId);
-            Assert.Equal(HttpStatusCode.NotFound, findPostByIdResponse.StatusCode);
-            Assert.Contains($"Post with id: {postToDeleteId} was not found.", findPostByIdResponse.Content);
+            var findPostByIdResponse = await GetPostByIdResponse(postToDeleteId.ToString());
+            findPostByIdResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            findPostByIdResponse.Content.Should().Contain($"Post with id: {postToDeleteId} was not found.");
 
-            allPosts = await GetAllPosts();
-            Assert.Null(allPosts.Find(p => p.PostId.ToString() == postToDeleteId));
+            var getPostFromDb = async () => await PostsDbTestBase.GetPostById(postToDeleteId);
+            await getPostFromDb.Should().ThrowAsync<Exception>();
         }
 
     }

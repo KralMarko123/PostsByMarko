@@ -1,6 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 using PostsTesting.Utility.Pages;
-using Xunit;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
@@ -37,7 +37,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
         {
             await title.WaitForAsync();
             var homeElementsAreDisplayed = await title.IsVisibleAsync() && await description.IsVisibleAsync();
-            Assert.True(homeElementsAreDisplayed);
+            homeElementsAreDisplayed.Should().BeTrue();
 
             await ClickCreatePostButton();
             await modal.CheckVisibility("Create A Post");
@@ -49,7 +49,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 var postCount = await GetNumberOfPosts();
                 for (int i = 0; i < postCount; i++)
                 {
-                    Post post = new Post(page, postCard.Nth(i));
+                    var post = new Post(page, postCard.Nth(i));
                     await post.CheckPost();
                 }
             }
@@ -58,22 +58,22 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 var infoMessageIsDisplyed = await infoMessage.IsVisibleAsync();
                 var infoMessageText = await infoMessage.TextContentAsync();
 
-                Assert.True(infoMessageIsDisplyed);
-                Assert.Equal("Seems there are no posts.", infoMessageText);
+                infoMessageIsDisplyed.Should().BeTrue();
+                infoMessageText.Should().Be("Seems there are no posts.");
             }
         }
 
         public async Task<bool> WaitForPostsToLoad()
         {
             await postList.WaitForAsync();
-            bool postsAreVisible = await postList.IsVisibleAsync();
+            var postsAreVisible = await postList.IsVisibleAsync();
             return postsAreVisible;
         }
 
         public Post FindPostWithTitleAndContent(string titleToFindBy)
         {
-            ILocator newlyCreatedPostCard = page.Locator(".post", new PageLocatorOptions { HasTextString = titleToFindBy });
-            Post newlyCreatedPost = new Post(page, newlyCreatedPostCard);
+            var newlyCreatedPostCard = page.Locator(".post", new PageLocatorOptions { HasTextString = titleToFindBy });
+            var newlyCreatedPost = new Post(page, newlyCreatedPostCard);
 
             return newlyCreatedPost;
         }

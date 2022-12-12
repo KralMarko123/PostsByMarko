@@ -1,5 +1,5 @@
-﻿using Microsoft.Playwright;
-using Xunit;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
 
 namespace PostsTesting.Utility.UI_Models.Pages
 {
@@ -72,7 +72,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await errorMessage.WaitForAsync();
 
             var errorTitleText = await errorMessage.TextContentAsync();
-            Assert.Equal(errorTitleText, expectedErrorTitle);
+            errorTitleText.Should().Be(expectedErrorTitle);
 
             if (expectedErrorMessages != null)
             {
@@ -80,7 +80,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 for (int i = 0; i < numberOfErrorMessages; i++)
                 {
                     var errorMessageText = await errorSubmessage.Nth(i).TextContentAsync();
-                    Assert.Equal(errorMessageText, expectedErrorMessages.ElementAt(i));
+                    errorMessageText.Should().Be(expectedErrorMessages[i]);
                 }
             }
         }
@@ -88,12 +88,12 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public async Task CheckForSuccessfulRegistration()
         {
             await title.WaitForAsync();
-        
+
             var titleText = await title.TextContentAsync();
             var descriptionText = await description.TextContentAsync();
 
-            Assert.Equal("Successfully Registered!", titleText);
-            Assert.Equal("Please check your email to confirm your account first. You can click on the button below to login", descriptionText);
+            titleText.Should().Be("Successfully Registered!");
+            descriptionText.Should().Be("Please check your email to confirm your account first. You can click on the button below to login");
         }
 
     }
