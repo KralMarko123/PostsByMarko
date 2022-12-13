@@ -35,10 +35,6 @@
 	font-size: var(--md-text);
 }
 
-.post__id {
-	left: 0.5em;
-}
-
 .post__delete {
 	right: 0.5em;
 }

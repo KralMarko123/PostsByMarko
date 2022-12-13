@@ -42,7 +42,6 @@ const Post = ({ postId, authorId, title, content, onPostDeleted, onPostUpdated }
 						<p>&times;</p>
 					</span>
 				)}
-				<span className="post__icon post__id">{postId}</span>
 				<h1 className="post__title">{title}</h1>
 				<p className="post__content">{content}</p>
 			</div>
