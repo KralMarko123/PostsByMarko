@@ -99,10 +99,8 @@ const UpdatePostForm = (props) => {
 		>
 			<form method={updatePostForm.action} className="form">
 				{updatePostForm.formGroups.map((group) => (
-					<div key={group.id} className="form__group">
-						<label htmlFor={group.id} className="input__label">
-							{group.label}
-						</label>
+					<div key={group.id} className={`form__group ${group.type === "textarea" ? "text" : ""}`}>
+						{group.icon}
 						{group.type === "textarea" ? (
 							<textarea
 								id={group.id}
@@ -111,6 +109,7 @@ const UpdatePostForm = (props) => {
 									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
 								}
 								defaultValue={props.content}
+								placeholder={group.placeholder}
 							/>
 						) : (
 							<input
@@ -121,6 +120,7 @@ const UpdatePostForm = (props) => {
 									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
 								}
 								defaultValue={props.title}
+								placeholder={group.placeholder}
 							/>
 						)}
 					</div>

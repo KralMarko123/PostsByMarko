@@ -1,62 +1,71 @@
+import { ICONS } from "./misc";
+
 export const FORMS = {
 	registerForm: {
 		action: "POST",
-		formTitle: "Register",
+		formTitle: "REGISTER",
 		formGroups: [
 			{
 				id: "firstName",
 				label: "First Name",
 				type: "text",
-				placeholder: "Enter your first name",
+				placeholder: "First name",
+				icon: ICONS.USER_INFO_ICON(),
 			},
 
 			{
 				id: "lastName",
 				label: "Last Name",
 				type: "text",
-				placeholder: "Enter your last name",
+				placeholder: "Last name",
+				icon: ICONS.USER_INFO_ICON(),
 			},
 
 			{
 				id: "username",
 				label: "Username",
 				type: "text",
-				placeholder: "Enter a valid email address",
+				placeholder: "Valid email address",
 				requirements: ["Be a valid email address"],
+				icon: ICONS.EMAIL_ICON(),
 			},
 
 			{
 				id: "password",
 				label: "Password",
 				type: "password",
-				placeholder: "Enter your password",
+				placeholder: "Password",
+				icon: ICONS.PASSWORD_ICON(),
 			},
 
 			{
 				id: "confirmPassword",
 				label: "Confirm Password",
 				type: "password",
-				placeholder: "Confirm your password",
+				placeholder: "Confirm password",
+				icon: ICONS.PASSWORD_ICON(),
 			},
 		],
 	},
 
 	loginForm: {
 		action: "POST",
-		formTitle: "Login",
+		formTitle: "LOG IN",
 		formGroups: [
 			{
 				id: "username",
 				label: "Username",
 				type: "text",
-				placeholder: "Enter your username",
+				placeholder: "Username",
+				icon: ICONS.USER_ICON(),
 			},
 
 			{
 				id: "password",
 				label: "Password",
 				type: "password",
-				placeholder: "Enter your password",
+				placeholder: "Password",
+				icon: ICONS.PASSWORD_ICON(),
 			},
 		],
 	},
@@ -69,12 +78,16 @@ export const FORMS = {
 				id: "title",
 				label: "Title",
 				type: "text",
+				placeholder: "Title",
+				icon: ICONS.TITLE_ICON(),
 			},
 
 			{
 				id: "content",
 				label: "Content",
 				type: "textarea",
+				placeholder: "Content",
+				icon: ICONS.CONTENT_ICON(),
 			},
 		],
 	},
@@ -87,12 +100,16 @@ export const FORMS = {
 				id: "title",
 				label: "Title",
 				type: "text",
+				placeholder: "Title",
+				icon: ICONS.TITLE_ICON(),
 			},
 
 			{
 				id: "content",
 				label: "Content",
 				type: "textarea",
+				placeholder: "Content",
+				icon: ICONS.CONTENT_ICON(),
 			},
 		],
 	},

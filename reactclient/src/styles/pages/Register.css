@@ -1,6 +1,13 @@
+.register {
+	justify-content: center;
+}
+
+.register .container {
+	height: 100%;
+}
+
 .register .form {
 	width: 100%;
-	align-self: center;
 
 	background-color: var(--dark-accent);
 	padding: calc(var(--normal-padding) * 2);
@@ -18,11 +25,15 @@
 .register .input {
 	background: none;
 	outline: none;
-
-	border-bottom: solid 3px var(--light);
-	color: var(--text-color);
 }
 
 .register .input:focus {
 	border-color: var(--light-accent);
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.register .form {
+		padding: calc(var(--small-padding) * 2);
+	}
 }

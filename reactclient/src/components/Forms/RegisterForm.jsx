@@ -91,9 +91,7 @@ const RegisterForm = () => {
 				<h1 className="form__title">{registerForm.formTitle}</h1>
 				{registerForm.formGroups.map((group) => (
 					<div key={group.id} className="form__group">
-						<label htmlFor={group.id} className="input__label">
-							{group.label}
-						</label>
+						{group.icon}
 						<input
 							id={group.id}
 							type={group.type}

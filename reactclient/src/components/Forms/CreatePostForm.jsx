@@ -84,10 +84,8 @@ const CreatePostForm = (props) => {
 		>
 			<form method={createPostForm.action} className="form">
 				{createPostForm.formGroups.map((group) => (
-					<div key={group.id} className="form__group">
-						<label htmlFor={group.id} className="input__label">
-							{group.label}
-						</label>
+					<div key={group.id} className={`form__group ${group.type === "textarea" ? "text" : ""}`}>
+						{group.icon}
 						{group.type === "textarea" ? (
 							<textarea
 								id={group.id}
@@ -95,6 +93,7 @@ const CreatePostForm = (props) => {
 								onChange={(e) =>
 									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
 								}
+								placeholder={group.placeholder}
 							/>
 						) : (
 							<input
@@ -104,6 +103,7 @@ const CreatePostForm = (props) => {
 								onChange={(e) =>
 									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
 								}
+								placeholder={group.placeholder}
 							/>
 						)}
 					</div>

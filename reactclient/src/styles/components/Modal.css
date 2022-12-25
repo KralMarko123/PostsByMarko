@@ -74,6 +74,14 @@
 	color: var(--danger);
 }
 
+.modal .form__group {
+	width: 100%;
+}
+
+.modal .form__actions {
+	width: 100%;
+}
+
 /**TABLET*/
 @media (min-width: 768px) and (max-width: 1199px) {
 	.modal {

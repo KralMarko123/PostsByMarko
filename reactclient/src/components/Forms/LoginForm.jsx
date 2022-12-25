@@ -56,9 +56,7 @@ const LoginForm = () => {
 			<h1 className="form__title">{loginForm.formTitle}</h1>
 			{loginForm.formGroups.map((group) => (
 				<div key={group.id} className="form__group">
-					<label htmlFor={group.id} className="input__label">
-						{group.label}
-					</label>
+					{group.icon}
 					<input
 						id={group.id}
 						type={group.type}
@@ -70,7 +68,7 @@ const LoginForm = () => {
 			))}
 
 			<div className="form__actions">
-				<Button onButtonClick={() => handleLogin()} text="Login" loading={isLoading} />
+				<Button onButtonClick={() => handleLogin()} text="Log In" loading={isLoading} />
 			</div>
 			<p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
 				Haven't registered yet? Click here to create an account

@@ -95,7 +95,7 @@
 
 .link {
 	color: var(--light);
-	font-size: var(--lg-text);
+	font-size: var(--md-text);
 	cursor: pointer;
 }
 
