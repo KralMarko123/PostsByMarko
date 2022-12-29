@@ -1,23 +1,28 @@
-import { React, useState } from "react";
+import { React, useContext, useState, useEffect } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
 import { modalTransitionDuration } from "../../constants/misc";
+import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
+import AppContext from "../../context/AppContext";
 import "../../styles/components/Form.css";
 
-const UpdatePostForm = (props) => {
+const UpdatePostForm = () => {
+	const appContext = useContext(AppContext);
 	const updatePostForm = FORMS.updatePostForm;
-	const [postData, setPostData] = useState({
-		title: props.title,
-		content: props.content,
-	});
+	const [newPostData, setNewPostData] = useState({ ...appContext.postBeingModified });
 	const [message, setMessage] = useState(null);
 	const { user } = useAuth();
+	const { sendMessage } = useSignalR();
+
+	useEffect(() => {
+		setNewPostData({ ...appContext.postBeingModified });
+	}, [appContext.postBeingModified]);
 
 	const onClose = () => {
-		props.onClose();
+		appContext.dispatch({ type: "CLOSE_MODAL", modal: "updatePost" });
 		setTimeout(() => {
 			setMessage(null);
 		}, modalTransitionDuration);
@@ -26,7 +31,10 @@ const UpdatePostForm = (props) => {
 	const checkForSameData = () => {
 		let hasSameData = false;
 
-		if (postData.title === props.title && postData.content === props.content) {
+		if (
+			newPostData.title === appContext.postBeingModified.title &&
+			newPostData.content === appContext.postBeingModified.content
+		) {
 			setMessage({
 				message: "Can't update with same data",
 				type: "fail",
@@ -40,7 +48,7 @@ const UpdatePostForm = (props) => {
 	const checkForEmptyFields = () => {
 		let hasEmptyField = false;
 
-		if (postData.title === "") {
+		if (newPostData.title === "") {
 			hasEmptyField = true;
 			setMessage({
 				type: "fail",
@@ -48,7 +56,7 @@ const UpdatePostForm = (props) => {
 			});
 		}
 
-		if (postData.content === "") {
+		if (newPostData.content === "") {
 			hasEmptyField = true;
 			setMessage({
 				type: "fail",
@@ -63,15 +71,9 @@ const UpdatePostForm = (props) => {
 		let isValidUpdate = !checkForEmptyFields() && !checkForSameData();
 
 		if (isValidUpdate) {
-			const postToUpdate = {
-				postId: props.postId,
-				title: postData.title,
-				content: postData.content,
-			};
-
-			await PostsService.updatePost(postToUpdate, user.token)
+			await PostsService.updatePost(newPostData, user.token)
 				.then(() => {
-					props.onSubmit(postToUpdate);
+					sendMessage("Updated Post");
 					setMessage({
 						type: "success",
 						message: "Post updated successfully",
@@ -81,7 +83,6 @@ const UpdatePostForm = (props) => {
 					}, 1000);
 				})
 				.catch((error) => {
-					console.error(error);
 					setMessage({
 						type: "fail",
 						message: "Error during post update",
@@ -92,7 +93,7 @@ const UpdatePostForm = (props) => {
 
 	return (
 		<Modal
-			isShown={props.isShown}
+			isShown={appContext.modalVisibility.updatePost}
 			title={updatePostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}
@@ -106,9 +107,9 @@ const UpdatePostForm = (props) => {
 								id={group.id}
 								className="input"
 								onChange={(e) =>
-									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
+									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
 								}
-								defaultValue={props.content}
+								defaultValue={appContext.postBeingModified.content}
 								placeholder={group.placeholder}
 							/>
 						) : (
@@ -117,9 +118,9 @@ const UpdatePostForm = (props) => {
 								type={group.type}
 								className="input"
 								onChange={(e) =>
-									setPostData({ ...postData, [`${group.id}`]: e.currentTarget.value })
+									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
 								}
-								defaultValue={props.title}
+								defaultValue={appContext.postBeingModified.title}
 								placeholder={group.placeholder}
 							/>
 						)}

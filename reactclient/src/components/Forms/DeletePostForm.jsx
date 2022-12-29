@@ -1,24 +1,28 @@
-import { React, useState } from "react";
+import { React, useContext, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { modalTransitionDuration } from "../../constants/misc";
+import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
+import AppContext from "../../context/AppContext";
 import "../../styles/components/Form.css";
 
-const DeletePostForm = (props) => {
+const DeletePostForm = () => {
+	const appContext = useContext(AppContext);
 	const [message, setMessage] = useState(null);
 	const { user } = useAuth();
+	const { sendMessage } = useSignalR();
 
 	const onClose = () => {
-		props.onClose();
+		appContext.dispatch({ type: "CLOSE_MODAL", modal: "deletePost" });
 		setTimeout(() => {
 			setMessage(null);
 		}, modalTransitionDuration);
 	};
 
 	const onDelete = async () => {
-		await PostsService.deletePostById(props.postId, user.token)
+		await PostsService.deletePostById(appContext.postBeingModified.postId, user.token)
 			.then(() => {
 				setMessage({
 					type: "success",
@@ -28,7 +32,7 @@ const DeletePostForm = (props) => {
 					onClose();
 				}, 1000);
 				setTimeout(() => {
-					props.onPostDeleted();
+					sendMessage("Deleted Post");
 				}, 1000 + modalTransitionDuration);
 			})
 			.catch((error) => {
@@ -41,7 +45,12 @@ const DeletePostForm = (props) => {
 	};
 
 	return (
-		<Modal isShown={props.isShown} title="Delete Post" message={message} onClose={() => onClose()}>
+		<Modal
+			isShown={appContext.modalVisibility.deletePost}
+			title="Delete Post"
+			message={message}
+			onClose={() => onClose()}
+		>
 			<form className="form">
 				<h1 className="form__confirmational">Are you sure you want to delete this post?</h1>
 				<div className="form__actions">

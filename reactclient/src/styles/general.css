@@ -32,6 +32,8 @@
 	color: var(--light);
 	font-size: var(--lg-text);
 	line-height: 1.25;
+
+	word-wrap: break-word;
 }
 
 .container__back {
@@ -61,8 +63,6 @@
 	width: fit-content;
 	padding: 1em;
 	margin: 0.5em 0em;
-
-	justify-self: center;
 
 	background-color: var(--dark-accent);
 	border-radius: var(--card-radius);

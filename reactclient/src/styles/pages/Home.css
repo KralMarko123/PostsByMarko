@@ -5,9 +5,22 @@
 .posts__list {
 	width: 100%;
 
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--normal-gap);
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc((100% / 3) - var(--normal-gap)), 0.3333fr));
+	grid-auto-rows: fit-content;
+	grid-gap: var(--normal-gap);
+}
+
+/**TABLET*/
+@media (min-width: 768px) and (max-width: 1199px) {
+	.posts__list {
+		grid-template-columns: repeat(auto-fit, minmax(calc((100% / 2) - var(--normal-gap)), 1fr));
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.posts__list {
+		grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+	}
 }

@@ -1,13 +1,16 @@
-import { React, useState } from "react";
+import { React, useContext, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
 import { modalTransitionDuration } from "../../constants/misc";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
+import AppContext from "../../context/AppContext";
+import { useSignalR } from "../../custom/useSignalR";
 import "../../styles/components/Form.css";
 
-const CreatePostForm = (props) => {
+const CreatePostForm = () => {
+	const appContext = useContext(AppContext);
 	const createPostForm = FORMS.createPostForm;
 	const [newPostData, setNewPostData] = useState({
 		title: "",
@@ -15,9 +18,10 @@ const CreatePostForm = (props) => {
 	});
 	const [message, setMessage] = useState(null);
 	const { user } = useAuth();
+	const { sendMessage } = useSignalR();
 
 	const onClose = () => {
-		props.onClose();
+		appContext.dispatch({ type: "CLOSE_MODAL", modal: "createPost" });
 		setTimeout(() => {
 			setMessage(null);
 			setNewPostData({ title: "", content: "" });
@@ -56,7 +60,7 @@ const CreatePostForm = (props) => {
 
 			await PostsService.createPost(postToCreate, user.token)
 				.then(() => {
-					props.onSubmit();
+					sendMessage("Created Post");
 					setMessage({
 						type: "success",
 						message: "Post created successfully",
@@ -77,7 +81,7 @@ const CreatePostForm = (props) => {
 
 	return (
 		<Modal
-			isShown={props.isShown}
+			isShown={appContext.modalVisibility.createPost}
 			title={createPostForm.formTitle}
 			message={message}
 			onClose={() => onClose()}

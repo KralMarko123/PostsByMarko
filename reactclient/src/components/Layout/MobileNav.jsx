@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
-import Button from "../Helper/Button";
+import AppContext from "../../context/AppContext";
 import "../../styles/components/MobileNav.css";
 
 const MobileNav = () => {
+	const appContext = useContext(AppContext);
 	const { user, logout } = useAuth();
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -22,9 +23,19 @@ const MobileNav = () => {
 						{user.firstName} {user.lastName}
 					</span>
 				</p>
-				<span className="nav__separator"></span>
-				<div className="nav__actions">
-					<Button onButtonClick={() => logout()} text={"Logout"} />
+				<div className="mobile__actions">
+					<li
+						className="actions__item"
+						onClick={() => {
+							appContext.dispatch({ type: "SHOW_MODAL", modal: "createPost" });
+							setIsExpanded(false);
+						}}
+					>
+						Create Post
+					</li>
+					<li className="actions__item" onClick={() => logout()}>
+						Logout
+					</li>
 				</div>
 			</ul>
 		</nav>

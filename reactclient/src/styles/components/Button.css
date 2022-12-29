@@ -5,7 +5,7 @@
 	outline: none;
 	border: none;
 	background-color: var(--light-accent);
-	border-radius: 0.25em;
+	border-radius: var(--button-radius);
 
 	color: var(--text-color);
 	font-size: var(--big-text);

@@ -19,8 +19,9 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public ILocator username => page.Locator(".nav__username");
         public ILocator postCard => page.Locator(".post");
         public ILocator postList => page.Locator(".posts__list");
-        public ILocator createPostButton => page.Locator(".button", new PageLocatorOptions { HasTextString = "Create Post" });
+        public ILocator createPost => page.Locator(".action__item", new PageLocatorOptions { HasTextString = "Create Post" });
         public ILocator infoMessage => page.Locator(".info__message");
+        public ILocator dropdownMenu => page.Locator(".nav__actions");
 
 
         public async Task Visit()
@@ -28,9 +29,16 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await page.GotoAsync(url);
         }
 
+        public async Task HoverDropdownMenu()
+        {
+            await dropdownMenu.HoverAsync();
+        }
+
+
         public async Task ClickCreatePostButton()
         {
-            await createPostButton.ClickAsync();
+            await HoverDropdownMenu();
+            await createPost.ClickAsync();
         }
 
         public async Task CheckDefaultState()

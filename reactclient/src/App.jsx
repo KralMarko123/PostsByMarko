@@ -6,29 +6,32 @@ import Home from "./pages/Home";
 import Details from "./pages/Details";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import AppProvider from "./context/ContextProvider";
 
 const App = () => {
 	return (
-		<Routes>
-			<Route
-				path={ROUTES.HOME}
-				element={
-					<ProtectedRoute>
-						<Home />
-					</ProtectedRoute>
-				}
-			/>
-			<Route
-				path={ROUTES.DETAILS}
-				element={
-					<ProtectedRoute>
-						<Details />
-					</ProtectedRoute>
-				}
-			/>
-			<Route path={ROUTES.LOGIN} element={<Login />} />
-			<Route path={ROUTES.REGISTER} element={<Register />} />
-		</Routes>
+		<AppProvider>
+			<Routes>
+				<Route
+					path={ROUTES.HOME}
+					element={
+						<ProtectedRoute>
+							<Home />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path={ROUTES.DETAILS}
+					element={
+						<ProtectedRoute>
+							<Details />
+						</ProtectedRoute>
+					}
+				/>
+				<Route path={ROUTES.LOGIN} element={<Login />} />
+				<Route path={ROUTES.REGISTER} element={<Register />} />
+			</Routes>
+		</AppProvider>
 	);
 };
 

@@ -1,91 +1,64 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../custom/useAuth";
 import { useSignalR } from "../custom/useSignalR";
 import PostsService from "../api/PostsService";
-import Button from "../components/Helper/Button";
-import CreatePostForm from "../components/Forms/CreatePostForm";
 import Post from "../components/Post";
 import InfoMessage from "../components/Helper/InfoMessage";
 import Nav from "../components/Layout/Nav";
+import UpdatePostForm from "../components/Forms/UpdatePostForm";
+import DeletePostForm from "../components/Forms/DeletePostForm";
+import AppContext from "../context/AppContext";
 import "../styles/pages/Home.css";
 
 const Home = () => {
-	const [posts, setPosts] = useState([]);
+	const appContext = useContext(AppContext);
 	const [isLoading, setIsLoading] = useState(true);
-	const [showCreateForm, setShowCreateForm] = useState(false);
 	const { user } = useAuth();
-	const { sendMessage, lastMessageRegistered } = useSignalR();
+	const { lastMessageRegistered } = useSignalR();
 
 	const getPosts = async () => {
 		await PostsService.getAllPosts(user.token)
-			.then((postsFromServer) => setPosts(postsFromServer))
+			.then((postsFromServer) =>
+				appContext.dispatch({ type: "LOAD_POSTS", posts: postsFromServer })
+			)
 			.catch((error) => console.error(error))
 			.then(() => setIsLoading(false));
 	};
 
-	const onPostCreated = () => {
-		getPosts();
-		sendMessage("Created Post");
-	};
-
-	const onPostDeleted = (postId) => {
-		setPosts(
-			posts.filter((p) => {
-				return p.postId !== postId;
-			})
-		);
-		sendMessage("Deleted Post");
-	};
-
-	const onPostUpdated = (updatedPost) => {
-		const postIndex = posts.findIndex((p) => p.postId === updatedPost.postId);
-
-		let updatedPosts = [...posts];
-		updatedPosts[postIndex] = updatedPost;
-		setPosts(updatedPosts);
-
-		sendMessage("Modified Post");
-	};
-
 	useEffect(() => {
 		getPosts();
+		console.log("here");
 	}, [lastMessageRegistered]);
 
 	return (
 		<div className="home page">
 			<Nav />
-			<CreatePostForm
-				isShown={showCreateForm}
-				onSubmit={() => onPostCreated()}
-				onClose={() => setShowCreateForm(false)}
-			/>
 			<div className="container">
-				<h1 className="container__title">Welcome to our blog!</h1>
-				<p className="container__description">
-					Feel free to check out our posts and add one yourself
-				</p>
+				<h1 className="container__title">Posts By Marko</h1>
+				<p className="container__description">Create and share posts with your friends</p>
 				{isLoading ? (
 					<InfoMessage message={"Loading Posts..."} shouldAnimate />
 				) : (
 					<ul className="posts__list">
-						{posts.length > 0 ? (
-							posts.map((p) => (
-								<Post
-									key={p.postId}
-									postId={p.postId}
-									authorId={p.userId}
-									title={p.title}
-									content={p.content}
-									onPostDeleted={(postId) => onPostDeleted(postId)}
-									onPostUpdated={(updatedPost) => onPostUpdated(updatedPost)}
-								/>
-							))
+						{appContext.posts.length > 0 ? (
+							<>
+								{appContext.posts.map((p) => (
+									<Post
+										key={p.postId}
+										postId={p.postId}
+										authorId={p.userId}
+										title={p.title}
+										content={p.content}
+									/>
+								))}
+								<UpdatePostForm />
+								<DeletePostForm />
+							</>
 						) : (
 							<InfoMessage message={"Seems there are no posts"} />
 						)}
 					</ul>
 				)}
-				<Button onButtonClick={() => setShowCreateForm(true)} text="Create Post" />
 			</div>
 		</div>
 	);
