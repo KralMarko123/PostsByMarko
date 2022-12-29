@@ -3,6 +3,7 @@ using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
+using aspnetserver.Decorators;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,7 @@ public class PostsController : BaseController
     [HttpGet]
     [Route("/get-all-posts")]
     [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
     public async Task<List<Post>> GetPostsAsync()
     {
         return await postsRepository.GetPostsAsync();
@@ -32,6 +34,7 @@ public class PostsController : BaseController
     [HttpGet]
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 2, TimeWindow = 5)]
     public async Task<IActionResult> GetPostByIdAsync(int postId)
     {
         var post = await postsRepository.GetPostByIdAsync(postId);
@@ -53,6 +56,7 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/create-post")]
     [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
     public async Task<IActionResult> CreatePostAsync([FromBody] Post postToCreate)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -79,6 +83,7 @@ public class PostsController : BaseController
     [HttpPut]
     [Route("/update-post")]
     [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
     public async Task<IActionResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -101,6 +106,7 @@ public class PostsController : BaseController
     [HttpDelete]
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 5)]
     public async Task<IActionResult> DeletePostByIdAsync(int postId)
     {
         LoadUserInfoForRequestBeingExecuted();

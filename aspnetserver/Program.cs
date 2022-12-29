@@ -1,20 +1,13 @@
-using aspnetserver.Constants;
 using aspnetserver.Data;
 using aspnetserver.Data.Mappings;
-using aspnetserver.Data.Models;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
+using aspnetserver.Extensions;
 using aspnetserver.Helper;
 using aspnetserver.Hubs;
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Text;
 using System.Text.Json.Serialization;
 using static aspnetserver.Constants.AppConstants;
 
@@ -24,7 +17,6 @@ var environment = builder.Configuration["Environment"];
 var connectionString = "";
 var allowedOrigins = new List<string>();
 IConfigurationSection jwtConfig = null;
-
 
 switch (environment)
 {
@@ -46,20 +38,11 @@ switch (environment)
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: corsPolicyName,
-        policy =>
-        {
-            policy
-             .WithOrigins(allowedOrigins.ToArray())
-             .AllowAnyHeader()
-             .AllowAnyMethod()
-             .AllowCredentials();
-        });
-});
+
+builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.AddSignalR();
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -72,81 +55,12 @@ builder.Services.AddScoped<IPostsRepository, PostsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
-builder.Services.AddIdentity<User, IdentityRole>(user =>
-{
-    user.Password.RequiredLength = 6;
-    user.Password.RequireDigit = true;
-    user.Password.RequireLowercase = true;
-    user.Password.RequireUppercase = true;
-    user.Password.RequireNonAlphanumeric = false;
-    user.User.RequireUniqueEmail = true;
-    user.SignIn.RequireConfirmedEmail = true;
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+builder.WithIdentity();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(swaggerOptions =>
-{
-    swaggerOptions.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "ASP.NET Posts Project",
-        Version = "v1",
-        Description = "Posts API Services",
-        Contact = new OpenApiContact { Name = "Marko Markovikj" }
-    });
-    swaggerOptions.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-    swaggerOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme."
-    });
-    swaggerOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[]{}
-        }
-    });
-});
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuers = jwtConfig.GetSection("validIssuers").Get<List<string>>(),
-        ValidAudiences = jwtConfig.GetSection("validAudiences").Get<List<string>>(),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["secret"])),
-    };
-});
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-    .RequireAuthenticatedUser()
-    .Build();
-});
-
-
+builder.WithSwagger();
+builder.WithAuthentication(jwtConfig);
+builder.WithAuthorization();
 
 #endregion
 
@@ -163,13 +77,14 @@ app.UseSwaggerUI(swaggerUIOptions =>
 });
 
 app.UseCors(corsPolicyName);
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseHttpsRedirection();
+
 app.MapHub<PostHub>("/postHub");
 app.MapControllers();
+
+app.UseRateLimiting();
 
 #endregion
 
