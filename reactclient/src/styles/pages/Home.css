@@ -11,6 +11,31 @@
 	grid-gap: var(--normal-gap);
 }
 
+.dashboard__filters {
+	padding: var(--small-padding);
+
+	display: flex;
+	gap: var(--small-gap);
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.dashboard__filters p {
+	margin-right: var(--normal-gap);
+
+	font-size: var(--lg-text);
+	font-weight: bold;
+}
+
+.filter {
+	display: flex;
+	gap: var(--small-gap);
+
+	font-size: var(--md-text);
+	color: var(--light);
+	text-transform: uppercase;
+}
+
 /**TABLET*/
 @media (min-width: 768px) and (max-width: 1199px) {
 	.posts__list {
