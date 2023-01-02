@@ -1,6 +1,7 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../custom/useAuth";
 import { useSignalR } from "../custom/useSignalR";
+import { HelperFunctions } from "../util/helperFunctions";
 import PostsService from "../api/PostsService";
 import Post from "../components/Post";
 import InfoMessage from "../components/Helper/InfoMessage";
@@ -25,7 +26,7 @@ const Home = () => {
 		await PostsService.getAllPosts(user.token)
 			.then((postsFromServer) => {
 				appContext.dispatch({ type: "LOAD_POSTS", posts: postsFromServer });
-				setFilteredPosts(postsFromServer);
+				setFilteredPosts(HelperFunctions.sortPostsByLastUpdatedDate(postsFromServer));
 			})
 			.catch((error) => console.error(error))
 			.then(() => setIsLoading(false));
@@ -46,22 +47,13 @@ const Home = () => {
 		if (filterToggled.isFilterApplied) {
 			switch (filterToggled.filterType) {
 				case "myPosts":
-					setFilteredPosts([...filteredPosts.filter((p) => p.userId === user.userId)]);
+					setFilteredPosts(HelperFunctions.filterPostsByUserId(filteredPosts, user));
 					break;
-				case "byLastUpdatedDate":
-					setFilteredPosts([
-						...filteredPosts.sort((p1, p2) => {
-							const date1 = Date.parse(p1.lastUpdatedDate);
-							const date2 = Date.parse(p2.lastUpdatedDate);
-
-							return date1 > date2 ? -1 : 1;
-						}),
-					]);
 
 				default:
 					break;
 			}
-		} else setFilteredPosts(appContext.posts);
+		} else setFilteredPosts(HelperFunctions.sortPostsByLastUpdatedDate(appContext.posts));
 	}, [filterToggled.isFilterApplied]);
 
 	return (
@@ -83,15 +75,6 @@ const Home = () => {
 										type="checkbox"
 										name="myPosts"
 										id="myPosts"
-										onChange={(e) => handleFilterToggle(e)}
-									/>
-								</span>
-								<span className="filter">
-									By Date
-									<input
-										type="checkbox"
-										name="byLastUpdatedDate"
-										id="byLastUpdatedDate"
 										onChange={(e) => handleFilterToggle(e)}
 									/>
 								</span>

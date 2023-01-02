@@ -39,4 +39,17 @@ export const HelperFunctions = {
 				return "Error during submission, please try again later";
 		}
 	},
+
+	sortPostsByLastUpdatedDate(posts) {
+		return posts.sort((p1, p2) => {
+			const date1 = Date.parse(p1.lastUpdatedDate);
+			const date2 = Date.parse(p2.lastUpdatedDate);
+
+			return date1 > date2 ? -1 : 1;
+		});
+	},
+
+	filterPostsByUserId(posts, user) {
+		return posts.filter((p) => p.userId === user.userId);
+	},
 };

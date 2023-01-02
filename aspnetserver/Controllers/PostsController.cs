@@ -45,17 +45,15 @@ public class PostsController : BaseController
         var post = await postsRepository.GetPostByIdAsync(postId);
 
         if (post == null) return NotFound($"Post with id: {postId} was not found.");
-        else
-        {
-            var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+        if (post.IsHidden == true && !post.AllowedUsers.Contains(username)) return Unauthorized($"Post with id: {postId} is hidden.");
 
-            return Ok(new PostDetailsResponse()
-            {
-                Post = post,
-                AuthorFirstName = postAuthor.FirstName,
-                AuthorLastName = postAuthor.LastName,
-            });
-        }
+        var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+        return Ok(new PostDetailsResponse()
+        {
+            Post = post,
+            AuthorFirstName = postAuthor.FirstName,
+            AuthorLastName = postAuthor.LastName,
+        });
     }
 
     [HttpPost]
@@ -127,5 +125,27 @@ public class PostsController : BaseController
             else return BadRequest("Error during post deletion.");
         }
         else return BadRequest("Error during post deletion.");
+    }
+
+    [HttpPost]
+    [Route("/toggle-post-visibility")]
+    [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
+    public async Task<IActionResult> TogglePostVisibilityAsync(int postId)
+    {
+        LoadUserInfoForRequestBeingExecuted();
+
+        var post = await postsRepository.GetPostByIdAsync(postId);
+
+        if (post.UserId == userId || userRoles.Contains("Admin"))
+        {
+            post.IsHidden = !post.IsHidden;
+
+            bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
+
+            if (postUpdatedSuccessfully) return Ok("Post was updated successfully.");
+            else return BadRequest("Error during post update.");
+        }
+        else return BadRequest("Error during post update.");
     }
 }

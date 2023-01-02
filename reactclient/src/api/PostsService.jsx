@@ -72,6 +72,21 @@ const PostsService = {
 			})
 			.then((responseFromServer) => responseFromServer);
 	},
+
+	async togglePostVisibility(postId, userToken) {
+		return await fetch(`${ENDPOINT__URLS.TOGGLE_POST_HIDDEN}/${postId}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${userToken}`,
+			},
+		})
+			.then((response) => {
+				if (response.ok) return true;
+				else throw new Error(`Error during post update.`);
+			})
+			.then((responseFromServer) => responseFromServer);
+	},
 };
 
 export default PostsService;

@@ -29,6 +29,11 @@ const Post = ({ postId, authorId, title, content }) => {
 	return (
 		<>
 			<div className="post" onClick={() => handlePostClick()}>
+				{(isAuthor || isAdmin) && (
+					<span className="post__icon post__hidden-toggle">
+						<p>&times;</p>
+					</span>
+				)}
 				{(isAuthor || isAdmin || isEditor) && (
 					<span
 						className="post__icon post__update"
