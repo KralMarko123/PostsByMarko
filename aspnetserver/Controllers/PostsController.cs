@@ -28,7 +28,12 @@ public class PostsController : BaseController
     [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
     public async Task<List<Post>> GetPostsAsync()
     {
-        return await postsRepository.GetPostsAsync();
+        LoadUserInfoForRequestBeingExecuted();
+
+        var allPosts = await postsRepository.GetPostsAsync();
+        allPosts.RemoveAll(p => p.IsHidden == true && !p.AllowedUsers.Contains(username));
+
+        return allPosts;
     }
 
     [HttpGet]
@@ -64,6 +69,7 @@ public class PostsController : BaseController
         if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
         {
             postToCreate.UserId = userId;
+            postToCreate.AllowedUsers.Add(username);
 
             bool postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
 
