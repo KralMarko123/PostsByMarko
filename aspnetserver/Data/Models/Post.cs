@@ -21,7 +21,7 @@ namespace aspnetserver.Data.Models
 
         public DateTime? CreatedDate { get; set; }
         public DateTime? LastUpdatedDate { get; set; }
-        public bool? IsHidden { get; set; }
+        public bool IsHidden { get; set; } = false;
 
         public List<string> AllowedUsers { get; set; } = new List<string>();
     }

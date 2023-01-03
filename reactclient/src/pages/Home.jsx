@@ -9,13 +9,14 @@ import Nav from "../components/Layout/Nav";
 import UpdatePostForm from "../components/Forms/UpdatePostForm";
 import DeletePostForm from "../components/Forms/DeletePostForm";
 import AppContext from "../context/AppContext";
+import PostFilters from "../components/PostFilters";
 import "../styles/pages/Home.css";
 
 const Home = () => {
 	const appContext = useContext(AppContext);
-	const [filterToggled, setFilterToggled] = useState({
-		isFilterApplied: false,
-		filterType: "",
+	const [filters, setFilters] = useState({
+		showOnlyMyPosts: false,
+		showHiddenPosts: false,
 	});
 	const [filteredPosts, setFilteredPosts] = useState(appContext.posts);
 	const [isLoading, setIsLoading] = useState(true);
@@ -26,17 +27,9 @@ const Home = () => {
 		await PostsService.getAllPosts(user.token)
 			.then((postsFromServer) => {
 				appContext.dispatch({ type: "LOAD_POSTS", posts: postsFromServer });
-				setFilteredPosts(HelperFunctions.sortPostsByLastUpdatedDate(postsFromServer));
+				setFilteredPosts(HelperFunctions.applyFilters(postsFromServer, filters, user.userId));
 			})
-			.catch((error) => console.error(error))
-			.then(() => setIsLoading(false));
-	};
-
-	const handleFilterToggle = (e) => {
-		setFilterToggled({
-			isFilterApplied: e.target.checked,
-			filterType: e.target.name,
-		});
+			.finally(() => setIsLoading(false));
 	};
 
 	useEffect(() => {
@@ -44,17 +37,8 @@ const Home = () => {
 	}, [lastMessageRegistered]);
 
 	useEffect(() => {
-		if (filterToggled.isFilterApplied) {
-			switch (filterToggled.filterType) {
-				case "myPosts":
-					setFilteredPosts(HelperFunctions.filterPostsByUserId(filteredPosts, user));
-					break;
-
-				default:
-					break;
-			}
-		} else setFilteredPosts(HelperFunctions.sortPostsByLastUpdatedDate(appContext.posts));
-	}, [filterToggled.isFilterApplied]);
+		setFilteredPosts(HelperFunctions.applyFilters(appContext.posts, filters, user.userId));
+	}, [filters]);
 
 	return (
 		<div className="home page">
@@ -63,34 +47,35 @@ const Home = () => {
 				<h1 className="container__title">Posts By Marko</h1>
 				<p className="container__description">Create and share posts with your friends</p>
 				{isLoading ? (
-					<InfoMessage message={"Loading Posts..."} shouldAnimate />
+					<InfoMessage message="Loading Posts..." shouldAnimate />
 				) : (
 					<>
-						<div className="posts__dashboard">
-							<div className="dashboard__filters">
-								<p>Filters:</p>
-								<span className="filter">
-									My Posts
-									<input
-										type="checkbox"
-										name="myPosts"
-										id="myPosts"
-										onChange={(e) => handleFilterToggle(e)}
-									/>
-								</span>
+						{appContext.posts?.length > 0 ? (
+							<div className="posts__dashboard">
+								<PostFilters
+									onFilterToggle={(isApplied, filter) =>
+										setFilters({
+											...filters,
+											[filter]: isApplied,
+										})
+									}
+								/>
+								<ul className="posts__list">
+									{filteredPosts.map((p) => (
+										<Post
+											key={p.postId}
+											postId={p.postId}
+											authorId={p.userId}
+											title={p.title}
+											content={p.content}
+											isHidden={p.isHidden}
+										/>
+									))}
+								</ul>
 							</div>
-							<ul className="posts__list">
-								{filteredPosts.map((p) => (
-									<Post
-										key={p.postId}
-										postId={p.postId}
-										authorId={p.userId}
-										title={p.title}
-										content={p.content}
-									/>
-								))}
-							</ul>
-						</div>
+						) : (
+							<InfoMessage message="Seems there are no posts" />
+						)}
 						<UpdatePostForm />
 						<DeletePostForm />
 					</>

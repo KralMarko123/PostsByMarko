@@ -12,15 +12,33 @@ export const defaultAppState = {
 };
 
 export const appReducer = (state, action) => {
+	let posts;
+	let postBeingModifiedIndex;
+
 	switch (action.type) {
 		case "SHOW_MODAL":
 			return { ...state, modalVisibility: { ...state.modalVisibility, [action.modal]: true } };
+
 		case "CLOSE_MODAL":
 			return { ...state, modalVisibility: { ...state.modalVisibility, [action.modal]: false } };
+
 		case "LOAD_POSTS":
 			return { ...state, posts: action.posts };
+
 		case "MODIFYING_POST":
 			return { ...state, postBeingModified: action.post };
+
+		case "DELETE_POST":
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.postId);
+			posts = [...state.posts.splice(postBeingModifiedIndex, 1)];
+
+			return { ...state, posts: [...state.posts.splice(postBeingModifiedIndex, 1)] };
+
+		case "TOGGLE_POST_HIDDEN":
+			posts = [...state.posts];
+			posts[action.postPosition].isHidden = !posts[action.postPosition].isHidden;
+
+			return { ...state, posts: posts };
 
 		default:
 			return defaultAppState;

@@ -7,10 +7,9 @@ const PostsService = {
 			headers: {
 				Authorization: `Bearer ${userToken}`,
 			},
-		}).then((response) => {
-			if (response.ok) return response.json();
-			else throw new Error("Posts not found.");
-		});
+		})
+			.then((response) => response.json())
+			.catch((error) => console.log(error));
 	},
 
 	async getPostById(postId, userToken) {
@@ -19,12 +18,13 @@ const PostsService = {
 			headers: {
 				Authorization: `Bearer ${userToken}`,
 			},
-		})
-			.then((response) => {
-				if (response.ok) return response.json();
-				else throw new Error(`Post with id: ${postId} was not found.`);
-			})
-			.then((postFromServer) => postFromServer);
+		}).then(async (response) => {
+			if (response.ok) return response.json();
+			else {
+				let errorMessage = await response.text();
+				throw new Error(errorMessage);
+			}
+		});
 	},
 
 	async createPost(postToCreate, userToken) {
@@ -35,12 +35,12 @@ const PostsService = {
 				Authorization: `Bearer ${userToken}`,
 			},
 			body: JSON.stringify(postToCreate),
-		})
-			.then((response) => {
-				if (response.ok) return true;
-				Error("Error during post creation.");
-			})
-			.then((responseFromServer) => responseFromServer);
+		}).then(async (response) => {
+			let responseMessage = await response.text();
+
+			if (response.ok) return { isSuccessful: true, message: responseMessage };
+			else throw new Error(responseMessage);
+		});
 	},
 
 	async updatePost(postToUpdate, userToken) {
@@ -51,12 +51,12 @@ const PostsService = {
 				Authorization: `Bearer ${userToken}`,
 			},
 			body: JSON.stringify(postToUpdate),
-		})
-			.then((response) => {
-				if (response.ok) return true;
-				else throw new Error(`Error during post update.`);
-			})
-			.then((responseFromServer) => responseFromServer);
+		}).then(async (response) => {
+			let responseMessage = await response.text();
+
+			if (response.ok) return { isSuccessful: true, message: responseMessage };
+			else throw new Error(responseMessage);
+		});
 	},
 
 	async deletePostById(postId, userToken) {
@@ -65,12 +65,12 @@ const PostsService = {
 			headers: {
 				Authorization: `Bearer ${userToken}`,
 			},
-		})
-			.then((response) => {
-				if (response.ok) return true;
-				else throw new Error(`Error during post deletion.`);
-			})
-			.then((responseFromServer) => responseFromServer);
+		}).then(async (response) => {
+			let responseMessage = await response.text();
+
+			if (response.ok) return { isSuccessful: true, message: responseMessage };
+			else throw new Error(responseMessage);
+		});
 	},
 
 	async togglePostVisibility(postId, userToken) {
@@ -80,12 +80,10 @@ const PostsService = {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${userToken}`,
 			},
-		})
-			.then((response) => {
-				if (response.ok) return true;
-				else throw new Error(`Error during post update.`);
-			})
-			.then((responseFromServer) => responseFromServer);
+		}).then(async (response) => {
+			let responseMessage = await response.text();
+			if (!response.ok) throw new Error(responseMessage);
+		});
 	},
 };
 

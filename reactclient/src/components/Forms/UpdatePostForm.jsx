@@ -36,9 +36,10 @@ const UpdatePostForm = () => {
 			newPostData.content === appContext.postBeingModified.content
 		) {
 			setMessage({
+				isSuccessful: false,
 				message: "Can't update with same data",
-				type: "fail",
 			});
+
 			hasSameData = true;
 		}
 
@@ -51,7 +52,7 @@ const UpdatePostForm = () => {
 		if (newPostData.title === "") {
 			hasEmptyField = true;
 			setMessage({
-				type: "fail",
+				isSuccessful: false,
 				message: "Title can't be empty",
 			});
 		}
@@ -59,7 +60,7 @@ const UpdatePostForm = () => {
 		if (newPostData.content === "") {
 			hasEmptyField = true;
 			setMessage({
-				type: "fail",
+				isSuccessful: false,
 				message: "Content can't be empty",
 			});
 		}
@@ -72,22 +73,19 @@ const UpdatePostForm = () => {
 
 		if (isValidUpdate) {
 			await PostsService.updatePost(newPostData, user.token)
-				.then(() => {
+				.then((response) => {
 					sendMessage("Updated Post");
-					setMessage({
-						type: "success",
-						message: "Post updated successfully",
-					});
+					setMessage(response);
 					setTimeout(() => {
 						onClose();
 					}, 1000);
 				})
-				.catch((error) => {
+				.catch((error) =>
 					setMessage({
-						type: "fail",
-						message: "Error during post update",
-					});
-				});
+						isSuccessful: false,
+						message: error.message,
+					})
+				);
 		}
 	};
 

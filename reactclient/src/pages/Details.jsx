@@ -2,26 +2,15 @@ import { React, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { useAuth } from "../custom/useAuth";
+import { HelperFunctions } from "../util/helperFunctions";
 import PostsService from "../api/PostsService";
 import Nav from "../components/Layout/Nav";
 import "../styles/pages/Details.css";
-import { HelperFunctions } from "../util/helperFunctions";
 
 const Details = () => {
 	const params = useParams();
 	const postId = params.id;
-	const [postDetails, setPostDetails] = useState({
-		post: {
-			postId: "",
-			title: "",
-			content: "",
-			userId: "",
-			createdDate: "",
-			lastUpdatedDate: "",
-		},
-		authorFirstName: "",
-		authorLastName: "",
-	});
+	const [postDetails, setPostDetails] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 	const { user } = useAuth();
@@ -29,21 +18,19 @@ const Details = () => {
 	useEffect(() => {
 		const getPost = async () => {
 			await PostsService.getPostById(postId, user.token)
-				.then((postFromServer) => {
-					setPostDetails(postFromServer);
-				})
-				.catch((error) => {
-					console.error(error);
+				.then((response) => setPostDetails(response))
+				.catch((error) =>
 					setPostDetails({
 						post: {
 							...postDetails.post,
-							title: "No Post Found",
-							content: `The post with Id: ${postId} doesn't seem to exist. Go back to view other posts`,
+							title: "Cannot open post",
+							content: error.message,
 						},
-						author: { ...postDetails.author, firstName: "Yours", lastName: "Truly" },
-					});
-				})
-				.then(() => setIsLoading(false));
+						authorFirstName: "Someone",
+						authorLastName: "Hypothetical",
+					})
+				)
+				.finally(() => setIsLoading(false));
 		};
 		getPost();
 	}, []);
@@ -61,14 +48,16 @@ const Details = () => {
 					<>
 						<h1 className="container__title">{postDetails.post.title}</h1>
 						<p className="container__description">{postDetails.post.content}</p>
-						<div className="container__footer">
-							<p className="footer__author">
-								BY {`${postDetails.authorLastName} ${postDetails.authorFirstName}`}
-							</p>
-							<span className="footer__date">
-								Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
-							</span>
-						</div>
+						{postDetails.post && (
+							<div className="container__footer">
+								<p className="footer__author">
+									BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
+								</p>
+								<span className="footer__date">
+									Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
+								</span>
+							</div>
+						)}
 					</>
 				)}
 			</div>

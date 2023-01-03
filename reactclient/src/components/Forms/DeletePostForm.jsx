@@ -23,25 +23,27 @@ const DeletePostForm = () => {
 
 	const onDelete = async () => {
 		await PostsService.deletePostById(appContext.postBeingModified.postId, user.token)
-			.then(() => {
-				setMessage({
-					type: "success",
-					message: "Post deleted successfully",
-				});
+			.then((response) => {
+				setMessage(response);
+
 				setTimeout(() => {
 					onClose();
 				}, 1000);
+
 				setTimeout(() => {
 					sendMessage("Deleted Post");
+					appContext.dispatch({
+						type: "DELETE_POST",
+						postId: appContext.postBeingModified.postId,
+					});
 				}, 1000 + modalTransitionDuration);
 			})
-			.catch((error) => {
-				console.error(error);
+			.catch((error) =>
 				setMessage({
-					type: "fail",
-					message: "Error during post deletion",
-				});
-			});
+					isSuccessful: false,
+					message: error.message,
+				})
+			);
 	};
 
 	return (

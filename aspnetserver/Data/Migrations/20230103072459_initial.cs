@@ -167,7 +167,7 @@ namespace aspnetserver.Data.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsHidden = table.Column<bool>(type: "bit", nullable: true),
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
                     AllowedUsers = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -186,8 +186,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "b9dbacc9-dc58-4218-990e-0c18940d8a5f", "3e39f9d5-bc6f-4bdc-85e9-1832471b9f8c", "Editor", "EDITOR" },
-                    { "f21dca3e-6194-4080-be4f-221ad1a5b7ff", "1a336fa9-1a14-43da-abc4-9ea9bf4acc27", "Admin", "ADMIN" }
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "63539564-3b84-4d00-862e-36d0449332f3", "Editor", "EDITOR" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "9dad6a36-c2bd-422a-911a-1a3063321594", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -195,8 +195,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "3559fd12-89db-41d9-a9df-e817fbf587e7", 0, "46e3d6d0-8aa6-448d-bf91-adb02ab2ed91", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEJ9UE4silgBNDTLy2Su4hmXL70KmXVlbmglKFWQLUQH7oRpp9NpfbLwVUrMqylufJA==", null, false, "fc40de63-5059-4246-b01f-8744b260355a", false, "test@test.com" },
-                    { "57eb027f-8865-4dfd-a955-afc0167fb3c3", 0, "77f2e9cc-3ad2-417f-a421-9032442a283f", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAEIpXQ42fS9n/YqtoMolgWhrbhHg0xgwqK4CFXeQXMwB11lN4qFbWPmrdv295KvO0Ow==", null, false, "e4b05c03-bd7c-4b41-9851-0e6f28090f01", false, "kralmarko123@gmail.com" }
+                    { "9440235e-3c0b-40c0-9cae-9039a2e93807", 0, "5a930b1a-cbeb-44e8-97aa-2841b1524348", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEE+fVHuEAOq5a1D7OITA7UdMyMND/nhaJtLhdFZApRoIDb8VdQM3ixqxyvoq8NAE6Q==", null, false, "e04e39d1-2d2d-4886-a76c-fdda103c719e", false, "test@test.com" },
+                    { "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b", 0, "8742d452-1a20-45f9-8194-b3af5d7b1dbe", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAELKhWaxCRI5txizrNMWLLUEqahdM510Me9PquouEMbhstpIMVwFFvHOCBeCpVnqE5A==", null, false, "f0d8bc8d-3274-4ab0-814c-05665528f10e", false, "kralmarko123@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -204,10 +204,10 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "b9dbacc9-dc58-4218-990e-0c18940d8a5f", "3559fd12-89db-41d9-a9df-e817fbf587e7" },
-                    { "f21dca3e-6194-4080-be4f-221ad1a5b7ff", "3559fd12-89db-41d9-a9df-e817fbf587e7" },
-                    { "b9dbacc9-dc58-4218-990e-0c18940d8a5f", "57eb027f-8865-4dfd-a955-afc0167fb3c3" },
-                    { "f21dca3e-6194-4080-be4f-221ad1a5b7ff", "57eb027f-8865-4dfd-a955-afc0167fb3c3" }
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "9440235e-3c0b-40c0-9cae-9039a2e93807" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "9440235e-3c0b-40c0-9cae-9039a2e93807" },
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b" }
                 });
 
             migrationBuilder.CreateIndex(

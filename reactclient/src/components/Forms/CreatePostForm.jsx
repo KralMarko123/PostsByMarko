@@ -34,7 +34,7 @@ const CreatePostForm = () => {
 		if (newPostData.title === "") {
 			hasEmptyField = true;
 			setMessage({
-				type: "fail",
+				isSuccessful: false,
 				message: "Title can't be empty",
 			});
 		}
@@ -42,7 +42,7 @@ const CreatePostForm = () => {
 		if (newPostData.content === "") {
 			hasEmptyField = true;
 			setMessage({
-				type: "fail",
+				isSuccessful: false,
 				message: "Content can't be empty",
 			});
 		}
@@ -59,23 +59,20 @@ const CreatePostForm = () => {
 			};
 
 			await PostsService.createPost(postToCreate, user.token)
-				.then(() => {
+				.then((response) => {
 					sendMessage("Created Post");
-					setMessage({
-						type: "success",
-						message: "Post created successfully",
-					});
+					setMessage(response);
+
 					setTimeout(() => {
 						onClose();
 					}, 1000);
 				})
-				.catch((error) => {
-					console.error(error.message);
+				.catch((error) =>
 					setMessage({
-						type: "fail",
-						message: "Error during post creation",
-					});
-				});
+						isSuccessful: false,
+						message: error.message,
+					})
+				);
 		}
 	};
 
