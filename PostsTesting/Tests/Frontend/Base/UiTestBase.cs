@@ -1,4 +1,6 @@
-﻿using PostsTesting.Utility.UI_Models.Pages;
+﻿using PostsTesting.Utility;
+using PostsTesting.Utility.Pages;
+using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
 namespace PostsTesting.Tests.Frontend.Base
@@ -21,6 +23,15 @@ namespace PostsTesting.Tests.Frontend.Base
         {
             await LoginAsTestUser();
             await homePage.CheckDefaultState();
+        }
+
+        public async Task<Post> CreateANewPost(string title, string content)
+        {
+            await homePage.Visit();
+            await homePage.ClickCreatePostButton();
+            await homePage.modal.FillInFormAndSubmit(title, content, "Post was created successfully");
+
+            return homePage.GetPostWithTitle(title);
         }
     }
 }

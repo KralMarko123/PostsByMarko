@@ -22,7 +22,8 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public ILocator createPost => page.Locator(".action__item", new PageLocatorOptions { HasTextString = "Create Post" });
         public ILocator infoMessage => page.Locator(".info__message");
         public ILocator dropdownMenu => page.Locator(".nav__actions");
-
+        public ILocator myPostsCheckbox => page.Locator("#showOnlyMyPosts");
+        public ILocator hiddenPostsCheckbox => page.Locator("#showHiddenPosts");
 
         public async Task Visit()
         {
@@ -35,6 +36,17 @@ namespace PostsTesting.Utility.UI_Models.Pages
             await dropdownMenu.WaitForAsync();
         }
 
+        public async Task ToggleMyPostsCheckbox(bool shouldBeChecked = true)
+        {
+            if (shouldBeChecked) await myPostsCheckbox.CheckAsync();
+            else await myPostsCheckbox.UncheckAsync();
+        }
+
+        public async Task ToggleHiddenPostsCheckbox(bool shouldBeChecked = true)
+        {
+            if (shouldBeChecked) await hiddenPostsCheckbox.CheckAsync();
+            else await hiddenPostsCheckbox.UncheckAsync();
+        }
 
         public async Task ClickCreatePostButton()
         {
@@ -59,7 +71,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
                 for (int i = 0; i < postCount; i++)
                 {
                     var post = new Post(page, postCard.Nth(i));
-                    await post.CheckPost();
+                    await post.CheckPostState();
                 }
             }
             else
@@ -79,7 +91,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
             return postsAreVisible;
         }
 
-        public Post FindPostWithTitleAndContent(string titleToFindBy)
+        public Post GetPostWithTitle(string titleToFindBy)
         {
             var newlyCreatedPostCard = page.Locator(".post", new PageLocatorOptions { HasTextString = titleToFindBy });
             var newlyCreatedPost = new Post(page, newlyCreatedPostCard);

@@ -44,7 +44,7 @@ namespace PostsTesting.Utility.Pages
             await hideIcon.ClickAsync();
         }
 
-        public async Task CheckPost()
+        public async Task CheckPostState()
         {
             await post.WaitForAsync();
 

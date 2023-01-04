@@ -40,5 +40,11 @@ namespace PostsTesting.Tests.Frontend.Posts
         {
             await VerifyPostCanBeHidden();
         }
+
+        [Fact]
+        public async Task VerifyPostFiltersCanBeToggled()
+        {
+            await VerifyPostFiltersCanBeChecked();
+        }
     }
 }
