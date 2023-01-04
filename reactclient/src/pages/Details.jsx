@@ -6,6 +6,7 @@ import { HelperFunctions } from "../util/helperFunctions";
 import PostsService from "../api/PostsService";
 import Nav from "../components/Layout/Nav";
 import "../styles/pages/Details.css";
+import Button from "../components/Helper/Button";
 
 const Details = () => {
 	const params = useParams();
@@ -50,6 +51,9 @@ const Details = () => {
 						<p className="container__description">{postDetails.post.content}</p>
 						{postDetails.post && (
 							<div className="container__footer">
+								<div className="footer__actions">
+									
+								</div>
 								<p className="footer__author">
 									BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
 								</p>

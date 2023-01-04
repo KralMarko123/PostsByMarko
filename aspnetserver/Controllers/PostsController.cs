@@ -72,7 +72,7 @@ public class PostsController : BaseController
             postToCreate.UserId = userId;
             postToCreate.AllowedUsers.Add(username);
 
-            bool postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
+            var postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
 
             if (postCreatedSuccessfully)
             {
@@ -102,7 +102,7 @@ public class PostsController : BaseController
             postToUpdate.Title = updatedPost.Title;
             postToUpdate.Content = updatedPost.Content;
 
-            bool postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
+            var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
 
             if (postUpdatedSuccessfully) return Ok("Post was updated successfully");
             else return BadRequest("Error during post update");
@@ -122,7 +122,7 @@ public class PostsController : BaseController
 
         if (postToDelete != null && (userId == postToDelete.UserId || userRoles.Contains("Admin")))
         {
-            bool postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
+            var postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
 
             if (postDeletedSuccessfully) return Ok("Post was deleted successfully");
             else return BadRequest("Error during post deletion");
@@ -133,7 +133,7 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/toggle-post-visibility/{postId}")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<IActionResult> TogglePostVisibilityAsync(int postId)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -144,11 +144,37 @@ public class PostsController : BaseController
         {
             post.IsHidden = !post.IsHidden;
 
-            bool postToggledSuccessfully = await postsRepository.UpdatePostAsync(post);
+            var postToggledSuccessfully = await postsRepository.UpdatePostAsync(post);
 
             if (postToggledSuccessfully) return Ok("Post visibility was toggled successfully");
             else return BadRequest("Error during post visibility toggle");
         }
         else return Unauthorized("Unauthorized to toggle Post's visibility");
+    }
+
+    [HttpPost]
+    [Route("/add-user-to-post/{postId}")]
+    [Tags("Posts Endpoint")]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
+    public async Task<IActionResult> AllowUserForPost(int postId, [FromBody] string username)
+    {
+        LoadUserInfoForRequestBeingExecuted();
+
+        var post = await postsRepository.GetPostByIdAsync(postId);
+        if (post.UserId == userId || userRoles.Contains("Admin"))
+        {
+            var userToAdd = await usersRepository.GetUserByUsernameAsync(username);
+
+            if (userToAdd != null && !post.AllowedUsers.Contains(userToAdd.UserName))
+            {
+                post.AllowedUsers.Add(userToAdd.UserName);
+                var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
+
+                if (postUpdatedSuccessfully) return Ok("Post visibility was toggled successfully");
+                else return BadRequest("Error while adding user to post");
+            }
+            else return BadRequest("Invalid user to add");
+        }
+        else return Unauthorized("Unauthorized to add user to this Post");
     }
 }
