@@ -64,19 +64,21 @@ export const HelperFunctions = {
 	},
 
 	sortPostsByLastUpdatedDate(posts) {
-		posts.sort((p1, p2) => {
-			const date1 = Date.parse(p1.lastUpdatedDate);
-			const date2 = Date.parse(p2.lastUpdatedDate);
+		posts.length > 0
+			? posts.sort((p1, p2) => {
+					const date1 = Date.parse(p1.lastUpdatedDate);
+					const date2 = Date.parse(p2.lastUpdatedDate);
 
-			return date1 > date2 ? -1 : 1;
-		});
+					return date1 > date2 ? -1 : 1;
+			  })
+			: null;
 	},
 
 	showOnlyMyPosts(posts, userId) {
-		return posts.filter((p) => p.userId === userId);
+		return posts.length > 0 ? posts.filter((p) => p.userId === userId) : posts;
 	},
 
 	filterHiddenPosts(posts, hidden) {
-		return posts.filter((p) => p.isHidden === hidden);
+		return posts.length > 0 ? posts.filter((p) => p.isHidden === hidden) : posts;
 	},
 };
