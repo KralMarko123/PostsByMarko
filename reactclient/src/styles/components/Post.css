@@ -14,15 +14,19 @@
 	cursor: pointer;
 }
 
+.post.hidden {
+	opacity: 0.5;
+}
+
 .post:hover {
 	background-color: rgba(var(--dark-accent-decimal), 0.75);
 }
 
 .post__icon {
-	width: 2em;
-	height: 2em;
+	width: 1.75em;
+	height: 1.75em;
 	position: absolute;
-	top: 0.5em;
+	top: 0.75em;
 
 	border-radius: 50%;
 	background-color: var(--dark);
@@ -34,21 +38,28 @@
 	font-size: var(--md-text);
 }
 
+.post__icon:hover {
+	color: var(--light);
+}
+
+.post__hidden {
+	left: 1em;
+}
+
 .post__delete {
-	right: 0.5em;
+	right: 1em;
 }
 
-.post__delete p {
+.post__delete {
 	font-weight: bold;
-	font-size: var(--lg-text);
 }
 
-.post__delete:hover p {
+.post__delete:hover {
 	color: var(--danger);
 }
 
 .post__update {
-	right: 3em;
+	right: 3.5em;
 }
 
 .post__update:hover {
@@ -85,8 +96,8 @@
 	}
 
 	.post__icon {
-		width: 1.85em;
-		height: 1.85em;
+		width: 1.65em;
+		height: 1.65em;
 	}
 
 	.post__delete p {
@@ -102,8 +113,8 @@
 	}
 
 	.post__icon {
-		width: 1.75em;
-		height: 1.75em;
+		width: 1.5em;
+		height: 1.5em;
 	}
 
 	.post__delete p {

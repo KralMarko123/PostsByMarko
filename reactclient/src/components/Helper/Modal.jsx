@@ -38,7 +38,9 @@ const Modal = (props) => {
 					<h1 className="modal__title">{props.title}</h1>
 					{props.children}
 					{props.message && (
-						<p className={`modal__message ${props.message.type}`}>{props.message.message}</p>
+						<p className={`modal__message ${props.message.isSuccessful ? "success" : "fail"}`}>
+							{props.message.message}
+						</p>
 					)}
 				</div>
 			</div>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using aspnetserver.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace aspnetserver.Data
 {
@@ -12,8 +13,12 @@ namespace aspnetserver.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Seed();
+            modelBuilder.Entity<Post>().Property(p => p.AllowedUsers)
+                .HasConversion(p => JsonSerializer.Serialize(p, (JsonSerializerOptions)default),
+                               p => JsonSerializer.Deserialize<List<string>>(p, (JsonSerializerOptions)default));
+
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Seed();
         }
     }
 }

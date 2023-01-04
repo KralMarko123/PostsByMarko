@@ -41,22 +41,16 @@ namespace PostsTesting.Tests.Frontend.Base
         public async Task VerifyPostDetailsForNotFoundPost()
         {
             await postDetailsPage.Visit("404");
-            await postDetailsPage.CheckPostDetails("No Post Found", "The post with Id: 404 doesn't seem to exist. Go back to view other posts");
+            await postDetailsPage.CheckPostDetails("Cannot open post", "Post with Id: 404 was not found");
         }
 
         public async Task VerifyPostCanBeCreated()
         {
             var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
             var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
 
-            await homePage.Visit();
-            await homePage.ClickCreatePostButton();
-            await homePage.modal.ClickSubmit();
-            await homePage.modal.FillInFormAndSubmit(randomTitle, randomContent, "Post created successfully");
-
-            var newlyCreatedPost = homePage.FindPostWithTitleAndContent(randomTitle);
-
-            await newlyCreatedPost.CheckPost();
+            await newlyCreatedPost.CheckPostState();
             await newlyCreatedPost.CheckPostTitleAndContent(randomTitle, randomContent);
         }
 
@@ -64,12 +58,7 @@ namespace PostsTesting.Tests.Frontend.Base
         {
             var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
             var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
-
-            await homePage.Visit();
-            await homePage.ClickCreatePostButton();
-            await homePage.modal.FillInFormAndSubmit(randomTitle, randomContent);
-
-            var newlyCreatedPost = homePage.FindPostWithTitleAndContent(randomTitle);
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
 
             await newlyCreatedPost.ClickOnUpdateIcon();
             await newlyCreatedPost.modal.ClickSubmit();
@@ -78,11 +67,10 @@ namespace PostsTesting.Tests.Frontend.Base
             randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
             randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
 
-            await newlyCreatedPost.modal.FillInFormAndSubmit(randomTitle, randomContent, "Post updated successfully");
+            await newlyCreatedPost.modal.FillInFormAndSubmit(randomTitle, randomContent, "Post was updated successfully");
 
-            var updatedPost = homePage.FindPostWithTitleAndContent(randomTitle);
-
-            await updatedPost.CheckPost();
+            var updatedPost = homePage.GetPostWithTitle(randomTitle);
+            await updatedPost.CheckPostState();
             await updatedPost.CheckPostTitleAndContent(randomTitle, randomContent);
         }
 
@@ -90,22 +78,48 @@ namespace PostsTesting.Tests.Frontend.Base
         {
             var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
             var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
-
-            await homePage.Visit();
-            await homePage.ClickCreatePostButton();
-            await homePage.modal.FillInFormAndSubmit(randomTitle, randomContent);
-
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
             var numberOfPostsPriorDelete = await homePage.GetNumberOfPosts();
-            var newlyCreatedPost = homePage.FindPostWithTitleAndContent(randomTitle);
 
             await newlyCreatedPost.ClickOnDeleteIcon();
-            await newlyCreatedPost.modal.ClickDelete("Post deleted successfully");
+            await newlyCreatedPost.modal.ClickDelete("Post was deleted successfully");
 
             var isPostVisible = await page.Locator(".post", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
             isPostVisible.Should().BeFalse();
 
             var numberOfPostsAfterDelete = await homePage.GetNumberOfPosts();
             numberOfPostsAfterDelete.Should().Be(numberOfPostsPriorDelete - 1);
+        }
+
+        public async Task VerifyPostCanBeHidden()
+        {
+            var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
+            var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
+
+            await newlyCreatedPost.ClickOnHideICon();
+
+            var isPostVisible = await page.Locator(".post.hidden", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
+            isPostVisible.Should().BeFalse();
+        }
+
+        public async Task VerifyPostFiltersCanBeChecked()
+        {
+            var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
+            var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
+
+            await homePage.ToggleMyPostsCheckbox();
+            await homePage.ToggleMyPostsCheckbox(false);
+            await newlyCreatedPost.ClickOnHideICon();
+            await homePage.ToggleHiddenPostsCheckbox();
+
+            var isPostVisible = await page.Locator(".post.hidden", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
+            isPostVisible.Should().BeTrue();
+
+            await homePage.ToggleHiddenPostsCheckbox(false);
+            isPostVisible = await page.Locator(".post.hidden", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
+            isPostVisible.Should().BeFalse();
         }
     }
 }

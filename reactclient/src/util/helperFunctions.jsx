@@ -39,4 +39,44 @@ export const HelperFunctions = {
 				return "Error during submission, please try again later";
 		}
 	},
+
+	applyFilters(posts, filters, userId) {
+		let filteredPosts = posts;
+
+		Object.entries(filters).forEach((filter) => {
+			const [name, isApplied] = filter;
+
+			switch (name) {
+				case "showOnlyMyPosts":
+					filteredPosts = isApplied ? this.showOnlyMyPosts(filteredPosts, userId) : filteredPosts;
+					break;
+				case "showHiddenPosts":
+					filteredPosts = isApplied ? filteredPosts : this.filterHiddenPosts(posts, false);
+					break;
+
+				default:
+					break;
+			}
+		});
+
+		this.sortPostsByLastUpdatedDate(filteredPosts);
+		return filteredPosts;
+	},
+
+	sortPostsByLastUpdatedDate(posts) {
+		posts.sort((p1, p2) => {
+			const date1 = Date.parse(p1.lastUpdatedDate);
+			const date2 = Date.parse(p2.lastUpdatedDate);
+
+			return date1 > date2 ? -1 : 1;
+		});
+	},
+
+	showOnlyMyPosts(posts, userId) {
+		return posts.filter((p) => p.userId === userId);
+	},
+
+	filterHiddenPosts(posts, hidden) {
+		return posts.filter((p) => p.isHidden === hidden);
+	},
 };

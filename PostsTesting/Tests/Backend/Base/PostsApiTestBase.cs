@@ -13,6 +13,8 @@ namespace PostsTesting.Tests.Backend.Base
         private const string CREATE_POST = "/create-post";
         private const string UPDATE_POST = "/update-post";
         private const string DELETE_POST = "/delete-post-by-id";
+        private const string TOGGLE_POST_HIDDEN = "/toggle-post-visibility";
+
 
         public async Task<List<Post>?> GetAllPosts()
         {
@@ -42,6 +44,10 @@ namespace PostsTesting.Tests.Backend.Base
         public async Task<RestResponse?> DeletePostById(string postId)
         {
             return await Delete($"{BASE_URL}{DELETE_POST}/{postId}");
+        }
+        public async Task<RestResponse?> TogglePostVisibilityById(string postId)
+        {
+            return await Post($"{BASE_URL}{TOGGLE_POST_HIDDEN}/{postId}");
         }
     }
 }

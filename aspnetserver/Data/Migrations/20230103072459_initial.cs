@@ -166,7 +166,9 @@ namespace aspnetserver.Data.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", maxLength: 100000, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
+                    AllowedUsers = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,8 +186,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "21891ff9-ce87-418f-88d8-9d2a11161b9c", "Admin", "ADMIN" },
-                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "c5ae9578-3287-4439-a310-0686ad41218b", "Editor", "EDITOR" }
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "63539564-3b84-4d00-862e-36d0449332f3", "Editor", "EDITOR" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "9dad6a36-c2bd-422a-911a-1a3063321594", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -193,8 +195,8 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "7fb99ea5-38ae-4323-832f-4af81a7cd4da", 0, "26415fb4-57ef-4aad-80d9-731b4fa8b937", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAEBmDolRzcDwzVB3CRlhXBF4cRoXvi7gkPfWE3uyfLGXTG1aRFPhOsR8K+G3ghVey5Q==", null, false, "72e9bf55-aebe-44fe-82b3-f1097acc18fb", false, "kralmarko123@gmail.com" },
-                    { "b267308d-534f-4263-891e-cf3321b95f05", 0, "fdea298d-f16f-4bd2-9340-8b75c589f1d1", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEIMqvcSEed9RC2PO4kUIbRSZdmZfHa20Pv9Q7PBthZOcQwC1mBKTykSTAtQKglxpqw==", null, false, "2b34529f-d97a-4bac-b633-821543278e2c", false, "test@test.com" }
+                    { "9440235e-3c0b-40c0-9cae-9039a2e93807", 0, "5a930b1a-cbeb-44e8-97aa-2841b1524348", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEE+fVHuEAOq5a1D7OITA7UdMyMND/nhaJtLhdFZApRoIDb8VdQM3ixqxyvoq8NAE6Q==", null, false, "e04e39d1-2d2d-4886-a76c-fdda103c719e", false, "test@test.com" },
+                    { "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b", 0, "8742d452-1a20-45f9-8194-b3af5d7b1dbe", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAELKhWaxCRI5txizrNMWLLUEqahdM510Me9PquouEMbhstpIMVwFFvHOCBeCpVnqE5A==", null, false, "f0d8bc8d-3274-4ab0-814c-05665528f10e", false, "kralmarko123@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -202,10 +204,10 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "7fb99ea5-38ae-4323-832f-4af81a7cd4da" },
-                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "7fb99ea5-38ae-4323-832f-4af81a7cd4da" },
-                    { "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa", "b267308d-534f-4263-891e-cf3321b95f05" },
-                    { "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6", "b267308d-534f-4263-891e-cf3321b95f05" }
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "9440235e-3c0b-40c0-9cae-9039a2e93807" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "9440235e-3c0b-40c0-9cae-9039a2e93807" },
+                    { "1df0c8b3-8321-4f86-b49d-4fae8140531d", "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b" },
+                    { "7ef03121-08e5-4258-aea5-b5ee315102ad", "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b" }
                 });
 
             migrationBuilder.CreateIndex(

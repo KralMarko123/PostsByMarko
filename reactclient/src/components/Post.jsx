@@ -1,11 +1,13 @@
 import { React, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../custom/useAuth";
+import { ICONS } from "../constants/misc";
 import * as ROUTES from "../constants/routes";
 import AppContext from "../context/AppContext";
+import PostsService from "../api/PostsService";
 import "../styles/components/Post.css";
 
-const Post = ({ postId, authorId, title, content }) => {
+const Post = ({ postId, authorId, title, content, isHidden }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
 	const { user } = useAuth();
@@ -26,29 +28,41 @@ const Post = ({ postId, authorId, title, content }) => {
 		appContext.dispatch({ type: "SHOW_MODAL", modal: modalToToggle });
 	};
 
+	const handleHiddenToggle = async (e) => {
+		e.stopPropagation();
+		await PostsService.togglePostVisibility(postId, user.token)
+			.then(() => appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", postId: postId }))
+			.catch((error) => console.log(error.message));
+	};
+
 	return (
-		<>
-			<div className="post" onClick={() => handlePostClick()}>
-				{(isAuthor || isAdmin || isEditor) && (
-					<span
-						className="post__icon post__update"
-						onClick={(e) => handleModalToggle(e, "updatePost")}
-					>
-						<p>&#9998;</p>
+		<div className={`post ${isHidden ? "hidden" : ""}`} onClick={() => handlePostClick()}>
+			{(isAuthor || isAdmin) && (
+				<>
+					<span className="post__icon post__hidden" onClick={(e) => handleHiddenToggle(e)}>
+						{ICONS.EYE_ICON(isHidden)}
 					</span>
-				)}
-				{(isAuthor || isAdmin) && (
-					<span
-						className="post__icon post__delete"
-						onClick={(e) => handleModalToggle(e, "deletePost")}
-					>
-						<p>&times;</p>
-					</span>
-				)}
-				<h1 className="post__title">{title}</h1>
-				<p className="post__content">{content}</p>
-			</div>
-		</>
+				</>
+			)}
+			{(isAuthor || isAdmin || isEditor) && (
+				<span
+					className="post__icon post__update"
+					onClick={(e) => handleModalToggle(e, "updatePost")}
+				>
+					&#9998;
+				</span>
+			)}
+			{(isAuthor || isAdmin) && (
+				<span
+					className="post__icon post__delete"
+					onClick={(e) => handleModalToggle(e, "deletePost")}
+				>
+					&times;
+				</span>
+			)}
+			<h1 className="post__title">{title}</h1>
+			<p className="post__content">{content}</p>
+		</div>
 	);
 };
 

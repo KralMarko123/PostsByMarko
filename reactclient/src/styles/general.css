@@ -28,6 +28,14 @@
 	line-height: 1;
 }
 
+.container__subtitle {
+	font-size: var(--lg-text);
+	font-weight: bold;
+	color: var(--light);
+
+	margin: var(--small-padding) 0;
+}
+
 .container__description {
 	color: var(--light);
 	font-size: var(--lg-text);

@@ -12,7 +12,7 @@ using aspnetserver.Data;
 namespace aspnetserver.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221209005825_initial")]
+    [Migration("20230103072459_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace aspnetserver.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostId"), 1L, 1);
 
+                    b.Property<string>("AllowedUsers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(100000)
@@ -39,6 +43,9 @@ namespace aspnetserver.Data.Migrations
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime2");
@@ -132,9 +139,9 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7fb99ea5-38ae-4323-832f-4af81a7cd4da",
+                            Id = "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "26415fb4-57ef-4aad-80d9-731b4fa8b937",
+                            ConcurrencyStamp = "8742d452-1a20-45f9-8194-b3af5d7b1dbe",
                             Email = "kralmarko123@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Marko",
@@ -142,17 +149,17 @@ namespace aspnetserver.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "KRALMARKO123@GMAIL.COM",
                             NormalizedUserName = "KRALMARKO123@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEBmDolRzcDwzVB3CRlhXBF4cRoXvi7gkPfWE3uyfLGXTG1aRFPhOsR8K+G3ghVey5Q==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELKhWaxCRI5txizrNMWLLUEqahdM510Me9PquouEMbhstpIMVwFFvHOCBeCpVnqE5A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "72e9bf55-aebe-44fe-82b3-f1097acc18fb",
+                            SecurityStamp = "f0d8bc8d-3274-4ab0-814c-05665528f10e",
                             TwoFactorEnabled = false,
                             UserName = "kralmarko123@gmail.com"
                         },
                         new
                         {
-                            Id = "b267308d-534f-4263-891e-cf3321b95f05",
+                            Id = "9440235e-3c0b-40c0-9cae-9039a2e93807",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fdea298d-f16f-4bd2-9340-8b75c589f1d1",
+                            ConcurrencyStamp = "5a930b1a-cbeb-44e8-97aa-2841b1524348",
                             Email = "test@test.com",
                             EmailConfirmed = true,
                             FirstName = "Test",
@@ -160,9 +167,9 @@ namespace aspnetserver.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.COM",
                             NormalizedUserName = "TEST@TEST.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEIMqvcSEed9RC2PO4kUIbRSZdmZfHa20Pv9Q7PBthZOcQwC1mBKTykSTAtQKglxpqw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEE+fVHuEAOq5a1D7OITA7UdMyMND/nhaJtLhdFZApRoIDb8VdQM3ixqxyvoq8NAE6Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2b34529f-d97a-4bac-b633-821543278e2c",
+                            SecurityStamp = "e04e39d1-2d2d-4886-a76c-fdda103c719e",
                             TwoFactorEnabled = false,
                             UserName = "test@test.com"
                         });
@@ -197,15 +204,15 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa",
-                            ConcurrencyStamp = "21891ff9-ce87-418f-88d8-9d2a11161b9c",
+                            Id = "7ef03121-08e5-4258-aea5-b5ee315102ad",
+                            ConcurrencyStamp = "9dad6a36-c2bd-422a-911a-1a3063321594",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6",
-                            ConcurrencyStamp = "c5ae9578-3287-4439-a310-0686ad41218b",
+                            Id = "1df0c8b3-8321-4f86-b49d-4fae8140531d",
+                            ConcurrencyStamp = "63539564-3b84-4d00-862e-36d0449332f3",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });
@@ -300,23 +307,23 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "7fb99ea5-38ae-4323-832f-4af81a7cd4da",
-                            RoleId = "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa"
+                            UserId = "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b",
+                            RoleId = "7ef03121-08e5-4258-aea5-b5ee315102ad"
                         },
                         new
                         {
-                            UserId = "7fb99ea5-38ae-4323-832f-4af81a7cd4da",
-                            RoleId = "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6"
+                            UserId = "dc2bc2bb-e2f8-4b4b-8100-3d27a68d423b",
+                            RoleId = "1df0c8b3-8321-4f86-b49d-4fae8140531d"
                         },
                         new
                         {
-                            UserId = "b267308d-534f-4263-891e-cf3321b95f05",
-                            RoleId = "aedd9acb-66e3-4e72-8cb7-fa1cffdf0faa"
+                            UserId = "9440235e-3c0b-40c0-9cae-9039a2e93807",
+                            RoleId = "7ef03121-08e5-4258-aea5-b5ee315102ad"
                         },
                         new
                         {
-                            UserId = "b267308d-534f-4263-891e-cf3321b95f05",
-                            RoleId = "b3fb62ee-2ad4-4ad2-9d17-3a89739b4ed6"
+                            UserId = "9440235e-3c0b-40c0-9cae-9039a2e93807",
+                            RoleId = "1df0c8b3-8321-4f86-b49d-4fae8140531d"
                         });
                 });
 

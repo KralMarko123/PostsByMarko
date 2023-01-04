@@ -34,5 +34,17 @@ namespace PostsTesting.Tests.Frontend.Posts
         {
             await VerifyPostCanBeDeleted();
         }
+
+        [Fact]
+        public async Task VerifyPostVisibilityCanBeToggled()
+        {
+            await VerifyPostCanBeHidden();
+        }
+
+        [Fact]
+        public async Task VerifyPostFiltersCanBeToggled()
+        {
+            await VerifyPostFiltersCanBeChecked();
+        }
     }
 }
