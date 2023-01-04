@@ -28,15 +28,25 @@ export const appReducer = (state, action) => {
 		case "MODIFYING_POST":
 			return { ...state, postBeingModified: action.post };
 
-		case "DELETE_POST":
-			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.postId);
-			posts = [...state.posts.splice(postBeingModifiedIndex, 1)];
+		case "DELETED_POST":
+			return { ...state, posts: [...state.posts.filter((p) => p.postId !== action.postId)] };
 
-			return { ...state, posts: [...state.posts.splice(postBeingModifiedIndex, 1)] };
+		case "UPDATED_POST":
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.post.postId);
+			posts = [...state.posts];
+
+			posts[postBeingModifiedIndex].title = action.post.title;
+			posts[postBeingModifiedIndex].content = action.post.content;
+			posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
+
+			return { ...state, posts: posts };
 
 		case "TOGGLE_POST_HIDDEN":
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.postId);
 			posts = [...state.posts];
-			posts[action.postPosition].isHidden = !posts[action.postPosition].isHidden;
+
+			posts[postBeingModifiedIndex].isHidden = !posts[postBeingModifiedIndex].isHidden;
+			posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
 
 			return { ...state, posts: posts };
 

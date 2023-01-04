@@ -39,10 +39,10 @@ namespace PostsTesting.Tests.Backend.Base
             return await client.GetJsonAsync<T>(url);
         }
 
-        public async Task<RestResponse> Post(string url, object payload)
+        public async Task<RestResponse> Post(string url, object payload = null)
         {
             var request = new RestRequest(url, Method.Post);
-            request.AddBody(payload);
+            if (payload != null) request.AddBody(payload);
 
             return await client.PostAsync(request);
         }

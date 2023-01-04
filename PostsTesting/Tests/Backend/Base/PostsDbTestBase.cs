@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using PostsTesting.Utility;
+using System.Text.Json;
 
 namespace PostsTesting.Tests.Backend.Base
 {
@@ -41,6 +42,8 @@ namespace PostsTesting.Tests.Backend.Base
                     UserId = reader.GetString(3),
                     CreatedDate = reader.GetDateTime(4),
                     LastUpdatedDate = reader.GetDateTime(5),
+                    IsHidden = reader.GetBoolean(6),
+                    AllowedUsers = JsonSerializer.Deserialize<List<string>>(reader.GetString(7))
                 };
 
                 posts.Add(post);

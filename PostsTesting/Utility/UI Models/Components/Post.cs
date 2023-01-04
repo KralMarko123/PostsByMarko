@@ -21,6 +21,7 @@ namespace PostsTesting.Utility.Pages
         public ILocator idIcon => post.Locator(".post__id");
         public ILocator updateIcon => post.Locator(".post__update");
         public ILocator deleteIcon => post.Locator(".post__delete");
+        public ILocator hideIcon => post.Locator(".post__hidden");
 
 
         public async Task ClickOnPost()
@@ -36,6 +37,11 @@ namespace PostsTesting.Utility.Pages
         public async Task ClickOnDeleteIcon()
         {
             await deleteIcon.ClickAsync();
+        }
+
+        public async Task ClickOnHideICon()
+        {
+            await hideIcon.ClickAsync();
         }
 
         public async Task CheckPost()

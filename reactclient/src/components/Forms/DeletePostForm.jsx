@@ -31,9 +31,9 @@ const DeletePostForm = () => {
 				}, 1000);
 
 				setTimeout(() => {
-					sendMessage("Deleted Post");
+					sendMessage("Deleted Post", false);
 					appContext.dispatch({
-						type: "DELETE_POST",
+						type: "DELETED_POST",
 						postId: appContext.postBeingModified.postId,
 					});
 				}, 1000 + modalTransitionDuration);

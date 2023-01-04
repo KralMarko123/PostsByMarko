@@ -9,7 +9,7 @@ export const FILTERS = {
 		{
 			type: "checkbox",
 			name: "showHiddenPosts",
-			text: "Hidden",
+			text: "Show Hidden",
 		},
 	],
 };

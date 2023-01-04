@@ -32,6 +32,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
         public async Task HoverDropdownMenu()
         {
             await dropdownMenu.HoverAsync();
+            await dropdownMenu.WaitForAsync();
         }
 
 

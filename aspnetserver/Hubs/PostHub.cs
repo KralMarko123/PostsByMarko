@@ -9,5 +9,10 @@ namespace aspnetserver.Hubs
         {
             await Clients.All.ReceiveMessage($"Received Message: {message} with Message Id: {Guid.NewGuid()}");
         }
+
+        public async Task SendMessageToOthers(string message)
+        {
+            await Clients.Others.ReceiveMessage($"Received Message: {message} with Message Id: {Guid.NewGuid()}");
+        }
     }
 }

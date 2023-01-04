@@ -14,8 +14,8 @@ export const useSignalR = () => {
 			.configureLogging(LogLevel.Information)
 			.build(),
 
-		sendMessage(message) {
-			sendMessageToHub(message);
+		async sendMessage(message, toAll = true) {
+			await sendMessageToHub(message, toAll);
 		},
 
 		lastMessageRegistered: "",
@@ -35,10 +35,10 @@ export const useSignalR = () => {
 		}
 	}, [signalR.connection]);
 
-	const sendMessageToHub = async (message) => {
+	const sendMessageToHub = async (message, toAll) => {
 		if (signalR.connection) {
 			try {
-				await signalR.connection.send("SendMessageToAll", message);
+				await signalR.connection.send(toAll ? "SendMessageToAll" : "SendMessageToOthers", message);
 			} catch (error) {
 				console.error(error);
 			}

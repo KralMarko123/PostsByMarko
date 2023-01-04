@@ -48,7 +48,7 @@ public class PostsController : BaseController
         var post = await postsRepository.GetPostByIdAsync(postId);
 
         if (post == null) return NotFound($"Post with Id: {postId} was not found");
-        if (post.IsHidden == true && !post.AllowedUsers.Contains(username)) return Unauthorized($"Post with Id: {postId} is hidden");
+        if (post.IsHidden == true && !post.AllowedUsers.Contains(username) && !userRoles.Contains("Admin")) return Unauthorized($"Post with Id: {postId} is hidden");
 
         var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
         return Ok(new PostDetailsResponse()

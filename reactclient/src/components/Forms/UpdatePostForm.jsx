@@ -74,7 +74,11 @@ const UpdatePostForm = () => {
 		if (isValidUpdate) {
 			await PostsService.updatePost(newPostData, user.token)
 				.then((response) => {
-					sendMessage("Updated Post");
+					appContext.dispatch({
+						type: "UPDATED_POST",
+						post: newPostData,
+					});
+					sendMessage("Updated Post", false);
 					setMessage(response);
 					setTimeout(() => {
 						onClose();

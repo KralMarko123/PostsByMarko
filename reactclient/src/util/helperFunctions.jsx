@@ -50,11 +50,9 @@ export const HelperFunctions = {
 				case "showOnlyMyPosts":
 					filteredPosts = isApplied ? this.showOnlyMyPosts(filteredPosts, userId) : filteredPosts;
 					break;
-				// case "showHiddenPosts":
-				// 	isApplied
-				// 		? filteredPosts.push(...this.filterHiddenPosts(posts, true))
-				// 		: this.filterHiddenPosts(posts, false);
-				// 	break;
+				case "showHiddenPosts":
+					filteredPosts = isApplied ? filteredPosts : this.filterHiddenPosts(posts, false);
+					break;
 
 				default:
 					break;

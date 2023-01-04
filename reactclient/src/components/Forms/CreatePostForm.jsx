@@ -60,7 +60,7 @@ const CreatePostForm = () => {
 
 			await PostsService.createPost(postToCreate, user.token)
 				.then((response) => {
-					sendMessage("Created Post");
+					sendMessage("Created Post", true);
 					setMessage(response);
 
 					setTimeout(() => {

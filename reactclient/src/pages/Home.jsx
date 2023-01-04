@@ -37,8 +37,9 @@ const Home = () => {
 	}, [lastMessageRegistered]);
 
 	useEffect(() => {
-		setFilteredPosts(HelperFunctions.applyFilters(appContext.posts, filters, user.userId));
-	}, [filters]);
+		console.log(new Date().toISOString());
+		setFilteredPosts([...HelperFunctions.applyFilters(appContext.posts, filters, user.userId)]);
+	}, [filters, appContext.posts]);
 
 	return (
 		<div className="home page">
