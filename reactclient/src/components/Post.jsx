@@ -7,13 +7,11 @@ import AppContext from "../context/AppContext";
 import PostsService from "../api/PostsService";
 import "../styles/components/Post.css";
 
-const Post = ({ postId, authorId, title, content, isHidden }) => {
+const Post = ({ postId, authorId, title, content, isHidden, allowedUsers }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
-	const { user } = useAuth();
+	const { user, isAdmin, isEditor } = useAuth();
 	const isAuthor = authorId === user.userId;
-	const isAdmin = user.roles.includes("Admin");
-	const isEditor = user.roles.includes("Editor");
 
 	const handlePostClick = () => {
 		navigate(`.${ROUTES.DETAILS_PREFIX}/${postId}`);

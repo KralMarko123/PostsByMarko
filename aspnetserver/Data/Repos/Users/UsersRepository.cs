@@ -3,20 +3,28 @@ using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Models.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace aspnetserver.Data.Repos.Users
 {
     public class UsersRepository : IUsersRepository
     {
+        private readonly AppDbContext appDbContext;
         private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
         private User? user;
 
-        public UsersRepository(UserManager<User> userManager, IMapper mapper)
+        public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager, IMapper mapper)
         {
+            this.appDbContext = appDbContext;
             this.userManager = userManager;
             this.mapper = mapper;
+        }
+
+        public async Task<List<string>> GetAllUsernamesAsync()
+        {
+            return await appDbContext.Users.Select(u => u.UserName).ToListAsync();
         }
 
         public async Task<UserValidationResponse> MapAndCreateUserAsync(UserRegistrationDto userRegistration)

@@ -1,20 +1,29 @@
-import { React, useEffect, useState } from "react";
+import { React, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { useAuth } from "../custom/useAuth";
 import { HelperFunctions } from "../util/helperFunctions";
 import PostsService from "../api/PostsService";
 import Nav from "../components/Layout/Nav";
+import ToggleUserToPost from "../components/Forms/ToggleUserToPost";
+import AppContext from "../context/AppContext";
 import "../styles/pages/Details.css";
-import Button from "../components/Helper/Button";
 
 const Details = () => {
 	const params = useParams();
 	const postId = params.id;
-	const [postDetails, setPostDetails] = useState({});
-	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
-	const { user } = useAuth();
+	const [postDetails, setPostDetails] = useState({
+		post: {
+			allowedUsers: [],
+		},
+		authorFirstName: "",
+		authorLastName: "",
+		isAuthor: false,
+	});
+	const [isLoading, setIsLoading] = useState(true);
+	const { user, isAdmin } = useAuth();
+	const appContext = useContext(AppContext);
 
 	useEffect(() => {
 		const getPost = async () => {
@@ -29,12 +38,24 @@ const Details = () => {
 						},
 						authorFirstName: "Someone",
 						authorLastName: "Hypothetical",
+						isAuthor: this.post.userId === user.userId,
 					})
 				)
 				.finally(() => setIsLoading(false));
 		};
 		getPost();
 	}, []);
+
+	const openAddUsersModal = () => {
+		appContext.dispatch({
+			type: "MODIFYING_POST",
+			post: {
+				postId: postId,
+				allowedUsers: appContext.posts.find((p) => p.postId == postId)?.allowedUsers,
+			},
+		});
+		appContext.dispatch({ type: "SHOW_MODAL", modal: "addUserToPost" });
+	};
 
 	return (
 		<div className="details page">
@@ -51,9 +72,13 @@ const Details = () => {
 						<p className="container__description">{postDetails.post.content}</p>
 						{postDetails.post && (
 							<div className="container__footer">
-								<div className="footer__actions">
-									
-								</div>
+								{(postDetails.isAuthor || isAdmin) && (
+									<div className="footer__actions">
+										<div className="footer__action" onClick={() => openAddUsersModal()}>
+											Add Users
+										</div>
+									</div>
+								)}
 								<p className="footer__author">
 									BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
 								</p>
@@ -65,6 +90,7 @@ const Details = () => {
 					</>
 				)}
 			</div>
+			<ToggleUserToPost />
 		</div>
 	);
 };

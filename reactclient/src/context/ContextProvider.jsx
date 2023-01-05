@@ -7,6 +7,7 @@ export const defaultAppState = {
 		createPost: false,
 		updatePost: false,
 		deletePost: false,
+		addUserToPost: false,
 	},
 	postBeingModified: {},
 };
@@ -47,6 +48,18 @@ export const appReducer = (state, action) => {
 
 			posts[postBeingModifiedIndex].isHidden = !posts[postBeingModifiedIndex].isHidden;
 			posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
+
+			return { ...state, posts: posts };
+
+		case "TOGGLED_USER":
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId == action.postId);
+			posts = [...state.posts];
+
+			if (action.isAdded) posts[postBeingModifiedIndex].allowedUsers.push(action.username);
+			else
+				posts[postBeingModifiedIndex].allowedUsers = posts[
+					postBeingModifiedIndex
+				].allowedUsers.filter((u) => u !== action.username);
 
 			return { ...state, posts: posts };
 

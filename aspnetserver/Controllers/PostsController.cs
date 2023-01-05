@@ -33,7 +33,14 @@ public class PostsController : BaseController
         var allPosts = await postsRepository.GetPostsAsync();
         if (userRoles.Contains("Admin")) return allPosts;
 
-        allPosts.RemoveAll(p => p.IsHidden == true && !p.AllowedUsers.Contains(username));
+        for (int i = 0; i < allPosts.Count; i++)
+        {
+            var post = allPosts[i];
+
+            if (post.IsHidden && !post.AllowedUsers.Contains(username) && post.UserId != userId)
+                allPosts.RemoveAt(i);
+        }
+
         return allPosts;
     }
 
@@ -70,7 +77,6 @@ public class PostsController : BaseController
         if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
         {
             postToCreate.UserId = userId;
-            postToCreate.AllowedUsers.Add(username);
 
             var postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
 
@@ -153,28 +159,30 @@ public class PostsController : BaseController
     }
 
     [HttpPost]
-    [Route("/add-user-to-post/{postId}")]
+    [Route("/toggle-user-for-post/{postId}")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
-    public async Task<IActionResult> AllowUserForPost(int postId, [FromBody] string username)
+    public async Task<IActionResult> ToggleUserForPost(int postId, [FromBody] string username)
     {
         LoadUserInfoForRequestBeingExecuted();
 
         var post = await postsRepository.GetPostByIdAsync(postId);
         if (post.UserId == userId || userRoles.Contains("Admin"))
         {
-            var userToAdd = await usersRepository.GetUserByUsernameAsync(username);
+            var user = await usersRepository.GetUserByUsernameAsync(username);
 
-            if (userToAdd != null && !post.AllowedUsers.Contains(userToAdd.UserName))
+            if (user != null)
             {
-                post.AllowedUsers.Add(userToAdd.UserName);
+                if (!post.AllowedUsers.Contains(user.UserName)) post.AllowedUsers.Add(user.UserName);
+                else post.AllowedUsers.Remove(user.UserName);
+
                 var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
 
-                if (postUpdatedSuccessfully) return Ok("Post visibility was toggled successfully");
-                else return BadRequest("Error while adding user to post");
+                if (postUpdatedSuccessfully) return Ok("User was toggled successfully for this post");
+                else return BadRequest("Error while toggling user for post");
             }
-            else return BadRequest("Invalid user to add");
+            else return BadRequest("Invalid user to toggle");
         }
-        else return Unauthorized("Unauthorized to add user to this Post");
+        else return Unauthorized("Unauthorized to toggle user for this Post");
     }
 }

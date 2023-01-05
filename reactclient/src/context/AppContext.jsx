@@ -6,6 +6,7 @@ const AppContext = createContext({
 		createPost: false,
 		updatePost: false,
 		deletePost: false,
+		addUserToPost: false,
 	},
 	postBeingModified: {},
 });

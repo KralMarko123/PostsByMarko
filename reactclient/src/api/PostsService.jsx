@@ -82,6 +82,22 @@ const PostsService = {
 			},
 		}).then(async (response) => {
 			let responseMessage = await response.text();
+
+			if (!response.ok) throw new Error(responseMessage);
+		});
+	},
+
+	async toggleUserForPost(postId, username, userToken) {
+		return await fetch(`${ENDPOINT__URLS.TOGGLE_USER_FOR_POST}/${postId}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${userToken}`,
+			},
+			body: JSON.stringify(username),
+		}).then(async (response) => {
+			let responseMessage = await response.text();
+
 			if (!response.ok) throw new Error(responseMessage);
 		});
 	},

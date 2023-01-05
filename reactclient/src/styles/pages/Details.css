@@ -2,15 +2,37 @@
 	margin-top: var(--small-gap);
 }
 
-
-.footer__author{
+.footer__author {
 	font-size: var(--md-text);
 	text-transform: uppercase;
 	font-weight: bold;
 	color: var(--light-accent);
 }
 
-.footer__date{
+.footer__date {
 	font-size: var(--s-text);
 	font-style: italic;
+}
+
+.footer__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--normal-gap);
+
+	margin: var(--small-gap) 0;
+}
+
+.footer__action {
+	padding: var(--small-padding);
+	background-color: var(--light-accent);
+	border-radius: var(--button-radius);
+
+	font-size: var(--s-text);
+	text-transform: uppercase;
+
+	cursor: pointer;
+}
+
+.footer__action:hover {
+	opacity: 0.85;
 }

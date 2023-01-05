@@ -15,5 +15,6 @@ namespace aspnetserver.Data.Repos.Users
         Task<List<string>> GetUserRolesByUsername(string username);
         Task<User> GetUserByIdAsync(string id);
         Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd);
+        Task<List<string>> GetAllUsernamesAsync();
     }
 }

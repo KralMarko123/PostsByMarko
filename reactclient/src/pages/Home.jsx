@@ -37,7 +37,6 @@ const Home = () => {
 	}, [lastMessageRegistered]);
 
 	useEffect(() => {
-		console.log(new Date().toISOString());
 		setFilteredPosts([...HelperFunctions.applyFilters(appContext.posts, filters, user.userId)]);
 	}, [filters, appContext.posts]);
 
@@ -70,6 +69,7 @@ const Home = () => {
 											title={p.title}
 											content={p.content}
 											isHidden={p.isHidden}
+											allowedUsers={p.allowedUsers}
 										/>
 									))}
 								</ul>
