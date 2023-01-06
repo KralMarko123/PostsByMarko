@@ -9,6 +9,7 @@ const PostsService = {
 			},
 		})
 			.then((response) => response.json())
+			.then((requestResult) => requestResult.payload)
 			.catch((error) => console.log(error));
 	},
 
@@ -19,11 +20,10 @@ const PostsService = {
 				Authorization: `Bearer ${userToken}`,
 			},
 		}).then(async (response) => {
-			if (response.ok) return response.json();
-			else {
-				let errorMessage = await response.text();
-				throw new Error(errorMessage);
-			}
+			const requestResult = await response.json();
+
+			if (requestResult.statusCode === 200) return requestResult.payload;
+			else throw new Error(requestResult.message);
 		});
 	},
 
@@ -36,10 +36,11 @@ const PostsService = {
 			},
 			body: JSON.stringify(postToCreate),
 		}).then(async (response) => {
-			let responseMessage = await response.text();
+			const requestResult = await response.json();
 
-			if (response.ok) return { isSuccessful: true, message: responseMessage };
-			else throw new Error(responseMessage);
+			if (requestResult.statusCode === 200)
+				return { isSuccessful: true, message: requestResult.message };
+			else throw new Error(requestResult.message);
 		});
 	},
 
@@ -52,10 +53,11 @@ const PostsService = {
 			},
 			body: JSON.stringify(postToUpdate),
 		}).then(async (response) => {
-			let responseMessage = await response.text();
+			const requestResult = await response.json();
 
-			if (response.ok) return { isSuccessful: true, message: responseMessage };
-			else throw new Error(responseMessage);
+			if (requestResult.statusCode === 200)
+				return { isSuccessful: true, message: requestResult.message };
+			else throw new Error(requestResult.message);
 		});
 	},
 
@@ -66,10 +68,11 @@ const PostsService = {
 				Authorization: `Bearer ${userToken}`,
 			},
 		}).then(async (response) => {
-			let responseMessage = await response.text();
+			const requestResult = await response.json();
 
-			if (response.ok) return { isSuccessful: true, message: responseMessage };
-			else throw new Error(responseMessage);
+			if (requestResult.statusCode === 200)
+				return { isSuccessful: true, message: requestResult.message };
+			else throw new Error(requestResult.message);
 		});
 	},
 
@@ -81,9 +84,9 @@ const PostsService = {
 				Authorization: `Bearer ${userToken}`,
 			},
 		}).then(async (response) => {
-			let responseMessage = await response.text();
+			const requestResult = await response.json();
 
-			if (!response.ok) throw new Error(responseMessage);
+			if (requestResult.statusCode !== 200) throw new Error(requestResult.message);
 		});
 	},
 
@@ -96,9 +99,9 @@ const PostsService = {
 			},
 			body: JSON.stringify(username),
 		}).then(async (response) => {
-			let responseMessage = await response.text();
+			const requestResult = await response.json();
 
-			if (!response.ok) throw new Error(responseMessage);
+			if (requestResult.statusCode !== 200) throw new Error(requestResult.message);
 		});
 	},
 };

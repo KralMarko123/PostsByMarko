@@ -1,5 +1,6 @@
-﻿using aspnetserver.Data.Repos.Users;
+﻿using aspnetserver.Data.Models;
 using aspnetserver.Decorators;
+using aspnetserver.Services;
 using AutoMapper;
 using Controllers;
 using Microsoft.AspNetCore.Authorization;
@@ -12,24 +13,20 @@ namespace aspnetserver.Controllers
     [Authorize]
     public class UsersController : BaseController
     {
-        private readonly IUsersRepository usersRepository;
-        public UsersController(IUsersRepository usersRepository, IMapper mapper) : base(mapper)
+        private readonly IUsersService usersService;
+        public UsersController(IUsersService usersService, IMapper mapper) : base(mapper)
         {
-            this.usersRepository = usersRepository;
+            this.usersService = usersService;
         }
 
         [HttpGet]
         [Route("/get-all-users")]
         [Tags("Users Endpoint")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<List<string>> GetAllUsernamesAsync()
+        public async Task<RequestResult> GetAllUsernamesAsync()
         {
             LoadUserInfoForRequestBeingExecuted();
-
-            var allUsernames = await usersRepository.GetAllUsernamesAsync();
-            allUsernames.Remove(username);
-
-            return allUsernames;
+            return await usersService.GetAllUsernamesAsync();
         }
     }
 }

@@ -9,6 +9,7 @@ const UsersService = {
 			},
 		})
 			.then((response) => response.json())
+			.then((requestResult) => requestResult.payload)
 			.catch((error) => console.log(error));
 	},
 };

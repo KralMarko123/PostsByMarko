@@ -1,9 +1,6 @@
 using aspnetserver.Data;
 using aspnetserver.Data.Mappings;
-using aspnetserver.Data.Repos.Posts;
-using aspnetserver.Data.Repos.Users;
 using aspnetserver.Extensions;
-using aspnetserver.Helper;
 using aspnetserver.Hubs;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +34,6 @@ switch (environment)
 #region ServicesConfiguration
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
 
 builder.WithCors(corsPolicyName, allowedOrigins);
 
@@ -51,10 +47,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IPostsRepository, PostsRepository>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
+builder.WithServices();
 builder.WithIdentity();
 
 builder.Services.AddEndpointsApiExplorer();
