@@ -26,14 +26,18 @@ namespace aspnetserver.Builders
         {
             requestResult.StatusCode = HttpStatusCode.Unauthorized;
             return this;
-
         }
 
         public RequestResultBuilder BadRequest()
         {
             requestResult.StatusCode = HttpStatusCode.BadRequest;
             return this;
+        }
 
+        public RequestResultBuilder Created()
+        {
+            requestResult.StatusCode = HttpStatusCode.Created;
+            return this;
         }
 
         public RequestResultBuilder WithMessage(string message)

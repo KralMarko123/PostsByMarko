@@ -5,9 +5,9 @@ namespace aspnetserver.Data.Repos.Posts
     {
         Task<List<Post>> GetPostsAsync();
 
-        Task<Post> GetPostByIdAsync(int postId);
+        Task<Post> GetPostByIdAsync(string postId);
 
-        Task<bool> CreatePostAsync(Post postToCreate);
+        Task<Post> CreatePostAsync(Post postToCreate);
 
         Task<bool> UpdatePostAsync(Post postToUpdate);
 

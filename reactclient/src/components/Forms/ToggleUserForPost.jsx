@@ -7,7 +7,7 @@ import UsersService from "../../api/UsersService";
 import PostsService from "../../api/PostsService";
 import "../../styles/components/ToggleUserToPost.css";
 
-const ToggleUserToPost = () => {
+const ToggleUserForPost = () => {
 	const { user } = useAuth();
 	const [allUsers, setAllUsers] = useState([]);
 	const appContext = useContext(AppContext);
@@ -19,8 +19,9 @@ const ToggleUserToPost = () => {
 	};
 
 	const isAllowedUser = (username) => {
-		const post = appContext.posts.find((p) => p.postId == appContext.postBeingModified.postId);
-		return post?.allowedUsers?.includes(username);
+		return appContext.posts
+			.find((p) => p.postId == appContext.postBeingModified.postId)
+			?.allowedUsers.includes(username);
 	};
 
 	const onClose = () => {
@@ -84,4 +85,4 @@ const ToggleUserToPost = () => {
 	);
 };
 
-export default ToggleUserToPost;
+export default ToggleUserForPost;

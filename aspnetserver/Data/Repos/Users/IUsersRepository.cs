@@ -12,7 +12,7 @@ namespace aspnetserver.Data.Repos.Users
         Task<UserValidationResponse> ValidateUserAsync(UserLoginDto userLogin);
         Task<List<Claim>> GetClaimsAsync(User user);
         Task<User> GetUserByUsernameAsync(string username);
-        Task<List<string>> GetUserRolesByUsername(string username);
+        Task<List<string>> GetUserRolesByUsernameAsync(string username);
         Task<User> GetUserByIdAsync(string id);
         Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd);
         Task<List<string>> GetAllUsernamesAsync();

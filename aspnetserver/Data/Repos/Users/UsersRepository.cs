@@ -85,7 +85,7 @@ namespace aspnetserver.Data.Repos.Users
             return user;
         }
 
-        public async Task<List<string>> GetUserRolesByUsername(string username)
+        public async Task<List<string>> GetUserRolesByUsernameAsync(string username)
         {
             user = await GetUserByUsernameAsync(username);
             var roles = await userManager.GetRolesAsync(user);

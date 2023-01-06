@@ -76,7 +76,7 @@ public class AuthController : BaseController
                 UserId = loggedInUser.Id,
                 FirstName = loggedInUser.FirstName,
                 LastName = loggedInUser.LastName,
-                Roles = await usersRepository.GetUserRolesByUsername(loggedInUser.UserName),
+                Roles = await usersRepository.GetUserRolesByUsernameAsync(loggedInUser.UserName),
             });
         }
     }

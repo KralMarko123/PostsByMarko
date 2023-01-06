@@ -2,11 +2,11 @@ import { React, useContext, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
 import { modalTransitionDuration } from "../../constants/misc";
+import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button";
 import Modal from "../Helper/Modal";
 import AppContext from "../../context/AppContext";
-import { useSignalR } from "../../custom/useSignalR";
 import "../../styles/components/Form.css";
 
 const CreatePostForm = () => {
@@ -60,8 +60,12 @@ const CreatePostForm = () => {
 
 			await PostsService.createPost(postToCreate, user.token)
 				.then((response) => {
-					sendMessage("Created Post", true);
-					setMessage(response);
+					sendMessage("Created Post");
+					setMessage({ isSuccessful: true, message: response.message });
+					appContext.dispatch({
+						type: "CREATED_POST",
+						post: response.newPost,
+					});
 
 					setTimeout(() => {
 						onClose();

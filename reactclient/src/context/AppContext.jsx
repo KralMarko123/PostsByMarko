@@ -8,7 +8,12 @@ const AppContext = createContext({
 		deletePost: false,
 		addUserToPost: false,
 	},
-	postBeingModified: {},
+	postBeingModified: {
+		postId: null,
+		title: "",
+		content: "",
+		index: null,
+	},
 });
 
 export default AppContext;

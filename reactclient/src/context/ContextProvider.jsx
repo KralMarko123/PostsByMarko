@@ -9,7 +9,12 @@ export const defaultAppState = {
 		deletePost: false,
 		addUserToPost: false,
 	},
-	postBeingModified: {},
+	postBeingModified: {
+		postId: null,
+		title: "",
+		content: "",
+		index: null,
+	},
 };
 
 export const appReducer = (state, action) => {
@@ -39,6 +44,13 @@ export const appReducer = (state, action) => {
 			posts[postBeingModifiedIndex].title = action.post.title;
 			posts[postBeingModifiedIndex].content = action.post.content;
 			posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
+
+			return { ...state, posts: posts };
+
+		case "CREATED_POST":
+			posts = [...state.posts];
+
+			posts.push(action.post);
 
 			return { ...state, posts: posts };
 

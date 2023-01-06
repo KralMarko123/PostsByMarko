@@ -6,7 +6,7 @@ namespace aspnetserver.Data.Models
     public class Post
     {
         [Key]
-        public int PostId { get; set; }
+        public Guid PostId { get; set; }
 
         [Required]
         [MaxLength(100)]

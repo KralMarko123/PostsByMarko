@@ -38,8 +38,12 @@ const PostsService = {
 		}).then(async (response) => {
 			const requestResult = await response.json();
 
-			if (requestResult.statusCode === 200)
-				return { isSuccessful: true, message: requestResult.message };
+			if (requestResult.statusCode === 201)
+				return {
+					isSuccessful: true,
+					message: requestResult.message,
+					newPost: requestResult.payload,
+				};
 			else throw new Error(requestResult.message);
 		});
 	},

@@ -5,8 +5,9 @@ import { useAuth } from "../custom/useAuth";
 import { HelperFunctions } from "../util/helperFunctions";
 import PostsService from "../api/PostsService";
 import Nav from "../components/Layout/Nav";
-import ToggleUserToPost from "../components/Forms/ToggleUserToPost";
+import ToggleUserForPost from "../components/Forms/ToggleUserForPost";
 import AppContext from "../context/AppContext";
+import Refetcher from "../components/Helper/Refetcher";
 import "../styles/pages/Details.css";
 
 const Details = () => {
@@ -25,24 +26,23 @@ const Details = () => {
 	const { user, isAdmin } = useAuth();
 	const appContext = useContext(AppContext);
 
+	const getPost = async () => {
+		await PostsService.getPostById(postId, user.token)
+			.then((response) => setPostDetails(response))
+			.catch((error) =>
+				setPostDetails({
+					post: {
+						title: "Cannot open post",
+						content: error.message,
+					},
+					authorFirstName: "Someone",
+					authorLastName: "Hypothetical",
+				})
+			)
+			.finally(() => setIsLoading(false));
+	};
+
 	useEffect(() => {
-		const getPost = async () => {
-			await PostsService.getPostById(postId, user.token)
-				.then((response) => setPostDetails(response))
-				.catch((error) =>
-					setPostDetails({
-						post: {
-							...postDetails.post,
-							title: "Cannot open post",
-							content: error.message,
-						},
-						authorFirstName: "Someone",
-						authorLastName: "Hypothetical",
-						isAuthor: this.post.userId === user.userId,
-					})
-				)
-				.finally(() => setIsLoading(false));
-		};
 		getPost();
 	}, []);
 
@@ -51,47 +51,49 @@ const Details = () => {
 			type: "MODIFYING_POST",
 			post: {
 				postId: postId,
-				allowedUsers: appContext.posts.find((p) => p.postId == postId)?.allowedUsers,
+				allowedUsers: appContext.posts.find((p) => p.postId == postId).allowedUsers,
 			},
 		});
 		appContext.dispatch({ type: "SHOW_MODAL", modal: "addUserToPost" });
 	};
 
 	return (
-		<div className="details page">
-			<Nav />
-			<div className="container">
-				<span className="container__back" onClick={() => navigate(ROUTES.HOME)}>
-					Back
-				</span>
-				{isLoading ? (
-					<p className="info__message">Loading Post Details...</p>
-				) : (
-					<>
-						<h1 className="container__title">{postDetails.post.title}</h1>
-						<p className="container__description">{postDetails.post.content}</p>
-						{postDetails.post && (
-							<div className="container__footer">
-								{(postDetails.isAuthor || isAdmin) && (
-									<div className="footer__actions">
-										<div className="footer__action" onClick={() => openAddUsersModal()}>
-											Add Users
+		<Refetcher>
+			<div className="details page">
+				<Nav />
+				<div className="container">
+					<span className="container__back" onClick={() => navigate(ROUTES.HOME)}>
+						Back
+					</span>
+					{isLoading ? (
+						<p className="info__message">Loading Post Details...</p>
+					) : (
+						<>
+							<h1 className="container__title">{postDetails.post.title}</h1>
+							<p className="container__description">{postDetails.post.content}</p>
+							{postDetails.post && (
+								<div className="container__footer">
+									{(postDetails.isAuthor || isAdmin) && (
+										<div className="footer__actions">
+											<div className="footer__action" onClick={() => openAddUsersModal()}>
+												Add Users
+											</div>
 										</div>
-									</div>
-								)}
-								<p className="footer__author">
-									BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
-								</p>
-								<span className="footer__date">
-									Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
-								</span>
-							</div>
-						)}
-					</>
-				)}
+									)}
+									<p className="footer__author">
+										BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
+									</p>
+									<span className="footer__date">
+										Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
+									</span>
+								</div>
+							)}
+						</>
+					)}
+				</div>
+				<ToggleUserForPost />
 			</div>
-			<ToggleUserToPost />
-		</div>
+		</Refetcher>
 	);
 };
 

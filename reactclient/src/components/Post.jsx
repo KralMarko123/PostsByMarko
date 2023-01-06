@@ -7,7 +7,7 @@ import AppContext from "../context/AppContext";
 import PostsService from "../api/PostsService";
 import "../styles/components/Post.css";
 
-const Post = ({ postId, authorId, title, content, isHidden, allowedUsers }) => {
+const Post = ({ postId, authorId, title, content, isHidden }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
 	const { user, isAdmin, isEditor } = useAuth();

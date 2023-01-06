@@ -36,12 +36,11 @@ namespace aspnetserver.Services
             return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();
         }
 
-        public async Task<RequestResult> GetPostByIdAsync(int postId, RequestUser user)
+        public async Task<RequestResult> GetPostByIdAsync(string postId, RequestUser user)
         {
             var post = await postsRepository.GetPostByIdAsync(postId);
 
             if (post == null) return new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
-
 
             if (post.IsHidden == true && !post.AllowedUsers.Contains(user.Username) && !user.UserRoles.Contains("Admin"))
                 return new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
@@ -62,16 +61,13 @@ namespace aspnetserver.Services
             if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
             {
                 postToCreate.UserId = user.UserId;
+                postToCreate.CreatedDate = DateTime.UtcNow;
+                postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
 
-                var postCreatedSuccessfully = await postsRepository.CreatePostAsync(postToCreate);
+                var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
+                var postAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
 
-                if (postCreatedSuccessfully)
-                {
-                    var postAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, postToCreate);
-
-                    if (postAddedToUser.Succeeded) return new RequestResultBuilder().Ok().WithMessage("Post was created successfully").Build();
-                    else return badRequest;
-                }
+                if (postAddedToUser.Succeeded) return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
                 else return badRequest;
             }
             else return badRequest;
@@ -80,7 +76,7 @@ namespace aspnetserver.Services
         public async Task<RequestResult> UpdatePostAsync(Post updatedPost, RequestUser user)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post update").Build();
-            var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.PostId);
+            var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.PostId.ToString());
 
             if (postToUpdate != null && (user.UserId == postToUpdate.UserId || user.UserRoles.Any(x => AppConstants.appRoles.Any(y => y.Name == x))))
             {
@@ -95,7 +91,7 @@ namespace aspnetserver.Services
             else return badRequest;
         }
 
-        public async Task<RequestResult> DeletePostByIdAsync(int postId, RequestUser user)
+        public async Task<RequestResult> DeletePostByIdAsync(string postId, RequestUser user)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post deletion").Build();
             var postToDelete = await postsRepository.GetPostByIdAsync(postId);
@@ -110,7 +106,7 @@ namespace aspnetserver.Services
             else return badRequest;
         }
 
-        public async Task<RequestResult> TogglePostVisibilityAsync(int postId, RequestUser user)
+        public async Task<RequestResult> TogglePostVisibilityAsync(string postId, RequestUser user)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post visibility toggle").Build();
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage("Unauthorized to toggle Post's visibility").Build();
@@ -128,7 +124,7 @@ namespace aspnetserver.Services
             else return unauthorizedRequest;
         }
 
-        public async Task<RequestResult> ToggleUserForPostAsync(int postId, string username, RequestUser requestUser)
+        public async Task<RequestResult> ToggleUserForPostAsync(string postId, string username, RequestUser requestUser)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while toggling user for post with Id: {postId}").Build();
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post with Id: {postId}").Build();

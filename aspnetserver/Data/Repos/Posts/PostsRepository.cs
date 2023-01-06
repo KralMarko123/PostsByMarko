@@ -17,60 +17,48 @@ namespace aspnetserver.Data.Repos.Posts
             return await appDbContext.Posts.ToListAsync();
         }
 
-        public async Task<Post> GetPostByIdAsync(int postId)
+        public async Task<Post> GetPostByIdAsync(string postId)
         {
-            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));
+            if (Guid.TryParse(postId, out var guid))
+            {
+                var post = await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(guid));
+                return post;
+            }
+            else return null;
         }
 
-        public async Task<bool> CreatePostAsync(Post postToCreate)
+        public async Task<Post> CreatePostAsync(Post postToCreate)
         {
-            try
-            {
-                postToCreate.CreatedDate = DateTime.UtcNow;
-                postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
+            postToCreate.PostId = Guid.NewGuid();
 
-                await appDbContext.Posts.AddAsync(postToCreate);
+            await appDbContext.Posts.AddAsync(postToCreate);
 
-                return await appDbContext.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            var postAddedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
+
+            if (postAddedSuccessfully) return await GetPostByIdAsync(postToCreate.PostId.ToString());
+            else throw new Exception("Error during post creation");
         }
 
 
         public async Task<bool> UpdatePostAsync(Post postToUpdate)
         {
+            postToUpdate.LastUpdatedDate = DateTime.UtcNow;
+            appDbContext.Posts.Update(postToUpdate);
 
-            try
-            {
-                postToUpdate.LastUpdatedDate = DateTime.UtcNow;
+            var postUpdatedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
 
-                appDbContext.Posts.Update(postToUpdate);
-
-                return await appDbContext.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            if (postUpdatedSuccessfully) return true;
+            else return false;
         }
 
         public async Task<bool> DeletePostAsync(Post postToDelete)
         {
+            appDbContext.Remove(postToDelete);
 
-            try
-            {
-                appDbContext.Remove(postToDelete);
+            var postDeletedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
 
-                return await appDbContext.SaveChangesAsync() >= 1;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-
+            if (postDeletedSuccessfully) return true;
+            else return false;
         }
     }
 }

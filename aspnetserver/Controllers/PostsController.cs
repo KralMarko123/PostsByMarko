@@ -31,7 +31,7 @@ public class PostsController : BaseController
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 2, TimeWindow = 5)]
-    public async Task<RequestResult> GetPostByIdAsync(int postId)
+    public async Task<RequestResult> GetPostByIdAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
         return await postsService.GetPostByIdAsync(postId, user);
@@ -61,7 +61,7 @@ public class PostsController : BaseController
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 5)]
-    public async Task<RequestResult> DeletePostByIdAsync(int postId)
+    public async Task<RequestResult> DeletePostByIdAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
         return await postsService.DeletePostByIdAsync(postId, user);
@@ -71,7 +71,7 @@ public class PostsController : BaseController
     [Route("/toggle-post-visibility/{postId}")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
-    public async Task<RequestResult> TogglePostVisibilityAsync(int postId)
+    public async Task<RequestResult> TogglePostVisibilityAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
         return await postsService.TogglePostVisibilityAsync(postId, user);
@@ -81,7 +81,7 @@ public class PostsController : BaseController
     [Route("/toggle-user-for-post/{postId}")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
-    public async Task<RequestResult> ToggleUserForPost(int postId, [FromBody] string username)
+    public async Task<RequestResult> ToggleUserForPost(string postId, [FromBody] string username)
     {
         LoadUserInfoForRequestBeingExecuted();
         return await postsService.ToggleUserForPostAsync(postId, username, user);

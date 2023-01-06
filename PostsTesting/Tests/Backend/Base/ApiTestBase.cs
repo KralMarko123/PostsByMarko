@@ -27,37 +27,20 @@ namespace PostsTesting.Tests.Backend.Base
             client.AddDefaultParameter(new HeaderParameter("Authorization", $"Bearer {token}"));
         }
 
-        public async Task<RestResponse> Get(string url)
-        {
-            var request = new RestRequest(url, Method.Get);
-
-            return await client.GetAsync(request);
-        }
-
         public async Task<T?> GetAsJson<T>(string url)
         {
             return await client.GetJsonAsync<T>(url);
         }
 
-        public async Task<RestResponse> Post(string url, object payload = null)
-        {
-            var request = new RestRequest(url, Method.Post);
-            if (payload != null) request.AddBody(payload);
-
-            return await client.PostAsync(request);
-        }
-
-        public async Task<T?> PostAsJson<T>(string url, object payload)
+        public async Task<T?> PostAsJson<T>(string url, object payload = null)
         {
             return await client.PostJsonAsync<object, T>(url, payload);
         }
 
-        public async Task<RestResponse> Put(string url, object? payload)
+        public async Task<T?> Post<T>(string url)
         {
-            var request = new RestRequest(url, Method.Put);
-            request.AddBody(payload);
-
-            return await client.PutAsync(request);
+            var request = new RestRequest(url, Method.Post);
+            return await client.PostAsync<T>(request);
         }
 
         public async Task<T?> PutAsJson<T>(string url, object payload)
@@ -65,11 +48,11 @@ namespace PostsTesting.Tests.Backend.Base
             return await client.PutJsonAsync<object, T>(url, payload);
         }
 
-        public async Task<RestResponse> Delete(string url)
+        public async Task<T?> DeleteAsJson<T>(string url)
         {
             var request = new RestRequest(url, Method.Delete);
 
-            return await client.DeleteAsync(request);
+            return await client.DeleteAsync<T>(request);
         }
     }
 }
