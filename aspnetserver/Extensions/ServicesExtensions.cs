@@ -129,6 +129,7 @@ namespace aspnetserver.Extensions
             builder.Services.AddScoped<IPostsRepository, PostsRepository>();
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
             builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+            builder.Services.AddScoped<IEmailHelper, EmailHelper>();
         }
     }
 }

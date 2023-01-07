@@ -39,14 +39,13 @@ const LoginForm = () => {
 			setIsLoading(true);
 
 			await AuthService.login(loginData)
-				.then((response) => {
-					if (response.token) login(response);
-					else
-						setErrors({
-							title: HelperFunctions.getErrorMessageForFailingResponse(response),
-							messages: [],
-						});
-				})
+				.then((response) => login(response))
+				.catch((error) =>
+					setErrors({
+						title: error.message,
+						messages: [],
+					})
+				)
 				.finally(() => setIsLoading(false));
 		}
 	};

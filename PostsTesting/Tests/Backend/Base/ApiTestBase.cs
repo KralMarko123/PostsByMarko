@@ -1,5 +1,7 @@
-﻿using aspnetserver.Data.Models.Dtos;
+﻿using aspnetserver.Data.Models;
+using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Models.Responses;
+using Newtonsoft.Json;
 using RestSharp;
 using Xunit;
 
@@ -16,9 +18,10 @@ namespace PostsTesting.Tests.Backend.Base
         public async Task<string?> GetAuthenticationToken()
         {
             var request = new UserLoginDto { UserName = testUser.UserName, Password = "Test123" };
-            var response = await client.PostJsonAsync<UserLoginDto, LoginResponse>("/login", request);
+            var response = await client.PostJsonAsync<UserLoginDto, RequestResult>("/login", request);
+            var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(response.Payload.ToString());
 
-            return response?.Token;
+            return loginResponse?.Token;
         }
 
         public async Task AddAuthenticationTokenToClient()

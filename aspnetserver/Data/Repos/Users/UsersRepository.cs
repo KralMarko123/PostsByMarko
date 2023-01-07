@@ -1,6 +1,5 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Dtos;
-using aspnetserver.Data.Models.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,6 @@ namespace aspnetserver.Data.Repos.Users
         private readonly AppDbContext appDbContext;
         private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
-        private User? user;
 
         public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager, IMapper mapper)
         {
@@ -27,39 +25,10 @@ namespace aspnetserver.Data.Repos.Users
             return await appDbContext.Users.Select(u => u.UserName).ToListAsync();
         }
 
-        public async Task<UserValidationResponse> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
+        public async Task<IdentityResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
-            user = mapper.Map<User>(userRegistration);
-            var result = await userManager.CreateAsync(user, userRegistration.Password);
-
-            if (result.Succeeded) return new UserValidationResponse { IsValid = true };
-            else return new UserValidationResponse { IsValid = false, Reason = result.Errors.Select(e => e.Code.ToUpper()).ToList().First() };
-        }
-
-        public async Task<UserValidationResponse> ValidateUserAsync(UserLoginDto userLogin)
-        {
-            user = await userManager.FindByNameAsync(userLogin.UserName);
-
-            if (user == null) return new UserValidationResponse
-            {
-                IsValid = false,
-                Reason = "NO ACCOUNT"
-            };
-
-            if (!await userManager.CheckPasswordAsync(user, userLogin.Password)) return new UserValidationResponse
-            {
-                IsValid = false,
-                Reason = "INVALID PASSWORD"
-            };
-
-            if (!await userManager.IsEmailConfirmedAsync(user)) return new UserValidationResponse
-            {
-                IsValid = false,
-                Reason = "NOT CONFIRMED"
-            };
-
-
-            return new UserValidationResponse { IsValid = true };
+            var user = mapper.Map<User>(userRegistration);
+            return await userManager.CreateAsync(user, userRegistration.Password);
         }
 
         public async Task<List<Claim>> GetClaimsAsync(User user)
@@ -81,13 +50,12 @@ namespace aspnetserver.Data.Repos.Users
 
         public async Task<User> GetUserByUsernameAsync(string username)
         {
-            user = await userManager.FindByNameAsync(username);
-            return user;
+            return await userManager.FindByNameAsync(username);
         }
 
         public async Task<List<string>> GetUserRolesByUsernameAsync(string username)
         {
-            user = await GetUserByUsernameAsync(username);
+            var user = await GetUserByUsernameAsync(username);
             var roles = await userManager.GetRolesAsync(user);
 
             return roles.ToList();
@@ -95,7 +63,7 @@ namespace aspnetserver.Data.Repos.Users
 
         public async Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd)
         {
-            user = await GetUserByUsernameAsync(username);
+            var user = await GetUserByUsernameAsync(username);
             user.Posts.Add(postToAdd);
 
             return await userManager.UpdateAsync(user);
@@ -103,8 +71,27 @@ namespace aspnetserver.Data.Repos.Users
 
         public async Task<User> GetUserByIdAsync(string id)
         {
-            user = await userManager.FindByIdAsync(id);
-            return user;
+            return await userManager.FindByIdAsync(id);
+        }
+
+        public async Task<bool> CheckPasswordForUserAsync(User user, string password)
+        {
+            return await userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<bool> CheckIsEmailConfirmedForUserAsync(User user)
+        {
+            return await userManager.IsEmailConfirmedAsync(user);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenForUserAsync(User user)
+        {
+            return await userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token)
+        {
+            return await userManager.ConfirmEmailAsync(user, token);
         }
     }
 }

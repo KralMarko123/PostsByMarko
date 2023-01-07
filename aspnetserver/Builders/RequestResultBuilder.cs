@@ -27,6 +27,11 @@ namespace aspnetserver.Builders
             requestResult.StatusCode = HttpStatusCode.Unauthorized;
             return this;
         }
+        public RequestResultBuilder Forbidden()
+        {
+            requestResult.StatusCode = HttpStatusCode.Forbidden;
+            return this;
+        }
 
         public RequestResultBuilder BadRequest()
         {

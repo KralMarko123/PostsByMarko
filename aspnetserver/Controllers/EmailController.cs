@@ -1,8 +1,7 @@
-﻿using aspnetserver.Data.Models;
+﻿using aspnetserver.Services;
 using AutoMapper;
 using Controllers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static aspnetserver.Constants.AppConstants;
 
@@ -11,13 +10,12 @@ namespace aspnetserver.Controllers
     [Route("")]
     public class EmailController : BaseController
     {
-        private readonly UserManager<User> userManager;
+        private readonly IUsersService usersService;
         private readonly IConfiguration configuration;
 
-
-        public EmailController(IMapper mapper, UserManager<User> userManager, IConfiguration configuration) : base(mapper)
+        public EmailController(IUsersService usersService, IMapper mapper, IConfiguration configuration) : base(mapper)
         {
-            this.userManager = userManager;
+            this.usersService = usersService;
             this.configuration = configuration;
         }
 
@@ -27,15 +25,11 @@ namespace aspnetserver.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
-            var user = await userManager.FindByNameAsync(email);
+            var user = await usersService.GetUserByUsernameAsync(email);
 
-            if (user == null) return new NotFoundObjectResult(user);
-
-            var result = await userManager.ConfirmEmailAsync(user, token);
-
-            if (result.Succeeded)
+            if (user == null) return NotFound($"User with username: {email} was not found");
+            if (await usersService.ConfirmEmailForUserAsync(user, token))
             {
-
                 var environment = configuration["Environment"];
                 var redirectToLogin = "";
 
@@ -50,9 +44,10 @@ namespace aspnetserver.Controllers
                     default:
                         break;
                 }
+
                 return Redirect(redirectToLogin);
             }
-            else return new BadRequestObjectResult(result);
+            else return BadRequest("Error during email confirmation");
         }
     }
 }
