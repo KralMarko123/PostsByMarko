@@ -38,6 +38,7 @@ namespace aspnetserver.Services
             return new RequestResultBuilder().Ok().WithMessage("Successfully Logged In").WithPayload(new LoginResponse
             {
                 Token = await jwtHelper.CreateTokenAsync(user),
+                Username = user.UserName,
                 UserId = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

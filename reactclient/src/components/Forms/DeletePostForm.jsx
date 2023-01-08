@@ -11,6 +11,7 @@ import "../../styles/components/Form.css";
 const DeletePostForm = () => {
 	const appContext = useContext(AppContext);
 	const [message, setMessage] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
 	const { sendMessage } = useSignalR();
 
@@ -22,6 +23,7 @@ const DeletePostForm = () => {
 	};
 
 	const onDelete = async () => {
+		setIsLoading(true);
 		await PostsService.deletePostById(appContext.postBeingModified.postId, user.token)
 			.then((response) => {
 				setMessage(response);
@@ -31,7 +33,7 @@ const DeletePostForm = () => {
 				}, 1000);
 
 				setTimeout(() => {
-					sendMessage("Deleted Post", false);
+					sendMessage("Deleted Post");
 					appContext.dispatch({
 						type: "DELETED_POST",
 						postId: appContext.postBeingModified.postId,
@@ -43,7 +45,8 @@ const DeletePostForm = () => {
 					isSuccessful: false,
 					message: error.message,
 				})
-			);
+			)
+			.finally(() => setIsLoading(false));
 	};
 
 	return (
@@ -56,7 +59,7 @@ const DeletePostForm = () => {
 			<form className="form">
 				<h1 className="form__confirmational">Are you sure you want to delete this post?</h1>
 				<div className="form__actions">
-					<Button onButtonClick={() => onDelete()} text="Delete" />
+					<Button onButtonClick={() => onDelete()} text="Submit" loading={isLoading} />
 					<Button onButtonClick={() => onClose()} text="Cancel" />
 				</div>
 			</form>

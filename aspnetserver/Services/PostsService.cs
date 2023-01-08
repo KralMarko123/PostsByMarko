@@ -126,8 +126,8 @@ namespace aspnetserver.Services
 
         public async Task<RequestResult> ToggleUserForPostAsync(string postId, string username, RequestUser requestUser)
         {
-            var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while toggling user for post with Id: {postId}").Build();
-            var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post with Id: {postId}").Build();
+            var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while toggling user for post").Build();
+            var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
             if (post.UserId == requestUser.UserId || requestUser.UserRoles.Contains("Admin"))
@@ -141,7 +141,7 @@ namespace aspnetserver.Services
 
                     var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
 
-                    if (postUpdatedSuccessfully) return new RequestResultBuilder().Ok().WithMessage($"User was toggled successfully for post with Id: {postId}").Build();
+                    if (postUpdatedSuccessfully) return new RequestResultBuilder().Ok().WithMessage($"User was toggled successfully").Build();
                     else return badRequest;
                 }
                 else return badRequest;

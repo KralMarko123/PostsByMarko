@@ -17,6 +17,7 @@ const CreatePostForm = () => {
 		content: "",
 	});
 	const [message, setMessage] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
 	const { sendMessage } = useSignalR();
 
@@ -53,6 +54,8 @@ const CreatePostForm = () => {
 	const onSubmit = async () => {
 		let isValidPost = !checkForEmptyFields();
 		if (isValidPost) {
+			setIsLoading(true);
+
 			const postToCreate = {
 				title: newPostData.title,
 				content: newPostData.content,
@@ -60,7 +63,7 @@ const CreatePostForm = () => {
 
 			await PostsService.createPost(postToCreate, user.token)
 				.then((response) => {
-					sendMessage("Created Post");
+					sendMessage("Created Post", true);
 					setMessage({ isSuccessful: true, message: response.message });
 					appContext.dispatch({
 						type: "CREATED_POST",
@@ -76,7 +79,8 @@ const CreatePostForm = () => {
 						isSuccessful: false,
 						message: error.message,
 					})
-				);
+				)
+				.finally(setIsLoading(false));
 		}
 	};
 
@@ -115,7 +119,7 @@ const CreatePostForm = () => {
 				))}
 
 				<div className="form__actions">
-					<Button onButtonClick={() => onSubmit()} text="Submit" />
+					<Button onButtonClick={() => onSubmit()} text="Submit" loading={isLoading} />
 					<Button onButtonClick={() => onClose()} text="Cancel" />
 				</div>
 			</form>

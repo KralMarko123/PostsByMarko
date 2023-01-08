@@ -16,6 +16,12 @@ namespace PostsTesting.Utility.Pages
         public ILocator messageFailure => page.Locator(".modal__message.fail");
         public ILocator messageSuccess => page.Locator(".modal__message.success");
 
+        public async Task SubmitModal(string buttonText = "Submit", string expectedMessage = null, bool shouldCloseModal = true)
+        {
+            await GetButtonWithText(buttonText).ClickAsync();
+            if (expectedMessage != null) await CheckSuccessMessage(expectedMessage);
+            if (shouldCloseModal) await WaitForModalToBeRemoved();
+        }
 
         public async Task CloseModal()
         {
@@ -23,21 +29,9 @@ namespace PostsTesting.Utility.Pages
             await WaitForModalToBeRemoved();
         }
 
-        public async Task ClickSubmit()
-        {
-            await GetButtonWithText("Submit").ClickAsync();
-        }
-
         public async Task ClickCancel()
         {
             await GetButtonWithText("Cancel").ClickAsync();
-        }
-
-        public async Task ClickDelete(string expectedMessage = null)
-        {
-            await GetButtonWithText("Delete").ClickAsync();
-            if (expectedMessage != null) await CheckSuccessMessage(expectedMessage);
-            await WaitForModalToBeRemoved();
         }
 
         public async Task FillInTitleInput(string titleToBeEntered)
@@ -54,9 +48,7 @@ namespace PostsTesting.Utility.Pages
         {
             await FillInTitleInput(titleToBeEntered);
             await FillInContentInput(contentToBeEntered);
-            await ClickSubmit();
-            if (expectedMessage != null) await CheckSuccessMessage(expectedMessage);
-            await WaitForModalToBeRemoved();
+            await SubmitModal(expectedMessage: expectedMessage);
         }
 
         public async Task CheckVisibility(string expectedTitleText)

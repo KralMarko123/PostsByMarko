@@ -140,5 +140,37 @@ namespace PostsTesting.Tests.Backend
             postDetails.Post.IsHidden.Should().BeFalse();
         }
 
+        [Fact]
+        public async Task VerifyUserCanBeToggledForPost()
+        {
+            var payload = new ObjectBuilder()
+                 .WithTitle("Test Post")
+                 .WithContent("Test Content")
+                 .Build();
+            var createdPostResponse = await CreatePost(payload);
+            var post = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
+
+            post.AllowedUsers.Should().BeNullOrEmpty();
+
+            var toggleResponse = await ToggleUserForPostById(post.PostId.ToString(), testUser.UserName);
+
+            toggleResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            toggleResponse.Message.Should().Be("User was toggled successfully");
+
+            var getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
+
+            postDetails.Post.AllowedUsers.Should().Contain(testUser.UserName);
+
+            toggleResponse = await ToggleUserForPostById(post.PostId.ToString(), testUser.UserName);
+            toggleResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            toggleResponse.Message.Should().Be("User was toggled successfully");
+
+            getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
+
+            postDetails.Post.AllowedUsers.Should().NotContain(testUser.UserName);
+        }
+
     }
 }

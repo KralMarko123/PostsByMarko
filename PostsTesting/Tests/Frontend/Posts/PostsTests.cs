@@ -46,5 +46,11 @@ namespace PostsTesting.Tests.Frontend.Posts
         {
             await VerifyPostFiltersCanBeChecked();
         }
+
+        [Fact]
+        public async Task VerifyPostAllowedUserCanBeToggled()
+        {
+            await VerifyPostAllowedUsersCanBeModified();
+        }
     }
 }

@@ -61,7 +61,7 @@ namespace PostsTesting.Tests.Frontend.Base
             var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
 
             await newlyCreatedPost.ClickOnUpdateIcon();
-            await newlyCreatedPost.modal.ClickSubmit();
+            await newlyCreatedPost.modal.SubmitModal(shouldCloseModal: false);
             await newlyCreatedPost.modal.CheckFailureMessage("Can't update with same data");
 
             randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
@@ -82,7 +82,7 @@ namespace PostsTesting.Tests.Frontend.Base
             var numberOfPostsPriorDelete = await homePage.GetNumberOfPosts();
 
             await newlyCreatedPost.ClickOnDeleteIcon();
-            await newlyCreatedPost.modal.ClickDelete("Post was deleted successfully");
+            await newlyCreatedPost.modal.SubmitModal(expectedMessage: "Post was deleted successfully");
 
             var isPostVisible = await page.Locator(".post", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
             isPostVisible.Should().BeFalse();
@@ -120,6 +120,35 @@ namespace PostsTesting.Tests.Frontend.Base
             await homePage.ToggleHiddenPostsCheckbox(false);
             isPostVisible = await page.Locator(".post.hidden", new PageLocatorOptions { HasTextString = randomTitle }).IsVisibleAsync();
             isPostVisible.Should().BeFalse();
+        }
+
+        public async Task VerifyPostAllowedUsersCanBeModified()
+        {
+            var randomTitle = RandomDataGenerator.GetRandomTextWithLength(10);
+            var randomContent = RandomDataGenerator.GetRandomTextWithLength(30);
+            var newlyCreatedPost = await CreateANewPost(randomTitle, randomContent);
+
+            await newlyCreatedPost.ClickOnPost();
+            await postDetailsPage.ClickOnToggleUsersButton();
+            await postDetailsPage.modal.CheckVisibility("Toggle User For Post");
+            await postDetailsPage.modal.SubmitModal(shouldCloseModal: false);
+            await postDetailsPage.modal.CheckFailureMessage("Please select a user");
+
+            var selectedValueText = await postDetailsPage.select.value.TextContentAsync();
+            selectedValueText.Should().BeNullOrEmpty();
+
+            await postDetailsPage.select.OpenSelect();
+
+            var optionToBeSelected = await postDetailsPage.select.GetOptionContainingText(adminUser.UserName).TextContentAsync();
+            optionToBeSelected.Should().Contain("Hidden");
+
+            await postDetailsPage.select.ClickOnOption(adminUser.UserName);
+            await postDetailsPage.modal.SubmitModal(expectedMessage: "User was toggled successfully");
+            await postDetailsPage.ClickOnToggleUsersButton();
+            await postDetailsPage.select.OpenSelect();
+
+            optionToBeSelected = await postDetailsPage.select.GetOptionContainingText(adminUser.UserName).TextContentAsync();
+            optionToBeSelected.Should().Contain("Allowed");
         }
     }
 }

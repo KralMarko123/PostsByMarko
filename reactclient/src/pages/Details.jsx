@@ -44,16 +44,13 @@ const Details = () => {
 
 	useEffect(() => {
 		getPost();
+		appContext.dispatch({
+			type: "MODIFYING_POST",
+			post: { postId: postId },
+		});
 	}, []);
 
 	const openAddUsersModal = () => {
-		appContext.dispatch({
-			type: "MODIFYING_POST",
-			post: {
-				postId: postId,
-				allowedUsers: appContext.posts.find((p) => p.postId == postId).allowedUsers,
-			},
-		});
 		appContext.dispatch({ type: "SHOW_MODAL", modal: "addUserToPost" });
 	};
 
@@ -76,7 +73,7 @@ const Details = () => {
 									{(postDetails.isAuthor || isAdmin) && (
 										<div className="footer__actions">
 											<div className="footer__action" onClick={() => openAddUsersModal()}>
-												Add Users
+												Toggle Users
 											</div>
 										</div>
 									)}

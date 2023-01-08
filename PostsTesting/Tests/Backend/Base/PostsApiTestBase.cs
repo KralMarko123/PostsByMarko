@@ -1,5 +1,6 @@
 ﻿using aspnetserver.Data.Models;
 using PostsTesting.Utility.Constants;
+using System.Text.Json;
 
 namespace PostsTesting.Tests.Backend.Base
 {
@@ -12,6 +13,7 @@ namespace PostsTesting.Tests.Backend.Base
         private const string UPDATE_POST = "/update-post";
         private const string DELETE_POST = "/delete-post-by-id";
         private const string TOGGLE_POST_HIDDEN = "/toggle-post-visibility";
+        private const string TOOGLE_USER_FOR_POST = "/toggle-user-for-post";
 
 
         public async Task<RequestResult?> GetAllPosts()
@@ -46,6 +48,10 @@ namespace PostsTesting.Tests.Backend.Base
         public async Task<RequestResult?> TogglePostVisibilityById(string postId)
         {
             return await Post<RequestResult>($"{BASE_URL}{TOGGLE_POST_HIDDEN}/{postId}");
+        }
+        public async Task<RequestResult?> ToggleUserForPostById(string postId, string username)
+        {
+            return await PostAsJson<RequestResult>($"{BASE_URL}{TOOGLE_USER_FOR_POST}/{postId}", JsonSerializer.Serialize(username));
         }
     }
 }

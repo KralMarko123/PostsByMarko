@@ -14,7 +14,6 @@ namespace PostsTesting.Utility.UI_Models.Pages
             modal = new Modal(page);
         }
 
-
         public ILocator home => page.Locator(".home");
         public ILocator username => page.Locator(".nav__username");
         public ILocator postCard => page.Locator(".post");
