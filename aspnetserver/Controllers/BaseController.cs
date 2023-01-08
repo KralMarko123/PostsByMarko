@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using aspnetserver.Data.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -8,9 +9,7 @@ namespace Controllers;
 public class BaseController : ControllerBase
 {
     protected readonly IMapper mapper;
-    protected string? username;
-    protected string? userId;
-    protected List<string>? userRoles;
+    protected RequestUser? user;
 
     public BaseController(IMapper mapper)
     {
@@ -19,8 +18,11 @@ public class BaseController : ControllerBase
 
     protected void LoadUserInfoForRequestBeingExecuted()
     {
-        username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
-        userId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
-        userRoles = HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+        user = new RequestUser
+        {
+            UserId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid),
+            Username = HttpContext.User.FindFirstValue(ClaimTypes.Name),
+            UserRoles = HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList()
+        };
     }
 }

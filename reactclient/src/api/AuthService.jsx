@@ -9,9 +9,11 @@ const AuthService = {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(userToLogin),
-		}).then((response) => {
-			if (response.ok) return response.json();
-			else return response.text();
+		}).then(async (response) => {
+			const requestResult = await response.json();
+
+			if (requestResult.statusCode === 200) return requestResult.payload;
+			else throw new Error(requestResult.message);
 		});
 	},
 
@@ -23,9 +25,11 @@ const AuthService = {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ ...userToRegister, email: userToRegister.username }),
-		}).then((response) => {
-			if (response.ok) return response.status;
-			else return response.text();
+		}).then(async (response) => {
+			const requestResult = await response.json();
+
+			if (requestResult.statusCode === 201) return;
+			else throw new Error(requestResult.message);
 		});
 	},
 };

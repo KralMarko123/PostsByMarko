@@ -50,6 +50,8 @@ namespace PostsTesting.Utility.Constants
             }
         }
 
-        public static User TestUser = AppConstants.appUsers.Last();
+        public static readonly User AdminUser = AppConstants.appUsers.First();
+
+        public static readonly User TestUser = AppConstants.appUsers.Last();
     }
 }

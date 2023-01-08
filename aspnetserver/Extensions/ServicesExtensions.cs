@@ -1,5 +1,11 @@
 ﻿using aspnetserver.Data;
+using aspnetserver.Data.Mappings;
 using aspnetserver.Data.Models;
+using aspnetserver.Data.Repos.Posts;
+using aspnetserver.Data.Repos.Users;
+using aspnetserver.Helper;
+using aspnetserver.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -111,6 +117,19 @@ namespace aspnetserver.Extensions
                 .RequireAuthenticatedUser()
                 .Build();
             });
+        }
+
+        public static void WithServices(this WebApplicationBuilder builder)
+        {
+            var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
+
+            builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
+            builder.Services.AddScoped<IPostsService, PostsService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IPostsRepository, PostsRepository>();
+            builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+            builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+            builder.Services.AddScoped<IEmailHelper, EmailHelper>();
         }
     }
 }

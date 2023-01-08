@@ -14,6 +14,7 @@ const UpdatePostForm = () => {
 	const updatePostForm = FORMS.updatePostForm;
 	const [newPostData, setNewPostData] = useState({ ...appContext.postBeingModified });
 	const [message, setMessage] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
 	const { sendMessage } = useSignalR();
 
@@ -72,13 +73,14 @@ const UpdatePostForm = () => {
 		let isValidUpdate = !checkForEmptyFields() && !checkForSameData();
 
 		if (isValidUpdate) {
+			setIsLoading(true);
 			await PostsService.updatePost(newPostData, user.token)
 				.then((response) => {
 					appContext.dispatch({
 						type: "UPDATED_POST",
 						post: newPostData,
 					});
-					sendMessage("Updated Post", false);
+					sendMessage("Updated Post");
 					setMessage(response);
 					setTimeout(() => {
 						onClose();
@@ -89,7 +91,8 @@ const UpdatePostForm = () => {
 						isSuccessful: false,
 						message: error.message,
 					})
-				);
+				)
+				.finally(() => setIsLoading(false));
 		}
 	};
 
@@ -130,7 +133,7 @@ const UpdatePostForm = () => {
 				))}
 
 				<div className="form__actions">
-					<Button onButtonClick={() => onSubmit()} text="Submit" />
+					<Button onButtonClick={() => onSubmit()} text="Submit" loading={isLoading} />
 					<Button onButtonClick={() => onClose()} text="Cancel" />
 				</div>
 			</form>

@@ -65,6 +65,10 @@
 
 .container__footer {
 	padding-top: var(--small-padding);
+
+	display: flex;
+	flex-direction: column;
+	gap: var(--small-gap);
 }
 
 .info__message {

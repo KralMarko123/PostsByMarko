@@ -6,17 +6,14 @@ namespace aspnetserver.Helper
 {
     public class EmailHelper : IEmailHelper
     {
-        public async Task SendEmail(string firstName, string lastName, string emailToSendTo, string confirmationLink)
+        public async Task SendEmail(string firstName, string lastName, string emailToSendTo, string subject, string body)
         {
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress("ADMIN @ Posts By Marko", AppConstants.webserverAdminEmail));
             message.To.Add(new MailboxAddress($"{firstName} {lastName}", emailToSendTo));
-            message.Subject = $"Please confirm the registration for {emailToSendTo}";
-            message.Body = new TextPart("plain")
-            {
-                Text = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}"
-            };
+            message.Subject = subject;
+            message.Body = new TextPart("plain") { Text = body };
 
             try
             {

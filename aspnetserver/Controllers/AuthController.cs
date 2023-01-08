@@ -1,12 +1,11 @@
 ﻿using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Dtos;
-using aspnetserver.Data.Models.Responses;
-using aspnetserver.Data.Repos.Users;
 using aspnetserver.Helper;
+using aspnetserver.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Controllers;
 
@@ -14,70 +13,45 @@ namespace Controllers;
 [AllowAnonymous]
 public class AuthController : BaseController
 {
-    private readonly IUsersRepository usersRepository;
-    private readonly UserManager<User> userManager;
-    private readonly IJwtHelper jwtHelper;
+    private readonly IUsersService usersService;
+    private readonly IEmailHelper emailHelper;
 
-    public AuthController(IUsersRepository usersRepository, UserManager<User> userManager, IJwtHelper jwtHelper, IMapper mapper) : base(mapper)
+    public AuthController(IUsersService usersService, IEmailHelper emailHelper, IMapper mapper) : base(mapper)
     {
-        this.usersRepository = usersRepository;
-        this.userManager = userManager;
-        this.jwtHelper = jwtHelper;
+        this.usersService = usersService;
+        this.emailHelper = emailHelper;
     }
 
     [HttpPost]
     [Route("/register")]
     [Tags("Auth Endpoint")]
-    public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
+    public async Task<RequestResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
     {
+        var result = await usersService.MapAndCreateUserAsync(userRegistration);
 
-        var result = await usersRepository.MapAndCreateUserAsync(userRegistration);
-
-        if (result.IsValid)
-        {
-            var user = await usersRepository.GetUserByUsernameAsync(userRegistration.UserName);
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
-            var emailHelper = new EmailHelper();
-            await emailHelper.SendEmail(user.FirstName, user.LastName, user.Email, confirmationLink);
-
-            return StatusCode(201);
-        }
-        else return new BadRequestObjectResult(result.Reason);
-
+        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.UserName);
+        return result;
     }
 
     [HttpPost]
     [Route("/login")]
     [Tags("Auth Endpoint")]
-    public async Task<IActionResult> Authenticate([FromBody] UserLoginDto userLogin)
+    public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
-        var result = await usersRepository.ValidateUserAsync(userLogin);
+        var result = await usersService.ValidateUserAsync(userLogin);
 
-        if (!result.IsValid)
-        {
-            if (result.Reason == "NOT CONFIRMED")
-            {
-                var user = await usersRepository.GetUserByUsernameAsync(userLogin.UserName);
-                var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
-                var emailHelper = new EmailHelper();
-                await emailHelper.SendEmail(user.FirstName, user.LastName, user.Email, confirmationLink);
-            }
-            return new UnauthorizedObjectResult(result.Reason);
-        }
-        else
-        {
-            var loggedInUser = await usersRepository.GetUserByUsernameAsync(userLogin.UserName);
+        if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);
+        return result;
+    }
 
-            return Ok(new LoginResponse()
-            {
-                Token = await jwtHelper.CreateTokenAsync(loggedInUser),
-                UserId = loggedInUser.Id,
-                FirstName = loggedInUser.FirstName,
-                LastName = loggedInUser.LastName,
-                Roles = await usersRepository.GetUserRolesByUsername(loggedInUser.UserName),
-            });
-        }
+    private async Task SendEmailConfirmationLinkToUser(string username)
+    {
+        var user = await usersService.GetUserByUsernameAsync(username);
+        var token = await usersService.GenerateEmailConfirmationTokenForUserAsync(user);
+        var confirmationLink = Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
+        var subject = $"Please confirm the registration for {user.Email}";
+        var body = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
+
+        await emailHelper.SendEmail(user.FirstName, user.LastName, user.Email, subject, body);
     }
 }

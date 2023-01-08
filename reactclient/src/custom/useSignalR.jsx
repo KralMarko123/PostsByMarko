@@ -35,7 +35,7 @@ export const useSignalR = () => {
 		}
 	}, [signalR.connection]);
 
-	const sendMessageToHub = async (message, toAll) => {
+	const sendMessageToHub = async (message, toAll = false) => {
 		if (signalR.connection) {
 			try {
 				await signalR.connection.send(toAll ? "SendMessageToAll" : "SendMessageToOthers", message);

@@ -72,15 +72,13 @@ const RegisterForm = () => {
 			setIsLoading(true);
 
 			await AuthService.register(registerData)
-				.then((response) => {
-					if (response === 201) {
-						setIsRegistered(true);
-					} else
-						setErrors({
-							title: HelperFunctions.getErrorMessageForFailingResponse(response),
-							messages: [],
-						});
-				})
+				.then(() => setIsRegistered(true))
+				.catch((error) =>
+					setErrors({
+						title: error.message,
+						messages: [],
+					})
+				)
 				.finally(() => setIsLoading(false));
 		}
 	};

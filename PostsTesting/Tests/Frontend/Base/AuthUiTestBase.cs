@@ -75,7 +75,7 @@ namespace PostsTesting.Tests.Frontend.Base
             await registerPage.FillInConfirmPasswordInput($"{randomTestText}test123");
             await registerPage.FillInUsernameInput(testUser.UserName);
             await registerPage.ClickRegisterButton();
-            await registerPage.CheckForErrors("Username has already been taken, please try again with a different one");
+            await registerPage.CheckForErrors($"Username '{testUser.UserName}' is already taken.");
         }
     }
 }

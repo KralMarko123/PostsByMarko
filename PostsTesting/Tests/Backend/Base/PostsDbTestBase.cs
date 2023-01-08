@@ -12,7 +12,7 @@ namespace PostsTesting.Tests.Backend.Base
             return await ExecuteSearchQuery(query);
         }
 
-        public static async Task<Post?> GetPostById(int postId)
+        public static async Task<Post?> GetPostById(Guid postId)
         {
             var query = $"SELECT * FROM Posts WHERE PostId = '{postId}'";
             var posts = await ExecuteSearchQuery(query);
@@ -36,7 +36,7 @@ namespace PostsTesting.Tests.Backend.Base
             {
                 var post = new Post()
                 {
-                    PostId = reader.GetInt32(0),
+                    PostId = reader.GetGuid(0),
                     Title = reader.GetString(1),
                     Content = reader.GetString(2),
                     UserId = reader.GetString(3),

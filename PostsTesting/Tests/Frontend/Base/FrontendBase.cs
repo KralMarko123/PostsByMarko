@@ -11,6 +11,7 @@ namespace PostsTesting.Tests.Frontend.Base
         protected BrowserDriver driver;
         protected IBrowser browser;
         protected IPage page;
+        protected User adminUser = TestingConstants.AdminUser;
         protected User testUser = TestingConstants.TestUser;
         public async Task InitializeAsync()
         {

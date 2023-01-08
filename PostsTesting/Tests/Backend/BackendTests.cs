@@ -4,6 +4,9 @@ using PostsTesting.Utility.Extensions;
 using System.Net;
 using Xunit;
 using FluentAssertions;
+using aspnetserver.Data.Models;
+using aspnetserver.Data.Models.Responses;
+using Newtonsoft.Json;
 
 namespace PostsTesting.Tests.Backend
 {
@@ -13,18 +16,21 @@ namespace PostsTesting.Tests.Backend
         [Fact]
         public async Task VerifyPostsCanBeFetched()
         {
-            var posts = await GetAllPosts();
+            var allPostsResponse = await GetAllPosts();
+            var postsFromApi = JsonConvert.DeserializeObject<List<Post>>(allPostsResponse.Payload.ToString());
             var postsFromDb = await PostsDbTestBase.GetAllPosts();
 
-            posts.Should().BeEquivalentTo(postsFromDb);
+            postsFromApi.Should().BeEquivalentTo(postsFromDb);
+            allPostsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            for (int i = 0; i < posts.Count; i++)
+            for (int i = 0; i < postsFromApi.Count; i++)
             {
-                var post = posts[i];
-                var postFetchedSeparately = await GetPostById(post.PostId.ToString());
+                var post = postsFromApi[i];
+                var postByIdResult = await GetPostById(post.PostId.ToString());
+                var postFromApi = JsonConvert.DeserializeObject<PostDetailsResponse>(postByIdResult.Payload.ToString());
 
-                postFetchedSeparately.Should().NotBeNull();
-                postFetchedSeparately.Post.Should().BeEquivalentTo(post);
+                postByIdResult.StatusCode.Should().Be(HttpStatusCode.OK);
+                postFromApi.Post.Should().BeEquivalentTo(post);
             }
         }
 
@@ -33,19 +39,21 @@ namespace PostsTesting.Tests.Backend
         {
             var postsFromDb = await PostsDbTestBase.GetAllPosts();
             var postsCount = postsFromDb.Count();
-            var payload = new ObjectBuilder()
+            var data = new ObjectBuilder()
                 .WithTitle($"Test Post")
                 .WithContent($"Test Content")
                 .Build();
-            var createdPostResponse = await CreatePost(payload);
+            var createdPostResponse = await CreatePost(data);
+            var newlyCreatedPost = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
 
-            createdPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            createdPostResponse.Content.Should().Contain("Post was created successfully");
+            createdPostResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            createdPostResponse.Message.Should().Be("Post was created successfully");
+            newlyCreatedPost.Should().NotBeNull();
 
             postsFromDb = await PostsDbTestBase.GetAllPosts();
             postsFromDb.Count.Should().Be(postsCount + 1);
-            postsFromDb.Last().Title.Should().Be(payload.GetProperty("Title").ToString());
-            postsFromDb.Last().Content.Should().Be(payload.GetProperty("Content").ToString());
+            newlyCreatedPost.Title.Should().Be(data.GetProperty("Title").ToString());
+            newlyCreatedPost.Content.Should().Be(data.GetProperty("Content").ToString());
         }
 
         [Fact]
@@ -53,28 +61,27 @@ namespace PostsTesting.Tests.Backend
         {
             var updatedTitle = $"Updated Test Post";
             var updatedContent = $"Updated Test Content";
-            var payload = new ObjectBuilder()
+            var data = new ObjectBuilder()
                 .WithTitle("Test Post")
                 .WithContent("Test Content")
                 .Build();
+            var createdPostResponse = await CreatePost(data);
+            var postToUpdate = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
 
-            await CreatePost(payload);
-
-            var allPosts = await GetAllPosts();
-            var postToUpdateId = allPosts.Last().PostId;
-
-            payload = new ObjectBuilder()
-                .WithPostId(postToUpdateId.ToString())
+            data = new ObjectBuilder()
+                .WithPostId(postToUpdate.PostId.ToString())
                 .WithTitle(updatedTitle)
                 .WithContent(updatedContent)
                 .Build();
 
-            var updatedPostResponse = await UpdatePost(payload);
+            var updatedPostResponse = await UpdatePost(data);
+
             updatedPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            updatedPostResponse.Content.Should().Contain("Post was updated successfully");
+            updatedPostResponse.Message.Should().Be("Post was updated successfully");
 
 
-            var updatedPost = await PostsDbTestBase.GetPostById(postToUpdateId);
+            var updatedPost = await PostsDbTestBase.GetPostById(postToUpdate.PostId);
+
             updatedPost.Title.Should().Be(updatedTitle);
             updatedPost.Content.Should().Be(updatedContent);
             updatedPost.LastUpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
@@ -87,21 +94,19 @@ namespace PostsTesting.Tests.Backend
                  .WithTitle("Test Post")
                  .WithContent("Test Content")
                  .Build();
+            var createdPostResponse = await CreatePost(payload);
+            var postToDelete = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
+            var deletedPostResponse = await DeletePostById(postToDelete.PostId.ToString());
 
-            await CreatePost(payload);
-
-            var postsFromDb = await PostsDbTestBase.GetAllPosts();
-            var postToDeleteId = postsFromDb.Last().PostId;
-
-            var deletedPostResponse = await DeletePostById(postToDeleteId.ToString());
             deletedPostResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            deletedPostResponse.Content.Should().Contain("Post was deleted successfully");
+            deletedPostResponse.Message.Should().Be("Post was deleted successfully");
 
-            var findPostByIdResponse = await GetPostByIdResponse(postToDeleteId.ToString());
-            findPostByIdResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-            findPostByIdResponse.Content.Should().Contain($"Post with Id: {postToDeleteId} was not found");
+            var getPostByIdResponse = await GetPostByIdResponse(postToDelete.PostId.ToString());
 
-            var getPostFromDb = async () => await PostsDbTestBase.GetPostById(postToDeleteId);
+            getPostByIdResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            getPostByIdResponse.Message.Should().Be($"Post with Id: {postToDelete.PostId} was not found");
+
+            var getPostFromDb = async () => await PostsDbTestBase.GetPostById(postToDelete.PostId);
             await getPostFromDb.Should().ThrowAsync<Exception>();
         }
 
@@ -112,25 +117,59 @@ namespace PostsTesting.Tests.Backend
                  .WithTitle("Test Post")
                  .WithContent("Test Content")
                  .Build();
+            var createdPostResponse = await CreatePost(payload);
+            var post = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
 
-            await CreatePost(payload);
+            post.IsHidden.Should().BeFalse();
 
-            var postsFromDb = await PostsDbTestBase.GetAllPosts();
+            var postHiddenToggledResponse = await TogglePostVisibilityById(post.PostId.ToString());
 
-            var postId = postsFromDb.Last().PostId.ToString();
-            var post = await GetPostById(postId);
-            post.Post.IsHidden.Should().BeFalse();
-
-            var postHiddenToggledResponse = await TogglePostVisibilityById(postId);
             postHiddenToggledResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            postHiddenToggledResponse.Content.Should().Contain("Post visibility was toggled successfully");
+            postHiddenToggledResponse.Message.Should().Be("Post visibility was toggled successfully");
 
-            post = await GetPostById(postId);
-            post.Post.IsHidden.Should().BeTrue();
+            var getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
 
-            await TogglePostVisibilityById(postId);
-            post = await GetPostById(postId);
-            post.Post.IsHidden.Should().BeFalse();
+            postDetails.Post.IsHidden.Should().BeTrue();
+
+            await TogglePostVisibilityById(post.PostId.ToString());
+
+            getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
+
+            postDetails.Post.IsHidden.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task VerifyUserCanBeToggledForPost()
+        {
+            var payload = new ObjectBuilder()
+                 .WithTitle("Test Post")
+                 .WithContent("Test Content")
+                 .Build();
+            var createdPostResponse = await CreatePost(payload);
+            var post = JsonConvert.DeserializeObject<Post>(createdPostResponse.Payload.ToString());
+
+            post.AllowedUsers.Should().BeNullOrEmpty();
+
+            var toggleResponse = await ToggleUserForPostById(post.PostId.ToString(), testUser.UserName);
+
+            toggleResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            toggleResponse.Message.Should().Be("User was toggled successfully");
+
+            var getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
+
+            postDetails.Post.AllowedUsers.Should().Contain(testUser.UserName);
+
+            toggleResponse = await ToggleUserForPostById(post.PostId.ToString(), testUser.UserName);
+            toggleResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            toggleResponse.Message.Should().Be("User was toggled successfully");
+
+            getPostByIdResponse = await GetPostById(post.PostId.ToString());
+            postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(getPostByIdResponse.Payload.ToString());
+
+            postDetails.Post.AllowedUsers.Should().NotContain(testUser.UserName);
         }
 
     }
