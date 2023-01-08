@@ -20,7 +20,6 @@ public class PostsController : BaseController
     [HttpGet]
     [Route("/get-all-posts")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
     public async Task<RequestResult> GetPostsAsync()
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -30,7 +29,6 @@ public class PostsController : BaseController
     [HttpGet]
     [Route("/get-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 2, TimeWindow = 5)]
     public async Task<RequestResult> GetPostByIdAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -50,7 +48,7 @@ public class PostsController : BaseController
     [HttpPut]
     [Route("/update-post")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 5)]
     public async Task<RequestResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -60,7 +58,6 @@ public class PostsController : BaseController
     [HttpDelete]
     [Route("/delete-post-by-id/{postId}")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 5)]
     public async Task<RequestResult> DeletePostByIdAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -70,7 +67,6 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/toggle-post-visibility/{postId}")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> TogglePostVisibilityAsync(string postId)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -80,7 +76,6 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/toggle-user-for-post/{postId}")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> ToggleUserForPost(string postId, [FromBody] string username)
     {
         LoadUserInfoForRequestBeingExecuted();
