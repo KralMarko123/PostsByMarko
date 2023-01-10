@@ -13,7 +13,7 @@ namespace PostsTesting.Tests
 
         public async Task InitializeAsync()
         {
-            client = new RestClient(TestingConstants.ServerEndpoint);
+            client = new RestClient(TestingConstants.serverEndpoint);
         }
 
         public async Task DisposeAsync()

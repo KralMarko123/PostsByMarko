@@ -6,7 +6,7 @@ namespace PostsTesting.Tests.Backend.Base
 {
     public class PostsApiTestBase : ApiTestBase
     {
-        private static string BASE_URL = TestingConstants.ServerEndpoint;
+        private static string BASE_URL = TestingConstants.serverEndpoint;
         private const string GET_ALL_POSTS = "/get-all-posts";
         private const string GET_POST = "/get-post-by-id";
         private const string CREATE_POST = "/create-post";
