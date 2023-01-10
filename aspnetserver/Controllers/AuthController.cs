@@ -4,6 +4,7 @@ using aspnetserver.Helper;
 using aspnetserver.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 

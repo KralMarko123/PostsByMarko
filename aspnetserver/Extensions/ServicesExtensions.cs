@@ -17,7 +17,7 @@ namespace aspnetserver.Extensions
 {
     public static class ServicesExtensions
     {
-        public static void WithCors(this WebApplicationBuilder builder, string policyName = "defaultPolicy", List<string> allowedOrigins = null)
+        public static void WithCors(this WebApplicationBuilder builder, string policyName, List<string> allowedOrigins)
         {
             builder.Services.AddCors(options =>
             {
