@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
-namespace aspnetserver.Extensions
+namespace aspnetserver.Extensions 
 {
     public static class ServicesExtensions
     {

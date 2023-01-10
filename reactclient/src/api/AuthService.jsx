@@ -5,7 +5,6 @@ const AuthService = {
 		return await fetch(ENDPOINT__URLS.LOGIN, {
 			method: "POST",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(userToLogin),
@@ -21,7 +20,6 @@ const AuthService = {
 		return await fetch(ENDPOINT__URLS.REGISTER, {
 			method: "POST",
 			headers: {
-				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ ...userToRegister, email: userToRegister.username }),

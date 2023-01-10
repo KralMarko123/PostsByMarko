@@ -48,7 +48,7 @@ const Home = () => {
 					<h1 className="container__title">Posts By Marko</h1>
 					<p className="container__description">Create and share posts with your friends</p>
 
-					{appContext.posts.length > 0 ? (
+					{appContext.posts?.length > 0 ? (
 						<div className="posts__dashboard">
 							<PostFilters
 								onFilterToggle={(isApplied, filter) =>
@@ -59,7 +59,7 @@ const Home = () => {
 								}
 							/>
 							<ul className="posts__list">
-								{filteredPosts.map((p, i) => (
+								{filteredPosts?.map((p, i) => (
 									<Post
 										key={p.postId}
 										postId={p.postId}

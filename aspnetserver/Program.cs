@@ -16,10 +16,10 @@ var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
 #region ServicesConfiguration
+builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
-builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
@@ -46,18 +46,22 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-app.UseSwagger();
-app.UseSwaggerUI(swaggerUIOptions =>
+if (app.Environment.IsDevelopment())
 {
-    swaggerUIOptions.DocumentTitle = "ASP.NET Posts Project";
-    swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
-    swaggerUIOptions.RoutePrefix = string.Empty;
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(swaggerUIOptions =>
+    {
+        swaggerUIOptions.DocumentTitle = "ASP.NET Posts Project";
+        swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
+        swaggerUIOptions.RoutePrefix = string.Empty;
+    });
+}
+
 
 app.UseCors(corsPolicyName);
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
 
 app.MapHub<PostHub>("/postHub");
 app.MapControllers();
