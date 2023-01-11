@@ -6,8 +6,8 @@ namespace PostsTesting.Tests
 {
     public class TestingFactory : IAsyncLifetime
     {
-        private readonly TestcontainersContainer clientContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
-           .WithName("posts-client")
+        private readonly TestcontainersContainer dbContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
+           .WithName("posts-database")
            .WithImage("reactclient:latest")
            .WithPortBinding(3000, true)
            .Build();
