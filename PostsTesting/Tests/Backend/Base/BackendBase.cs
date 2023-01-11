@@ -6,13 +6,14 @@ using Xunit;
 
 namespace PostsTesting.Tests
 {
-    public class BackendBase : IAsyncLifetime
+    public class BackendBase : TestingFactory, IAsyncLifetime
     {
         protected RestClient client;
         protected User testUser = TestingConstants.TestUser;
 
         public async Task InitializeAsync()
         {
+            await base.InitializeAsync();
             client = new RestClient(TestingConstants.serverEndpoint);
         }
 
