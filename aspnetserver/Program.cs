@@ -8,18 +8,25 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using static aspnetserver.Constants.AppConstants;
 
-var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
+var isInDevelopment = builder.Environment.IsDevelopment();
 
+var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
-var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+var dbUserId = Environment.GetEnvironmentVariable("DB_USER_ID");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
+
+var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID={dbUserId};Password={dbPassword}";
+if (!isInDevelopment) connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
 #region ServicesConfiguration
 builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-
 
 builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
@@ -46,8 +53,15 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-if (app.Environment.IsDevelopment())
+
+if (isInDevelopment)
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        appDbContext.Database.EnsureCreated();
+    }
+
     app.UseSwagger();
     app.UseSwaggerUI(swaggerUIOptions =>
     {
@@ -56,7 +70,6 @@ if (app.Environment.IsDevelopment())
         swaggerUIOptions.RoutePrefix = string.Empty;
     });
 }
-
 
 app.UseCors(corsPolicyName);
 app.UseHttpsRedirection();
