@@ -12,7 +12,7 @@ namespace aspnetserver.Controllers
         private readonly IUsersService usersService;
         private readonly IConfiguration configuration;
 
-        public EmailController(IUsersService usersService, IMapper mapper, IConfiguration configuration, ILogger logger) : base(logger, mapper)
+        public EmailController(IUsersService usersService, IMapper mapper, IConfiguration configuration) : base(mapper)
         {
             this.usersService = usersService;
             this.configuration = configuration;

@@ -15,9 +15,11 @@ public class AuthController : BaseController
 {
     private readonly IUsersService usersService;
     private readonly IEmailHelper emailHelper;
-    
-    public AuthController(IUsersService usersService, IEmailHelper emailHelper, ILogger logger, IMapper mapper) : base(logger, mapper)
+    private readonly ILogger<AuthController> logger;
+
+    public AuthController(IUsersService usersService, IEmailHelper emailHelper, ILogger<AuthController> logger, IMapper mapper) : base(mapper)
     {
+        this.logger = logger;
         this.usersService = usersService;
         this.emailHelper = emailHelper;
     }

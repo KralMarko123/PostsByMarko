@@ -12,9 +12,11 @@ namespace Controllers;
 public class PostsController : BaseController
 {
     private readonly IPostsService postsService;
-    public PostsController(IPostsService postsService, ILogger logger, IMapper mapper) : base(logger, mapper)
+    private readonly ILogger<PostsController> logger;
+    public PostsController(IPostsService postsService, ILogger<PostsController> logger, IMapper mapper) : base(mapper)
     {
         this.postsService = postsService;
+        this.logger = logger;
     }
 
     [HttpGet]

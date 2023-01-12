@@ -64,13 +64,14 @@ services:
 
   #FLUENT
   fluentd:
-    container_name: fleuntd
+    container_name: fluentd
     image: ${DOCKER_REGISTRY-}fluentd
-    build: log/fluentd
+    build: logging/fluentd
     depends_on:
       - elasticsearch
       - kibana
-    restart: on-failure
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
     ports:
       - "24224:24224"
       - "24224:24224/udp"
@@ -80,12 +81,13 @@ services:
 
   #ELASTIC
   elasticsearch:
-    container_name: es
+    container_name: elasticsearch
     image: ${DOCKER_REGISTRY-}elasticsearch
-    build: log/elasticsearch
-    restart: on-failure
+    build: logging/elasticsearch
     ports:
       - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
     networks:
       - elasticsearch
       - kibana
@@ -93,10 +95,11 @@ services:
   #KIBANA
   kibana:
     container_name: kibana
-    image: kibana:7.13.2
-    restart: on-failure
+    image: kibana:7.17.8
     depends_on:
       - elasticsearch
+    environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
     ports:
       - "5601:5601"
     networks:

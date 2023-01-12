@@ -36,9 +36,12 @@ try
     logger.Info("Configuring Services for Posts-Server");
 
     #region ServicesConfiguration
-    builder.WithCors(corsPolicyName, allowedOrigins);
 
+    builder.Logging.ClearProviders();
+    builder.Logging.SetMinimumLevel(LogLevel.Trace);
     builder.Host.UseNLog();
+
+    builder.WithCors(corsPolicyName, allowedOrigins);
 
     builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
@@ -61,7 +64,7 @@ try
     builder.WithAuthentication(jwtConfig);
     builder.WithAuthorization();
 
-    #endregion
+    #endregion   
 
     var app = builder.Build();
 
@@ -82,7 +85,6 @@ try
         using (var scope = app.Services.CreateScope())
         {
             var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
 
             logger.Info(connectionString);
 
