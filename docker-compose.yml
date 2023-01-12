@@ -35,8 +35,7 @@ services:
       - DB_HOST=postsdb
       - DB_NAME=PostsDB
       - DB_USER_ID=sa
-      - DB_SA_PASSWORD=@Marko123
-      - DOTNET_RUNNING_IN_CONTAINER=true
+      - MSSQL_SA_PASSWORD=@Marko123
       - ASPNETCORE_ENVIRONMENT=Development
 
   reactclient:

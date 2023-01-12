@@ -38,7 +38,7 @@ public class PostsController : BaseController
     [HttpPost]
     [Route("/create-post")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 10)]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> CreatePostAsync([FromBody] Post postToCreate)
     {
         LoadUserInfoForRequestBeingExecuted();
@@ -48,7 +48,7 @@ public class PostsController : BaseController
     [HttpPut]
     [Route("/update-post")]
     [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 5)]
+    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
         LoadUserInfoForRequestBeingExecuted();

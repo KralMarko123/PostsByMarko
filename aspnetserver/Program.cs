@@ -18,7 +18,7 @@ var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
 var dbUserId = Environment.GetEnvironmentVariable("DB_USER_ID");
 var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
+var dbPassword = Environment.GetEnvironmentVariable("MSSQL_SA_PASSWORD");
 
 var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID={dbUserId};Password={dbPassword}";
 if (!isInDevelopment) connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
@@ -56,12 +56,6 @@ var app = builder.Build();
 
 if (isInDevelopment)
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        appDbContext.Database.EnsureCreated();
-    }
-
     app.UseSwagger();
     app.UseSwaggerUI(swaggerUIOptions =>
     {
@@ -69,6 +63,14 @@ if (isInDevelopment)
         swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
         swaggerUIOptions.RoutePrefix = string.Empty;
     });
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+           
+        appDbContext.Database.EnsureDeleted();
+        appDbContext.Database.EnsureCreated();
+    }
 }
 
 app.UseCors(corsPolicyName);
@@ -79,7 +81,7 @@ app.UseAuthorization();
 app.MapHub<PostHub>("/postHub");
 app.MapControllers();
 
-app.UseRateLimiting();
+//app.UseRateLimiting();
 
 #endregion
 

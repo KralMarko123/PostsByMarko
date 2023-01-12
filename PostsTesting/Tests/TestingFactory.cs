@@ -1,40 +1,32 @@
-﻿using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
+﻿using aspnetserver.Helper;
+using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Services;
 using Xunit;
 
 namespace PostsTesting.Tests
 {
     public class TestingFactory : IAsyncLifetime
     {
-        private readonly TestcontainersContainer dbContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
-           .WithName("posts-database")
-           .WithImage("reactclient:latest")
-           .WithPortBinding(3000, true)
-           .Build();
-
-        private readonly TestcontainersContainer serverContainer = new TestcontainersBuilder<TestcontainersContainer>()
-            .WithName("posts-server")
-            .WithImage("aspnetserver:latest")
-            .WithExposedPort(80)
-            .WithPortBinding(7171)
-            .Build();
-
-        private readonly TestcontainersContainer clientContainer = new TestcontainersBuilder<TestcontainersContainer>()
-           .WithName("posts-client")
-           .WithImage("reactclient:latest")
-           .WithPortBinding(3000, true)
-           .Build();
-
+        private static readonly string solutionDirectory = VisualStudioHelper.TryGetSolutionDirectoryInfo().FullName;
+        private static readonly string dockerComposeFilePath = Path.Combine(solutionDirectory, "docker-compose.yml");
+        private readonly ICompositeService dockerBuilder = new Builder()
+                    .UseContainer()
+                    .UseCompose()
+                    .FromFile(dockerComposeFilePath)
+                    .RemoveOrphans()
+                    .WaitForHttp("postsdb", "http://localhost:1433")
+                    .WaitForHttp("aspnetserver", "http://localhost:7171")
+                    .WaitForHttp("reactclient", "http://localhost:3000")
+                    .Build();
         public async Task InitializeAsync()
         {
-            throw new NotImplementedException();
+            dockerBuilder.Start();
         }
 
         public async Task DisposeAsync()
         {
-            throw new NotImplementedException();
+            dockerBuilder.Stop();
+            dockerBuilder.Dispose();
         }
-
-
     }
 }

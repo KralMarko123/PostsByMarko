@@ -11,13 +11,14 @@ namespace PostsTesting.Tests
         protected RestClient client;
         protected User testUser = TestingConstants.TestUser;
 
-        public async Task InitializeAsync()
+        public new async Task InitializeAsync()
         {
             await base.InitializeAsync();
+
             client = new RestClient(TestingConstants.serverEndpoint);
         }
 
-        public async Task DisposeAsync()
+        public new async Task DisposeAsync()
         {
             client.Dispose();
             await PostsDbTestBase.DeleteAllTestPosts();
