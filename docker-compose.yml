@@ -70,8 +70,6 @@ services:
     depends_on:
       - elasticsearch
       - kibana
-    volumes:
-      - ./fluentd/conf:/fluentd/etc
     ports:
       - "24224:24224"
       - "24224:24224/udp"
@@ -86,8 +84,6 @@ services:
     build: logging/elasticsearch
     ports:
       - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
     networks:
       - elasticsearch
       - kibana
