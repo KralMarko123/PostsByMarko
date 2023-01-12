@@ -5,3 +5,6 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/mnt/c/Users/ContainerUser/AppData/Roaming/Microsoft/UserSecrets:ro
       - ${APPDATA}/ASP.NET/Https:/mnt/c/Users/ContainerUser/AppData/Roaming/ASP.NET/Https:ro
+  elasticsearch:
+    volumes:
+      - ${APPDATA}/elasticsearch/volume:/usr/share/elasticsearch/data

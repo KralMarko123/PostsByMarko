@@ -14,7 +14,7 @@ namespace aspnetserver.Controllers
     public class UsersController : BaseController
     {
         private readonly IUsersService usersService;
-        public UsersController(IUsersService usersService, IMapper mapper) : base(mapper)
+        public UsersController(IUsersService usersService, ILogger logger, IMapper mapper) : base(logger, mapper)
         {
             this.usersService = usersService;
         }

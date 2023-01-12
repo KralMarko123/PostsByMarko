@@ -12,7 +12,7 @@ namespace Controllers;
 public class PostsController : BaseController
 {
     private readonly IPostsService postsService;
-    public PostsController(IPostsService postsService, IMapper mapper) : base(mapper)
+    public PostsController(IPostsService postsService, ILogger logger, IMapper mapper) : base(logger, mapper)
     {
         this.postsService = postsService;
     }

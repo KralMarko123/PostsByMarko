@@ -10,14 +10,17 @@ public class BaseController : ControllerBase
 {
     protected readonly IMapper mapper;
     protected RequestUser? user;
-
-    public BaseController(IMapper mapper)
+    protected readonly ILogger logger;
+    public BaseController(ILogger logger, IMapper mapper)
     {
+        this.logger = logger;
         this.mapper = mapper;
     }
 
     protected void LoadUserInfoForRequestBeingExecuted()
     {
+        logger.LogInformation("Loading user information from incoming request");
+
         user = new RequestUser
         {
             UserId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid),

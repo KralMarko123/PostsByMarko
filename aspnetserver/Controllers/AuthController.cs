@@ -4,7 +4,6 @@ using aspnetserver.Helper;
 using aspnetserver.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -16,8 +15,8 @@ public class AuthController : BaseController
 {
     private readonly IUsersService usersService;
     private readonly IEmailHelper emailHelper;
-
-    public AuthController(IUsersService usersService, IEmailHelper emailHelper, IMapper mapper) : base(mapper)
+    
+    public AuthController(IUsersService usersService, IEmailHelper emailHelper, ILogger logger, IMapper mapper) : base(logger, mapper)
     {
         this.usersService = usersService;
         this.emailHelper = emailHelper;
@@ -39,6 +38,8 @@ public class AuthController : BaseController
     [Tags("Auth Endpoint")]
     public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
+        logger.LogInformation($"Logging in user: {userLogin.UserName}");
+
         var result = await usersService.ValidateUserAsync(userLogin);
 
         if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);
