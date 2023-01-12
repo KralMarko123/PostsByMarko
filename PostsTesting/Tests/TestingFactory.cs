@@ -14,9 +14,9 @@ namespace PostsTesting.Tests
                     .UseCompose()
                     .FromFile(dockerComposeFilePath)
                     .RemoveOrphans()
-                    .WaitForHttp("postsdb", "http://localhost:1433")
-                    .WaitForHttp("aspnetserver", "http://localhost:7171")
-                    .WaitForHttp("reactclient", "http://localhost:3000")
+                    .WaitForHttp("postsdb", "http://localhost:1433", 30)
+                    .WaitForHttp("aspnetserver", "http://localhost:7171/index.html", 60)
+                    .WaitForHttp("reactclient", "http://localhost:3000/login", 30)
                     .Build();
         public async Task InitializeAsync()
         {
