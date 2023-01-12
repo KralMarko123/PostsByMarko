@@ -38,21 +38,7 @@ namespace aspnetserver.Helper
 
         private JwtSecurityToken GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
         {
-            var environment = configuration["Environment"];
-            IConfiguration jwtConfig = null;
-
-            switch (environment)
-            {
-                case "DEV":
-                    jwtConfig = configuration.GetSection("DevJwtConfig");
-                    break;
-                case "PRD":
-                    jwtConfig = configuration.GetSection("JwtConfig");
-                    break;
-                default:
-                    break;
-            }
-
+            var jwtConfig = configuration.GetSection("JwtConfig");
             var token = new JwtSecurityToken
             (
             issuer: jwtConfig.GetSection("validIssuers").Get<List<string>>().FirstOrDefault(),

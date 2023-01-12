@@ -1,0 +1,54 @@
+version: "3.4"
+
+networks:
+  postsBackendNetwork:
+  postsFrontendNetwork:
+
+name: posts-docker-compose
+
+services:
+  postsdb:
+    container_name: posts-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 1433:1433
+    networks:
+      - postsBackendNetwork
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=@Marko123
+
+  aspnetserver:
+    container_name: posts-server
+    image: ${DOCKER_REGISTRY-}aspnetserver:latest
+    build:
+      context: .
+      dockerfile: aspnetserver/Dockerfile
+    ports:
+      - 7171:80
+    depends_on:
+      - postsdb
+    networks:
+      - postsBackendNetwork
+      - postsFrontendNetwork
+    environment:
+      - DB_HOST=postsdb
+      - DB_NAME=PostsDB
+      - DB_USER_ID=sa
+      - MSSQL_SA_PASSWORD=@Marko123
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  reactclient:
+    container_name: posts-client
+    image: ${DOCKER_REGISTRY-}reactclient:latest
+    build:
+      context: .
+      dockerfile: reactclient/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - aspnetserver
+    volumes:
+      - ./src:/app/src
+    networks:
+      - postsFrontendNetwork

@@ -5,7 +5,7 @@ namespace PostsTesting.Utility.UI_Models.Pages
 {
     public class Page : Shared
     {
-        protected static string baseUrl => $"{TestingConstants.UiEndpoint}";
+        protected static string baseUrl => $"{TestingConstants.clientEndpoint}";
 
         public Page(IPage page) : base(page) { }
 

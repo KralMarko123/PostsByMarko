@@ -6,21 +6,23 @@ using Xunit;
 
 namespace PostsTesting.Tests.Frontend.Base
 {
-    public class FrontendBase : IAsyncLifetime
+    public class FrontendBase : TestingFactory, IAsyncLifetime
     {
         protected BrowserDriver driver;
         protected IBrowser browser;
         protected IPage page;
         protected User adminUser = TestingConstants.AdminUser;
         protected User testUser = TestingConstants.TestUser;
-        public async Task InitializeAsync()
+        public new async Task InitializeAsync()
         {
+            await base.InitializeAsync(); 
+
             driver = new BrowserDriver();
             browser = await driver.GetBrowserAsync();
             page = await browser.NewPageAsync();
         }
 
-        public async Task DisposeAsync()
+        public new async Task DisposeAsync()
         {
             await driver.DestroyBrowser();
             await driver.DestroyPlaywright();

@@ -10,9 +10,10 @@ using Newtonsoft.Json;
 
 namespace PostsTesting.Tests.Backend
 {
+    
     public class BackendTests : PostsApiTestBase
     {
-
+        
         [Fact]
         public async Task VerifyPostsCanBeFetched()
         {
@@ -172,5 +173,7 @@ namespace PostsTesting.Tests.Backend
             postDetails.Post.AllowedUsers.Should().NotContain(testUser.UserName);
         }
 
+
+        
     }
 }

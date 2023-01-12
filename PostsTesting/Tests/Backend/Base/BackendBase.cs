@@ -6,17 +6,19 @@ using Xunit;
 
 namespace PostsTesting.Tests
 {
-    public class BackendBase : IAsyncLifetime
+    public class BackendBase : TestingFactory, IAsyncLifetime
     {
         protected RestClient client;
         protected User testUser = TestingConstants.TestUser;
 
-        public async Task InitializeAsync()
+        public new async Task InitializeAsync()
         {
-            client = new RestClient(TestingConstants.ServerEndpoint);
+            await base.InitializeAsync();
+
+            client = new RestClient(TestingConstants.serverEndpoint);
         }
 
-        public async Task DisposeAsync()
+        public new async Task DisposeAsync()
         {
             client.Dispose();
             await PostsDbTestBase.DeleteAllTestPosts();

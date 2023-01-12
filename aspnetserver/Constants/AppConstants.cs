@@ -40,8 +40,6 @@ namespace aspnetserver.Constants
                  }
         };
 
-        public static List<string> allowedDevOrigins = new List<string> { devServerUrl, devClientUrl };
-        public static List<string> allowedPrdOrigins = new List<string> { prdServerUrl, prdClientUrl };
         #endregion
 
         #region Const

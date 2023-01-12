@@ -8,34 +8,25 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using static aspnetserver.Constants.AppConstants;
 
-var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var builder = WebApplication.CreateBuilder(args);
-var environment = builder.Configuration["Environment"];
-var connectionString = "";
-var allowedOrigins = new List<string>();
-IConfigurationSection jwtConfig = null;
+var isInDevelopment = builder.Environment.IsDevelopment();
 
-switch (environment)
-{
-    case "DEV":
-        allowedOrigins = allowedDevOrigins;
-        jwtConfig = builder.Configuration.GetSection("DevJwtConfig");
-        connectionString = builder.Configuration.GetConnectionString("DevConnection");
-        break;
-    case "PRD":
-        allowedOrigins = allowedPrdOrigins;
-        jwtConfig = builder.Configuration.GetSection("JwtConfig");
-        connectionString = builder.Configuration.GetConnectionString("PrdConnection");
-        break;
-    default:
-        break;
-}
+var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
+var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
+var jwtConfig = builder.Configuration.GetSection("JwtConfig");
+
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+var dbUserId = Environment.GetEnvironmentVariable("DB_USER_ID");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var dbPassword = Environment.GetEnvironmentVariable("MSSQL_SA_PASSWORD");
+
+var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID={dbUserId};Password={dbPassword}";
+if (!isInDevelopment) connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
 #region ServicesConfiguration
+builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-
-builder.WithCors(corsPolicyName, allowedOrigins);
 
 builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
@@ -62,23 +53,35 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-app.UseSwagger();
-app.UseSwaggerUI(swaggerUIOptions =>
+
+if (isInDevelopment)
 {
-    swaggerUIOptions.DocumentTitle = "ASP.NET Posts Project";
-    swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
-    swaggerUIOptions.RoutePrefix = string.Empty;
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(swaggerUIOptions =>
+    {
+        swaggerUIOptions.DocumentTitle = "ASP.NET Posts Project";
+        swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
+        swaggerUIOptions.RoutePrefix = string.Empty;
+    });
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+           
+        appDbContext.Database.EnsureDeleted();
+        appDbContext.Database.EnsureCreated();
+    }
+}
 
 app.UseCors(corsPolicyName);
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
 
 app.MapHub<PostHub>("/postHub");
 app.MapControllers();
 
-app.UseRateLimiting();
+//app.UseRateLimiting();
 
 #endregion
 
