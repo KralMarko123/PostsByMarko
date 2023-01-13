@@ -5,6 +5,7 @@ using aspnetserver.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Net;
 
 namespace Controllers;
@@ -15,11 +16,9 @@ public class AuthController : BaseController
 {
     private readonly IUsersService usersService;
     private readonly IEmailHelper emailHelper;
-    private readonly ILogger<AuthController> logger;
 
-    public AuthController(IUsersService usersService, IEmailHelper emailHelper, ILogger<AuthController> logger, IMapper mapper) : base(mapper)
+    public AuthController(IUsersService usersService, IEmailHelper emailHelper, IMapper mapper) : base(mapper)
     {
-        this.logger = logger;
         this.usersService = usersService;
         this.emailHelper = emailHelper;
     }
@@ -40,7 +39,7 @@ public class AuthController : BaseController
     [Tags("Auth Endpoint")]
     public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
-        logger.LogInformation($"Logging in user: {userLogin.UserName}");
+        Log.Logger.Information($"Loggin in user: {userLogin.UserName}");
 
         var result = await usersService.ValidateUserAsync(userLogin);
 

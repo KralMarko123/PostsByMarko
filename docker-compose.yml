@@ -3,11 +3,10 @@ version: "3.4"
 name: posts-docker-compose
 
 networks:
-  fluentd:
   postsBackendNetwork:
   postsFrontendNetwork:
   elasticsearch:
-  kibana:
+    driver: bridge
 
 services:
   #DATABASE
@@ -33,11 +32,10 @@ services:
       - 7171:80
     depends_on:
       - postsdb
-      - fluentd
     networks:
       - postsBackendNetwork
       - postsFrontendNetwork
-      - fluentd
+      - elasticsearch
     environment:
       - DB_HOST=postsdb
       - DB_NAME=PostsDB
@@ -62,41 +60,34 @@ services:
     networks:
       - postsFrontendNetwork
 
-  #FLUENT
-  fluentd:
-    container_name: fluentd
-    image: ${DOCKER_REGISTRY-}fluentd
-    build: logging/fluentd
-    depends_on:
-      - elasticsearch
-      - kibana
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-    networks:
-      - fluentd
-      - elasticsearch
-
   #ELASTIC
   elasticsearch:
     container_name: elasticsearch
-    image: ${DOCKER_REGISTRY-}elasticsearch
-    build: logging/elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    expose:
+      - 9200
     ports:
       - "9200:9200"
+    environment:
+      xpack.security.enabled: false
+      cluster.name: "posts-cluster"
+      discovery.type: "single-node"
     networks:
       - elasticsearch
-      - kibana
 
   #KIBANA
   kibana:
     container_name: kibana
-    image: kibana:7.17.8
+    image: docker.elastic.co/kibana/kibana:8.6.0
     depends_on:
       - elasticsearch
     environment:
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+      ELASTICSEARCH_URL: "http://localhost:9200"
+      xpack.security.enabled: "false"
+      xpack.monitoring.enabled: "true"
+      xpack.watcher.enabled: "true"
+      xpack.ml.enabled: "true"
     ports:
       - "5601:5601"
     networks:
-      - kibana
+      - elasticsearch
