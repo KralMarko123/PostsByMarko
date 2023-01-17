@@ -39,7 +39,7 @@ public class AuthController : BaseController
     [Tags("Auth Endpoint")]
     public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
-        Log.Logger.Information($"Loggin in user: {userLogin.UserName}");
+        Log.Logger.Information($"Logging in user with username: {userLogin.UserName}");
 
         var result = await usersService.ValidateUserAsync(userLogin);
 

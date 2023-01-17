@@ -8,43 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
-using System.Reflection;
 using System.Text.Json.Serialization;
 using static aspnetserver.Constants.AppConstants;
-
-ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string environment)
-{
-    return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
-    {
-        AutoRegisterTemplate = true,
-        IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
-    };
-}
-
-void ConfigureLogging()
-{
-    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-    var configuration = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .AddJsonFile(
-            $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
-            optional: true)
-        .Build();
-
-    Log.Logger = new LoggerConfiguration()
-        .Enrich.FromLogContext()
-        .Enrich.WithExceptionDetails()
-        .WriteTo.Debug()
-        .WriteTo.Console()
-        .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
-        .Enrich.WithProperty("Environment", environment)
-        .ReadFrom.Configuration(configuration)
-        .CreateLogger();
-}
-
-
-
-ConfigureLogging();
 
 var builder = WebApplication.CreateBuilder(args);
 var dockerFlag = Environment.GetEnvironmentVariable("IS_IN_DOCKER");
@@ -65,6 +30,7 @@ if (dockerFlag == null) connectionString = builder.Configuration.GetConnectionSt
 
 #region ServicesConfiguration
 builder.Host.UseSerilog();
+ConfigureLogging();
 
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
@@ -133,3 +99,25 @@ app.UseRateLimiting();
 app.Run();
 
 
+ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration)
+{
+    return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
+    {
+        AutoRegisterTemplate = true,
+        IndexFormat = $"posts-server-{DateTime.UtcNow:yyyy-MM}"
+    };
+}
+
+void ConfigureLogging()
+{
+    var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
+
+    Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
+        .Enrich.WithExceptionDetails()
+        .WriteTo.Debug()
+        .WriteTo.Console()
+        .WriteTo.Elasticsearch(ConfigureElasticSink(configuration))
+        .ReadFrom.Configuration(configuration)
+        .CreateLogger();
+}
