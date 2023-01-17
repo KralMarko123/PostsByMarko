@@ -10,7 +10,6 @@ public class BaseController : ControllerBase
 {
     protected readonly IMapper mapper;
     protected RequestUser? user;
-
     public BaseController(IMapper mapper)
     {
         this.mapper = mapper;

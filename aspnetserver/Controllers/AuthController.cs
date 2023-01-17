@@ -4,8 +4,8 @@ using aspnetserver.Helper;
 using aspnetserver.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Net;
 
 namespace Controllers;
@@ -39,6 +39,8 @@ public class AuthController : BaseController
     [Tags("Auth Endpoint")]
     public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
+        Log.Logger.Information($"Logging in user with username: {userLogin.UserName}");
+
         var result = await usersService.ValidateUserAsync(userLogin);
 
         if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);
