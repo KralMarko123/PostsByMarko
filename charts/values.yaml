@@ -1,0 +1,20 @@
+environment: development
+
+apphost: k8s
+
+label:
+  name: posts-kubernetes
+
+container:
+  beName: posts-server-k8s
+  feName: posts-client-k8s
+  pullPolicy: Always
+  beImage: ${DOCKER_REGISTRY-}aspnetserver:latest
+  feImage: ${DOCKER_REGISTRY-}reactclient:latest
+  namespace: markos-posts
+  beTag: v1
+  feTag: v1
+  bePort: 80
+  beServicePort: 7171
+  fePort: 3000
+  feServicePort: 3000
