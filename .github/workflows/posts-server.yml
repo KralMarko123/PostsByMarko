@@ -1,4 +1,4 @@
-name: Docker posts-aspnetserver build workflow
+name: Docker posts-server build workflow
 
 on:
   push:
