@@ -5,10 +5,7 @@
 **/.vs
 **/.vscode
 **/bin
-**/charts
 **/node_modules
 **/obj
-**/node_modules
-**/build
 LICENSE
 README.md
