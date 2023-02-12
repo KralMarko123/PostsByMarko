@@ -22,4 +22,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build docker image
-        run: docker build ./reactclient --file ./reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
+        run: docker build ./reactclient/ --file ./reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
