@@ -20,4 +20,4 @@ jobs:
 
       - name: Build docker image
         working-directory: aspnetserver
-        run: docker build . --file ./aspnetserver/Dockerfile --tag posts-aspnetserver:$(date +%s)
+        run: docker build . --file Dockerfile --tag posts-aspnetserver:$(date +%s)

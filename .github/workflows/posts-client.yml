@@ -20,4 +20,4 @@ jobs:
 
       - name: Build docker image
         working-directory: reactclient
-        run: docker build . --file ./reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
+        run: docker build . --file Dockerfile --tag posts-aspnetserver:$(date +%s)
