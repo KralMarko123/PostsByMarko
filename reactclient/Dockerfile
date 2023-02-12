@@ -9,8 +9,7 @@ COPY "reactclient/package.json" .
 COPY "reactclient/package-lock.json" .
 COPY "reactclient/" .
 
-RUN npm ci
-
 EXPOSE 3000
 
+RUN npm ci
 CMD [ "npm", "start" ]

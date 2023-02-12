@@ -29,7 +29,6 @@ services:
     container_name: posts-server
     image: ${DOCKER_REGISTRY-}aspnetserver:latest
     build:
-      context: .
       dockerfile: aspnetserver/Dockerfile
     ports:
       - 7171:80
@@ -55,7 +54,6 @@ services:
     container_name: posts-client
     image: ${DOCKER_REGISTRY-}reactclient:latest
     build:
-      context: .
       dockerfile: reactclient/Dockerfile
     ports:
       - 3000:3000
