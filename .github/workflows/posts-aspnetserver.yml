@@ -16,10 +16,11 @@ env:
   WORKING_DIRECTORY: aspnetserver
 
 jobs:
-  build-container:
+  build-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Build the posts web api docker image
-        working-directory: "${{ env.WORKING_DIRECTORY }}"
-        run: docker build ./"${{ env.WORKING_DIRECTORY }}" --file Dockerfile --tag posts-aspnetserver:$(date +%s)
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Build docker image
+        run: docker build ./aspnetserver --file ./aspnetserver/Dockerfile --tag posts-aspnetserver:$(date +%s)

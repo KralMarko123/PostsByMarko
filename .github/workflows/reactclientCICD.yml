@@ -15,10 +15,11 @@ env:
   WORKING_DIRECTORY: reactclient
 
 jobs:
-  build-container:
+  build-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Build the posts web client docker image
-        working-directory: "${{ env.WORKING_DIRECTORY }}"
-        run: docker build ./"${{ env.WORKING_DIRECTORY }}" --file Dockerfile --tag posts-client:$(date +%s)
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Build docker image
+        run: docker build ./reactclient --file ./reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
