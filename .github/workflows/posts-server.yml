@@ -19,5 +19,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build docker image
-        working-directory: /aspnetserver
         run: docker build . --file aspnetserver/Dockerfile --tag posts-aspnetserver:$(date +%s)

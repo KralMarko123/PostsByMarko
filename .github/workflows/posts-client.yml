@@ -19,5 +19,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build docker image
-        working-directory: /reactclient
         run: docker build . --file reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
