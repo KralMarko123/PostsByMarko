@@ -13,6 +13,7 @@ services:
   postsdb:
     container_name: posts-db
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
     ports:
       - 1433:1433
     networks:
@@ -20,6 +21,8 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=@Marko123
+    volumes:
+      - posts-sql-data:/var/lib/mysql
 
   #WEB API
   aspnetserver:
@@ -85,7 +88,7 @@ services:
     networks:
       - elasticsearch
     volumes:
-      - posts-data:/usr/share/elasticsearch/data
+      - posts-elastic-data:/usr/share/elasticsearch/data
 
   #KIBANA
   kibana:
@@ -106,5 +109,6 @@ services:
       - elasticsearch
 
 volumes:
-  posts-data:
+  posts-sql-data:
+  posts-elastic-data:
     driver: local

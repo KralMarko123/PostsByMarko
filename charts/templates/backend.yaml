@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: { { .Values.container.beName } }
+  labels:
+    app: { { .Values.container.beName } }
+  namespace: { { .Values.container.namespace } }
+
+spec:
+  selector:
+    matchLabels:
+      app: { { .Values.container.beName } }
+  template:
+    metadata:
+      labels:
+        app: { { .Values.container.beName } }
+        environment: { { .Values.environment } }
+    spec:
+      containers:
+        name: { { .Values.container.beName } }
+        image: { { .Values.container.beImage } }
+        imagePullPolicy: { { .Values.container.pullPolicy } }
+        ports:
+          protocol: TCP
+          containerPort: { { .Values.container.bePort } }
+          port: { { .Values.container.beServicePort } }
+        env:
+          - name: apphost
+            value: { { .Values.apphost } }
+          - name: appenvironment
+            value: { { .Values.environment } }
