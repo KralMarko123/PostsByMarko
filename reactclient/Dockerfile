@@ -7,7 +7,7 @@ WORKDIR /src
 
 COPY "reactclient/package.json" .
 COPY "reactclient/package-lock.json" .
-COPY . .
+COPY "reactclient/" .
 
 RUN npm ci
 
