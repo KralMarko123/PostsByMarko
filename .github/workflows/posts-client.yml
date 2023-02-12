@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-docker-image:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
