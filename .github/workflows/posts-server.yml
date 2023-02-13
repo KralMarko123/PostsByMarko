@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  DOCKER_REPOSITORY: kralmarko123
+  DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}
   IMAGE_NAME: posts-server
   IMAGE_TAG: 1.0.${{ github.run_number }}
 
@@ -29,7 +29,7 @@ jobs:
         run: docker build . --file aspnetserver/Dockerfile --tag $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
 
       - name: Login to Docker Hub
-        run: echo "nba2k13ftw" | docker login -u kralmarko123 --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_REPOSITORY --password-stdin
 
       - name: Push Image to Docker Hub
         run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
