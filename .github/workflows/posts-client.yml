@@ -14,7 +14,7 @@ on:
 env:
   REGISTRY: docker.io
   DOCKER_REPOSITORY: kralmarko123
-  IMAGE_NAME: posts-server
+  IMAGE_NAME: posts-client
   IMAGE_TAG: 1.0.${{ github.run_number }}
 
 jobs:
