@@ -11,12 +11,25 @@ on:
   #Allow manual workflow dispatching
   workflow_dispatch:
 
+env:
+  REGISTRY: docker.io
+  DOCKER_REPOSITORY: kralmarko123
+  IMAGE_NAME: posts-server
+  IMAGE_TAG: 1.0.${{ github.run_number }}
+
 jobs:
-  Build:
+  build-and-push-to-docker:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Git checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build docker image
-        run: docker build . --file reactclient/Dockerfile --tag posts-aspnetserver:$(date +%s)
+      - name: Build Docker Image
+        run: docker build . --file reactclient/Dockerfile --tag $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+
+      - name: Login to Docker Hub
+        run: echo "nba2k13ftw" | docker login -u kralmarko123 --password-stdin
+
+      - name: Push Image to Docker Hub
+        run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
