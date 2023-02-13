@@ -1,4 +1,4 @@
-name: Docker posts-client build workflow
+name: posts-client docker workflow
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - "reactclient/**"
-      - ".github/workflows/**"
 
   #Allow manual workflow dispatching
   workflow_dispatch:

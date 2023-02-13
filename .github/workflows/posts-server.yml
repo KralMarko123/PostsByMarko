@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - "aspnetserver/**"
-      - ".github/workflows/posts**"
 
   #Allow manual workflow dispatching
   workflow_dispatch:
