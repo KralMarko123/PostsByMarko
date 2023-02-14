@@ -1,0 +1,15 @@
+replicaCount: 1
+
+image:
+  repository: kralmarko123/posts-client
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  name: reactclient
+  port: 3000
+  targetPort: 3000
+
+container:
+  name: posts-client
+  port: 3000

@@ -1,0 +1,15 @@
+replicaCount: 1
+
+image:
+  repository: kralmarko123/posts-server
+  pullPolicy: IfNotPresent
+
+service:
+  name: aspnetserver
+  type: ClusterIP
+  port: 7171
+  targetPort: 7171
+
+container:
+  name: posts-server
+  port: 7171
