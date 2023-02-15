@@ -1,11 +1,11 @@
 replicaCount: 1
 
 image:
-  repository: kralmarko123/posts-client
-  pullPolicy: IfNotPresent
+  repository: docker.io/kralmarko123/posts-client
+  pullPolicy: Always
 
 service:
-  type: ClusterIP
+  type: NodePort
   name: reactclient
   port: 3000
   targetPort: 3000

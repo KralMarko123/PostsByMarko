@@ -1,15 +1,15 @@
 replicaCount: 1
 
 image:
-  repository: kralmarko123/posts-server
-  pullPolicy: IfNotPresent
+  repository: docker.io/kralmarko123/posts-server
+  pullPolicy: Always
 
 service:
   name: aspnetserver
-  type: ClusterIP
+  type: NodePort
   port: 7171
-  targetPort: 7171
 
 container:
   name: posts-server
   port: 7171
+  targetPort: 7171
