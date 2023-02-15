@@ -8,17 +8,17 @@ namespace PostsTesting.Tests
 {
     public class BackendBase : IAsyncLifetime
     {
-        protected RestClient client;
+        protected RestClient? client;
         protected User testUser = TestingConstants.TestUser;
 
-        public new async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            client = new RestClient(TestingConstants.serverEndpoint);
+            await Task.Run(() => client = new RestClient(TestingConstants.serverEndpoint));
         }
 
-        public new async Task DisposeAsync()
+        public async Task DisposeAsync()
         {
-            client.Dispose();
+            client?.Dispose();
             await PostsDbTestBase.DeleteAllTestPosts();
         }
     }

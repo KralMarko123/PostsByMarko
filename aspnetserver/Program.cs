@@ -16,9 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 var isInDocker = Environment.GetEnvironmentVariable("IS_IN_DOCKER");
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
 
-Console.WriteLine(isInDocker);
-Console.WriteLine(isInLocalDevelopment);
-
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");

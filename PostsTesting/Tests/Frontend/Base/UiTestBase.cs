@@ -1,5 +1,4 @@
-﻿using PostsTesting.Utility;
-using PostsTesting.Utility.Pages;
+﻿using PostsTesting.Utility.Pages;
 using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
@@ -10,7 +9,7 @@ namespace PostsTesting.Tests.Frontend.Base
         LoginPage loginPage => new LoginPage(page);
         HomePage homePage => new HomePage(page);
 
-        public async Task InitializeAsync() => await base.InitializeAsync();
+        public new async Task InitializeAsync() => await base.InitializeAsync();
 
         public async Task LoginAsTestUser()
         {

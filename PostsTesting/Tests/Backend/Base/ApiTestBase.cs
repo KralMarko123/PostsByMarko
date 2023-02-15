@@ -9,7 +9,7 @@ namespace PostsTesting.Tests.Backend.Base
 {
     public class ApiTestBase : BackendBase, IAsyncLifetime
     {
-        public async Task InitializeAsync()
+        public async new Task InitializeAsync()
         {
             await base.InitializeAsync();
             await AddAuthenticationTokenToClient();
