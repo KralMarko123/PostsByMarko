@@ -1,5 +1,5 @@
 const BASE_URL_DEV = "http://localhost:7171";
-const BASE_URL_PRODUCTION = "https://posts-aspnetserver.azurewebsites.net";
+const BASE_URL_PRODUCTION = "";
 
 const ENDPOINTS = {
 	//POSTS

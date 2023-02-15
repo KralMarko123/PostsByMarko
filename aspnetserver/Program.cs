@@ -12,9 +12,12 @@ using System.Text.Json.Serialization;
 using static aspnetserver.Constants.AppConstants;
 
 var builder = WebApplication.CreateBuilder(args);
-var dockerFlag = Environment.GetEnvironmentVariable("IS_IN_DOCKER");
 
-var isInDevelopment = builder.Environment.IsDevelopment();
+var isInDocker = Environment.GetEnvironmentVariable("IS_IN_DOCKER");
+var isInLocalDevelopment = builder.Environment.IsDevelopment();
+
+Console.WriteLine(isInDocker);
+Console.WriteLine(isInLocalDevelopment);
 
 var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
@@ -26,7 +29,7 @@ var dbName = Environment.GetEnvironmentVariable("DB_NAME");
 var dbPassword = Environment.GetEnvironmentVariable(variable: "MSSQL_SA_PASSWORD");
 
 var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID={dbUserId};Password={dbPassword}";
-if (dockerFlag == null) connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+if (isInDocker == null) connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
 #region ServicesConfiguration
 builder.Host.UseSerilog();
@@ -64,7 +67,7 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-if (isInDevelopment)
+if (isInLocalDevelopment)
 {
     app.UseSwagger();
     app.UseSwaggerUI(swaggerUIOptions =>
@@ -85,7 +88,7 @@ if (isInDevelopment)
 }
 
 app.UseCors(corsPolicyName);
-if (!isInDevelopment) app.UseHttpsRedirection();
+if (!isInLocalDevelopment) app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

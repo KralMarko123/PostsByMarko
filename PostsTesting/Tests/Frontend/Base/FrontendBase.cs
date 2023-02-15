@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PostsTesting.Tests.Frontend.Base
 {
-    public class FrontendBase : TestingFactory, IAsyncLifetime
+    public class FrontendBase : IAsyncLifetime
     {
         protected BrowserDriver driver;
         protected IBrowser browser;
@@ -15,8 +15,6 @@ namespace PostsTesting.Tests.Frontend.Base
         protected User testUser = TestingConstants.TestUser;
         public new async Task InitializeAsync()
         {
-            await base.InitializeAsync(); 
-
             driver = new BrowserDriver();
             browser = await driver.GetBrowserAsync();
             page = await browser.NewPageAsync();
