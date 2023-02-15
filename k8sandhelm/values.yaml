@@ -13,7 +13,7 @@ container:
   frontendImage: kralmarko123/posts-client
   backendImage: kralmarko123/posts-server
   frontendTag: 1.0.20
-  backendTag: 1.0.24
+  backendTag: 1.0.25
   namespace: development
   backendPort: 7171
   backendServicePort: 80
