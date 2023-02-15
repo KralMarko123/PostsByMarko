@@ -1,0 +1,15 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/kralmarko123/posts-server
+  pullPolicy: Always
+
+service:
+  name: aspnetserver
+  type: NodePort
+  port: 7171
+
+container:
+  name: posts-server
+  port: 7171
+  targetPort: 7171

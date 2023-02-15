@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspnetserver
+  labels:
+    app: aspnetserver
+    chart: aspnetserver
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  revisionHistoryLimit: 0
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: aspnetserver
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: aspnetserver
+        draft: {{ .Values.draft | default "draft-app" }}
+        release: {{ .Release.Name }}
+      
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP

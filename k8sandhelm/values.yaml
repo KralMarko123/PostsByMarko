@@ -1,0 +1,28 @@
+environment: development
+
+apphost: postsasproject
+
+label: 
+  name: postsaspproject-helm
+
+container:  
+  frontendName: posts-client
+  backendName: posts-server
+  pullPolicy: IfNotPresent
+  repository: docker.io
+  frontendImage: kralmarko123/posts-client
+  backendImage: kralmarko123/posts-server
+  frontendTag: 1.0.19
+  backendTag: 1.0.23
+  namespace: development
+  backendPort: 7171
+  backendServicePort: 80
+  frontendPort: 3000
+  frontendServicePort: 3000
+
+replicaCount: 1
+
+service: 
+  port: 8888
+  type: NodePort
+  
