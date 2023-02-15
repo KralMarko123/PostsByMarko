@@ -12,7 +12,7 @@ namespace PostsTesting.Tests.Frontend.Base
         HomePage homePage => new HomePage(page);
         PostDetailsPage postDetailsPage => new PostDetailsPage(page);
 
-        public async Task InitializeAsync()
+        public async new Task InitializeAsync()
         {
             await base.InitializeAsync();
             await LoginAsTestUser();

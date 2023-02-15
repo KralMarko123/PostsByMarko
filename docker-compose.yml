@@ -20,14 +20,13 @@ services:
       - postsBackendNetwork
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=@Marko123
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
     volumes:
       - posts-sql-data:/var/lib/mysql
 
   #WEB API
   aspnetserver:
     container_name: posts-server
-    image: ${DOCKER_REGISTRY-}aspnetserver:latest
     build:
       dockerfile: aspnetserver/Dockerfile
     ports:
@@ -45,14 +44,13 @@ services:
       - DB_HOST=postsdb
       - DB_NAME=PostsDB
       - DB_USER_ID=sa
-      - MSSQL_SA_PASSWORD=@Marko123
-      - ASPNETCORE_ENVIRONMENT=Development
       - IS_IN_DOCKER=true
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
 
   #CLIENT
   reactclient:
     container_name: posts-client
-    image: ${DOCKER_REGISTRY-}reactclient:latest
     build:
       dockerfile: reactclient/Dockerfile
     ports:
@@ -63,11 +61,13 @@ services:
       - ./src:/app/src
     networks:
       - postsFrontendNetwork
+    environment:
+      - NODE_ENV=development
 
   #ELASTIC
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_STACK}
     expose:
       - 9200
     ports:
@@ -91,7 +91,7 @@ services:
   #KIBANA
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:7.9.0
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_STACK}
     depends_on:
       - elasticsearch
     environment:

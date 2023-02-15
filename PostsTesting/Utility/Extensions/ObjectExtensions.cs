@@ -6,12 +6,12 @@ namespace PostsTesting.Utility.Extensions
     {
         public static bool CheckForProperty(this ExpandoObject obj, string name)
         {
-            return ((IDictionary<string, object>)obj).ContainsKey(name);
+            return (obj as IDictionary<string, object>).ContainsKey(name);
         }
 
         public static object GetProperty(this ExpandoObject obj, string name)
         {
-            ((IDictionary<string, object>)obj).TryGetValue(name, out object? value);
+            (obj as IDictionary<string, object>).TryGetValue(name, out object? value);
             return value;
         }
     }

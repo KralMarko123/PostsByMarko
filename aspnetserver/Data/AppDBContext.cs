@@ -7,7 +7,7 @@ namespace aspnetserver.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<Post>? Posts { get; set; }
 
         public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
 
