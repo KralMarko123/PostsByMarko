@@ -8,8 +8,9 @@ metadata:
 spec:
   selector:
     app: {{ .Values.container.frontendName }}
-  type: ClusterIP
+  type: NodePort
   ports:
-    - protocol: TCP
+    - name: {{ .Values.container.frontendName }}
+      protocol: TCP
       port: {{ .Values.container.frontendServicePort }} 
       targetPort: {{ .Values.container.frontendPort }}
