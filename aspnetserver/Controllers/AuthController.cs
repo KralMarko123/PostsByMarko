@@ -39,8 +39,6 @@ public class AuthController : BaseController
     [Tags("Auth Endpoint")]
     public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
     {
-        Log.Logger.Information($"Logging in user with username: {userLogin.UserName}");
-
         var result = await usersService.ValidateUserAsync(userLogin);
 
         if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);

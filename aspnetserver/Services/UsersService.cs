@@ -4,6 +4,7 @@ using aspnetserver.Data.Models.Dtos;
 using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Users;
 using aspnetserver.Helper;
+using Serilog;
 
 namespace aspnetserver.Services
 {
@@ -34,7 +35,7 @@ namespace aspnetserver.Services
             if (!await usersRepository.CheckPasswordForUserAsync(user, userLogin.Password)) return new RequestResultBuilder().BadRequest().WithMessage("Invalid password for the given account").Build();
             if (!await usersRepository.CheckIsEmailConfirmedForUserAsync(user)) return new RequestResultBuilder().Forbidden().WithMessage("Please check your email and confirm your account before logging in").Build();
 
-
+            Log.Logger.Information($"Successfully logged in user: {user.UserName}");
             return new RequestResultBuilder().Ok().WithMessage("Successfully Logged In").WithPayload(new LoginResponse
             {
                 Token = await jwtHelper.CreateTokenAsync(user),

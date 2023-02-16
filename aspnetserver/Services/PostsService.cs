@@ -4,6 +4,7 @@ using aspnetserver.Data.Models;
 using aspnetserver.Data.Models.Responses;
 using aspnetserver.Data.Repos.Posts;
 using aspnetserver.Data.Repos.Users;
+using Serilog;
 
 namespace aspnetserver.Services
 {
@@ -67,7 +68,11 @@ namespace aspnetserver.Services
                 var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
                 var postAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
 
-                if (postAddedToUser.Succeeded) return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
+                if (postAddedToUser.Succeeded)
+                {
+                    Log.Logger.Information($"Successfully created Post with Id: {newlyCreatedPost.PostId}");
+                    return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
+                }
                 else return badRequest;
             }
             else return badRequest;
@@ -85,7 +90,11 @@ namespace aspnetserver.Services
 
                 var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
 
-                if (postUpdatedSuccessfully) return new RequestResultBuilder().Ok().WithMessage("Post was updated successfully").Build();
+                if (postUpdatedSuccessfully)
+                {
+                    Log.Logger.Information($"Successfully updated Post with Id: {postToUpdate.PostId}");
+                    return new RequestResultBuilder().Ok().WithMessage("Post was updated successfully").Build();
+                }
                 else return badRequest;
             }
             else return badRequest;
@@ -100,7 +109,11 @@ namespace aspnetserver.Services
             {
                 var postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
 
-                if (postDeletedSuccessfully) return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
+                if (postDeletedSuccessfully)
+                {
+                    Log.Logger.Information($"Successfully deleted Post with Id: {postToDelete.PostId}");
+                    return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
+                }
                 else return badRequest;
             }
             else return badRequest;
