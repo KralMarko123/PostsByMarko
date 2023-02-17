@@ -78,7 +78,6 @@ if (isInLocalDevelopment)
     {
         var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Log.Logger.Information(connectionString);
         appDbContext.Database.EnsureDeleted();
         appDbContext.Database.EnsureCreated();
     }
