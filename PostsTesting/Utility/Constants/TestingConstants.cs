@@ -1,5 +1,5 @@
-﻿using aspnetserver.Constants;
-using aspnetserver.Data.Models;
+﻿using PostsByMarko.Host.Constants;
+using PostsByMarko.Host.Data.Models;
 
 namespace PostsTesting.Utility.Constants
 {

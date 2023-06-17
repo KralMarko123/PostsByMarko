@@ -1,4 +1,4 @@
-﻿using aspnetserver.Data.Models;
+﻿using PostsByMarko.Host.Data.Models;
 
 namespace PostsTesting.Utility
 {

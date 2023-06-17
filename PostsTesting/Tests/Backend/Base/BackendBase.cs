@@ -1,4 +1,4 @@
-﻿using aspnetserver.Data.Models;
+﻿using PostsByMarko.Host.Data.Models;
 using PostsTesting.Tests.Backend.Base;
 using PostsTesting.Utility.Constants;
 using RestSharp;

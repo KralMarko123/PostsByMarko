@@ -4,13 +4,13 @@ using PostsTesting.Utility.Extensions;
 using System.Net;
 using Xunit;
 using FluentAssertions;
-using aspnetserver.Data.Models;
-using aspnetserver.Data.Models.Responses;
 using Newtonsoft.Json;
+using PostsByMarko.Host.Data.Models.Responses;
+using PostsByMarko.Host.Data.Models;
 
 namespace PostsTesting.Tests.Backend
 {
-    
+
     public class BackendTests : PostsApiTestBase
     {
         

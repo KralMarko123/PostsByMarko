@@ -1,5 +1,5 @@
-﻿using aspnetserver.Data.Models;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
+using PostsByMarko.Host.Data.Models;
 using PostsTesting.Utility;
 using PostsTesting.Utility.Constants;
 using Xunit;

@@ -1,7 +1,7 @@
-﻿using aspnetserver.Data.Models;
-using aspnetserver.Data.Models.Dtos;
-using aspnetserver.Data.Models.Responses;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Models.Dtos;
+using PostsByMarko.Host.Data.Models.Responses;
 using RestSharp;
 using Xunit;
 

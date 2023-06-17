@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspnetserver\aspnetserver.csproj" />
+    <ProjectReference Include="..\PostsByMarko.Host\PostsByMarko.Host.csproj" />
   </ItemGroup>
 
 </Project>

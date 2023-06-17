@@ -5,13 +5,11 @@ name: posts-docker-compose
 networks:
   postsBackendNetwork:
   postsFrontendNetwork:
-  elasticsearch:
-    driver: bridge
-
+  
 services:
   #DATABASE
-  postsdb:
-    container_name: posts-db
+  PostsByMarko.Database:
+    container_name: postsbymarkodb
     image: mcr.microsoft.com/mssql/server:2022-latest
     user: root
     ports:
@@ -21,25 +19,19 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - posts-sql-data:/var/lib/mysql
-
+   
   #WEB API
-  aspnetserver:
-    container_name: posts-server
+  PostsByMarko.Host:
+    container_name: postsbymarkohost
     build:
-      dockerfile: aspnetserver/Dockerfile
+      dockerfile: PostsByMarko.Host/Dockerfile
     ports:
       - 7171:80
     depends_on:
-      - postsdb
-      - elasticsearch
-    links:
-      - elasticsearch
+      - PostsByMarko.Database
     networks:
       - postsBackendNetwork
       - postsFrontendNetwork
-      - elasticsearch
     environment:
       - DB_HOST=postsdb
       - DB_NAME=PostsDB
@@ -49,14 +41,14 @@ services:
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
 
   #CLIENT
-  reactclient:
-    container_name: posts-client
+  PostsByMarko.Client:
+    container_name: postsbymarkoclient
     build:
-      dockerfile: reactclient/Dockerfile
+      dockerfile: PostsByMarko.Client/Dockerfile
     ports:
       - 3000:3000
     depends_on:
-      - aspnetserver
+      - PostsByMarko.Host
     volumes:
       - ./src:/app/src
     networks:
@@ -64,49 +56,3 @@ services:
     environment:
       - NODE_ENV=development
 
-  #ELASTIC
-  elasticsearch:
-    container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_STACK}
-    expose:
-      - 9200
-    ports:
-      - 9200:9200
-    environment:
-      - node.name=elasticsearch
-      - cluster.name=posts-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
-      - discovery.type=single-node
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    networks:
-      - elasticsearch
-    volumes:
-      - posts-elastic-data:/usr/share/elasticsearch/data
-
-  #KIBANA
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:${ELASTIC_STACK}
-    depends_on:
-      - elasticsearch
-    environment:
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
-      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
-      xpack.security.enabled: "false"
-      xpack.monitoring.enabled: "true"
-      xpack.watcher.enabled: "true"
-      xpack.ml.enabled: "true"
-    ports:
-      - 5601:5601
-    networks:
-      - elasticsearch
-
-volumes:
-  posts-sql-data:
-  posts-elastic-data:
-    driver: local
