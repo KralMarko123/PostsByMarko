@@ -25,13 +25,7 @@ namespace PostsByMarko.Host.Services
 
             if (!user.UserRoles.Contains("Admin"))
             {
-                for (int i = 0; i < allPosts.Count; i++)
-                {
-                    var post = allPosts[i];
-
-                    if (post.IsHidden && !post.AllowedUsers.Contains(user.Username) && post.UserId != user.UserId)
-                        allPosts.RemoveAt(i);
-                }
+                allPosts.RemoveAll(p => p.IsHidden && !p.AllowedUsers.Contains(user.Username) && p.UserId != user.UserId);
             }
 
             return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();
@@ -47,6 +41,7 @@ namespace PostsByMarko.Host.Services
                 return new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
 
             var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+
             return new RequestResultBuilder().Ok().WithPayload(new PostDetailsResponse
             {
                 Post = post,
