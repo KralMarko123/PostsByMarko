@@ -1,37 +1,37 @@
-name: posts-server docker workflow
+# name: posts-server docker workflow
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "aspnetserver/**"
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - "aspnetserver/**"
 
-  #Allow manual workflow dispatching
-  workflow_dispatch:
+#   #Allow manual workflow dispatching
+#   workflow_dispatch:
 
-env:
-  REGISTRY: docker.io
-  DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}
-  IMAGE_NAME: posts-server
-  IMAGE_TAG: 1.0.${{ github.run_number }}
+# env:
+#   REGISTRY: docker.io
+#   DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}
+#   IMAGE_NAME: posts-server
+#   IMAGE_TAG: 1.0.${{ github.run_number }}
 
-jobs:
-  build-and-push-to-docker:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-and-push-to-docker:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - id: commit
-        uses: pr-mpt/actions-commit-hash@v2
+#     steps:
+#       - id: commit
+#         uses: pr-mpt/actions-commit-hash@v2
         
-      - name: Checkout repository
-        uses: actions/checkout@v3
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: Build Docker Image
-        run: docker build . --file aspnetserver/Dockerfile --tag $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+#       - name: Build Docker Image
+#         run: docker build . --file aspnetserver/Dockerfile --tag $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
 
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_REPOSITORY --password-stdin
+#       - name: Login to Docker Hub
+#         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_REPOSITORY --password-stdin
 
-      - name: Push Image to Docker Hub
-        run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:1.0.${{ steps.commit.outputs.short }}
+#       - name: Push Image to Docker Hub
+#         run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:1.0.${{ steps.commit.outputs.short }}
