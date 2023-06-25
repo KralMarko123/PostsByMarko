@@ -61,12 +61,14 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return roles.ToList();
         }
 
-        public async Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd)
+        public async Task<bool> AddPostToUserAsync(string username, Post postToAdd)
         {
             var user = await GetUserByUsernameAsync(username);
             user.Posts.Add(postToAdd);
 
-            return await userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
 
         public async Task<User> GetUserByIdAsync(string id)

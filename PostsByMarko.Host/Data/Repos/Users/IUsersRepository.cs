@@ -12,7 +12,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<User> GetUserByUsernameAsync(string username);
         Task<List<string>> GetUserRolesByUsernameAsync(string username);
         Task<User> GetUserByIdAsync(string id);
-        Task<IdentityResult> AddPostToUserAsync(string username, Post postToAdd);
+        Task<bool> AddPostToUserAsync(string username, Post postToAdd);
         Task<List<string>> GetAllUsernamesAsync();
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<bool> CheckPasswordForUserAsync(User user, string password);
