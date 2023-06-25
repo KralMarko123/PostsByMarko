@@ -61,9 +61,9 @@ namespace PostsByMarko.Host.Services
                 postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
 
                 var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
-                var postAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
+                var postSuccessfullyAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
 
-                if (postAddedToUser.Succeeded)
+                if (postSuccessfullyAddedToUser)
                 {
                     Log.Logger.Information($"Successfully created Post with Id: {newlyCreatedPost.PostId}");
                     return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
