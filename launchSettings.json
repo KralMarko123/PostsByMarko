@@ -4,8 +4,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "PostsByMarko.Host": "StartDebugging",
-        "PostsByMarko.Database": "StartWithoutDebugging"
+        "postsbymarko.host": "StartDebugging",
+        "postsbymarko.database": "StartWithoutDebugging"
       }
     }
   }

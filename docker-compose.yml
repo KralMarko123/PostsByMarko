@@ -1,6 +1,6 @@
 version: "3.4"
 
-name: posts-docker-compose
+name: docker-compose
 
 networks:
   postsBackendNetwork:
@@ -8,7 +8,7 @@ networks:
   
 services:
   #DATABASE
-  PostsByMarko.Database:
+  postsbymarko.database:
     container_name: postsbymarkodb
     image: mcr.microsoft.com/mssql/server:2022-latest
     user: root
@@ -21,38 +21,34 @@ services:
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
    
   #WEB API
-  PostsByMarko.Host:
+  postsbymarko.host:
     container_name: postsbymarkohost
     build:
-      dockerfile: PostsByMarko.Host/Dockerfile
+      dockerfile: PostsByMarko.host/Dockerfile
     ports:
       - 7171:80
     depends_on:
-      - PostsByMarko.Database
+      - postsbymarko.database
     networks:
       - postsBackendNetwork
       - postsFrontendNetwork
     environment:
-      - DB_HOST=postsdb
-      - DB_NAME=PostsDB
-      - DB_USER_ID=sa
-      - IS_IN_DOCKER=true
-      - ASPNETCORE_ENVIRONMENT=Development
-      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://host.docker.internal:7171
 
   #CLIENT
-  PostsByMarko.Client:
+  postsbymarko.client:
     container_name: postsbymarkoclient
     build:
       dockerfile: PostsByMarko.Client/Dockerfile
     ports:
       - 3000:3000
     depends_on:
-      - PostsByMarko.Host
+      - postsbymarko.host
     volumes:
       - ./src:/app/src
     networks:
       - postsFrontendNetwork
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=docker
 
