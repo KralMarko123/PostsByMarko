@@ -25,10 +25,12 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return await appDbContext.Users.Select(u => u.UserName).ToListAsync();
         }
 
-        public async Task<IdentityResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
+        public async Task<bool> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
             var user = mapper.Map<User>(userRegistration);
-            return await userManager.CreateAsync(user, userRegistration.Password);
+            var result = await userManager.CreateAsync(user, userRegistration.Password);
+
+            return result.Succeeded;
         }
 
         public async Task<List<Claim>> GetClaimsAsync(User user)
@@ -91,9 +93,10 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return await userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token)
+        public async Task<bool> ConfirmEmailForUserAsync(User user, string token)
         {
-            return await userManager.ConfirmEmailAsync(user, token);
+            var result = await userManager.ConfirmEmailAsync(user, token);
+            return result.Succeeded;
         }
     }
 }
