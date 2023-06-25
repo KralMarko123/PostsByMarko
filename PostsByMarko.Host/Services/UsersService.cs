@@ -23,8 +23,8 @@ namespace PostsByMarko.Host.Services
         {
             var result = await usersRepository.MapAndCreateUserAsync(userRegistration);
 
-            if (result.Succeeded) return new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
-            else return new RequestResultBuilder().BadRequest().WithMessage(result.Errors.Select(e => e.Description).ToList().First()).Build();
+            if (result) return new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
+            else return new RequestResultBuilder().BadRequest().WithMessage("Error during user registration").Build();
         }
 
         public async Task<RequestResult> ValidateUserAsync(UserLoginDto userLogin)
@@ -69,8 +69,7 @@ namespace PostsByMarko.Host.Services
         }
         public async Task<bool> ConfirmEmailForUserAsync(User user, string token)
         {
-            var confirmedEmail = await usersRepository.ConfirmEmailForUserAsync(user, token);
-            return confirmedEmail.Succeeded;
+            return await usersRepository.ConfirmEmailForUserAsync(user, token);
         }
     }
 }
