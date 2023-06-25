@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Responses;
@@ -22,7 +21,7 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task get_all_posts_should_return_payload_with_all_posts()
+        public async Task get_all_posts_should_return_ok_with_payload_of_all_posts()
         {
             // Arrange
             var postsToReturn = new List<Post>{
@@ -31,12 +30,7 @@ namespace PostsByMarko.UnitTests
                new Post { PostId = Guid.NewGuid() }
             };
 
-            var user = new RequestUser
-            {
-                UserId = Guid.NewGuid().ToString(),
-                Username = "test_user",
-                UserRoles = new List<string> { "Admin" }
-            };
+            var user = new RequestUser { UserId = Guid.NewGuid().ToString(), Username = "test_user", UserRoles = new List<string> { "Admin" } };
 
             postsRepositoryMock.Setup(r => r.GetPostsAsync()).ReturnsAsync(postsToReturn);
 
@@ -46,10 +40,11 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             resultPayload.Should().BeEquivalentTo(postsToReturn);
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
-        public async Task get_all_posts_should_return_payload_with_filtered_posts()
+        public async Task get_all_posts_should_return_ok_with_payload_of_filtered_posts()
         {
             // Arrange
             var user = new RequestUser
@@ -76,10 +71,11 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             resultPayload.Should().NotContain(postToBeFiltered);
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
-        public async Task get_post_by_id_should_return_payload_with_post_when_post_exists()
+        public async Task get_post_by_id_should_return_ok_with_payload_of_post_when_post_exists()
         {
             // Arrange
             var userId = Guid.NewGuid().ToString();
@@ -95,6 +91,7 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             resultPayload!.Post.Should().BeEquivalentTo(postToReturn);
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
@@ -233,7 +230,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
             var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
 
@@ -249,8 +246,8 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_ok_with_appropriate_message_when_post_is_deleted()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToDelete = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = user.Id };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = user.Id };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
             postsRepositoryMock.Setup(r => r.DeletePostAsync(postToDelete)).ReturnsAsync(() => true);
@@ -267,8 +264,8 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_bad_request_with_appropriate_message_when_post_is_not_deleted()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToDelete = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = user.Id };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = user.Id };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
             postsRepositoryMock.Setup(r => r.DeletePostAsync(postToDelete)).ReturnsAsync(() => false);
@@ -285,8 +282,8 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_bad_request_with_appropriate_message_when_post_cannot_be_deleted()
         {
             // Arrange
-            var postToDelete = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = Guid.NewGuid().ToString() };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
 
@@ -320,8 +317,8 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_ok_with_apppropriate_message_when_post_is_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = user.Id };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = user.Id };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToToggle)).ReturnsAsync(() => true);
@@ -339,8 +336,8 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_bad_request_with_apppropriate_message_when_post_is_not_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = Guid.NewGuid().ToString() };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToToggle)).ReturnsAsync(() => false);
@@ -357,8 +354,8 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_unauthorized_with_apppropriate_message_when_post_cannot_be_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = Guid.NewGuid().ToString() };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
 
@@ -377,7 +374,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
             var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", AllowedUsers = new List<string> { } };
+            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
             usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
@@ -398,7 +395,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
             var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", AllowedUsers = new List<string> { userToToggle.UserName } };
+            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { userToToggle.UserName } };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
             usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
@@ -419,7 +416,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
             var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", AllowedUsers = new List<string> { } };
+            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
             usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
@@ -439,7 +436,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var admin = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
             var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", AllowedUsers = new List<string> { } };
+            var post = new Post { PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
             usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(It.IsAny<string>())).ReturnsAsync(() => null);
