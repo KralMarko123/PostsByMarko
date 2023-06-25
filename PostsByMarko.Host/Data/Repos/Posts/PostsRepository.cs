@@ -27,6 +27,11 @@ namespace PostsByMarko.Host.Data.Repos.Posts
             else return null;
         }
 
+        public async Task<Post> GetPostByIdAsync(Guid postId)
+        {
+            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId)) ?? null;
+        }
+
         public async Task<Post> CreatePostAsync(Post postToCreate)
         {
             postToCreate.PostId = Guid.NewGuid();
