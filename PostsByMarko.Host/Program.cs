@@ -75,3 +75,5 @@ app.UseRateLimiting();
 #endregion
 
 app.Run();
+
+public interface IApiMarker { }
