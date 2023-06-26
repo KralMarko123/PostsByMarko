@@ -17,7 +17,7 @@ namespace PostsByMarko.Host.Data.Models
         public string Content { get; set; } = string.Empty;
 
         [ForeignKey("User")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         public DateTime? CreatedDate { get; set; }
         public DateTime? LastUpdatedDate { get; set; }
