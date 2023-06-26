@@ -43,12 +43,12 @@ namespace PostsByMarko.Host.Constants
         #endregion
 
         #region Const
+
         public const string corsPolicyName = "postsCorsPolicy";
         public const string webserverAdminEmail = "posts@markomarkovikj.com";
         public const string devServerUrl = "http://localhost:7171";
-        public const string prdServerUrl = "https://posts-aspnetserver.azurewebsites.net";
         public const string devClientUrl = "http://localhost:3000";
-        public const string prdClientUrl = "https://posts.markomarkovikj.com";
+
         #endregion
     }
 }
