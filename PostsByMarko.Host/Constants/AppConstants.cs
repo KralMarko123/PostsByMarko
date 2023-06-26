@@ -30,11 +30,11 @@ namespace PostsByMarko.Host.Constants
                  new User
                  {
                     FirstName = "Test",
-                    LastName = "Testerson",
-                    UserName = "test@test.com",
-                    NormalizedUserName = "TEST@TEST.COM",
-                    Email = "test@test.com",
-                    NormalizedEmail = "TEST@TEST.COM",
+                    LastName = "User",
+                    UserName = "test_user",
+                    NormalizedUserName = "TEST_USER",
+                    Email = "test_user@test.com",
+                    NormalizedEmail = "TEST_USER@TEST.COM",
                     EmailConfirmed = true,
                     Posts = new List<Post>(),
                  }

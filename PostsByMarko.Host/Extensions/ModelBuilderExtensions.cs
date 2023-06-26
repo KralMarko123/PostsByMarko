@@ -20,8 +20,8 @@ namespace PostsByMarko.Host.Extensions
             //seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-            appUsers[0].PasswordHash = passwordHasher.HashPassword(appUsers[0], "@Marko123");
-            appUsers[1].PasswordHash = passwordHasher.HashPassword(appUsers[1], "Test123");
+            appUsers[0].PasswordHash = passwordHasher.HashPassword(appUsers[0], "@PostsByMarko123");
+            appUsers[1].PasswordHash = passwordHasher.HashPassword(appUsers[1], "@PostsByMarko123");
 
             appUsers.ForEach(u =>
             {
