@@ -32,7 +32,7 @@ namespace PostsByMarko.Host.Data.Repos.Posts
 
         public async Task<Post> CreatePostAsync(Post postToCreate)
         {
-            postToCreate.PostId = Guid.NewGuid();
+            if (postToCreate.PostId == Guid.Empty) postToCreate.PostId = Guid.NewGuid();
 
             await appDbContext.Posts.AddAsync(postToCreate);
 
