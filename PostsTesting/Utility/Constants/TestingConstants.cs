@@ -10,8 +10,8 @@ namespace PostsTesting.Utility.Constants
         public static readonly string browserType = ConfigReader.GetConfigurationEntries().FirstOrDefault(e => e.Key.Equals("Browser")).Value;
         public static readonly string connectionString = ConfigReader.GetConfigurationEntries().FirstOrDefault(e => e.Key.Equals("ConnectionString")).Value;
 
-        public static readonly User AdminUser = AppConstants.appUsers.First();
+        public static readonly User AdminUser = AppConstants.DEFAULT_USERS.First();
 
-        public static readonly User TestUser = AppConstants.appUsers.Last();
+        public static readonly User TestUser = AppConstants.DEFAULT_USERS.Last();
     }
 }

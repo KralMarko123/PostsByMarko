@@ -4,7 +4,6 @@ using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Host.Data.Repos.Posts;
 using PostsByMarko.Host.Data.Repos.Users;
-using Serilog;
 
 namespace PostsByMarko.Host.Services
 {
@@ -23,9 +22,9 @@ namespace PostsByMarko.Host.Services
         {
             var allPosts = await postsRepository.GetPostsAsync();
 
-            if (!user.UserRoles.Contains("Admin"))
+            if (!user.UserRoles!.Contains(RoleConstants.ADMIN))
             {
-                allPosts.RemoveAll(p => p.IsHidden && !p.AllowedUsers.Contains(user.Username) && p.UserId != user.UserId);
+                allPosts.RemoveAll(p => p.IsHidden && !p.AllowedUsers.Contains(user.Username!) && p.UserId != user.UserId);
             }
 
             return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();
@@ -37,7 +36,7 @@ namespace PostsByMarko.Host.Services
 
             if (post == null) return new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
 
-            if (post.IsHidden == true && !post.AllowedUsers.Contains(user.Username) && !user.UserRoles.Contains("Admin"))
+            if (post.IsHidden && !post.AllowedUsers.Contains(user.Username) && !user.UserRoles!.Contains(RoleConstants.ADMIN))
                 return new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
 
             var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
@@ -60,14 +59,12 @@ namespace PostsByMarko.Host.Services
                 postToCreate.CreatedDate = DateTime.UtcNow;
                 postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
 
+                if (postToCreate.PostId == Guid.Empty) postToCreate.PostId = Guid.NewGuid();
+
                 var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
                 var postSuccessfullyAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
 
-                if (postSuccessfullyAddedToUser)
-                {
-                    Log.Logger.Information($"Successfully created Post with Id: {newlyCreatedPost.PostId}");
-                    return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
-                }
+                if (postSuccessfullyAddedToUser) return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
                 else return badRequest;
             }
             else return badRequest;
@@ -78,18 +75,15 @@ namespace PostsByMarko.Host.Services
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post update").Build();
             var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.PostId.ToString());
 
-            if (postToUpdate != null && (user.UserId == postToUpdate.UserId || user.UserRoles.Any(x => AppConstants.appRoles.Any(y => y.Name == x))))
+            if (postToUpdate != null && (user.UserId == postToUpdate.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN)))
             {
                 postToUpdate.Title = updatedPost.Title;
                 postToUpdate.Content = updatedPost.Content;
+                postToUpdate.LastUpdatedDate = DateTime.UtcNow;
 
                 var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(postToUpdate);
 
-                if (postUpdatedSuccessfully)
-                {
-                    Log.Logger.Information($"Successfully updated Post with Id: {postToUpdate.PostId}");
-                    return new RequestResultBuilder().Ok().WithMessage("Post was updated successfully").Build();
-                }
+                if (postUpdatedSuccessfully) return new RequestResultBuilder().Ok().WithMessage("Post was updated successfully").Build();
                 else return badRequest;
             }
             else return badRequest;
@@ -100,15 +94,11 @@ namespace PostsByMarko.Host.Services
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post deletion").Build();
             var postToDelete = await postsRepository.GetPostByIdAsync(postId);
 
-            if (postToDelete != null && (user.UserId == postToDelete.UserId || user.UserRoles.Contains("Admin")))
+            if (postToDelete != null && (user.UserId == postToDelete.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN)))
             {
                 var postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
 
-                if (postDeletedSuccessfully)
-                {
-                    Log.Logger.Information($"Successfully deleted Post with Id: {postToDelete.PostId}");
-                    return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
-                }
+                if (postDeletedSuccessfully) return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
                 else return badRequest;
             }
             else return badRequest;
@@ -120,7 +110,7 @@ namespace PostsByMarko.Host.Services
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage("Unauthorized to toggle Post's visibility").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
-            if (post.UserId == user.UserId || user.UserRoles.Contains("Admin"))
+            if (post.UserId == user.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN))
             {
                 post.IsHidden = !post.IsHidden;
 
@@ -138,7 +128,7 @@ namespace PostsByMarko.Host.Services
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
-            if (post.UserId == requestUser.UserId || requestUser.UserRoles.Contains("Admin"))
+            if (post.UserId == requestUser.UserId || requestUser.UserRoles!.Contains(RoleConstants.ADMIN))
             {
                 var user = await usersRepository.GetUserByUsernameAsync(username);
 

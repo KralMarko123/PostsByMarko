@@ -5,15 +5,15 @@ namespace PostsByMarko.Host.Constants
 {
     public static class AppConstants
     {
-        #region Static
-        public static List<IdentityRole> appRoles = new List<IdentityRole>()
+
+        public static List<IdentityRole> APP_ROLES = new List<IdentityRole>()
         {
-                new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Name = "Editor", NormalizedName = "EDITOR" },
+                new IdentityRole { Name = RoleConstants.ADMIN },
+                new IdentityRole { Name = RoleConstants.USER }
         };
 
 
-        public static List<User> appUsers = new List<User>()
+        public static List<User> DEFAULT_USERS = new List<User>()
         {
                  new User
                  {
@@ -39,16 +39,5 @@ namespace PostsByMarko.Host.Constants
                     Posts = new List<Post>(),
                  }
         };
-
-        #endregion
-
-        #region Const
-
-        public const string corsPolicyName = "postsCorsPolicy";
-        public const string webserverAdminEmail = "posts@markomarkovikj.com";
-        public const string devServerUrl = "http://localhost:7171";
-        public const string devClientUrl = "http://localhost:3000";
-
-        #endregion
     }
 }

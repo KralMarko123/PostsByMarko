@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Mappings;
 using PostsByMarko.Host.Extensions;
@@ -22,7 +23,7 @@ var connectionString = builder.Configuration.GetConnectionString("MySqlConnectio
 builder.Host.UseSerilog();
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
-builder.WithCors(corsPolicyName, allowedOrigins!);
+builder.WithCors(MiscConstants.CORS_POLICY_NAME, allowedOrigins!);
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
@@ -64,7 +65,7 @@ if (isInLocalDevelopment)
     }
 }
 
-app.UseCors(corsPolicyName);
+app.UseCors(MiscConstants.CORS_POLICY_NAME);
 if (!isInLocalDevelopment || isInDocker != null) app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

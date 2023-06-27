@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data.Models;
-using static PostsByMarko.Host.Constants.AppConstants;
 
 namespace PostsByMarko.Host.Extensions
 {
@@ -10,20 +10,22 @@ namespace PostsByMarko.Host.Extensions
         public static void Seed(this ModelBuilder builder)
         {
             var passwordHasher = new PasswordHasher<User>();
+            var appRoles = AppConstants.APP_ROLES;
+            var defaultUsers = AppConstants.DEFAULT_USERS;
 
             //seed roles
             builder.Entity<IdentityRole>().HasData(appRoles);
 
             //seed users
-            builder.Entity<User>().HasData(appUsers);
+            builder.Entity<User>().HasData(defaultUsers);
 
             //seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-            appUsers[0].PasswordHash = passwordHasher.HashPassword(appUsers[0], "@PostsByMarko123");
-            appUsers[1].PasswordHash = passwordHasher.HashPassword(appUsers[1], "@PostsByMarko123");
+            defaultUsers[0].PasswordHash = passwordHasher.HashPassword(defaultUsers[0], "@PostsByMarko123");
+            defaultUsers[1].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@PostsByMarko123");
 
-            appUsers.ForEach(u =>
+            defaultUsers.ForEach(u =>
             {
                 userRoles.Add(new IdentityUserRole<string>
                 {
@@ -34,7 +36,7 @@ namespace PostsByMarko.Host.Extensions
                 userRoles.Add(new IdentityUserRole<string>
                 {
                     UserId = u.Id,
-                    RoleId = appRoles.First(q => q.Name == "Editor").Id
+                    RoleId = appRoles.First(q => q.Name == "User").Id
                 });
             });
 

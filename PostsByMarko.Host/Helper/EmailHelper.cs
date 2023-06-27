@@ -10,7 +10,7 @@ namespace PostsByMarko.Host.Helper
         {
             var message = new MimeMessage();
 
-            message.From.Add(new MailboxAddress("ADMIN @ Posts By Marko", AppConstants.webserverAdminEmail));
+            message.From.Add(new MailboxAddress("ADMIN @ Posts By Marko", MiscConstants.SERVER_EMAIL));
             message.To.Add(new MailboxAddress($"{firstName} {lastName}", emailToSendTo));
             message.Subject = subject;
             message.Body = new TextPart("plain") { Text = body };
@@ -25,7 +25,7 @@ namespace PostsByMarko.Host.Helper
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
                 // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(AppConstants.webserverAdminEmail, "nba2k13ftw");
+                client.Authenticate(MiscConstants.SERVER_EMAIL, "nba2k13ftw");
 
                 await client.SendAsync(message);
                 client.Disconnect(true);
