@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoMapper;
+using FluentAssertions;
 using Moq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -15,10 +16,12 @@ namespace PostsByMarko.UnitTests
         private readonly UsersService service;
         private readonly Mock<IUsersRepository> usersRepositoryMock = new Mock<IUsersRepository>();
         private readonly Mock<IJwtHelper> jwtHelperMock = new Mock<IJwtHelper>();
+        private readonly Mock<IMapper> autoMapperMock = new Mock<IMapper>();
+
 
         public UsersServiceTests()
         {
-            service = new UsersService(usersRepositoryMock.Object, jwtHelperMock.Object);
+            service = new UsersService(usersRepositoryMock.Object, jwtHelperMock.Object, autoMapperMock.Object);
         }
 
         [Fact]
@@ -30,8 +33,10 @@ namespace PostsByMarko.UnitTests
                 UserName = "test_user",
                 Password = "test_password"
             };
+            var registeredUser = new User { UserName = userToRegister.UserName };
 
-            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(userToRegister)).ReturnsAsync(() => true);
+            autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
+            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => true);
 
             // Act
             var result = await service.MapAndCreateUserAsync(userToRegister);
@@ -50,8 +55,10 @@ namespace PostsByMarko.UnitTests
                 UserName = "test_user",
                 Password = "test_password"
             };
+            var registeredUser = new User { UserName = userToRegister.UserName };
 
-            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(It.IsAny<UserRegistrationDto>())).ReturnsAsync(() => false);
+            autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
+            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => false);
 
             // Act
             var result = await service.MapAndCreateUserAsync(userToRegister);
@@ -75,7 +82,7 @@ namespace PostsByMarko.UnitTests
             usersRepositoryMock.Setup(r => r.GetUserRolesByUsernameAsync(user.UserName)).ReturnsAsync(userRoles);
             usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => true);
-            usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => true); 
+            usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => true);
 
             // Act
             var result = await service.ValidateUserAsync(userLogin);

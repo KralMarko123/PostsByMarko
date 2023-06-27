@@ -190,7 +190,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
+            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content", LastUpdatedDate = DateTime.UtcNow };
             var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
@@ -200,7 +200,9 @@ namespace PostsByMarko.UnitTests
             var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
 
             // Assert
-            postToUpdate.Should().BeEquivalentTo(updatedPost);
+            postToUpdate.Should().BeEquivalentTo(updatedPost, options => options
+            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(1000)))
+            .WhenTypeIs<DateTime>());
             result.Message.Should().Be("Post was updated successfully");
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
