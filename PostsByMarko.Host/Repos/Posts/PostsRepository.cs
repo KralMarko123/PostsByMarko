@@ -21,13 +21,13 @@ namespace PostsByMarko.Host.Data.Repos.Posts
         {
             Guid.TryParse(postId, out var guid);
             {
-                return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(guid)) ?? null;
+                return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(guid));
             }
         }
 
         public async Task<Post> GetPostByIdAsync(Guid postId)
         {
-            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId)) ?? null;
+            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));
         }
 
         public async Task<Post> CreatePostAsync(Post postToCreate)
