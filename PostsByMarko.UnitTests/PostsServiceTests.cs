@@ -189,9 +189,9 @@ namespace PostsByMarko.UnitTests
         public async Task update_post_should_return_ok_with_appropriate_message_when_post_is_updated()
         {
             // Arrange
-            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content", LastUpdatedDate = DateTime.UtcNow };
             var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = user.Id };
+            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content", UserId = user.Id, LastUpdatedDate = DateTime.UtcNow };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToUpdate)).ReturnsAsync(() => true);
@@ -235,6 +235,24 @@ namespace PostsByMarko.UnitTests
             var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
+
+            // Act
+            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+
+            // Assert
+            result.Message.Should().Be("Error during post update");
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task update_post_should_return_bad_request_with_appropriate_message_when_post_does_not_exist()
+        {
+            // Arrange
+            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
+            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
+            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
             var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });

@@ -5,7 +5,6 @@ using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
-using Serilog;
 
 namespace PostsByMarko.Host.Services
 {
