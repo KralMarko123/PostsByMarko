@@ -22,7 +22,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> GetPostsAsync()
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.GetAllPostsAsync(user);
     }
 
@@ -31,7 +31,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> GetPostByIdAsync(string postId)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.GetPostByIdAsync(postId, user);
     }
 
@@ -41,7 +41,7 @@ public class PostsController : BaseController
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> CreatePostAsync([FromBody] Post postToCreate)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.CreatePostAsync(postToCreate, user);
     }
 
@@ -51,7 +51,7 @@ public class PostsController : BaseController
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> UpdatePostAsync([FromBody] Post updatedPost)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.UpdatePostAsync(updatedPost, user);
     }
 
@@ -60,7 +60,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> DeletePostByIdAsync(string postId)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.DeletePostByIdAsync(postId, user);
     }
 
@@ -69,7 +69,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> TogglePostVisibilityAsync(string postId)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.TogglePostVisibilityAsync(postId, user);
     }
 
@@ -78,7 +78,7 @@ public class PostsController : BaseController
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> ToggleUserForPost(string postId, [FromBody] string username)
     {
-        LoadUserInfoForRequestBeingExecuted();
+        LoadRequestClaims();
         return await postsService.ToggleUserForPostAsync(postId, username, user);
     }
 }

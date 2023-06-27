@@ -24,7 +24,7 @@ namespace PostsByMarko.Host.Controllers
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
         public async Task<RequestResult> GetAllUsernamesAsync()
         {
-            LoadUserInfoForRequestBeingExecuted();
+            LoadRequestClaims();
             return await usersService.GetAllUsernamesAsync();
         }
     }

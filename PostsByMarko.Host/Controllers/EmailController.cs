@@ -25,7 +25,7 @@ namespace PostsByMarko.Host.Controllers
         {
             var user = await usersService.GetUserByUsernameAsync(email);
             var jwtConfig = configuration.GetSection("JwtConfig");
-            var urlToRedirectTo = $"{jwtConfig.GetSection("validAudiences").Get<List<string>>().FirstOrDefault()}/login";
+            var urlToRedirectTo = $"{jwtConfig.GetSection("validAudiences").Get<List<string>>()!.FirstOrDefault()}/login";
 
             if (user == null) return NotFound($"User with username: {email} was not found");
             if (await usersService.ConfirmEmailForUserAsync(user, token)) return Redirect(urlToRedirectTo);

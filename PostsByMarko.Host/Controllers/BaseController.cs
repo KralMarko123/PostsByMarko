@@ -9,13 +9,14 @@ namespace PostsByMarko.Host.Controllers;
 public class BaseController : ControllerBase
 {
     protected readonly IMapper mapper;
-    protected RequestUser? user;
+    protected RequestUser user;
     public BaseController(IMapper mapper)
     {
         this.mapper = mapper;
+        user = new RequestUser { };
     }
 
-    protected void LoadUserInfoForRequestBeingExecuted()
+    protected void LoadRequestClaims()
     {
         user = new RequestUser
         {

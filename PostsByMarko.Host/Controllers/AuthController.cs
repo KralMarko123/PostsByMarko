@@ -5,7 +5,6 @@ using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Helper;
 using PostsByMarko.Host.Services;
-using Serilog;
 using System.Net;
 
 namespace PostsByMarko.Host.Controllers;
@@ -30,7 +29,7 @@ public class AuthController : BaseController
     {
         var result = await usersService.MapAndCreateUserAsync(userRegistration);
 
-        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.UserName);
+        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.UserName!);
         return result;
     }
 
@@ -53,6 +52,6 @@ public class AuthController : BaseController
         var subject = $"Please confirm the registration for {user.Email}";
         var body = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 
-        await emailHelper.SendEmail(user.FirstName, user.LastName, user.Email, subject, body);
+        await emailHelper.SendEmail(user.FirstName!, user.LastName!, user.Email, subject, body);
     }
 }
