@@ -2,16 +2,16 @@ const BASE_URL_DEVELOPMENT = "http://localhost:7171";
 const BASE_URL_DOCKER = "http://host.docker.internal:7171";
 const ENDPOINTS = {
 	//POSTS
-	GET_ALL_POSTS: "get-all-posts",
-	GET_POST_BY_ID: "get-post-by-id",
-	CREATE_POST: "create-post",
-	UPDATE_POST: "update-post",
-	DELETE_POST_BY_ID: "delete-post-by-id",
-	TOGGLE_POST_HIDDEN: "toggle-post-visibility",
-	TOGGLE_USER_FOR_POST: "toggle-user-for-post",
+	GET_ALL_POSTS: "getAllPosts",
+	GET_POST_BY_ID: "getPost",
+	CREATE_POST: "createPost",
+	UPDATE_POST: "updatePost",
+	DELETE_POST_BY_ID: "deletePost",
+	TOGGLE_POST_HIDDEN: "togglePostVisibility",
+	TOGGLE_USER_FOR_POST: "toggleUserForPost",
 
 	//USERS
-	GET_ALL_USERS: "get-all-users",
+	GET_ALL_USERS: "getAllUsers",
 
 	//AUTH
 	LOGIN: "login",

@@ -22,7 +22,7 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_return_list_of_all_usernames()
         {
-            var result = await client.GetFromJsonAsync<RequestResult>("/get-all-users");
+            var result = await client.GetFromJsonAsync<RequestResult>("/getAllUsers");
             var usernames = JsonConvert.DeserializeObject<List<string>>(result!.Payload!.ToString()!);
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);

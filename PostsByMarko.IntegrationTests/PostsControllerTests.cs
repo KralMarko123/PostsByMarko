@@ -23,18 +23,18 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_create_then_update_then_toggle_and_then_finally_delete_a_post()
         {
-            var post = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "title", Content = "content" };
+            var post = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "title", Content = "content", UserId = Guid.NewGuid().ToString() };
 
-            await client.PostAsJsonAsync("/create-post", post);
+            await client.PostAsJsonAsync("/createPost", post);
 
             post.Title = "updated_title";
             post.Content = "updated_content";
 
-            await client.PutAsJsonAsync("/update-post", post);
-            await client.PostAsync($"/toggle-post-visibility/{post.PostId}", null);
-            await client.PostAsJsonAsync($"/toggle-user-for-post/{post.PostId}", "test_user");
+            await client.PutAsJsonAsync("/updatePost", post);
+            await client.PostAsync($"/togglePostVisibility/{post.PostId}", null);
+            await client.PostAsJsonAsync($"/toggleUserForPost/{post.PostId}", "test_user");
 
-            var result = await client.GetFromJsonAsync<RequestResult>($"/get-post-by-id/{post.PostId}");
+            var result = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.PostId}");
             var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(result!.Payload!.ToString()!);
 
             post = postDetails!.Post;
@@ -44,9 +44,9 @@ namespace PostsByMarko.IntegrationTests
             post.IsHidden.Should().BeTrue();
             post.AllowedUsers.Should().Contain("test_user");
 
-            await client.DeleteAsync($"/delete-post-by-id/{post.PostId}");
+            await client.DeleteAsync($"/deletePost/{post.PostId}");
 
-            result = await client.GetFromJsonAsync<RequestResult>("/get-all-posts");
+            result = await client.GetFromJsonAsync<RequestResult>("/getAllPosts");
 
             var allPosts = JsonConvert.DeserializeObject<List<Post>>(result!.Payload!.ToString()!);
 

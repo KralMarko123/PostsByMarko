@@ -18,7 +18,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("/confirm-email")]
+        [Route("/confirmEmail")]
         [Tags("Auth Endpoint")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)

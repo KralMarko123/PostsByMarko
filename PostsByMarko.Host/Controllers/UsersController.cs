@@ -19,7 +19,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("/get-all-users")]
+        [Route("/getAllUsers")]
         [Tags("Users Endpoint")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
         public async Task<RequestResult> GetAllUsernamesAsync()

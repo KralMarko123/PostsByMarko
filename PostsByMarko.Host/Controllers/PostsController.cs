@@ -18,25 +18,25 @@ public class PostsController : BaseController
     }
 
     [HttpGet]
-    [Route("/get-all-posts")]
+    [Route("/getAllPosts")]
     [Tags("Posts Endpoint")]
-    public async Task<RequestResult> GetPostsAsync()
+    public async Task<RequestResult> GetAllPostsAsync()
     {
         LoadRequestClaims();
         return await postsService.GetAllPostsAsync(user);
     }
 
     [HttpGet]
-    [Route("/get-post-by-id/{postId}")]
+    [Route("/getPost/{postId}")]
     [Tags("Posts Endpoint")]
-    public async Task<RequestResult> GetPostByIdAsync(string postId)
+    public async Task<RequestResult> GetPostAsync(string postId)
     {
         LoadRequestClaims();
         return await postsService.GetPostByIdAsync(postId, user);
     }
 
     [HttpPost]
-    [Route("/create-post")]
+    [Route("/createPost")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> CreatePostAsync([FromBody] Post postToCreate)
@@ -46,7 +46,7 @@ public class PostsController : BaseController
     }
 
     [HttpPut]
-    [Route("/update-post")]
+    [Route("/updatePost")]
     [Tags("Posts Endpoint")]
     [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
     public async Task<RequestResult> UpdatePostAsync([FromBody] Post updatedPost)
@@ -56,16 +56,16 @@ public class PostsController : BaseController
     }
 
     [HttpDelete]
-    [Route("/delete-post-by-id/{postId}")]
+    [Route("/deletePost/{postId}")]
     [Tags("Posts Endpoint")]
-    public async Task<RequestResult> DeletePostByIdAsync(string postId)
+    public async Task<RequestResult> DeletePostAsync(string postId)
     {
         LoadRequestClaims();
         return await postsService.DeletePostByIdAsync(postId, user);
     }
 
     [HttpPost]
-    [Route("/toggle-post-visibility/{postId}")]
+    [Route("/togglePostVisibility/{postId}")]
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> TogglePostVisibilityAsync(string postId)
     {
@@ -74,7 +74,7 @@ public class PostsController : BaseController
     }
 
     [HttpPost]
-    [Route("/toggle-user-for-post/{postId}")]
+    [Route("/toggleUserForPost/{postId}")]
     [Tags("Posts Endpoint")]
     public async Task<RequestResult> ToggleUserForPost(string postId, [FromBody] string username)
     {
