@@ -32,8 +32,6 @@ namespace PostsByMarko.Host.Data.Repos.Posts
 
         public async Task<Post> CreatePostAsync(Post postToCreate)
         {
-            if (postToCreate.PostId == Guid.Empty) postToCreate.PostId = Guid.NewGuid();
-
             await appDbContext.Posts.AddAsync(postToCreate);
 
             var postAddedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
@@ -45,7 +43,6 @@ namespace PostsByMarko.Host.Data.Repos.Posts
 
         public async Task<bool> UpdatePostAsync(Post postToUpdate)
         {
-            postToUpdate.LastUpdatedDate = DateTime.UtcNow;
             appDbContext.Posts.Update(postToUpdate);
 
             var postUpdatedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
