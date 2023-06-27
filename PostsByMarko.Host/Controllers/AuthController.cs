@@ -30,6 +30,7 @@ public class AuthController : BaseController
         var result = await usersService.MapAndCreateUserAsync(userRegistration);
 
         if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.UserName!);
+
         return result;
     }
 
@@ -41,6 +42,7 @@ public class AuthController : BaseController
         var result = await usersService.ValidateUserAsync(userLogin);
 
         if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);
+
         return result;
     }
 
