@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
 using System.Security.Claims;
 
 namespace PostsByMarko.Host.Data.Repos.Users
@@ -11,13 +9,11 @@ namespace PostsByMarko.Host.Data.Repos.Users
     {
         private readonly AppDbContext appDbContext;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
 
-        public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager, IMapper mapper)
+        public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager)
         {
             this.appDbContext = appDbContext;
             this.userManager = userManager;
-            this.mapper = mapper;
         }
 
         public async Task<List<string>> GetAllUsernamesAsync()
@@ -25,10 +21,9 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return await appDbContext.Users.Select(u => u.UserName).ToListAsync();
         }
 
-        public async Task<bool> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
+        public async Task<bool> MapAndCreateUserAsync(User userToCreate, string passwordForUser)
         {
-            var user = mapper.Map<User>(userRegistration);
-            var result = await userManager.CreateAsync(user, userRegistration.Password);
+            var result = await userManager.CreateAsync(userToCreate, passwordForUser);
 
             return result.Succeeded;
         }
@@ -42,6 +37,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
             };
 
             var roles = await userManager.GetRolesAsync(user);
+
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -66,6 +62,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
         public async Task<bool> AddPostToUserAsync(string username, Post postToAdd)
         {
             var user = await GetUserByUsernameAsync(username);
+
             user.Posts.Add(postToAdd);
 
             var result = await userManager.UpdateAsync(user);

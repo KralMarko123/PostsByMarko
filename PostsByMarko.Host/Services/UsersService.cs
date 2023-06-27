@@ -1,4 +1,5 @@
-﻿using PostsByMarko.Host.Builders;
+﻿using AutoMapper;
+using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
@@ -12,16 +13,19 @@ namespace PostsByMarko.Host.Services
     {
         private readonly IUsersRepository usersRepository;
         private readonly IJwtHelper jwtHelper;
+        private readonly IMapper mapper;
 
-        public UsersService(IUsersRepository usersRepository, IJwtHelper jwtHelper)
+        public UsersService(IUsersRepository usersRepository, IJwtHelper jwtHelper, IMapper mapper)
         {
             this.usersRepository = usersRepository;
             this.jwtHelper = jwtHelper;
+            this.mapper = mapper;
         }
 
         public async Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
-            var result = await usersRepository.MapAndCreateUserAsync(userRegistration);
+            var userToCreate = mapper.Map<User>(userRegistration);
+            var result = await usersRepository.MapAndCreateUserAsync(userToCreate, userRegistration.Password!);
 
             if (result) return new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
             else return new RequestResultBuilder().BadRequest().WithMessage("Error during user registration").Build();
@@ -35,7 +39,6 @@ namespace PostsByMarko.Host.Services
             if (!await usersRepository.CheckPasswordForUserAsync(user, userLogin.Password)) return new RequestResultBuilder().BadRequest().WithMessage("Invalid password for the given account").Build();
             if (!await usersRepository.CheckIsEmailConfirmedForUserAsync(user)) return new RequestResultBuilder().Forbidden().WithMessage("Please check your email and confirm your account before logging in").Build();
 
-            Log.Logger.Information($"Successfully logged in user: {user.UserName}");
             return new RequestResultBuilder().Ok().WithMessage("Successfully Logged In").WithPayload(new LoginResponse
             {
                 Token = await jwtHelper.CreateTokenAsync(user),
@@ -60,6 +63,7 @@ namespace PostsByMarko.Host.Services
         public async Task<RequestResult> GetAllUsernamesAsync()
         {
             var allUsernames = await usersRepository.GetAllUsernamesAsync();
+
             return new RequestResultBuilder().Ok().WithPayload(allUsernames).Build();
         }
 

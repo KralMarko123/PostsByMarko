@@ -1,12 +1,11 @@
 ﻿using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
 using System.Security.Claims;
 
 namespace PostsByMarko.Host.Data.Repos.Users
 {
     public interface IUsersRepository
     {
-        Task<bool> MapAndCreateUserAsync(UserRegistrationDto userRegistration);
+        Task<bool> MapAndCreateUserAsync(User userToCreate, string passwordForUser);
         Task<List<Claim>> GetClaimsAsync(User user);
         Task<User> GetUserByUsernameAsync(string username);
         Task<List<string>> GetUserRolesByUsernameAsync(string username);
