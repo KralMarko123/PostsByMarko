@@ -12,8 +12,8 @@ using PostsByMarko.Host.Data;
 namespace PostsByMarko.Host.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230628144558_new_migration")]
-    partial class new_migration
+    [Migration("20230628204346_initial_migration")]
+    partial class initial_migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,14 +53,14 @@ namespace PostsByMarko.Host.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941",
-                            ConcurrencyStamp = "6373895d-4851-4dc3-9b14-c52b866ab4af",
+                            Id = "030a6ad6-dcab-4955-b04e-afa3cbea05a4",
+                            ConcurrencyStamp = "20b643c3-f349-4cb0-bafc-5d34141ec35c",
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = "e19147d5-659c-4225-b06d-942f862b5853",
-                            ConcurrencyStamp = "7d14dc7a-384a-49eb-b933-d23b0b07c9a1",
+                            Id = "b0aaeedc-c0e4-4091-8eed-651260aa6ceb",
+                            ConcurrencyStamp = "2bf0af8f-2e8f-4dc9-9f06-4391a6f7b5a4",
                             Name = "User"
                         });
                 });
@@ -154,23 +154,23 @@ namespace PostsByMarko.Host.Data.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
-                            RoleId = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941"
+                            UserId = "e6d5370e-e83c-4dd8-bcc9-64ca3501428e",
+                            RoleId = "030a6ad6-dcab-4955-b04e-afa3cbea05a4"
                         },
                         new
                         {
-                            UserId = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
-                            RoleId = "e19147d5-659c-4225-b06d-942f862b5853"
+                            UserId = "e6d5370e-e83c-4dd8-bcc9-64ca3501428e",
+                            RoleId = "b0aaeedc-c0e4-4091-8eed-651260aa6ceb"
                         },
                         new
                         {
-                            UserId = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
-                            RoleId = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941"
+                            UserId = "31f8d175-658e-44f7-b5ae-90ca7b5b15b2",
+                            RoleId = "030a6ad6-dcab-4955-b04e-afa3cbea05a4"
                         },
                         new
                         {
-                            UserId = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
-                            RoleId = "e19147d5-659c-4225-b06d-942f862b5853"
+                            UserId = "31f8d175-658e-44f7-b5ae-90ca7b5b15b2",
+                            RoleId = "b0aaeedc-c0e4-4091-8eed-651260aa6ceb"
                         });
                 });
 
@@ -248,11 +248,9 @@ namespace PostsByMarko.Host.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -307,9 +305,9 @@ namespace PostsByMarko.Host.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
+                            Id = "e6d5370e-e83c-4dd8-bcc9-64ca3501428e",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2438c48c-533b-4998-aaa0-ef889e271e01",
+                            ConcurrencyStamp = "5a15a491-4542-4765-8e37-493712d097f1",
                             Email = "kralmarko123@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Marko",
@@ -317,18 +315,18 @@ namespace PostsByMarko.Host.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "KRALMARKO123@GMAIL.COM",
                             NormalizedUserName = "KRALMARKO123@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAELaPXrFbjNHi6DC8nSfyIuA1BFh/WP8lmknya4Yuei5Xx8iyk7nw8iraW1JyLV7clA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKVL1tnA2R15rJd/LHgwxCCgnqbq2ZffdH7fqOAQbfPjXar7CeHH+k9Vfu85n+DDyA==",
                             PhoneNumberConfirmed = false,
                             PostIds = "[]",
-                            SecurityStamp = "c101aabc-7889-4fbc-a093-d46df143679b",
+                            SecurityStamp = "aaac75a5-136b-4cdd-a6c5-8f56a98041f4",
                             TwoFactorEnabled = false,
                             UserName = "kralmarko123@gmail.com"
                         },
                         new
                         {
-                            Id = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
+                            Id = "31f8d175-658e-44f7-b5ae-90ca7b5b15b2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7d3fdfcd-768e-4034-b5c8-c27cab22aa1b",
+                            ConcurrencyStamp = "1d29dd70-e1a5-4523-8668-8f8a819ef467",
                             Email = "test_user@test.com",
                             EmailConfirmed = true,
                             FirstName = "Test",
@@ -336,10 +334,10 @@ namespace PostsByMarko.Host.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST_USER@TEST.COM",
                             NormalizedUserName = "TEST_USER@TEST.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEOB2Z5S2r2uNadPbYfmAi0vmx4kQQpqSpo1zkaJ2AqVWQVi3yEaQr1v2AqRgz8C0Lg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEBjSTWCeeyprRZVsaS7gB/CoZD60o1+eMsQu46DONT+3nCyedoU7qKYEdNCyu7/XBg==",
                             PhoneNumberConfirmed = false,
                             PostIds = "[]",
-                            SecurityStamp = "1c40666d-aa10-4f0b-ac31-26d3c56d19cc",
+                            SecurityStamp = "51b483e7-4368-4be6-a8dd-b23776d4872a",
                             TwoFactorEnabled = false,
                             UserName = "test_user@test.com"
                         });

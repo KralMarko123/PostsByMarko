@@ -7,8 +7,8 @@ namespace PostsByMarko.Host.Data.Models
     {
         public override string Email { get; set; }
         public override bool EmailConfirmed { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
 
         [NotMapped]
         public List<string> PostIds { get; set; } = new List<string>();
@@ -16,6 +16,9 @@ namespace PostsByMarko.Host.Data.Models
         public User(string email)
         {
             Email = email;
+            NormalizedEmail = email.ToUpper();
+            UserName = email;
+            NormalizedUserName = email.ToUpper();
         }
 
         public User(string email, string firstName, string lastName)
