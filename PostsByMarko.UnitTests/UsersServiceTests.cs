@@ -30,13 +30,11 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var userToRegister = new UserRegistrationDto
             {
-                Email = "test_user@test.com",
+                Email = "some_user@test.com",
                 Password = "test_password"
             };
-            var registeredUser = new User(userToRegister.Email);
 
-            autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
-            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => true);
+            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(It.IsAny<User>(), userToRegister.Password)).ReturnsAsync(() => true);
 
             // Act
             var result = await service.MapAndCreateUserAsync(userToRegister);

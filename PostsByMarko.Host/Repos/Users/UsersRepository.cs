@@ -104,6 +104,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
         public async Task<bool> ConfirmEmailForUserAsync(User user, string token)
         {
             var result = await userManager.ConfirmEmailAsync(user, token);
+
             return result.Succeeded;
         }
     }

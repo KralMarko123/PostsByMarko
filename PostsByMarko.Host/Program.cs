@@ -8,7 +8,6 @@ using PostsByMarko.Host.Extensions;
 using PostsByMarko.Host.Hubs;
 using Serilog;
 using System.Text.Json.Serialization;
-using static PostsByMarko.Host.Constants.AppConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");

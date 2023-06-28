@@ -23,8 +23,8 @@ namespace PostsByMarko.Host.Services
 
         public async Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
-            var userToCreate = mapper.Map<User>(userRegistration);
-            var result = await usersRepository.MapAndCreateUserAsync(userToCreate, userRegistration.Password!);
+            var newUser = new User(userRegistration.Email!);
+            var result = await usersRepository.MapAndCreateUserAsync(newUser, userRegistration.Password!);
 
             if (result) return new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
             else return new RequestResultBuilder().BadRequest().WithMessage("Error during user registration").Build();
