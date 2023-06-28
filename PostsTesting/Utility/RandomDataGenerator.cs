@@ -19,29 +19,12 @@ namespace PostsTesting.Utility
 
         public static User GetRandomTestUser()
         {
-            return new User
-            {
-                FirstName = $"Random {GetRandomTextWithLength(5)}",
-                LastName = $"Randomson {GetRandomTextWithLength(5)}",
-                UserName = $"test@{GetRandomTextWithLength(4)}.com",
-                NormalizedUserName = $"test@{GetRandomTextWithLength(4)}.com".ToUpper(),
-                Email = $"test@{GetRandomTextWithLength(4)}.com",
-                NormalizedEmail = $"test@{GetRandomTextWithLength(4)}.com".ToUpper(),
-                EmailConfirmed = true,
-                Posts = new List<Post>(),
-            };
+            return new User($"test@{GetRandomTextWithLength(4)}.com", "Test", "User", true);
         }
 
         public static Post GetRandomPost()
         {
-            return new Post
-            {
-                Title = $"Test Title: {GetRandomTextWithLength(5)}",
-                Content = $"Test Content: {GetRandomTextWithLength(20)}",
-                UserId = new Guid().ToString(),
-                CreatedDate = DateTime.UtcNow,
-                LastUpdatedDate = DateTime.UtcNow
-            };
+            return new Post($"Test Title: {GetRandomTextWithLength(5)}", $"Test Content: {GetRandomTextWithLength(20)}");
         }
     }
 }

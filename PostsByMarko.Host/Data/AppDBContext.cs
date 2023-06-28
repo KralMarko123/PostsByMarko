@@ -18,8 +18,12 @@ namespace PostsByMarko.Host.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Post>().Property(p => p.AllowedUsers)
-                .HasConversion(p => JsonSerializer.Serialize(p, (JsonSerializerOptions)default!),
-                               p => JsonSerializer.Deserialize<List<string>>(p, (JsonSerializerOptions)default!)!);
+               .HasConversion(p => JsonSerializer.Serialize(p, (JsonSerializerOptions)default!),
+                              p => JsonSerializer.Deserialize<List<string>>(p, (JsonSerializerOptions)default!)!);
+
+            modelBuilder.Entity<User>().Property(u => u.PostIds)
+              .HasConversion(u => JsonSerializer.Serialize(u, (JsonSerializerOptions)default!),
+                             u => JsonSerializer.Deserialize<List<string>>(u, (JsonSerializerOptions)default!)!);
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();

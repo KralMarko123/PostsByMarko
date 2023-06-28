@@ -21,8 +21,8 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_register_and_then_try_to_login()
         {
-            var registration = new UserRegistrationDto { UserName = "some_user", Password = "@SomePassword123" , Email = "some_user@somedomain.com"};
-            var login = new UserLoginDto { UserName = registration.UserName, Password = registration.Password };
+            var registration = new UserRegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
+            var login = new UserLoginDto { Email = registration.Email, Password = registration.Password };
 
             await client.PostAsJsonAsync("/register", registration);
 

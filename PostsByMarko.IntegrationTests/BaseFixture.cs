@@ -34,7 +34,7 @@ namespace PostsByMarko.IntegrationTests
 
         private async Task ConfigureClientAuthentication()
         {
-            var result = await client.PostAsJsonAsync("/login", new UserLoginDto { UserName = "test_user", Password = "@PostsByMarko123" });
+            var result = await client.PostAsJsonAsync("/login", new UserLoginDto { Email = "test_user@test.com", Password = "@PostsByMarko123" });
             var typedResult = await result.Content.ReadFromJsonAsync<RequestResult>();
             var payload = JsonConvert.DeserializeObject<LoginResponse>(typedResult!.Payload!.ToString()!);
             var token = payload!.Token;

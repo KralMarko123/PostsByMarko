@@ -2,6 +2,7 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Responses;
+using PostsByMarko.Shared.Constants;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -23,7 +24,8 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_create_then_update_then_toggle_and_then_finally_delete_a_post()
         {
-            var post = new Post { IsHidden = false, PostId = Guid.NewGuid(), Title = "title", Content = "content", UserId = Guid.NewGuid().ToString() };
+            var post = new Post { Id = Guid.NewGuid().ToString(), IsHidden = false, Title = "title", Content = "content", AuthorId = Guid.NewGuid().ToString() };
+            var testEmail = TestingConstants.TEST_USER.Email;
 
             await client.PostAsJsonAsync("/createPost", post);
 
@@ -31,10 +33,10 @@ namespace PostsByMarko.IntegrationTests
             post.Content = "updated_content";
 
             await client.PutAsJsonAsync("/updatePost", post);
-            await client.PostAsync($"/togglePostVisibility/{post.PostId}", null);
-            await client.PostAsJsonAsync($"/toggleUserForPost/{post.PostId}", "test_user");
+            await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
+            await client.PostAsJsonAsync($"/toggleUserForPost/{post.Id}", testEmail);
 
-            var result = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.PostId}");
+            var result = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
             var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(result!.Payload!.ToString()!);
 
             post = postDetails!.Post;
@@ -42,9 +44,9 @@ namespace PostsByMarko.IntegrationTests
             post!.Title.Should().Be("updated_title");
             post.Content.Should().Be("updated_content");
             post.IsHidden.Should().BeTrue();
-            post.AllowedUsers.Should().Contain("test_user");
+            post.AllowedUsers.Should().Contain(testEmail);
 
-            await client.DeleteAsync($"/deletePost/{post.PostId}");
+            await client.DeleteAsync($"/deletePost/{post.Id}");
 
             result = await client.GetFromJsonAsync<RequestResult>("/getAllPosts");
 

@@ -1,7 +1,7 @@
 ﻿using PostsTesting.Tests.Frontend.Base;
 using Xunit;
 
-namespace PostsTesting.Tests.Frontend.Auth
+namespace PostsByMarko.FrontendTests.Frontend
 {
     public class AuthTests : AuthUiTestBase
     {

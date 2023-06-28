@@ -29,7 +29,7 @@ public class AuthController : BaseController
     {
         var result = await usersService.MapAndCreateUserAsync(userRegistration);
 
-        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.UserName!);
+        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.Email!);
 
         return result;
     }
@@ -41,14 +41,14 @@ public class AuthController : BaseController
     {
         var result = await usersService.ValidateUserAsync(userLogin);
 
-        if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.UserName);
+        if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.Email!);
 
         return result;
     }
 
     private async Task SendEmailConfirmationLinkToUser(string username)
     {
-        var user = await usersService.GetUserByUsernameAsync(username);
+        var user = await usersService.GetUserByEmailAsync(username);
         var token = await usersService.GenerateEmailConfirmationTokenForUserAsync(user);
         var confirmationLink = Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
         var subject = $"Please confirm the registration for {user.Email}";

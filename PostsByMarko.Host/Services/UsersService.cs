@@ -32,36 +32,36 @@ namespace PostsByMarko.Host.Services
 
         public async Task<RequestResult> ValidateUserAsync(UserLoginDto userLogin)
         {
-            var user = await usersRepository.GetUserByUsernameAsync(userLogin.UserName);
+            var user = await usersRepository.GetUserByEmailAsync(userLogin.Email!);
 
             if (user == null) return new RequestResultBuilder().BadRequest().WithMessage("No account found, please check your credentials and try again").Build();
-            if (!await usersRepository.CheckPasswordForUserAsync(user, userLogin.Password)) return new RequestResultBuilder().BadRequest().WithMessage("Invalid password for the given account").Build();
+            if (!await usersRepository.CheckPasswordForUserAsync(user, userLogin.Password!)) return new RequestResultBuilder().BadRequest().WithMessage("Invalid password for the given account").Build();
             if (!await usersRepository.CheckIsEmailConfirmedForUserAsync(user)) return new RequestResultBuilder().Forbidden().WithMessage("Please check your email and confirm your account before logging in").Build();
 
             return new RequestResultBuilder().Ok().WithMessage("Successfully Logged In").WithPayload(new LoginResponse
             {
                 Token = await jwtHelper.CreateTokenAsync(user),
-                Username = user.UserName,
+                Email = user.Email,
                 UserId = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Roles = await GetUserRolesByUsernameAsync(user.UserName),
+                Roles = await GetRolesForEmailAsync(user.Email),
             }).Build();
         }
 
-        public async Task<User> GetUserByUsernameAsync(string username)
+        public async Task<User> GetUserByEmailAsync(string username)
         {
-            return await usersRepository.GetUserByUsernameAsync(username);
+            return await usersRepository.GetUserByEmailAsync(username);
         }
 
-        public async Task<List<string>> GetUserRolesByUsernameAsync(string username)
+        public async Task<List<string>> GetRolesForEmailAsync(string username)
         {
-            return await usersRepository.GetUserRolesByUsernameAsync(username);
+            return await usersRepository.GetRolesForEmailAsync(username);
         }
 
-        public async Task<RequestResult> GetAllUsernamesAsync()
+        public async Task<RequestResult> GetAllUsersAsync()
         {
-            var allUsernames = await usersRepository.GetAllUsernamesAsync();
+            var allUsernames = await usersRepository.GetAllUsersAsync();
 
             return new RequestResultBuilder().Ok().WithPayload(allUsernames).Build();
         }

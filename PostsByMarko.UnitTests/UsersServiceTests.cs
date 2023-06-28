@@ -30,10 +30,10 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var userToRegister = new UserRegistrationDto
             {
-                UserName = "test_user",
+                Email = "test_user@test.com",
                 Password = "test_password"
             };
-            var registeredUser = new User { UserName = userToRegister.UserName };
+            var registeredUser = new User(userToRegister.Email);
 
             autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
             usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => true);
@@ -52,10 +52,10 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var userToRegister = new UserRegistrationDto
             {
-                UserName = "test_user",
+                Email = "test_user@test.com",
                 Password = "test_password"
             };
-            var registeredUser = new User { UserName = userToRegister.UserName };
+            var registeredUser = new User(userToRegister.Email);
 
             autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
             usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => false);
@@ -72,15 +72,15 @@ namespace PostsByMarko.UnitTests
         public async Task validate_user_should_return_ok_with_appropriate_message_and_payload_when_user_is_logged_in()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var userLogin = new UserLoginDto { UserName = user.UserName, Password = "test_password" };
+            var user = new User("test_user@test.com", "Test", "User");
+            var userLogin = new UserLoginDto { Email = user.Email, Password = "test_password" };
             var jwtToken = "some_jwt_token";
             var userRoles = new List<string> { "User" };
-            var loginResponse = new LoginResponse { Token = jwtToken, Username = user.UserName, UserId = user.Id, FirstName = user.FirstName, LastName = user.LastName, Roles = userRoles };
+            var loginResponse = new LoginResponse { Token = jwtToken, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, UserId = user.Id, Roles = userRoles };
 
             jwtHelperMock.Setup(h => h.CreateTokenAsync(user)).ReturnsAsync(jwtToken);
-            usersRepositoryMock.Setup(r => r.GetUserRolesByUsernameAsync(user.UserName)).ReturnsAsync(userRoles);
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.GetRolesForEmailAsync(user.Email)).ReturnsAsync(userRoles);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => true);
             usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => true);
 
@@ -98,9 +98,9 @@ namespace PostsByMarko.UnitTests
         public async Task validate_user_should_return_bad_request_with_appropriate_message_when_user_does_not_exist()
         {
             // Arrange
-            var userLogin = new UserLoginDto { UserName = "test_user", Password = "test_password" };
+            var userLogin = new UserLoginDto { Email = "test_user", Password = "test_password" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(It.IsAny<string>())).ReturnsAsync(() => null);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
             var result = await service.ValidateUserAsync(userLogin);
@@ -114,10 +114,10 @@ namespace PostsByMarko.UnitTests
         public async Task validate_user_should_return_bad_request_with_appropriate_message_when_password_does_not_match()
         {
             // Arrange
-            var user = new User { UserName = "test_user" };
-            var userLogin = new UserLoginDto { UserName = "test_user", Password = "test_password" };
+            var user = new User("test_user@test.com");
+            var userLogin = new UserLoginDto { Email = "test_user@test.com", Password = "test_password" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => false);
 
             // Act
@@ -132,10 +132,10 @@ namespace PostsByMarko.UnitTests
         public async Task validate_user_should_return_forbidden_with_appropriate_message_when_email_is_not_confirmed()
         {
             // Arrange
-            var user = new User { UserName = "test_user" };
-            var userLogin = new UserLoginDto { UserName = "test_user", Password = "test_password" };
+            var user = new User("test_user@test.com");
+            var userLogin = new UserLoginDto { Email = "test_user@test.com", Password = "test_password" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => true);
             usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => false);
 
@@ -151,12 +151,12 @@ namespace PostsByMarko.UnitTests
         public async Task get_user_by_username_should_return_user()
         {
             // Arrange
-            var user = new User { UserName = "test_user" };
+            var user = new User("test_user@test.com");
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
 
             // Act
-            var result = await service.GetUserByUsernameAsync(user.UserName);
+            var result = await service.GetUserByEmailAsync(user.Email);
 
             // Assert
             result.Should().BeEquivalentTo(user);
@@ -169,10 +169,10 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var usernames = new List<string> { "test_user", "other_user", "one_more_user" };
 
-            usersRepositoryMock.Setup(r => r.GetAllUsernamesAsync()).ReturnsAsync(usernames);
+            usersRepositoryMock.Setup(r => r.GetAllUsersAsync()).ReturnsAsync(usernames);
 
             // Act
-            var result = await service.GetAllUsernamesAsync();
+            var result = await service.GetAllUsersAsync();
             var resultPayload = result.Payload as List<string>;
 
             // Assert
@@ -185,7 +185,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var token = "some_token";
-            var user = new User { UserName = "test_user" };
+            var user = new User("test_user@test.com");
 
             usersRepositoryMock.Setup(r => r.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
 
@@ -201,7 +201,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var token = "some_token";
-            var user = new User { UserName = "test_user" };
+            var user = new User("test_user@test.com");
 
             usersRepositoryMock.Setup(r => r.ConfirmEmailForUserAsync(user, token)).ReturnsAsync(() => true);
 

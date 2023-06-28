@@ -23,7 +23,7 @@ namespace PostsByMarko.Host.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
-            var user = await usersService.GetUserByUsernameAsync(email);
+            var user = await usersService.GetUserByEmailAsync(email);
             var jwtConfig = configuration.GetSection("JwtConfig");
             var urlToRedirectTo = $"{jwtConfig.GetSection("validAudiences").Get<List<string>>()!.FirstOrDefault()}/login";
 

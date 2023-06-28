@@ -22,10 +22,7 @@ namespace PostsByMarko.Host.Services
         {
             var allPosts = await postsRepository.GetPostsAsync();
 
-            if (!user.UserRoles!.Contains(RoleConstants.ADMIN))
-            {
-                allPosts.RemoveAll(p => p.IsHidden && !p.AllowedUsers.Contains(user.Username!) && p.UserId != user.UserId);
-            }
+            if (!user.Roles!.Contains(RoleConstants.ADMIN)) allPosts.RemoveAll(p => p.IsHidden && !p.AllowedUsers.Contains(user.Email!) && p.AuthorId != user.UserId);
 
             return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();
         }
@@ -36,10 +33,10 @@ namespace PostsByMarko.Host.Services
 
             if (post == null) return new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
 
-            if (post.IsHidden && !post.AllowedUsers.Contains(user.Username) && !user.UserRoles!.Contains(RoleConstants.ADMIN))
+            if (post.IsHidden && !post.AllowedUsers.Contains(user.Email) && !user.Roles!.Contains(RoleConstants.ADMIN))
                 return new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
 
-            var postAuthor = await usersRepository.GetUserByIdAsync(post.UserId);
+            var postAuthor = await usersRepository.GetUserByIdAsync(post.AuthorId!);
 
             return new RequestResultBuilder().Ok().WithPayload(new PostDetailsResponse
             {
@@ -55,14 +52,14 @@ namespace PostsByMarko.Host.Services
 
             if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
             {
-                postToCreate.UserId = user.UserId;
+                postToCreate.AuthorId = user.UserId;
                 postToCreate.CreatedDate = DateTime.UtcNow;
                 postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
 
-                if (postToCreate.PostId == Guid.Empty) postToCreate.PostId = Guid.NewGuid();
+                if (postToCreate.Id == string.Empty) postToCreate.Id = Guid.NewGuid().ToString();
 
                 var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
-                var postSuccessfullyAddedToUser = await usersRepository.AddPostToUserAsync(user.Username, newlyCreatedPost);
+                var postSuccessfullyAddedToUser = await usersRepository.AddPostIdToUserAsync(user.Email, newlyCreatedPost.Id);
 
                 if (postSuccessfullyAddedToUser) return new RequestResultBuilder().Created().WithMessage("Post was created successfully").WithPayload(newlyCreatedPost).Build();
                 else return badRequest;
@@ -73,9 +70,9 @@ namespace PostsByMarko.Host.Services
         public async Task<RequestResult> UpdatePostAsync(Post updatedPost, RequestUser user)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post update").Build();
-            var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.PostId.ToString());
+            var postToUpdate = await postsRepository.GetPostByIdAsync(updatedPost.Id.ToString());
 
-            if (postToUpdate != null && (user.UserId == postToUpdate.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN)))
+            if (postToUpdate != null && (user.UserId == postToUpdate.AuthorId || user.Roles!.Contains(RoleConstants.ADMIN)))
             {
                 postToUpdate.Title = updatedPost.Title;
                 postToUpdate.Content = updatedPost.Content;
@@ -94,11 +91,15 @@ namespace PostsByMarko.Host.Services
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post deletion").Build();
             var postToDelete = await postsRepository.GetPostByIdAsync(postId);
 
-            if (postToDelete != null && (user.UserId == postToDelete.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN)))
+            if (postToDelete != null && (user.UserId == postToDelete.AuthorId || user.Roles!.Contains(RoleConstants.ADMIN)))
             {
                 var postDeletedSuccessfully = await postsRepository.DeletePostAsync(postToDelete);
 
-                if (postDeletedSuccessfully) return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
+                if (postDeletedSuccessfully)
+                {
+                    await usersRepository.RemovePostIdFromUserAsync(user.Email, postToDelete.Id);
+                    return new RequestResultBuilder().Ok().WithMessage("Post was deleted successfully").Build();
+                }
                 else return badRequest;
             }
             else return badRequest;
@@ -110,7 +111,7 @@ namespace PostsByMarko.Host.Services
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage("Unauthorized to toggle Post's visibility").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
-            if (post.UserId == user.UserId || user.UserRoles!.Contains(RoleConstants.ADMIN))
+            if (post.AuthorId == user.UserId || user.Roles!.Contains(RoleConstants.ADMIN))
             {
                 post.IsHidden = !post.IsHidden;
 
@@ -122,20 +123,20 @@ namespace PostsByMarko.Host.Services
             else return unauthorizedRequest;
         }
 
-        public async Task<RequestResult> ToggleUserForPostAsync(string postId, string username, RequestUser requestUser)
+        public async Task<RequestResult> ToggleUserForPostAsync(string postId, string email, RequestUser requestUser)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while toggling user for post").Build();
             var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
-            if (post.UserId == requestUser.UserId || requestUser.UserRoles!.Contains(RoleConstants.ADMIN))
+            if (post.AuthorId == requestUser.UserId || requestUser.Roles!.Contains(RoleConstants.ADMIN))
             {
-                var user = await usersRepository.GetUserByUsernameAsync(username);
+                var user = await usersRepository.GetUserByEmailAsync(email);
 
                 if (user != null)
                 {
-                    if (!post.AllowedUsers.Contains(user.UserName)) post.AllowedUsers.Add(user.UserName);
-                    else post.AllowedUsers.Remove(user.UserName);
+                    if (!post.AllowedUsers.Contains(user.Email)) post.AllowedUsers.Add(user.Email);
+                    else post.AllowedUsers.Remove(user.Email);
 
                     var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
 

@@ -22,10 +22,10 @@ namespace PostsByMarko.Host.Controllers
         [Route("/getAllUsers")]
         [Tags("Users Endpoint")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<RequestResult> GetAllUsernamesAsync()
+        public async Task<RequestResult> GetAllUsersAsync()
         {
             LoadRequestClaims();
-            return await usersService.GetAllUsernamesAsync();
+            return await usersService.GetAllUsersAsync();
         }
     }
 }

@@ -21,13 +21,8 @@ namespace PostsByMarko.Host.Data.Repos.Posts
         {
             Guid.TryParse(postId, out var guid);
             {
-                return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(guid));
+                return await appDbContext.Posts.FirstOrDefaultAsync(p => p.Id.Equals(guid));
             }
-        }
-
-        public async Task<Post> GetPostByIdAsync(Guid postId)
-        {
-            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.PostId.Equals(postId));
         }
 
         public async Task<Post> CreatePostAsync(Post postToCreate)
@@ -36,7 +31,7 @@ namespace PostsByMarko.Host.Data.Repos.Posts
 
             var postAddedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
 
-            if (postAddedSuccessfully) return await GetPostByIdAsync(postToCreate.PostId.ToString());
+            if (postAddedSuccessfully) return await GetPostByIdAsync(postToCreate.Id);
             else throw new Exception("Error during post creation");
         }
 

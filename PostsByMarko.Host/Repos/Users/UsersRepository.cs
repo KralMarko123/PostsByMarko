@@ -16,9 +16,9 @@ namespace PostsByMarko.Host.Data.Repos.Users
             this.userManager = userManager;
         }
 
-        public async Task<List<string>> GetAllUsernamesAsync()
+        public async Task<List<string>> GetAllUsersAsync()
         {
-            return await appDbContext.Users.Select(u => u.UserName).ToListAsync();
+            return await appDbContext.Users.Select(u => u.Email).ToListAsync();
         }
 
         public async Task<bool> MapAndCreateUserAsync(User userToCreate, string passwordForUser)
@@ -33,7 +33,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.PrimarySid, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
             var roles = await userManager.GetRolesAsync(user);
@@ -46,24 +46,35 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return claims;
         }
 
-        public async Task<User> GetUserByUsernameAsync(string username)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await userManager.FindByNameAsync(username);
+            return await userManager.FindByEmailAsync(email);
         }
 
-        public async Task<List<string>> GetUserRolesByUsernameAsync(string username)
+        public async Task<List<string>> GetRolesForEmailAsync(string email)
         {
-            var user = await GetUserByUsernameAsync(username);
+            var user = await GetUserByEmailAsync(email);
             var roles = await userManager.GetRolesAsync(user);
 
             return roles.ToList();
         }
 
-        public async Task<bool> AddPostToUserAsync(string username, Post postToAdd)
+        public async Task<bool> AddPostIdToUserAsync(string email, string postIdToAdd)
         {
-            var user = await GetUserByUsernameAsync(username);
+            var user = await GetUserByEmailAsync(email);
 
-            user.Posts.Add(postToAdd);
+            user.PostIds.Add(postIdToAdd);
+
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
+        }
+
+        public async Task<bool> RemovePostIdFromUserAsync(string email, string postIdToRemove)
+        {
+            var user = await GetUserByEmailAsync(email);
+
+            user.PostIds.Remove(postIdToRemove);
 
             var result = await userManager.UpdateAsync(user);
 

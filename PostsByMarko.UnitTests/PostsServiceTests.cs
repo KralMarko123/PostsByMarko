@@ -24,13 +24,8 @@ namespace PostsByMarko.UnitTests
         public async Task get_all_posts_should_return_ok_with_payload_of_all_posts()
         {
             // Arrange
-            var postsToReturn = new List<Post>{
-               new Post { PostId = Guid.NewGuid() },
-               new Post { PostId = Guid.NewGuid() },
-               new Post { PostId = Guid.NewGuid() }
-            };
-
-            var user = new RequestUser { UserId = Guid.NewGuid().ToString(), Username = "test_user", UserRoles = new List<string> { "Admin" } };
+            var postsToReturn = Enumerable.Range(0, 10).Select((p) => new Post($"Ttile {p}", $"Content {p}")).ToList();
+            var user = new RequestUser { UserId = Guid.NewGuid().ToString().ToString(), Email = "test_user@test.com", Roles = new List<string> { "Admin" } };
 
             postsRepositoryMock.Setup(r => r.GetPostsAsync()).ReturnsAsync(postsToReturn);
 
@@ -49,15 +44,15 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new RequestUser
             {
-                UserId = Guid.NewGuid().ToString(),
-                Username = "test_user",
-                UserRoles = new List<string> { "User" }
+                UserId = Guid.NewGuid().ToString().ToString(),
+                Email = "test_user@test.com",
+                Roles = new List<string> { "User" }
             };
 
             var postsToReturn = new List<Post>
             {
-               new Post { IsHidden= true, AllowedUsers = new List<string>{ "test_user" } },
-               new Post { IsHidden = true, UserId = user.UserId },
+               new Post { IsHidden= true, AllowedUsers = new List<string>{ "test_user@test.com" } },
+               new Post { IsHidden = true, AuthorId = user.UserId },
                new Post { IsHidden = true }
             };
 
@@ -79,14 +74,14 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var userId = Guid.NewGuid().ToString();
-            var postToReturn = new Post { PostId = Guid.NewGuid(), UserId = userId };
-            var user = new User { Id = userId, UserName = "test_user", FirstName = "test", LastName = "user", Posts = new List<Post> { postToReturn } };
+            var postToReturn = new Post { Id = Guid.NewGuid().ToString(), AuthorId = userId };
+            var user = new User("test_user@test.com") { Id = userId, Email = "test_user@test.com", FirstName = "test", LastName = "user", PostIds = new List<string> { postToReturn.Id } };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync(user);
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToReturn.PostId.ToString())).ReturnsAsync(postToReturn);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToReturn.Id.ToString())).ReturnsAsync(postToReturn);
 
             // Act
-            var result = await service.GetPostByIdAsync(postToReturn.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.GetPostByIdAsync(postToReturn.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
             var resultPayload = result.Payload as PostDetailsResponse;
 
             // Assert
@@ -98,15 +93,15 @@ namespace PostsByMarko.UnitTests
         public async Task get_post_by_id_should_return_not_found_and_appropriate_message_when_post_does_not_exist()
         {
             // Arrange
-            var userId = Guid.NewGuid().ToString();
-            var nonexistentPostId = Guid.NewGuid().ToString();
-            var user = new User { Id = userId, UserName = "test_user", FirstName = "test", LastName = "user" };
+            var userId = Guid.NewGuid().ToString().ToString();
+            var nonexistentPostId = Guid.NewGuid().ToString().ToString();
+            var user = new User("test_user@test.com");
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync(user);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
-            var result = await service.GetPostByIdAsync(nonexistentPostId, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.GetPostByIdAsync(nonexistentPostId, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             result.Message.Should().Be($"Post with Id: {nonexistentPostId} was not found");
@@ -117,18 +112,17 @@ namespace PostsByMarko.UnitTests
         public async Task get_post_by_id_should_return_unauthorized_and_appropriate_message_when_post_is_hidden()
         {
             // Arrange
-            var userId = Guid.NewGuid().ToString();
-            var postToReturn = new Post { PostId = Guid.NewGuid(), IsHidden = true, AllowedUsers = new List<string> { "other_user" } };
-            var user = new User { Id = userId, UserName = "test_user", FirstName = "test", LastName = "user" };
+            var postToReturn = new Post { Id = Guid.NewGuid().ToString(), IsHidden = true, AllowedUsers = new List<string> { "other_user" } };
+            var user = new User("test_user@test.com");
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userId)).ReturnsAsync(user);
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToReturn.PostId.ToString())).ReturnsAsync(postToReturn);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToReturn.Id.ToString())).ReturnsAsync(postToReturn);
 
             // Act
-            var result = await service.GetPostByIdAsync(postToReturn.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.GetPostByIdAsync(postToReturn.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
-            result.Message.Should().Be($"Post with Id: {postToReturn.PostId} is hidden");
+            result.Message.Should().Be($"Post with Id: {postToReturn.Id} is hidden");
             result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
@@ -137,14 +131,14 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var postToCreate = new Post { Title = "Test Title", Content = "Test Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var user = new User("test_user@test.com");
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
-            usersRepositoryMock.Setup(r => r.AddPostToUserAsync(user.UserName, postToCreate)).ReturnsAsync(() => true);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.AddPostIdToUserAsync(user.Email, postToCreate.Id)).ReturnsAsync(() => true);
             postsRepositoryMock.Setup(r => r.CreatePostAsync(postToCreate)).ReturnsAsync(postToCreate);
 
             // Act
-            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Username = user.UserName });
+            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Email = user.Email });
 
             // Assert
             result.Message.Should().Be("Post was created successfully");
@@ -156,14 +150,14 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var postToCreate = new Post { Title = "Test Title", Content = "Test Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var user = new User("test_user@test.com");
 
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(user.UserName)).ReturnsAsync(user);
-            usersRepositoryMock.Setup(r => r.AddPostToUserAsync(user.UserName, postToCreate)).ReturnsAsync(() => false);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            usersRepositoryMock.Setup(r => r.AddPostIdToUserAsync(user.Email, postToCreate.Id)).ReturnsAsync(() => false);
             postsRepositoryMock.Setup(r => r.CreatePostAsync(postToCreate)).ReturnsAsync(postToCreate);
 
             // Act
-            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Username = user.UserName });
+            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Email = user.Email });
 
             // Assert
             result.Message.Should().Be("Error during post creation");
@@ -175,10 +169,10 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var postToCreate = new Post();
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var user = new User("test_user@test.com");
 
             // Act
-            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Username = user.UserName });
+            var result = await service.CreatePostAsync(postToCreate, new RequestUser { UserId = user.Id, Email = user.Email });
 
             // Assert
             result.Message.Should().Be("Error during post creation");
@@ -189,15 +183,15 @@ namespace PostsByMarko.UnitTests
         public async Task update_post_should_return_ok_with_appropriate_message_when_post_is_updated()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
-            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content", UserId = user.Id };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content", UserId = user.Id, LastUpdatedDate = DateTime.UtcNow };
+            var user = new User("test_user@test.com");
+            var postToUpdate = new Post { Id = Guid.NewGuid().ToString(), Title = "Test Title", Content = "Test Content", AuthorId = user.Id };
+            var updatedPost = new Post { Id = postToUpdate.Id, Title = "Updated Title", Content = "Updated Content", AuthorId = user.Id, LastUpdatedDate = DateTime.UtcNow };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.Id.ToString())).ReturnsAsync(postToUpdate);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToUpdate)).ReturnsAsync(() => true);
 
             // Act
-            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             postToUpdate.Should().BeEquivalentTo(updatedPost, options => options
@@ -211,15 +205,15 @@ namespace PostsByMarko.UnitTests
         public async Task update_post_should_return_bad_request_with_appropriate_message_when_post_is_not_updated()
         {
             // Arrange
-            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user", FirstName = "test", LastName = "user" };
+            var postToUpdate = new Post { Id = Guid.NewGuid().ToString(), Title = "Test Title", Content = "Test Content" };
+            var updatedPost = new Post { Id = postToUpdate.Id, Title = "Updated Title", Content = "Updated Content" };
+            var user = new User("test_user@test.com");
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.Id.ToString())).ReturnsAsync(postToUpdate);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToUpdate)).ReturnsAsync(() => false);
 
             // Act
-            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             result.Message.Should().Be("Error during post update");
@@ -230,14 +224,14 @@ namespace PostsByMarko.UnitTests
         public async Task update_post_should_return_bad_request_with_appropriate_message_when_post_cannot_be_updated()
         {
             // Arrange
-            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToUpdate = new Post { Id = Guid.NewGuid().ToString(), Title = "Test Title", Content = "Test Content" };
+            var updatedPost = new Post { Id = postToUpdate.Id, Title = "Updated Title", Content = "Updated Content" };
+            var user = new User("test_user@test.com");
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.PostId.ToString())).ReturnsAsync(postToUpdate);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToUpdate.Id.ToString())).ReturnsAsync(postToUpdate);
 
             // Act
-            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             result.Message.Should().Be("Error during post update");
@@ -248,14 +242,14 @@ namespace PostsByMarko.UnitTests
         public async Task update_post_should_return_bad_request_with_appropriate_message_when_post_does_not_exist()
         {
             // Arrange
-            var postToUpdate = new Post { PostId = Guid.NewGuid(), Title = "Test Title", Content = "Test Content" };
-            var updatedPost = new Post { PostId = postToUpdate.PostId, Title = "Updated Title", Content = "Updated Content" };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToUpdate = new Post { Id = Guid.NewGuid().ToString(), Title = "Test Title", Content = "Test Content" };
+            var updatedPost = new Post { Id = postToUpdate.Id, Title = "Updated Title", Content = "Updated Content" };
+            var user = new User("test_user@test.com");
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
-            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.UpdatePostAsync(updatedPost, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             result.Message.Should().Be("Error during post update");
@@ -266,14 +260,14 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_ok_with_appropriate_message_when_post_is_deleted()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = user.Id };
+            var user = new User("test_user@test.com");
+            var postToDelete = new Post { Id = Guid.NewGuid().ToString(), AuthorId = user.Id };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.Id.ToString())).ReturnsAsync(postToDelete);
             postsRepositoryMock.Setup(r => r.DeletePostAsync(postToDelete)).ReturnsAsync(() => true);
 
             // Act
-            var result = await service.DeletePostByIdAsync(postToDelete.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName });
+            var result = await service.DeletePostByIdAsync(postToDelete.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email });
 
             // Assert
             result.Message.Should().Be("Post was deleted successfully");
@@ -284,14 +278,14 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_bad_request_with_appropriate_message_when_post_is_not_deleted()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = user.Id };
+            var user = new User("test_user@test.com");
+            var postToDelete = new Post { Id = Guid.NewGuid().ToString(), AuthorId = user.Id };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.Id.ToString())).ReturnsAsync(postToDelete);
             postsRepositoryMock.Setup(r => r.DeletePostAsync(postToDelete)).ReturnsAsync(() => false);
 
             // Act
-            var result = await service.DeletePostByIdAsync(postToDelete.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName });
+            var result = await service.DeletePostByIdAsync(postToDelete.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email });
 
             // Assert
             result.Message.Should().Be("Error during post deletion");
@@ -302,13 +296,13 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_bad_request_with_appropriate_message_when_post_cannot_be_deleted()
         {
             // Arrange
-            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToDelete = new Post { Id = Guid.NewGuid().ToString(), AuthorId = Guid.NewGuid().ToString().ToString() };
+            var user = new User("test_user@test.com");
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.PostId.ToString())).ReturnsAsync(postToDelete);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToDelete.Id.ToString())).ReturnsAsync(postToDelete);
 
             // Act
-            var result = await service.DeletePostByIdAsync(postToDelete.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.DeletePostByIdAsync(postToDelete.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             result.Message.Should().Be("Error during post deletion");
@@ -320,13 +314,13 @@ namespace PostsByMarko.UnitTests
         public async Task delete_post_should_return_bad_request_with_appropriate_message_when_post_does_not_exist()
         {
             // Arrange
-            var postToDelete = new Post { PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
+            var postToDelete = new Post { Id = Guid.NewGuid().ToString(), AuthorId = Guid.NewGuid().ToString().ToString() };
+            var user = new User("test_user@test.com");
 
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
-            var result = await service.DeletePostByIdAsync(postToDelete.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.DeletePostByIdAsync(postToDelete.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             result.Message.Should().Be("Error during post deletion");
@@ -337,14 +331,14 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_ok_with_apppropriate_message_when_post_is_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = user.Id };
+            var user = new User("test_user@test.com");
+            var postToToggle = new Post { IsHidden = false, Id = Guid.NewGuid().ToString(), AuthorId = user.Id };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.Id.ToString())).ReturnsAsync(postToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToToggle)).ReturnsAsync(() => true);
 
             // Act
-            var result = await service.TogglePostVisibilityAsync(postToToggle.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.TogglePostVisibilityAsync(postToToggle.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             postToToggle.IsHidden.Should().BeTrue();
@@ -356,14 +350,15 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_bad_request_with_apppropriate_message_when_post_is_not_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
+            var user = new User("test_user@test.com");
+            var postToToggle = new Post("Some Title", "Some Content");
+            postToToggle.AuthorId = user.Id;
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.Id.ToString())).ReturnsAsync(postToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(postToToggle)).ReturnsAsync(() => false);
 
             // Act
-            var result = await service.TogglePostVisibilityAsync(postToToggle.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.TogglePostVisibilityAsync(postToToggle.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             result.Message.Should().Be("Error during post visibility toggle");
@@ -374,13 +369,13 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_post_visibility_should_return_unauthorized_with_apppropriate_message_when_post_cannot_be_toggled()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var postToToggle = new Post { IsHidden = false, PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
+            var user = new User("test_user@test.com");
+            var postToToggle = new Post { IsHidden = false, Id = Guid.NewGuid().ToString(), AuthorId = Guid.NewGuid().ToString().ToString() };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.PostId.ToString())).ReturnsAsync(postToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(postToToggle.Id.ToString())).ReturnsAsync(postToToggle);
 
             // Act
-            var result = await service.TogglePostVisibilityAsync(postToToggle.PostId.ToString(), new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.TogglePostVisibilityAsync(postToToggle.Id.ToString(), new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             postToToggle.IsHidden.Should().BeFalse();
@@ -392,19 +387,19 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_user_for_a_post_should_return_ok_with_apppropriate_message_when_user_is_added_to_post()
         {
             // Arrange
-            var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
+            var author = new User("test_user@test.com");
+            var userToToggle = new User("other_user@test.com");
+            var post = new Post { AuthorId = author.Id, Id = Guid.NewGuid().ToString(), AllowedUsers = new List<string> { } };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id.ToString())).ReturnsAsync(post);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(userToToggle.Email)).ReturnsAsync(userToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(post)).ReturnsAsync(() => true);
 
             // Act
-            var result = await service.ToggleUserForPostAsync(post.PostId.ToString(), userToToggle.UserName, new RequestUser { UserId = author.Id, Username = author.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.ToggleUserForPostAsync(post.Id.ToString(), userToToggle.Email, new RequestUser { UserId = author.Id, Email = author.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
-            post.AllowedUsers.Should().Contain(userToToggle.UserName);
+            post.AllowedUsers.Should().Contain(userToToggle.Email);
             result.Message.Should().Be("User was toggled successfully");
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -413,19 +408,19 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_user_for_a_post_should_return_ok_with_apppropriate_message_when_user_is_removed_from_post()
         {
             // Arrange
-            var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { userToToggle.UserName } };
+            var author = new User("test_user@test.com");
+            var userToToggle = new User("other_user@test.com");
+            var post = new Post { AuthorId = author.Id, Id = Guid.NewGuid().ToString(), AllowedUsers = new List<string> { userToToggle.Email } };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id.ToString())).ReturnsAsync(post);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(userToToggle.Email)).ReturnsAsync(userToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(post)).ReturnsAsync(() => true);
 
             // Act
-            var result = await service.ToggleUserForPostAsync(post.PostId.ToString(), userToToggle.UserName, new RequestUser { UserId = author.Id, Username = author.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.ToggleUserForPostAsync(post.Id.ToString(), userToToggle.Email, new RequestUser { UserId = author.Id, Email = author.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
-            post.AllowedUsers.Should().NotContain(userToToggle.UserName);
+            post.AllowedUsers.Should().NotContain(userToToggle.Email);
             result.Message.Should().Be("User was toggled successfully");
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -434,16 +429,16 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_user_for_a_post_should_return_bad_request_with_apppropriate_message_when_user_is_not_toggled_for_post()
         {
             // Arrange
-            var author = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { UserId = author.Id, PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
+            var author = new User("test_user@test.com");
+            var userToToggle = new User("other_user@test.com");
+            var post = new Post { AuthorId = author.Id, Id = Guid.NewGuid().ToString(), AllowedUsers = new List<string> { } };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(userToToggle.UserName)).ReturnsAsync(userToToggle);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id.ToString())).ReturnsAsync(post);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(userToToggle.Email)).ReturnsAsync(userToToggle);
             postsRepositoryMock.Setup(r => r.UpdatePostAsync(post)).ReturnsAsync(() => false);
 
             // Act
-            var result = await service.ToggleUserForPostAsync(post.PostId.ToString(), userToToggle.UserName, new RequestUser { UserId = author.Id, Username = author.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.ToggleUserForPostAsync(post.Id.ToString(), userToToggle.Email, new RequestUser { UserId = author.Id, Email = author.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             result.Message.Should().Be("Error while toggling user for post");
@@ -454,15 +449,15 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_user_for_a_post_should_return_bad_request_with_apppropriate_message_when_user_does_not_exist()
         {
             // Arrange
-            var admin = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { PostId = Guid.NewGuid(), AllowedUsers = new List<string> { } };
+            var admin = new User("test_user@test.com");
+            var userToToggle = new User("other_user@test.com");
+            var post = new Post { Id = Guid.NewGuid().ToString(), AllowedUsers = new List<string> { } };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
-            usersRepositoryMock.Setup(r => r.GetUserByUsernameAsync(It.IsAny<string>())).ReturnsAsync(() => null);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id.ToString())).ReturnsAsync(post);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
             // Act
-            var result = await service.ToggleUserForPostAsync(post.PostId.ToString(), userToToggle.UserName, new RequestUser { UserId = admin.Id, Username = admin.UserName, UserRoles = new List<string> { "Admin" } });
+            var result = await service.ToggleUserForPostAsync(post.Id.ToString(), userToToggle.Email, new RequestUser { UserId = admin.Id, Email = admin.Email, Roles = new List<string> { "Admin" } });
 
             // Assert
             post.AllowedUsers.Should().BeNullOrEmpty();
@@ -474,14 +469,14 @@ namespace PostsByMarko.UnitTests
         public async Task toggling_user_for_a_post_should_return_unauthorized_with_apppropriate_message_when_user_cannot_be_toggled_for_post()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid().ToString(), UserName = "test_user" };
-            var userToToggle = new User { Id = Guid.NewGuid().ToString(), UserName = "other_user" };
-            var post = new Post { PostId = Guid.NewGuid(), UserId = Guid.NewGuid().ToString() };
+            var user = new User("test_user@test.com");
+            var userToToggle = new User("other_user@test.com");
+            var post = new Post { Id = Guid.NewGuid().ToString(), AuthorId = Guid.NewGuid().ToString().ToString() };
 
-            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.PostId.ToString())).ReturnsAsync(post);
+            postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id.ToString())).ReturnsAsync(post);
 
             // Act
-            var result = await service.ToggleUserForPostAsync(post.PostId.ToString(), userToToggle.UserName, new RequestUser { UserId = user.Id, Username = user.UserName, UserRoles = new List<string> { "User" } });
+            var result = await service.ToggleUserForPostAsync(post.Id.ToString(), userToToggle.Email, new RequestUser { UserId = user.Id, Email = user.Email, Roles = new List<string> { "User" } });
 
             // Assert
             result.Message.Should().Be("Unauthorized to toggle user for post");

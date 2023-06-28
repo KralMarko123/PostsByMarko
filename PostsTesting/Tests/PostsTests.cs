@@ -1,7 +1,7 @@
 ﻿using PostsTesting.Tests.Frontend.Base;
 using Xunit;
 
-namespace PostsTesting.Tests.Frontend.Posts
+namespace PostsTesting.Frontend
 {
     public class PostsTests : PostsUiTestBase
     {

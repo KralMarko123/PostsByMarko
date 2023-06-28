@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace aspnetserver.Data.Migrations
+namespace PostsByMarko.Host.Data.Migrations
 {
-    public partial class initial : Migration
+    public partial class new_migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,13 +28,14 @@ namespace aspnetserver.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostIds = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -48,6 +49,24 @@ namespace aspnetserver.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
+                    AllowedUsers = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,46 +175,22 @@ namespace aspnetserver.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Posts",
-                columns: table => new
-                {
-                    PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", maxLength: 100000, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
-                    AllowedUsers = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Posts", x => x.PostId);
-                    table.ForeignKey(
-                        name: "FK_Posts_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "4cddd91b-03fd-499c-b899-2523eaa1bf40", "c3e2b444-fa78-4536-9aa8-2a0fa9f6e41b", "Admin", "ADMIN" },
-                    { "9beb52fd-570d-42df-b966-d17da8ffc431", "68b5e8fd-5182-4a80-83ef-90fe2812ccec", "Editor", "EDITOR" }
+                    { "e19147d5-659c-4225-b06d-942f862b5853", "7d14dc7a-384a-49eb-b933-d23b0b07c9a1", "User", null },
+                    { "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941", "6373895d-4851-4dc3-9b14-c52b866ab4af", "Admin", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PostIds", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "171f313b-b676-44c6-9994-9f809f7aef72", 0, "34587d6d-f8ff-4191-975b-4a206608056e", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAEOAQZbR3JOuI0H9i2134t2Zc7I9DrXQOc9cpMnkVQ76GvH9wxxzwewmPP7u29Di/Hg==", null, false, "470c7786-b44a-4e59-99e3-a668df7edf5d", false, "kralmarko123@gmail.com" },
-                    { "8fe5f090-84ff-4caa-9519-177fb86ef973", 0, "d6aecd21-8259-4aa6-89af-c546a82392dd", "test@test.com", true, "Test", "Testerson", false, null, "TEST@TEST.COM", "TEST@TEST.COM", "AQAAAAEAACcQAAAAEL919QOVRQ84aesECDIRomVp0r9nXn8i4ylOGRHcP6BilXVCyBUvzbyuwLsCxI0THg==", null, false, "1ad309b0-7c57-42d1-aa36-f5d0dab87e72", false, "test@test.com" }
+                    { "3cbd2099-8682-49ef-a6be-b5cb754da7d7", 0, "2438c48c-533b-4998-aaa0-ef889e271e01", "kralmarko123@gmail.com", true, "Marko", "Markovikj", false, null, "KRALMARKO123@GMAIL.COM", "KRALMARKO123@GMAIL.COM", "AQAAAAEAACcQAAAAELaPXrFbjNHi6DC8nSfyIuA1BFh/WP8lmknya4Yuei5Xx8iyk7nw8iraW1JyLV7clA==", null, false, "[]", "c101aabc-7889-4fbc-a093-d46df143679b", false, "kralmarko123@gmail.com" },
+                    { "fc7abcb7-ca1a-45ac-b607-c1549849bd3b", 0, "7d3fdfcd-768e-4034-b5c8-c27cab22aa1b", "test_user@test.com", true, "Test", "User", false, null, "TEST_USER@TEST.COM", "TEST_USER@TEST.COM", "AQAAAAEAACcQAAAAEOB2Z5S2r2uNadPbYfmAi0vmx4kQQpqSpo1zkaJ2AqVWQVi3yEaQr1v2AqRgz8C0Lg==", null, false, "[]", "1c40666d-aa10-4f0b-ac31-26d3c56d19cc", false, "test_user@test.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -203,10 +198,10 @@ namespace aspnetserver.Data.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "4cddd91b-03fd-499c-b899-2523eaa1bf40", "171f313b-b676-44c6-9994-9f809f7aef72" },
-                    { "9beb52fd-570d-42df-b966-d17da8ffc431", "171f313b-b676-44c6-9994-9f809f7aef72" },
-                    { "4cddd91b-03fd-499c-b899-2523eaa1bf40", "8fe5f090-84ff-4caa-9519-177fb86ef973" },
-                    { "9beb52fd-570d-42df-b966-d17da8ffc431", "8fe5f090-84ff-4caa-9519-177fb86ef973" }
+                    { "e19147d5-659c-4225-b06d-942f862b5853", "3cbd2099-8682-49ef-a6be-b5cb754da7d7" },
+                    { "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941", "3cbd2099-8682-49ef-a6be-b5cb754da7d7" },
+                    { "e19147d5-659c-4225-b06d-942f862b5853", "fc7abcb7-ca1a-45ac-b607-c1549849bd3b" },
+                    { "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941", "fc7abcb7-ca1a-45ac-b607-c1549849bd3b" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -247,11 +242,6 @@ namespace aspnetserver.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Posts_UserId",
-                table: "Posts",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

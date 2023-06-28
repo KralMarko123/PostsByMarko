@@ -8,7 +8,7 @@ using PostsByMarko.Host.Data;
 
 #nullable disable
 
-namespace aspnetserver.Data.Migrations
+namespace PostsByMarko.Host.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -51,14 +51,14 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "96958a9e-7d07-4e31-8333-dbd736c73523",
-                            ConcurrencyStamp = "4c5895fd-6df5-4424-8ace-d56f334ffe61",
+                            Id = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941",
+                            ConcurrencyStamp = "6373895d-4851-4dc3-9b14-c52b866ab4af",
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = "6f84dc7b-5afe-41af-ae39-95f58d8ca5d2",
-                            ConcurrencyStamp = "b9ca4b23-49d2-4c1f-ac37-2b82f89a21db",
+                            Id = "e19147d5-659c-4225-b06d-942f862b5853",
+                            ConcurrencyStamp = "7d14dc7a-384a-49eb-b933-d23b0b07c9a1",
                             Name = "User"
                         });
                 });
@@ -152,23 +152,23 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "f00d1d51-126f-4290-82bc-1aba743a2591",
-                            RoleId = "96958a9e-7d07-4e31-8333-dbd736c73523"
+                            UserId = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
+                            RoleId = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941"
                         },
                         new
                         {
-                            UserId = "f00d1d51-126f-4290-82bc-1aba743a2591",
-                            RoleId = "6f84dc7b-5afe-41af-ae39-95f58d8ca5d2"
+                            UserId = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
+                            RoleId = "e19147d5-659c-4225-b06d-942f862b5853"
                         },
                         new
                         {
-                            UserId = "66c1344b-abd7-417b-b0fb-70a55e334cd6",
-                            RoleId = "96958a9e-7d07-4e31-8333-dbd736c73523"
+                            UserId = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
+                            RoleId = "e2650f57-7b4a-43f0-a2dc-7a8a8dfa1941"
                         },
                         new
                         {
-                            UserId = "66c1344b-abd7-417b-b0fb-70a55e334cd6",
-                            RoleId = "6f84dc7b-5afe-41af-ae39-95f58d8ca5d2"
+                            UserId = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
+                            RoleId = "e19147d5-659c-4225-b06d-942f862b5853"
                         });
                 });
 
@@ -193,39 +193,34 @@ namespace aspnetserver.Data.Migrations
 
             modelBuilder.Entity("PostsByMarko.Host.Data.Models.Post", b =>
                 {
-                    b.Property<Guid>("PostId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AllowedUsers")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(100000)
+                    b.Property<string>("AuthorId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsHidden")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastUpdatedDate")
+                    b.Property<DateTime>("LastUpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("PostId");
-
-                    b.HasIndex("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Posts");
                 });
@@ -243,6 +238,7 @@ namespace aspnetserver.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -250,9 +246,11 @@ namespace aspnetserver.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -277,6 +275,10 @@ namespace aspnetserver.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PostIds")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -303,9 +305,9 @@ namespace aspnetserver.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "f00d1d51-126f-4290-82bc-1aba743a2591",
+                            Id = "3cbd2099-8682-49ef-a6be-b5cb754da7d7",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cc6a0054-0339-4a5f-b1f4-212bceb57e22",
+                            ConcurrencyStamp = "2438c48c-533b-4998-aaa0-ef889e271e01",
                             Email = "kralmarko123@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Marko",
@@ -313,29 +315,31 @@ namespace aspnetserver.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "KRALMARKO123@GMAIL.COM",
                             NormalizedUserName = "KRALMARKO123@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJju7JR208vN9kZY6b6HnnRWA3kAqtRJSK6LTP9FNnZ5OPkW1okv+orJV/R2e09ZIg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELaPXrFbjNHi6DC8nSfyIuA1BFh/WP8lmknya4Yuei5Xx8iyk7nw8iraW1JyLV7clA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8b647685-301b-4987-9fa0-10174eafb24f",
+                            PostIds = "[]",
+                            SecurityStamp = "c101aabc-7889-4fbc-a093-d46df143679b",
                             TwoFactorEnabled = false,
                             UserName = "kralmarko123@gmail.com"
                         },
                         new
                         {
-                            Id = "66c1344b-abd7-417b-b0fb-70a55e334cd6",
+                            Id = "fc7abcb7-ca1a-45ac-b607-c1549849bd3b",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "28c03e02-3216-4b36-a9ec-895c01918f37",
+                            ConcurrencyStamp = "7d3fdfcd-768e-4034-b5c8-c27cab22aa1b",
                             Email = "test_user@test.com",
                             EmailConfirmed = true,
                             FirstName = "Test",
                             LastName = "User",
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST_USER@TEST.COM",
-                            NormalizedUserName = "TEST_USER",
-                            PasswordHash = "AQAAAAEAACcQAAAAENxyLzj2FL5EqNBosjWSpX7m3SuaVwaxaTczDCe+GUbfFHoCl6o+CB6pQOHyMzbS8A==",
+                            NormalizedUserName = "TEST_USER@TEST.COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAEOB2Z5S2r2uNadPbYfmAi0vmx4kQQpqSpo1zkaJ2AqVWQVi3yEaQr1v2AqRgz8C0Lg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d2f59de2-69f3-4a88-8555-888ab74e9d94",
+                            PostIds = "[]",
+                            SecurityStamp = "1c40666d-aa10-4f0b-ac31-26d3c56d19cc",
                             TwoFactorEnabled = false,
-                            UserName = "test_user"
+                            UserName = "test_user@test.com"
                         });
                 });
 
@@ -388,18 +392,6 @@ namespace aspnetserver.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("PostsByMarko.Host.Data.Models.Post", b =>
-                {
-                    b.HasOne("PostsByMarko.Host.Data.Models.User", null)
-                        .WithMany("Posts")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("PostsByMarko.Host.Data.Models.User", b =>
-                {
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
