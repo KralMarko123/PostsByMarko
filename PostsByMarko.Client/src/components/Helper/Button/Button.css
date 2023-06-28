@@ -1,6 +1,6 @@
 .button {
 	width: 100%;
-	padding: var(--small-padding) 0em;
+	padding: 0.5em 0;
 
 	outline: none;
 	border: none;
@@ -8,9 +8,7 @@
 	border-radius: var(--button-radius);
 
 	color: var(--text-color);
-	font-size: var(--big-text);
-	text-align: center;
-	text-transform: uppercase;
+	font-size: 2rem;
 
 	display: flex;
 	justify-content: center;

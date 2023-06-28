@@ -48,21 +48,17 @@ export const FORMS = {
 		],
 	},
 
-	loginForm: {
-		action: "POST",
-		formTitle: "LOG IN",
+	LOGIN_FORM: {
 		formGroups: [
 			{
-				id: "username",
-				label: "Username",
+				id: "email",
 				type: "text",
-				placeholder: "Username",
+				placeholder: "Email",
 				icon: ICONS.USER_ICON(),
 			},
 
 			{
 				id: "password",
-				label: "Password",
 				type: "password",
 				placeholder: "Password",
 				icon: ICONS.PASSWORD_ICON(),

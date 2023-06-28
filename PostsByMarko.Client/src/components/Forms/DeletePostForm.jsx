@@ -3,10 +3,9 @@ import { useAuth } from "../../custom/useAuth";
 import { modalTransitionDuration } from "../../constants/misc";
 import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
-import Button from "../Helper/Button";
+import Button from "../Helper/Button/Button";
 import Modal from "../Helper/Modal";
 import AppContext from "../../context/AppContext";
-import "../../styles/components/Form.css";
 
 const DeletePostForm = () => {
 	const appContext = useContext(AppContext);

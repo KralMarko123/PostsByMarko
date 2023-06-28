@@ -1,0 +1,13 @@
+.form {
+	min-height: 70vh;
+	justify-content: center;
+}
+
+.form-desc {
+	margin-bottom: 2em;
+}
+
+.error{
+  margin-top: 1em;
+  align-self: center;
+}

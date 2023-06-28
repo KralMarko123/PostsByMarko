@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { ROUTES } from "../../constants/routes";
 import { FORMS } from "../../constants/forms";
 import { HelperFunctions } from "../../util/helperFunctions";
-import Button from "../Helper/Button";
+import Button from "../Helper/Button/Button";
 import AuthService from "../../api/AuthService";
 
 const RegisterForm = () => {

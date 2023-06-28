@@ -4,7 +4,7 @@ import { useSignalR } from "../../custom/useSignalR";
 import { modalTransitionDuration } from "../../constants/misc";
 import Modal from "../Helper/Modal";
 import AppContext from "../../context/AppContext";
-import Button from "../Helper/Button";
+import Button from "../Helper/Button/Button";
 import UsersService from "../../api/UsersService";
 import PostsService from "../../api/PostsService";
 import Select from "../Gen/Select";

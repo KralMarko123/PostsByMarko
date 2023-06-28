@@ -5,7 +5,7 @@ export const HelperFunctions = {
 		else return "what most likely was a Friday";
 	},
 
-	checkForEmptyFields(data) {
+	noEmptyFields(data) {
 		return Object.values(data).every((field) => field.length > 0);
 	},
 

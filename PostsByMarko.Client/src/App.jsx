@@ -4,7 +4,7 @@ import { ROUTES } from "./constants/routes";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import Home from "./pages/Home";
 import Details from "./pages/Details";
-import Login from "./pages/Login";
+import Login from "./pages/Login/Login";
 import Register from "./pages/Register";
 import AppProvider from "./context/ContextProvider";
 

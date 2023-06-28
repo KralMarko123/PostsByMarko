@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 
 :root {
 	/**COLORS*/
@@ -11,7 +11,7 @@
 	--danger: rgb(210, 43, 43);
 
 	/**TEXT*/
-	--main-font: "Open Sans", sans-serif;
+	--main-font: "Roboto", sans-serif;
 	--base-font-size: 18px;
 	--text-color: #f9f5eb;
 

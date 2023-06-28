@@ -45,9 +45,6 @@ const Home = () => {
 			<div className="home page">
 				<Nav />
 				<div className="container">
-					<h1 className="container__title">Posts By Marko</h1>
-					<p className="container__description">Create and share posts with your friends</p>
-
 					{appContext.posts?.length > 0 ? (
 						<div className="posts__dashboard">
 							<PostFilters

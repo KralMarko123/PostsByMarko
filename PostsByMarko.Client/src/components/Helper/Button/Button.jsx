@@ -1,6 +1,6 @@
 import React from "react";
-import Loader from "./Loader";
-import "../../styles/components/Button.css";
+import Loader from "../Loader";
+import "./Button.css";
 
 const Button = ({ onButtonClick, text, loading }) => {
 	const onClick = (e) => {
