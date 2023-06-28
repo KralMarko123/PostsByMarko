@@ -20,11 +20,15 @@ namespace PostsByMarko.IntegrationTests
         }
 
         [Fact]
-        public async Task should_return_list_of_all_usernames()
+        public async Task should_return_a_list_of_all_usernames()
         {
+            // Arrange
+
+            // Act
             var result = await client.GetFromJsonAsync<RequestResult>("/getAllUsers");
             var usernames = JsonConvert.DeserializeObject<List<string>>(result!.Payload!.ToString()!);
 
+            // Assert
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             usernames.Should().NotBeNullOrEmpty();
         }

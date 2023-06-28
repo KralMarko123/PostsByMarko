@@ -21,14 +21,17 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_register_and_then_try_to_login()
         {
+            // Arrange
             var registration = new UserRegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
             var login = new UserLoginDto { Email = registration.Email, Password = registration.Password };
 
+            // Act
             await client.PostAsJsonAsync("/register", registration);
 
             var response = await client.PostAsJsonAsync("/login", login);
             var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 
+            // Assert
             result!.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             result!.Message.Should().Be("Please check your email and confirm your account before logging in");
         }

@@ -24,9 +24,11 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_create_then_update_then_toggle_and_then_finally_delete_a_post()
         {
+            // Arrange
             var post = new Post { Id = Guid.NewGuid().ToString(), IsHidden = false, Title = "title", Content = "content", AuthorId = Guid.NewGuid().ToString() };
             var testEmail = TestingConstants.TEST_USER.Email;
 
+            // Act
             await client.PostAsJsonAsync("/createPost", post);
 
             post.Title = "updated_title";
@@ -41,6 +43,7 @@ namespace PostsByMarko.IntegrationTests
 
             post = postDetails!.Post;
 
+            // Assert
             post!.Title.Should().Be("updated_title");
             post.Content.Should().Be("updated_content");
             post.IsHidden.Should().BeTrue();
