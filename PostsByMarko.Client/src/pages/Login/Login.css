@@ -18,3 +18,30 @@
 .login .form {
 	background-color: var(--dark-accent);
 }
+
+/**TABLET*/
+@media (max-width: 1199px) {
+	.login .container {
+		width: 50%;
+	}
+
+	.logo {
+		width: 100px;
+		position: absolute;
+		top: 1em;
+		left: 1em;
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.login .container {
+		width: 90%;
+	}
+
+	.logo {
+		width: 25%;
+		position: static;
+		margin-bottom: 1em;
+	}
+}

@@ -110,4 +110,8 @@
 
 		text-align: center;
 	}
+
+	.link {
+		font-size: 0.85rem;
+	}
 }

@@ -25,6 +25,7 @@
 /**MOBILE*/
 @media (max-width: 767px) {
 	.button {
+		font-size: 1.5rem;
 		padding: 0.25em 0em;
 	}
 }

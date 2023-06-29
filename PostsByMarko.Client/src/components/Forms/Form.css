@@ -77,19 +77,30 @@
 
 /**TABLET*/
 @media (max-width: 1199px) {
-	.form-group,
-	.form__actions {
-		width: 100%;
-	}
 }
 
 /**MOBILE*/
 @media (max-width: 767px) {
+	.form-title {
+		font-size: 1.5rem;
+	}
+
+	.form-desc {
+		font-size: 0.85rem;
+	}
+
+	.form-group {
+		margin: 0.25em 0;
+	}
+
 	.form-group svg {
-		left: var(--small-padding);
+		left: 0.25em;
+		transform: translateY(-50%) scale(1);
 	}
 
 	.input {
-		padding-left: 0;
+		font-size: 1rem;
+		padding: 0.5em;
+		padding-left: 1.5em;
 	}
 }
