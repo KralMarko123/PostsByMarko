@@ -7,9 +7,9 @@ namespace PostsTesting.Tests.Frontend.Base
 {
     public class AuthUiTestBase : UiTestBase, IAsyncLifetime
     {
-        RegisterPage registerPage => new RegisterPage(page);
-        LoginPage loginPage => new LoginPage(page);
-        HomePage homePage => new HomePage(page);
+        protected RegisterPage registerPage => new RegisterPage(page);
+        protected LoginPage loginPage => new LoginPage(page);
+        protected HomePage homePage => new HomePage(page);
 
 
         public async new Task InitializeAsync() => await base.InitializeAsync();

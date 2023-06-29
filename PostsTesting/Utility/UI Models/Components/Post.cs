@@ -15,7 +15,6 @@ namespace PostsTesting.Utility.Pages
             modal = new Modal(page);
         }
 
-
         public ILocator title => post.Locator(".post__title");
         public ILocator content => post.Locator(".post__content");
         public ILocator idIcon => post.Locator(".post__id");

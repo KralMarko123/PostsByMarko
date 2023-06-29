@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.19" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="Microsoft.Playwright" Version="1.29.0" />
@@ -27,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PostsByMarko.Host\PostsByMarko.Host.csproj" />
+    <ProjectReference Include="..\PostsByMarko.Shared\PostsByMarko.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,11 @@
 ﻿using Microsoft.Playwright;
-using PostsTesting.Utility.Constants;
 
 namespace PostsTesting.Utility
 {
     public class BrowserDriver
     {
-        IPlaywright playwrightInstance;
-        IBrowser browser;
+        IPlaywright? playwrightInstance;
+        IBrowser? browser;
 
         private async Task<IPlaywright> GetPlaywrightAsync()
         {
@@ -14,34 +13,31 @@ namespace PostsTesting.Utility
             return playwrightInstance;
         }
 
-        public async Task<IBrowser> GetBrowserAsync(bool headless = false)
+        public async Task<IBrowser> GetChromeBrowserAsync(bool headless = false)
         {
-            switch (TestingConstants.browserType)
-            {
-                case "Chrome":
-                    browser ??= await GetPlaywrightAsync().Result.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
-                    {
-                        Headless = headless
-                    });
-                    return browser;
-                case "Firefox":
-                    browser ??= await GetPlaywrightAsync().Result.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
-                    {
-                        Headless = headless
-                    });
-                    return browser;
-                default: return browser;
-            }
+
+            browser ??= await GetPlaywrightAsync()
+                .Result
+                .Chromium
+                .LaunchAsync(new BrowserTypeLaunchOptions { Headless = headless });
+
+            return browser;
         }
 
-        public async Task DestroyPlaywright()
+        public async Task<IBrowser> GetFirefoxBrowserAsync(bool headless = false)
         {
-            await Task.Run(() => playwrightInstance.Dispose());
+
+            browser ??= await GetPlaywrightAsync()
+                .Result
+                .Firefox
+                .LaunchAsync(new BrowserTypeLaunchOptions { Headless = headless });
+
+            return browser;
         }
 
-        public async Task DestroyBrowser()
+        public async Task DestroyPlaywrightAsync()
         {
-            await browser.CloseAsync();
+            await Task.Run(() => playwrightInstance!.Dispose());
         }
 
     }

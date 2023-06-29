@@ -1,32 +1,33 @@
-﻿using PostsTesting.Tests.Frontend.Base;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
+using PostsByMarko.Host.Data.Models;
+using PostsTesting.Utility.UI_Models.Pages;
 using Xunit;
 
 namespace PostsByMarko.FrontendTests.Frontend
 {
-    public class AuthTests : AuthUiTestBase
+    [Collection("Frontend Collection")]
+    public class AuthTests
     {
-        [Fact]
-        public async Task VerifyUserCanLogin()
+        private readonly User testUser;
+        private readonly IPage page;
+        private LoginPage loginPage => new LoginPage(page);
+
+        public AuthTests(BaseFixture baseFixture)
         {
-            await VerifyUserCanBeLoggedIn();
+            page = baseFixture.page;
+            testUser = baseFixture.testUser;
         }
 
         [Fact]
-        public async Task VerifyUserCanRegister()
+        public async Task Test()
         {
-            await VerifyUserCanBeRegistered();
-        }
+            await loginPage.Visit();
+            await loginPage.Login(testUser.UserName, "some_password");
+            await loginPage.errorMessage.WaitForAsync();
 
-        [Fact]
-        public async Task VerifyLoginErrorMessages()
-        {
-            await VerifyErrorMessagesWhenLoggingIn();
-        }
-
-        [Fact]
-        public async Task VerifyRegisterErrorMessages()
-        {
-            await VerifyErrorMessagesWhenRegistering();
+            var errorTitleText = await loginPage.errorMessage.TextContentAsync();
+            errorTitleText.Should().Be("Invalid password for the given account");
         }
     }
 }
