@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using NuGet.Protocol.Plugins;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
@@ -29,6 +28,7 @@ namespace PostsByMarko.IntegrationTests
 
         public new Task DisposeAsync()
         {
+            client.Dispose();
             return Task.CompletedTask;
         }
 

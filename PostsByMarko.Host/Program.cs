@@ -76,4 +76,5 @@ app.UseRateLimiting();
 
 app.Run();
 
+public partial class Program { }
 public interface IApiMarker { }
