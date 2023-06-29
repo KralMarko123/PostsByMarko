@@ -8,11 +8,11 @@
 
 .form-title {
 	font-weight: bold;
-	font-size: 3rem;
+	font-size: 2rem;
 }
 
 .form-desc {
-	font-size: 1.25rem;
+	font-size: 1rem;
 }
 
 .form-group {
@@ -25,12 +25,16 @@
 	overflow: hidden;
 }
 
+.form-group:focus-within {
+	box-shadow: var(--accent-shadow);
+}
+
 .form-group svg {
 	position: absolute;
 	top: 50%;
 	left: 1em;
 	transform: translateY(-50%) scale(1.5);
-	fill: var(--light-accent);
+	fill: var(--dark-accent);
 }
 
 .input {
@@ -43,15 +47,20 @@
 
 	color: var(--dark);
 	background-color: inherit;
-	font-size: 1.75rem;
-	padding: 0.5em;
+	font-size: 1.5rem;
+	padding: 1em;
 	padding-left: 2em;
+}
+
+.input:focus + svg {
+	fill: var(--light-accent);
 }
 
 .form__actions {
 	width: 100%;
 
-	margin: 2em 0;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
 
 	display: flex;
 	flex-direction: column;

@@ -10,9 +10,7 @@ const AuthService = {
 			body: JSON.stringify(userToLogin),
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode === 200) return requestResult.payload;
-			else throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 

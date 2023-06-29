@@ -34,8 +34,10 @@ const LoginForm = () => {
 		if (noEmptyFields()) {
 			setIsLoading(true);
 			await AuthService.login(loginData)
-				.then((response) => login(response))
-				.catch((errorMessage) => setErrorMessage(errorMessage))
+				.then((requestResult) => {
+					if (requestResult.statusCode === 200) login(requestResult.payload);
+					else setErrorMessage(requestResult.message);
+				})
 				.finally(() => setIsLoading(false));
 		}
 	};
@@ -46,7 +48,6 @@ const LoginForm = () => {
 			<p className="form-desc">Stay updated with the newest posts</p>
 			{loginForm.formGroups.map((group) => (
 				<div key={group.id} className="form-group">
-					{group.icon}
 					<input
 						id={group.id}
 						type={group.type}
@@ -54,6 +55,7 @@ const LoginForm = () => {
 						placeholder={group.placeholder}
 						onChange={(e) => setLoginData({ ...loginData, [`${group.id}`]: e.currentTarget.value })}
 					/>
+					{group.icon}
 				</div>
 			))}
 

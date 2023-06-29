@@ -72,12 +72,11 @@
 
 .error,
 .error__message {
-	color: var(--danger);
+	color: var(--error);
 }
 
 .error {
-	font-size: var(--lg-text);
-	font-weight: bold;
+	font-size: 1rem;
 }
 
 .error__message {
@@ -90,7 +89,7 @@
 
 .link {
 	color: var(--light);
-	font-size: var(--md-text);
+	font-size: 1rem;
 	cursor: pointer;
 }
 
