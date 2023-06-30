@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Playwright;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
@@ -9,6 +10,7 @@ namespace PostsByMarko.FrontendTests
 {
     public class BaseFixture : WebApplicationFactory<IApiMarker>, IAsyncLifetime
     {
+        public HttpClient client;
 
         public BrowserDriver driver;
         public IBrowser browser;
@@ -18,9 +20,16 @@ namespace PostsByMarko.FrontendTests
 
         public async Task InitializeAsync()
         {
+            client = CreateClient();
+            
             driver = new BrowserDriver();
             browser = await driver.GetChromeBrowserAsync();
             page = await browser.NewPageAsync();
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.UseEnvironment("Development");
         }
 
         public async new Task DisposeAsync()
