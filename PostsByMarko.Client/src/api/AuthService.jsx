@@ -20,12 +20,10 @@ const AuthService = {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ ...userToRegister, email: userToRegister.username }),
+			body: JSON.stringify(userToRegister),
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode === 201) return;
-			else throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 };

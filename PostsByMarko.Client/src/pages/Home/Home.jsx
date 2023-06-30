@@ -1,17 +1,18 @@
 import { React, useState, useEffect, useContext } from "react";
-import { useAuth } from "../custom/useAuth";
-import { useSignalR } from "../custom/useSignalR";
-import { HelperFunctions } from "../util/helperFunctions";
-import PostsService from "../api/PostsService";
-import Post from "../components/Post";
-import InfoMessage from "../components/Helper/InfoMessage";
-import Nav from "../components/Layout/Nav";
-import UpdatePostForm from "../components/Forms/UpdatePostForm";
-import DeletePostForm from "../components/Forms/DeletePostForm";
-import AppContext from "../context/AppContext";
-import PostFilters from "../components/PostFilters";
-import Refetcher from "../components/Helper/Refetcher";
-import "../styles/pages/Home.css";
+import { useAuth } from "../../custom/useAuth";
+import { useSignalR } from "../../custom/useSignalR";
+import { HelperFunctions } from "../../util/helperFunctions";
+import PostsService from "../../api/PostsService";
+import Post from "../../components/Post";
+import InfoMessage from "../../components/Helper/InfoMessage";
+import Nav from "../../components/Layout/Nav";
+import UpdatePostForm from "../../components/Forms/UpdatePostForm";
+import DeletePostForm from "../../components/Forms/DeletePostForm";
+import AppContext from "../../context/AppContext";
+import PostFilters from "../../components/PostFilters";
+import Refetcher from "../../components/Helper/Refetcher";
+import "../Page.css";
+import "./Home.css";
 
 const Home = () => {
 	const appContext = useContext(AppContext);

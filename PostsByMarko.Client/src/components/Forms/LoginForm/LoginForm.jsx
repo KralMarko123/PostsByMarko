@@ -24,15 +24,14 @@ const LoginForm = () => {
 		if (!HelperFunctions.noEmptyFields(loginData)) {
 			setErrorMessage("Fields can't be empty");
 			return false;
-		} else {
-			setErrorMessage("");
-			return true;
-		}
+		} else return true;
 	};
 
 	const handleLogin = async () => {
 		if (noEmptyFields()) {
+			setErrorMessage("");
 			setIsLoading(true);
+
 			await AuthService.login(loginData)
 				.then((requestResult) => {
 					if (requestResult.statusCode === 200) login(requestResult.payload);
@@ -59,9 +58,10 @@ const LoginForm = () => {
 				</div>
 			))}
 
-			<div className="form__actions">
+			<div className="form-actions">
 				<Button onButtonClick={() => handleLogin()} text="Sign In" loading={isLoading} />
 			</div>
+
 			<p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
 				Haven't registered yet? Click here to create an account
 			</p>

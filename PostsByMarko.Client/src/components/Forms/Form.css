@@ -56,7 +56,7 @@
 	fill: var(--light-accent);
 }
 
-.form__actions {
+.form-actions {
 	width: 100%;
 
 	margin-top: 1em;
@@ -67,7 +67,7 @@
 	gap: var(--normal-gap);
 }
 
-.form__confirmational {
+.form-confirmational {
 	color: var(--text-color);
 	font-size: var(--big-text);
 

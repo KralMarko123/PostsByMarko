@@ -9,20 +9,13 @@ export const HelperFunctions = {
 		return Object.values(data).every((field) => field.length > 0);
 	},
 
-	checkPasswordRequirements(password) {
-		let passwordValidator = {
-			isValid: true,
-			messages: [],
-		};
+	isValidPassword(password) {
+		if (!/^.{6,}$/.test(password)) return "Password should be at least six characters long";
+		if (!/(?=.*[a-z])/.test(password)) return "Password should contain one lowercase letter";
+		if (!/(?=.*[A-Z])/.test(password)) return "Password should contain one uppercase letter";
+		if (!/(?=.*\d)/.test(password)) return "Password should contain one digit";
 
-		if (!/^.{6,}$/.test(password))
-			passwordValidator.messages.push("Should be at least six characters long");
-		if (!/(?=.*[a-z])/.test(password)) passwordValidator.messages.push("Have one lowercase letter");
-		if (!/(?=.*[A-Z])/.test(password)) passwordValidator.messages.push("Have one uppercase letter");
-		if (!/(?=.*\d)/.test(password)) passwordValidator.messages.push("Have one digit");
-		if (passwordValidator.messages.length > 0) passwordValidator.isValid = false;
-
-		return passwordValidator;
+		return true;
 	},
 
 	getErrorMessageForFailingResponse(responseMessage) {

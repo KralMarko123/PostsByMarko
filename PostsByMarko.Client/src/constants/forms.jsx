@@ -1,7 +1,7 @@
 import { ICONS } from "./misc";
 
 export const FORMS = {
-	registerForm: {
+	REGISTER_FORM: {
 		action: "POST",
 		formTitle: "REGISTER",
 		formGroups: [
@@ -22,12 +22,11 @@ export const FORMS = {
 			},
 
 			{
-				id: "username",
-				label: "Username",
+				id: "email",
+				label: "Email",
 				type: "text",
-				placeholder: "Valid email address",
-				requirements: ["Be a valid email address"],
-				icon: ICONS.EMAIL_ICON(),
+				placeholder: "Email",
+				icon: ICONS.USER_ICON(),
 			},
 
 			{

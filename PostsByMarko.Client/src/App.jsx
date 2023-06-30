@@ -2,10 +2,10 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { ROUTES } from "./constants/routes";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home";
 import Details from "./pages/Details";
 import Login from "./pages/Login/Login";
-import Register from "./pages/Register";
+import Register from "./pages/Register/Register";
 import AppProvider from "./context/ContextProvider";
 
 const App = () => {

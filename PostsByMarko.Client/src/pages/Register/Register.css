@@ -1,0 +1,47 @@
+.register {
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.logo {
+	width: 100px;
+	position: absolute;
+	top: 1em;
+	left: 1em;
+}
+
+.register .container {
+	width: 30%;
+}
+
+.register .form {
+	background-color: var(--dark-accent);
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+	.register .container {
+		width: 50%;
+	}
+
+	.logo {
+		width: 100px;
+		position: absolute;
+		top: 1em;
+		left: 1em;
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.register .container {
+		width: 90%;
+	}
+
+	.logo {
+		width: 25%;
+		position: static;
+		margin-bottom: 1em;
+	}
+}

@@ -1,0 +1,15 @@
+.form {
+	justify-content: center;
+}
+
+.form-desc {
+	margin-bottom: 1em;
+}
+
+.error {
+	margin-top: 1em;
+}
+
+.register-confirmational {
+	background-color: var(--dark-accent);
+}
