@@ -7,10 +7,10 @@ const PostsService = {
 			headers: {
 				Authorization: `Bearer ${userToken}`,
 			},
-		})
-			.then((response) => response.json())
-			.then((requestResult) => requestResult.payload)
-			.catch((error) => console.log(error));
+		}).then(async (response) => {
+			const requestResult = response.json();
+			return requestResult;
+		});
 	},
 
 	async getPostById(postId, userToken) {
@@ -37,14 +37,7 @@ const PostsService = {
 			body: JSON.stringify(postToCreate),
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode === 201)
-				return {
-					isSuccessful: true,
-					message: requestResult.message,
-					newPost: requestResult.payload,
-				};
-			else throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 

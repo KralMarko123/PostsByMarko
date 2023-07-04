@@ -1,0 +1,9 @@
+.form.create-post .form-title {
+	align-self: center;
+}
+
+.form.create-post .error,
+.form.create-post .success {
+	align-self: center;
+	font-size: 1.5rem;
+}

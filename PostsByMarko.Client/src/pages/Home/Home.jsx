@@ -9,7 +9,6 @@ import Nav from "../../components/Layout/Nav";
 import UpdatePostForm from "../../components/Forms/UpdatePostForm";
 import DeletePostForm from "../../components/Forms/DeletePostForm";
 import AppContext from "../../context/AppContext";
-import PostFilters from "../../components/PostFilters";
 import Refetcher from "../../components/Helper/Refetcher";
 import "../Page.css";
 import "./Home.css";
@@ -22,14 +21,12 @@ const Home = () => {
 		showOnlyMyPosts: false,
 		showHiddenPosts: false,
 	});
-	const [filteredPosts, setFilteredPosts] = useState(
-		HelperFunctions.applyFilters(appContext.posts, filters, user.userId)
-	);
+	const [filteredPosts, setFilteredPosts] = useState([]);
 
 	const getPosts = async () => {
-		await PostsService.getAllPosts(user.token).then((postsFromServer) => {
-			appContext.dispatch({ type: "LOAD_POSTS", posts: postsFromServer });
-			setFilteredPosts(HelperFunctions.applyFilters(postsFromServer, filters, user.userId));
+		await PostsService.getAllPosts(user.token).then((requestResult) => {
+			appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
+			setFilteredPosts(HelperFunctions.applyFilters(requestResult.payload, filters, user.userId));
 		});
 	};
 
@@ -48,14 +45,6 @@ const Home = () => {
 				<div className="container">
 					{appContext.posts?.length > 0 ? (
 						<div className="posts__dashboard">
-							<PostFilters
-								onFilterToggle={(isApplied, filter) =>
-									setFilters({
-										...filters,
-										[filter]: isApplied,
-									})
-								}
-							/>
 							<ul className="posts__list">
 								{filteredPosts?.map((p, i) => (
 									<Post

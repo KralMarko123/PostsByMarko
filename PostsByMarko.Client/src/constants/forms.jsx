@@ -2,8 +2,6 @@ import { ICONS } from "./misc";
 
 export const FORMS = {
 	REGISTER_FORM: {
-		action: "POST",
-		formTitle: "REGISTER",
 		formGroups: [
 			{
 				id: "firstName",
@@ -65,16 +63,13 @@ export const FORMS = {
 		],
 	},
 
-	createPostForm: {
-		action: "POST",
-		formTitle: "Create A Post",
+	CREATE_POST_FORM: {
 		formGroups: [
 			{
 				id: "title",
 				label: "Title",
 				type: "text",
 				placeholder: "Title",
-				icon: ICONS.TITLE_ICON(),
 			},
 
 			{
@@ -82,7 +77,6 @@ export const FORMS = {
 				label: "Content",
 				type: "textarea",
 				placeholder: "Content",
-				icon: ICONS.CONTENT_ICON(),
 			},
 		],
 	},

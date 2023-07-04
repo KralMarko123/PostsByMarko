@@ -9,6 +9,7 @@
 	--light-accent: rgb(96, 126, 170);
 	--light-accent-decimal: 96, 126, 170;
 	--error: #ff2800;
+	--success: #50c878;
 
 	/**TEXT*/
 	--main-font: "Roboto", sans-serif;

@@ -8,8 +8,8 @@ const Refetcher = ({ children }) => {
 	const { user } = useAuth();
 
 	const getPosts = async () => {
-		await PostsService.getAllPosts(user.token).then((postsFromServer) => {
-			appContext.dispatch({ type: "LOAD_POSTS", posts: postsFromServer });
+		await PostsService.getAllPosts(user.token).then((requestResult) => {
+			appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
 		});
 	};
 
