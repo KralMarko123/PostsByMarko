@@ -1,8 +1,8 @@
 import { FaUserAlt } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { MdAlternateEmail, MdTitle } from "react-icons/md";
+import { MdAlternateEmail, MdTitle, MdDeleteForever } from "react-icons/md";
 import { AiFillFileText, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { BiSolidUserDetail } from "react-icons/bi";
+import { BiSolidUserDetail, BiSolidPencil } from "react-icons/bi";
 
 //in milliseconds
 export const modalTransitionDuration = 300;
@@ -28,5 +28,11 @@ export const ICONS = {
 	},
 	EYE_ICON(hidden) {
 		return !hidden ? <AiFillEye /> : <AiFillEyeInvisible />;
+	},
+	PENCIL_ICON() {
+		return <BiSolidPencil />;
+	},
+	DELETE_ICON() {
+		return <MdDeleteForever />;
 	},
 };

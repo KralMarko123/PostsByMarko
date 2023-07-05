@@ -14,15 +14,16 @@ import "../Form.css";
 const CreatePostForm = () => {
 	const appContext = useContext(AppContext);
 	const createPostForm = FORMS.CREATE_POST_FORM;
-	const [newPostData, setNewPostData] = useState({
-		title: "",
-		content: "",
-	});
 	const [errorMessage, setErrorMessage] = useState("");
 	const [confirmationalMessage, setConfirmationalMessage] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
 	const { sendMessage } = useSignalR();
+	const [newPostData, setNewPostData] = useState({
+		authorId: user.userId,
+		title: "",
+		content: "",
+	});
 
 	const onClose = () => {
 		appContext.dispatch({ type: "CLOSE_MODAL", modal: "createPost" });
@@ -49,18 +50,17 @@ const CreatePostForm = () => {
 					if (requestResult.statusCode === 201) {
 						sendMessage("Created Post", true);
 						setConfirmationalMessage(requestResult.message);
+						appContext.dispatch({
+							type: "CREATED_POST",
+							post: requestResult.payload,
+						});
+
+						setTimeout(() => {
+							onClose();
+						}, 1000);
 					} else {
 						setErrorMessage(requestResult.message);
 					}
-
-					appContext.dispatch({
-						type: "CREATED_POST",
-						post: response.newPost,
-					});
-
-					setTimeout(() => {
-						onClose();
-					}, 1000);
 				})
 				.finally(setIsLoading(false));
 		}
@@ -69,11 +69,10 @@ const CreatePostForm = () => {
 	return (
 		<Modal
 			isShown={appContext.modalVisibility.createPost}
-			title={createPostForm.formTitle}
+			title="Create A Post"
 			onClose={() => onClose()}
 		>
 			<form method="POST" className="form create-post">
-				<h1 className="form-title">Create A Post</h1>
 				{createPostForm.formGroups.map((group) => (
 					<div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
 						{group.type === "textarea" ? (

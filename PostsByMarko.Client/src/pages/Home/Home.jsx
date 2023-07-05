@@ -3,7 +3,7 @@ import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import { HelperFunctions } from "../../util/helperFunctions";
 import PostsService from "../../api/PostsService";
-import Post from "../../components/Post";
+import Post from "../../components/Post/Post";
 import InfoMessage from "../../components/Helper/InfoMessage";
 import Nav from "../../components/Layout/Nav";
 import UpdatePostForm from "../../components/Forms/UpdatePostForm";

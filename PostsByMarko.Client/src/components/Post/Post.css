@@ -1,30 +1,29 @@
 .post {
 	position: relative;
-	padding: 3em 2em;
+	padding: 2em 1.5em;
 
 	background-color: var(--dark-accent);
-	border-radius: var(--card-radius);
-	box-shadow: var(--simple-shadow);
 
-	align-self: stretch;
 	display: flex;
 	flex-direction: column;
-	gap: var(--small-gap);
+	height: 100%;
+
+	min-height: 200px;
 
 	cursor: pointer;
 }
 
 .post.hidden {
-	opacity: 0.5;
+	opacity: 0.25;
 }
 
 .post:hover {
 	background-color: rgba(var(--dark-accent-decimal), 0.75);
 }
 
-.post__icon {
-	width: 1.75em;
-	height: 1.75em;
+.post-icon {
+	width: 1.5em;
+	height: 1.5em;
 	position: absolute;
 	top: 0.75em;
 
@@ -38,55 +37,42 @@
 	font-size: var(--md-text);
 }
 
-.post__icon:hover {
-	color: var(--light);
-}
-
-.post__hidden {
+.post-icon.hide {
 	left: 1em;
 }
 
-.post__delete {
+.post-icon.delete {
 	right: 1em;
 }
 
-.post__delete {
-	font-weight: bold;
+.post-icon.delete:hover {
+	color: var(--error);
 }
 
-.post__delete:hover {
-	color: var(--danger);
-}
-
-.post__update {
+.post-icon.update {
 	right: 3.5em;
 }
 
-.post__update:hover {
+.post-icon.hide:hover,
+.post-icon.update:hover {
 	color: var(--light);
 }
 
-.post__title,
-.post__content {
+.post-title {
+	margin-top: 0.5em;
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+.post-content {
+	font-size: 0.85rem;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	word-wrap: break-word;
 	display: -webkit-box;
-	-webkit-line-clamp: 1; /* number of lines to show */
-	line-clamp: 1;
 	-webkit-box-orient: vertical;
-}
-
-.post__title {
-	color: var(--light);
-	font-size: var(--big-text);
-	font-weight: bold;
-}
-
-.post__content {
-	text-align: justify;
-	-webkit-line-clamp: 2; /* number of lines to show */
-	line-clamp: 2;
+	-webkit-line-clamp: 3; /* number of lines to show */
+	line-clamp: 3;
 }
 
 /**TABLET*/
@@ -95,12 +81,12 @@
 		padding: 2.5em 1.25em;
 	}
 
-	.post__icon {
+	.post-icon {
 		width: 1.65em;
 		height: 1.65em;
 	}
 
-	.post__delete p {
+	.post-icon.delete {
 		color: var(--danger);
 	}
 }
@@ -109,15 +95,15 @@
 @media (max-width: 767px) {
 	.post {
 		width: 100%;
-		padding: 2.5em var(--normal-padding);
+		padding: 2.5em 1em;
 	}
 
-	.post__icon {
+	.post-icon {
 		width: 1.5em;
 		height: 1.5em;
 	}
 
-	.post__delete p {
+	.post-icon.delete {
 		color: var(--danger);
 	}
 }
