@@ -44,21 +44,20 @@ const Home = () => {
 				<Nav />
 				<div className="container">
 					{appContext.posts?.length > 0 ? (
-						<div className="posts__dashboard">
-							<ul className="posts__list">
-								{filteredPosts?.map((p, i) => (
-									<Post
-										key={p.postId}
-										postId={p.postId}
-										authorId={p.userId}
-										title={p.title}
-										content={p.content}
-										isHidden={p.isHidden}
-										allowedUsers={p.allowedUsers}
-									/>
-								))}
-							</ul>
-						</div>
+						<ul className="posts__list">
+							{filteredPosts?.map((p, i) => (
+								<Post
+									key={p.postId}
+									postId={p.postId}
+									authorId={p.userId}
+									title={p.title}
+									content={p.content}
+									isHidden={p.isHidden}
+									allowedUsers={p.allowedUsers}
+									createdDate={p.createdDate}
+								/>
+							))}
+						</ul>
 					) : (
 						<InfoMessage message="Seems there are no posts" />
 					)}

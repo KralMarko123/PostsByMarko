@@ -2,6 +2,8 @@
 	width: var(--container-width);
 	min-height: var(--header-height);
 
+	margin-bottom: 1em;
+
 	z-index: 1;
 }
 

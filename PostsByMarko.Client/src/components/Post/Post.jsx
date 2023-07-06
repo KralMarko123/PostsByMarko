@@ -6,13 +6,16 @@ import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
 import PostsService from "../../api/PostsService";
 import Card from "../Helper/Card/Card";
+import moment from "moment/moment";
 import "./Post.css";
 
-const Post = ({ postId, authorId, title, content, isHidden }) => {
+const Post = ({ postId, authorId, title, content, isHidden, createdDate }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
 	const { user, isAdmin, isEditor } = useAuth();
 	const isAuthor = authorId === user.userId;
+
+	const readableCreatedDate = moment(createdDate).format("Do MMMM YYYY");
 
 	const handlePostClick = () => {
 		navigate(`.${ROUTES.DETAILS_PREFIX}/${postId}`);
@@ -54,6 +57,7 @@ const Post = ({ postId, authorId, title, content, isHidden }) => {
 						{ICONS.DELETE_ICON()}
 					</span>
 				)}
+				<span className="post-date">{readableCreatedDate}</span>
 				<h1 className="post-title">{title}</h1>
 				<p className="post-content">{content}</p>
 			</div>

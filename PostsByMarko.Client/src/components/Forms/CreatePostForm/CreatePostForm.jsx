@@ -29,6 +29,7 @@ const CreatePostForm = () => {
 		appContext.dispatch({ type: "CLOSE_MODAL", modal: "createPost" });
 		setTimeout(() => {
 			setErrorMessage("");
+			setConfirmationalMessage("");
 			setNewPostData({ title: "", content: "" });
 		}, modalTransitionDuration);
 	};

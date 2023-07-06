@@ -1,4 +1,4 @@
-.home{
+.home {
 	align-items: center;
 }
 
@@ -10,9 +10,9 @@
 	width: 100%;
 
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(calc((100% / 3) - var(--normal-gap)), 0.3333fr));
+	grid-template-columns: repeat(auto-fit, minmax(calc((100% / 4) - var(--normal-gap)), 0.25fr));
 	grid-auto-rows: fit-content;
-	grid-gap: var(--normal-gap);
+	grid-gap: 1em;
 }
 
 .dashboard__filters {
