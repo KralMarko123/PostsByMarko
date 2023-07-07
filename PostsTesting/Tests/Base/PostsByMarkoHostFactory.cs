@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
@@ -8,10 +10,9 @@ using Xunit;
 
 namespace PostsByMarko.FrontendTests
 {
-    public class BaseFixture : WebApplicationFactory<IApiMarker>, IAsyncLifetime
+    public class PostsByMarkoHostFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
     {
-        public HttpClient client;
-
+        public static TestServer testServer { get; private set; }
         public BrowserDriver driver;
         public IBrowser browser;
         public IPage page;
@@ -20,16 +21,19 @@ namespace PostsByMarko.FrontendTests
 
         public async Task InitializeAsync()
         {
-            client = CreateClient();
-            
             driver = new BrowserDriver();
             browser = await driver.GetChromeBrowserAsync();
             page = await browser.NewPageAsync();
+
+            testServer = Server;
+            var neso = testServer.CreateClient();
+            neso.BaseAddress = new Uri("http://localhost:7171");
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Development");
+
         }
 
         public async new Task DisposeAsync()

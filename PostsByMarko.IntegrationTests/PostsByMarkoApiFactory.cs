@@ -11,7 +11,7 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    public class BaseFixture : WebApplicationFactory<IApiMarker>, IAsyncLifetime
+    public class PostsByMarkoApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
     {
         public HttpClient client;
 

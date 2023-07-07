@@ -10,9 +10,9 @@ namespace PostsByMarko.IntegrationTests
     public class EmailControllerTests
     {
         private readonly HttpClient client;
-        public EmailControllerTests(BaseFixture baseFixture)
+        public EmailControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = baseFixture.client;
+            client = postsByMarkoApiFactory.client;
         }
 
         [Fact]

@@ -13,9 +13,9 @@ namespace PostsByMarko.IntegrationTests
     public class AuthControllerTests
     {
         private readonly HttpClient client;
-        public AuthControllerTests(BaseFixture baseFixture)
+        public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = baseFixture.client;
+            client = postsByMarkoApiFactory.client;
         }
 
         [Fact]
