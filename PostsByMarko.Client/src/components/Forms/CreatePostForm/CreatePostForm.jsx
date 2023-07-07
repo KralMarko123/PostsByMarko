@@ -1,15 +1,16 @@
 import { React, useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
-import { modalTransitionDuration } from "../../../constants/misc";
+import { modalTransitionDuration } from "../../../constants/icons";
 import { useSignalR } from "../../../custom/useSignalR";
 import PostsService from "../../../api/PostsService";
 import Button from "../../Helper/Button/Button";
-import Modal from "../../Helper/Modal";
+import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
 import { HelperFunctions } from "../../../util/helperFunctions";
 import "./CreatePostForm.css";
 import "../Form.css";
+import Card from "../../Helper/Card/Card";
 
 const CreatePostForm = () => {
 	const appContext = useContext(AppContext);
@@ -27,11 +28,9 @@ const CreatePostForm = () => {
 
 	const onClose = () => {
 		appContext.dispatch({ type: "CLOSE_MODAL", modal: "createPost" });
-		setTimeout(() => {
-			setErrorMessage("");
-			setConfirmationalMessage("");
-			setNewPostData({ title: "", content: "" });
-		}, modalTransitionDuration);
+		setErrorMessage("");
+		setConfirmationalMessage("");
+		setNewPostData({ title: "", content: "" });
 	};
 
 	const noEmptyFields = () => {
@@ -74,6 +73,8 @@ const CreatePostForm = () => {
 			onClose={() => onClose()}
 		>
 			<form method="POST" className="form create-post">
+				<h1 className="form-title">Create post</h1>
+				<p className="form-desc">Build & share with your friends</p>
 				{createPostForm.formGroups.map((group) => (
 					<div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
 						{group.type === "textarea" ? (
@@ -93,7 +94,7 @@ const CreatePostForm = () => {
 								onChange={(e) =>
 									setNewPostData({ ...newPostData, [`${group.id}`]: e.currentTarget.value })
 								}
-								placeholder="What should this post be about?"
+								placeholder="What should the title for this post be?"
 							/>
 						)}
 						{group.icon}
@@ -107,7 +108,7 @@ const CreatePostForm = () => {
 
 				{errorMessage && <p className="error">{errorMessage}</p>}
 				{confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
-			</form>
+			</form>{" "}
 		</Modal>
 	);
 };

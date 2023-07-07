@@ -1,7 +1,7 @@
 import { React, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import { ICONS } from "../../constants/misc";
+import { ICONS } from "../../constants/icons";
 import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
 import PostsService from "../../api/PostsService";
@@ -9,32 +9,32 @@ import Card from "../Helper/Card/Card";
 import moment from "moment/moment";
 import "./Post.css";
 
-const Post = ({ postId, authorId, title, content, isHidden, createdDate }) => {
+const Post = ({ id, authorId, title, content, isHidden, createdDate }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
 	const { user, isAdmin, isEditor } = useAuth();
 	const isAuthor = authorId === user.userId;
-
 	const readableCreatedDate = moment(createdDate).format("Do MMMM YYYY");
 
 	const handlePostClick = () => {
-		navigate(`.${ROUTES.DETAILS_PREFIX}/${postId}`);
+		navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
 	};
 
 	const handleModalToggle = (e, modalToToggle) => {
 		e.stopPropagation();
 		appContext.dispatch({
 			type: "MODIFYING_POST",
-			post: { postId: postId, title: title, content: content },
+			post: { id: id, title: title, content: content },
 		});
 		appContext.dispatch({ type: "SHOW_MODAL", modal: modalToToggle });
 	};
 
 	const handleHiddenToggle = async (e) => {
 		e.stopPropagation();
-		await PostsService.togglePostVisibility(postId, user.token)
-			.then(() => appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", postId: postId }))
-			.catch((error) => console.log(error.message));
+		await PostsService.togglePostVisibility(id, user.token).then((requestResult) => {
+			if (requestResult.statusCode === 200)
+				appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });
+		});
 	};
 
 	return (

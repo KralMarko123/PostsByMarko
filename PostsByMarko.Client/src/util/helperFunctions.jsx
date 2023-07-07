@@ -33,29 +33,6 @@ export const HelperFunctions = {
 		}
 	},
 
-	applyFilters(posts, filters, userId) {
-		let filteredPosts = posts;
-
-		Object.entries(filters).forEach((filter) => {
-			const [name, isApplied] = filter;
-
-			switch (name) {
-				case "showOnlyMyPosts":
-					filteredPosts = isApplied ? this.showOnlyMyPosts(filteredPosts, userId) : filteredPosts;
-					break;
-				case "showHiddenPosts":
-					filteredPosts = isApplied ? filteredPosts : this.filterHiddenPosts(posts, false);
-					break;
-
-				default:
-					break;
-			}
-		});
-
-		this.sortPostsByLastUpdatedDate(filteredPosts);
-		return filteredPosts;
-	},
-
 	sortPostsByLastUpdatedDate(posts) {
 		posts.length > 0
 			? posts.sort((p1, p2) => {
@@ -65,13 +42,5 @@ export const HelperFunctions = {
 					return date1 > date2 ? -1 : 1;
 			  })
 			: null;
-	},
-
-	showOnlyMyPosts(posts, userId) {
-		return posts.length > 0 ? posts.filter((p) => p.userId === userId) : posts;
-	},
-
-	filterHiddenPosts(posts, hidden) {
-		return posts.length > 0 ? posts.filter((p) => p.isHidden === hidden) : posts;
 	},
 };

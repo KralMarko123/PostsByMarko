@@ -1,7 +1,7 @@
 import { FaUserAlt } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { MdAlternateEmail, MdTitle, MdDeleteForever } from "react-icons/md";
-import { AiFillFileText, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { MdAlternateEmail, MdDeleteForever } from "react-icons/md";
+import { AiFillFileText, AiFillEye, AiFillEyeInvisible, AiFillPushpin } from "react-icons/ai";
 import { BiSolidUserDetail, BiSolidPencil } from "react-icons/bi";
 
 //in milliseconds
@@ -20,8 +20,8 @@ export const ICONS = {
 	EMAIL_ICON() {
 		return <MdAlternateEmail />;
 	},
-	TITLE_ICON() {
-		return <MdTitle />;
+	PIN_ICON() {
+		return <AiFillPushpin />;
 	},
 	CONTENT_ICON() {
 		return <AiFillFileText />;

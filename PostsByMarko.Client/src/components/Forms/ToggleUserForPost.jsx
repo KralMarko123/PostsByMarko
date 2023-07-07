@@ -1,8 +1,8 @@
 import { React, useContext, useEffect, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
-import { modalTransitionDuration } from "../../constants/misc";
-import Modal from "../Helper/Modal";
+import { modalTransitionDuration } from "../../constants/icons";
+import Modal from "../Helper/Modal/Modal";
 import AppContext from "../../context/AppContext";
 import Button from "../Helper/Button/Button";
 import UsersService from "../../api/UsersService";

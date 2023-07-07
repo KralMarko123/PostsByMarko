@@ -82,8 +82,7 @@ const PostsService = {
 			},
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode !== 200) throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 

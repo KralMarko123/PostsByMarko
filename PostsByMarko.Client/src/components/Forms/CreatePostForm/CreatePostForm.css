@@ -1,9 +1,13 @@
-.form.create-post .form-title {
-	align-self: center;
+.create-post .input {
+	font-size: 1rem;
+	padding-left: 2.5em;
 }
 
-.form.create-post .error,
-.form.create-post .success {
-	align-self: center;
-	font-size: 1.5rem;
+.create-post .input-text {
+	font-size: 0.85rem;
+	padding-left: 1em;
+}
+
+.modal-container {
+	width: 40%;
 }

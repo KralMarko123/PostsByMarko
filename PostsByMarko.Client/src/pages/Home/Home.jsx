@@ -1,7 +1,6 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
-import { HelperFunctions } from "../../util/helperFunctions";
 import PostsService from "../../api/PostsService";
 import Post from "../../components/Post/Post";
 import InfoMessage from "../../components/Helper/InfoMessage";
@@ -17,26 +16,18 @@ const Home = () => {
 	const appContext = useContext(AppContext);
 	const { user } = useAuth();
 	const { lastMessageRegistered } = useSignalR();
-	const [filters, setFilters] = useState({
-		showOnlyMyPosts: false,
-		showHiddenPosts: false,
-	});
-	const [filteredPosts, setFilteredPosts] = useState([]);
+	const [posts, setPosts] = useState([]);
 
 	const getPosts = async () => {
 		await PostsService.getAllPosts(user.token).then((requestResult) => {
+			setPosts(requestResult.payload);
 			appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
-			setFilteredPosts(HelperFunctions.applyFilters(requestResult.payload, filters, user.userId));
 		});
 	};
 
 	useEffect(() => {
 		getPosts();
-	}, [lastMessageRegistered]);
-
-	useEffect(() => {
-		setFilteredPosts([...HelperFunctions.applyFilters(appContext.posts, filters, user.userId)]);
-	}, [filters, appContext.posts]);
+	}, [lastMessageRegistered, appContext.posts]);
 
 	return (
 		<Refetcher>
@@ -45,10 +36,10 @@ const Home = () => {
 				<div className="container">
 					{appContext.posts?.length > 0 ? (
 						<ul className="posts__list">
-							{filteredPosts?.map((p, i) => (
+							{posts.map((p) => (
 								<Post
-									key={p.postId}
-									postId={p.postId}
+									key={p.id}
+									id={p.id}
 									authorId={p.userId}
 									title={p.title}
 									content={p.content}

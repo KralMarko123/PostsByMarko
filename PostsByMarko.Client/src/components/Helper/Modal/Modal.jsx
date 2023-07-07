@@ -1,10 +1,13 @@
 import { React, useEffect } from "react";
 import { CSSTransition } from "react-transition-group";
-import { modalTransitionDuration } from "../../constants/misc";
 import ReactDOM from "react-dom";
-import "../../styles/components/Modal.css";
+import "./Modal.css";
 
 const Modal = (props) => {
+	// in milliseconds
+	// should you change this varialbe be sure to change it in the CSS aswell
+	const modalTransitionDuration = 300;
+
 	const onClose = () => {
 		props.onClose();
 	};
@@ -22,20 +25,11 @@ const Modal = (props) => {
 	return ReactDOM.createPortal(
 		<CSSTransition
 			in={props.isShown}
-			timeout={{ enter: 0, exit: modalTransitionDuration }}
 			unmountOnExit
+			timeout={{ enter: 0, exit: modalTransitionDuration }}
 		>
-			<div
-				className="modal"
-				onClick={() => onClose()}
-				style={{ transitionDuration: `${modalTransitionDuration / 1000}s` }}
-			>
-				<div
-					className="modal__container"
-					onClick={(e) => e.stopPropagation()}
-					style={{ transitionDuration: `${modalTransitionDuration / 1000}s` }}
-				>
-					<h1 className="modal__title">{props.title}</h1>
+			<div className="modal" onClick={() => onClose()}>
+				<div className="modal-container" onClick={(e) => e.stopPropagation()}>
 					{props.children}
 				</div>
 			</div>

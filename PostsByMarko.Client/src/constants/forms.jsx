@@ -1,4 +1,4 @@
-import { ICONS } from "./misc";
+import { ICONS } from "./icons";
 
 export const FORMS = {
 	REGISTER_FORM: {
@@ -70,6 +70,7 @@ export const FORMS = {
 				label: "Title",
 				type: "text",
 				placeholder: "Title",
+				icon: ICONS.PIN_ICON(),
 			},
 
 			{
@@ -90,7 +91,7 @@ export const FORMS = {
 				label: "Title",
 				type: "text",
 				placeholder: "Title",
-				icon: ICONS.TITLE_ICON(),
+				icon: ICONS.PIN_ICON(),
 			},
 
 			{

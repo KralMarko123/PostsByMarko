@@ -1,11 +1,11 @@
 import { React, useContext, useState, useEffect } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { FORMS } from "../../constants/forms";
-import { modalTransitionDuration } from "../../constants/misc";
+import { modalTransitionDuration } from "../../constants/icons";
 import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Button from "../Helper/Button/Button";
-import Modal from "../Helper/Modal";
+import Modal from "../Helper/Modal/Modal";
 import AppContext from "../../context/AppContext";
 
 const UpdatePostForm = () => {
