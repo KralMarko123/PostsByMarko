@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Decorators;
@@ -12,7 +11,7 @@ namespace PostsByMarko.Host.Controllers;
 public class PostsController : BaseController
 {
     private readonly IPostsService postsService;
-    public PostsController(IPostsService postsService, IMapper mapper) : base(mapper)
+    public PostsController(IPostsService postsService) : base()
     {
         this.postsService = postsService;
     }

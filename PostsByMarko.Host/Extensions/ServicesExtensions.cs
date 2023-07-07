@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PostsByMarko.Host.Data;
-using PostsByMarko.Host.Data.Mappings;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Repos.Posts;
 using PostsByMarko.Host.Data.Repos.Users;
@@ -121,9 +119,6 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithServices(this WebApplicationBuilder builder)
         {
-            var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
-
-            builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
             builder.Services.AddScoped<IPostsService, PostsService>();
             builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IPostsRepository, PostsRepository>();

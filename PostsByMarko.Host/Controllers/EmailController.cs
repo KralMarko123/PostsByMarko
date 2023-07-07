@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Services;
 
@@ -11,7 +10,7 @@ namespace PostsByMarko.Host.Controllers
         private readonly IUsersService usersService;
         private readonly IConfiguration configuration;
 
-        public EmailController(IUsersService usersService, IMapper mapper, IConfiguration configuration) : base(mapper)
+        public EmailController(IUsersService usersService, IConfiguration configuration) : base()
         {
             this.usersService = usersService;
             this.configuration = configuration;

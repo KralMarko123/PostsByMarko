@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using PostsByMarko.Host.Builders;
+﻿using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
@@ -12,13 +11,11 @@ namespace PostsByMarko.Host.Services
     {
         private readonly IUsersRepository usersRepository;
         private readonly IJwtHelper jwtHelper;
-        private readonly IMapper mapper;
 
-        public UsersService(IUsersRepository usersRepository, IJwtHelper jwtHelper, IMapper mapper)
+        public UsersService(IUsersRepository usersRepository, IJwtHelper jwtHelper)
         {
             this.usersRepository = usersRepository;
             this.jwtHelper = jwtHelper;
-            this.mapper = mapper;
         }
 
         public async Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)

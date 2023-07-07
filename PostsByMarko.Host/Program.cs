@@ -1,9 +1,9 @@
-using AutoMapper;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data;
-using PostsByMarko.Host.Data.Mappings;
+
 using PostsByMarko.Host.Extensions;
 using PostsByMarko.Host.Hubs;
 using Serilog;
@@ -12,7 +12,6 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
-var mapperConfiguration = new MapperConfiguration(mappperOptions => mappperOptions.AddProfile<UserMappingProfile>());
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");

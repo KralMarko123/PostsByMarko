@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PostsByMarko.Host\PostsByMarko.Host.csproj" />
-    <ProjectReference Include="..\PostsByMarko.Shared\PostsByMarko.Shared.csproj" />
+    <ProjectReference Include="..\PostsByMarko.Shared\PostsByMarko.Test.Shared.csproj" />
   </ItemGroup>
 
 </Project>

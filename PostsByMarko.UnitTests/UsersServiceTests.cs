@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -16,12 +15,11 @@ namespace PostsByMarko.UnitTests
         private readonly UsersService service;
         private readonly Mock<IUsersRepository> usersRepositoryMock = new Mock<IUsersRepository>();
         private readonly Mock<IJwtHelper> jwtHelperMock = new Mock<IJwtHelper>();
-        private readonly Mock<IMapper> autoMapperMock = new Mock<IMapper>();
 
 
         public UsersServiceTests()
         {
-            service = new UsersService(usersRepositoryMock.Object, jwtHelperMock.Object, autoMapperMock.Object);
+            service = new UsersService(usersRepositoryMock.Object, jwtHelperMock.Object);
         }
 
         [Fact]
@@ -55,7 +53,6 @@ namespace PostsByMarko.UnitTests
             };
             var registeredUser = new User(userToRegister.Email);
 
-            autoMapperMock.Setup(am => am.Map<User>(userToRegister)).Returns(registeredUser);
             usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(registeredUser, userToRegister.Password)).ReturnsAsync(() => false);
 
             // Act

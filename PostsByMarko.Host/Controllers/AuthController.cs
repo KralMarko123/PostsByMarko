@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -16,7 +15,7 @@ public class AuthController : BaseController
     private readonly IUsersService usersService;
     private readonly IEmailHelper emailHelper;
 
-    public AuthController(IUsersService usersService, IEmailHelper emailHelper, IMapper mapper) : base(mapper)
+    public AuthController(IUsersService usersService, IEmailHelper emailHelper) : base()
     {
         this.usersService = usersService;
         this.emailHelper = emailHelper;

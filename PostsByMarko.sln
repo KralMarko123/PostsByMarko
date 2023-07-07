@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostsByMarko.UnitTests", "P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostsByMarko.IntegrationTests", "PostsByMarko.IntegrationTests\PostsByMarko.IntegrationTests.csproj", "{F6491945-9369-4410-8293-C7348AEFDD5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostsByMarko.Shared", "PostsByMarko.Shared\PostsByMarko.Shared.csproj", "{D8D9311D-5210-4433-874C-67BAF90D5ED7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostsByMarko.Test.Shared", "PostsByMarko.Shared\PostsByMarko.Test.Shared.csproj", "{D8D9311D-5210-4433-874C-67BAF90D5ED7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{959F035B-225C-480F-A988-4E323221F06E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0B46F23B-B977-472A-8C66-0C03195C28BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{272BE9DF-3CD6-4D2D-B571-B6D3A3DEF34F} = {959F035B-225C-480F-A988-4E323221F06E}
+		{667CDB6E-52E2-4B68-9AF1-C97630F6C6F5} = {0B46F23B-B977-472A-8C66-0C03195C28BF}
+		{BD93B694-5DE6-42FE-9C9A-E587AFD1DB8C} = {0B46F23B-B977-472A-8C66-0C03195C28BF}
+		{F6491945-9369-4410-8293-C7348AEFDD5A} = {0B46F23B-B977-472A-8C66-0C03195C28BF}
+		{D8D9311D-5210-4433-874C-67BAF90D5ED7} = {0B46F23B-B977-472A-8C66-0C03195C28BF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B003471D-F450-46E8-B648-98843B0D8550}

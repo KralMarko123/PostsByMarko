@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Data.Models;
 using System.Security.Claims;
 
@@ -8,11 +7,9 @@ namespace PostsByMarko.Host.Controllers;
 [ApiController]
 public class BaseController : ControllerBase
 {
-    protected readonly IMapper mapper;
     protected RequestUser user;
-    public BaseController(IMapper mapper)
+    public BaseController()
     {
-        this.mapper = mapper;
         user = new RequestUser { };
     }
 
