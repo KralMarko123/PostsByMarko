@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace PostsByMarko.FrontendTests
+namespace PostsByMarko.FrontendTests.Tests
 {
 
     [CollectionDefinition("Frontend Collection")]

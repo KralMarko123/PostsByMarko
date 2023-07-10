@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsTesting.Utility.Pages;
+using PostsTesting.UI_Models.Components;
 
-namespace PostsTesting.Utility.UI_Models.Pages
+namespace PostsTesting.UI_Models.Pages
 {
     public class HomePage : Page
     {

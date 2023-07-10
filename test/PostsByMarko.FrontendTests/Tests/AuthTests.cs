@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using PostsByMarko.FrontendTests.Tests;
 using PostsByMarko.Host.Data.Models;
-using PostsTesting.Utility.UI_Models.Pages;
+using PostsTesting.UI_Models.Pages;
 using Xunit;
 
 namespace PostsByMarko.FrontendTests.Frontend

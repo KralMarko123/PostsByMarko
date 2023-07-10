@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 
-namespace PostsTesting.Utility.UI_Models
+namespace PostsTesting.UI_Models
 {
     public class Shared
     {

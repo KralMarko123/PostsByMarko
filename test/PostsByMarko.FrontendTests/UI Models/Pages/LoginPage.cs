@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
 
-namespace PostsTesting.Utility.UI_Models.Pages
+namespace PostsTesting.UI_Models.Pages
 {
     public class LoginPage : Page
     {

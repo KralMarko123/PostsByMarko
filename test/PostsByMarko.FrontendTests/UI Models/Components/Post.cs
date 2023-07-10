@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsTesting.Utility.UI_Models.Components;
+using PostsTesting.UI_Models.Components;
 
-namespace PostsTesting.Utility.Pages
+namespace PostsTesting.UI_Models.Components
 {
     public class Post : Component
     {

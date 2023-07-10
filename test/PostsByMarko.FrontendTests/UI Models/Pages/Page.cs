@@ -1,7 +1,7 @@
 ﻿using Microsoft.Playwright;
 using PostsByMarko.Shared.Constants;
 
-namespace PostsTesting.Utility.UI_Models.Pages
+namespace PostsTesting.UI_Models.Pages
 {
     public class Page : Shared
     {

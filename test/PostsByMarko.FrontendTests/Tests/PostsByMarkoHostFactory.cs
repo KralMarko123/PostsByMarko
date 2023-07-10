@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
+using PostsByMarko.FrontendTests.Drivers;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
-using PostsTesting.Utility;
 using Xunit;
 
-namespace PostsByMarko.FrontendTests
+namespace PostsByMarko.FrontendTests.Tests
 {
     public class PostsByMarkoHostFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
     {

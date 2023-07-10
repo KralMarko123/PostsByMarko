@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 
-namespace PostsTesting.Utility
+namespace PostsByMarko.FrontendTests.Drivers
 {
     public class BrowserDriver
     {
