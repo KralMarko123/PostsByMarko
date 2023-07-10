@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { ROUTES } from "./constants/routes";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import Home from "./pages/Home/Home";
-import Details from "./pages/Details";
+import Details from "./pages/Details/Details";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import AppProvider from "./context/ContextProvider";

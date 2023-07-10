@@ -5,6 +5,7 @@ import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../custom/useAuth";
 import logo from "../../assets/images/POSM_icon.png";
 import Card from "../../components/Helper/Card/Card";
+import Container from "../../components/Layout/Container/Container";
 import "../Page.css";
 import "./Login.css";
 
@@ -19,11 +20,11 @@ const Login = () => {
 	return (
 		<div className="login page">
 			<img src={logo} className="logo" alt="posm-logo" />
-			<div className="container">
+			<Container>
 				<Card>
 					<LoginForm />
 				</Card>
-			</div>
+			</Container>
 		</div>
 	);
 };

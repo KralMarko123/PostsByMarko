@@ -6,8 +6,8 @@ import { useSessionStorage } from "./useSessionStorage";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useSessionStorage("user", null);
 	const navigate = useNavigate();
+	const [user, setUser] = useSessionStorage("user", null);
 	const isAdmin = user?.roles.includes("Admin");
 	const isEditor = user?.roles.includes("Editor");
 

@@ -51,10 +51,7 @@ const PostsService = {
 			body: JSON.stringify(postToUpdate),
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode === 200)
-				return { isSuccessful: true, message: requestResult.message };
-			else throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 
@@ -66,10 +63,7 @@ const PostsService = {
 			},
 		}).then(async (response) => {
 			const requestResult = await response.json();
-
-			if (requestResult.statusCode === 200)
-				return { isSuccessful: true, message: requestResult.message };
-			else throw new Error(requestResult.message);
+			return requestResult;
 		});
 	},
 

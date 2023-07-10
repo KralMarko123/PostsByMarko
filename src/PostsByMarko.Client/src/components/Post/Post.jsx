@@ -9,7 +9,7 @@ import Card from "../Helper/Card/Card";
 import moment from "moment/moment";
 import "./Post.css";
 
-const Post = ({ id, authorId, title, content, isHidden, createdDate }) => {
+const Post = ({ id, authorId, title, content, isHidden, createdDate, index }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
 	const { user, isAdmin, isEditor } = useAuth();
@@ -31,6 +31,7 @@ const Post = ({ id, authorId, title, content, isHidden, createdDate }) => {
 
 	const handleHiddenToggle = async (e) => {
 		e.stopPropagation();
+
 		await PostsService.togglePostVisibility(id, user.token).then((requestResult) => {
 			if (requestResult.statusCode === 200)
 				appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });
@@ -39,7 +40,11 @@ const Post = ({ id, authorId, title, content, isHidden, createdDate }) => {
 
 	return (
 		<Card>
-			<div className={`post ${isHidden ? "hidden" : ""}`} onClick={() => handlePostClick()}>
+			<div
+				className={`post ${isHidden ? "hidden" : ""}`}
+				onClick={() => handlePostClick()}
+				style={{ animationDelay: `${index * 0.15}s` }}
+			>
 				{(isAuthor || isAdmin) && (
 					<>
 						<span className="post-icon hide" onClick={(e) => handleHiddenToggle(e)}>

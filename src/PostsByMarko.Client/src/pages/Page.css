@@ -8,3 +8,29 @@
 	background-color: var(--dark);
 	color: var(--text-color);
 }
+
+.logo {
+	width: 100px;
+	position: absolute;
+	top: 1em;
+	left: 1em;
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+	.logo {
+		width: 100px;
+		position: absolute;
+		top: 1em;
+		left: 1em;
+	}
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+	.logo {
+		width: 25%;
+		position: static;
+		margin-bottom: 1em;
+	}
+}

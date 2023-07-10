@@ -9,7 +9,7 @@ const AppContext = createContext({
 		addUserToPost: false,
 	},
 	postBeingModified: {
-		postId: null,
+		id: null,
 		title: "",
 		content: "",
 		index: null,

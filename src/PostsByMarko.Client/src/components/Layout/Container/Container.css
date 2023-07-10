@@ -1,0 +1,17 @@
+.container {
+	width: var(--container-width);
+}
+
+.container-title {
+	width: 100%;
+
+	font-size: 3rem;
+	font-weight: bold;
+}
+
+.container-desc {
+	font-size: 1rem;
+	color: var(--light);
+
+	margin-bottom: 1em;
+}

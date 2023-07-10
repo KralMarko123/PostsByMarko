@@ -10,8 +10,8 @@ export const useSignalR = () => {
 			.withUrl(ENDPOINT__URLS.HUB, {
 				accessTokenFactory: () => user.token,
 			})
-			.withAutomaticReconnect()
 			.configureLogging(LogLevel.Information)
+			.withAutomaticReconnect()
 			.build(),
 
 		async sendMessage(message, toAll = true) {
@@ -31,14 +31,14 @@ export const useSignalR = () => {
 						setSignalR({ ...signalR, lastMessageRegistered: message });
 					});
 				})
-				.catch((error) => console.error(`Connection failed with error: ${error}`));
+				.catch((error) => console.error(`SignalR connection	 failed with error: ${error}`));
 		}
 	}, [signalR.connection]);
 
 	const sendMessageToHub = async (message, toAll = false) => {
 		if (signalR.connection) {
 			try {
-				await signalR.connection.send(toAll ? "SendMessageToAll" : "SendMessageToOthers", message);
+				await signalR.connection.invoke(toAll ? "SendMessageToAll" : "SendMessageToOthers", message);
 			} catch (error) {
 				console.error(error);
 			}

@@ -3,12 +3,12 @@ import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Post from "../../components/Post/Post";
-import InfoMessage from "../../components/Helper/InfoMessage";
 import Nav from "../../components/Layout/Nav";
-import UpdatePostForm from "../../components/Forms/UpdatePostForm";
-import DeletePostForm from "../../components/Forms/DeletePostForm";
+import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
+import UpdatePostForm from "../../components/Forms/UpdatePostForm/UpdatePostForm";
 import AppContext from "../../context/AppContext";
-import Refetcher from "../../components/Helper/Refetcher";
+import Container from "../../components/Layout/Container/Container";
+import logo from "../../assets/images/POSM_icon.png";
 import "../Page.css";
 import "./Home.css";
 
@@ -27,36 +27,41 @@ const Home = () => {
 
 	useEffect(() => {
 		getPosts();
-	}, [lastMessageRegistered, appContext.posts]);
+	}, [lastMessageRegistered, appContext.posts.length]);
 
 	return (
-		<Refetcher>
-			<div className="home page">
-				<Nav />
-				<div className="container">
-					{appContext.posts?.length > 0 ? (
-						<ul className="posts__list">
-							{posts.map((p) => (
-								<Post
-									key={p.id}
-									id={p.id}
-									authorId={p.userId}
-									title={p.title}
-									content={p.content}
-									isHidden={p.isHidden}
-									allowedUsers={p.allowedUsers}
-									createdDate={p.createdDate}
-								/>
-							))}
-						</ul>
-					) : (
-						<InfoMessage message="Seems there are no posts" />
-					)}
-					<UpdatePostForm />
-					<DeletePostForm />
-				</div>
-			</div>
-		</Refetcher>
+		<div className="home page">
+			<img src={logo} className="logo" alt="posm-logo" />
+
+			<Nav />
+
+			<Container
+				title="Today's Posts"
+				desc="Check out what's going on with the world. Create, edit & inspire"
+			>
+				{appContext.posts?.length > 0 ? (
+					<ul className="posts__list">
+						{posts.map((p, i) => (
+							<Post
+								key={p.id}
+								id={p.id}
+								authorId={p.userId}
+								title={p.title}
+								content={p.content}
+								isHidden={p.isHidden}
+								allowedUsers={p.allowedUsers}
+								createdDate={p.createdDate}
+								index={i}
+							/>
+						))}
+					</ul>
+				) : (
+					<h1>Seems there are no posts</h1>
+				)}
+				<UpdatePostForm />
+				<DeletePostForm />
+			</Container>
+		</div>
 	);
 };
 

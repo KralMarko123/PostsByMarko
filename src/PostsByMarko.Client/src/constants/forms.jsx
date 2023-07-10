@@ -82,9 +82,7 @@ export const FORMS = {
 		],
 	},
 
-	updatePostForm: {
-		action: "POST",
-		formTitle: "Update Post",
+	UPDATE_POST_FORM: {
 		formGroups: [
 			{
 				id: "title",
@@ -99,7 +97,6 @@ export const FORMS = {
 				label: "Content",
 				type: "textarea",
 				placeholder: "Content",
-				icon: ICONS.CONTENT_ICON(),
 			},
 		],
 	},

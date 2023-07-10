@@ -10,7 +10,7 @@ export const defaultAppState = {
 		addUserToPost: false,
 	},
 	postBeingModified: {
-		postId: null,
+		id: null,
 		title: "",
 		content: "",
 		index: null,
@@ -35,10 +35,10 @@ export const appReducer = (state, action) => {
 			return { ...state, postBeingModified: action.post };
 
 		case "DELETED_POST":
-			return { ...state, posts: [...state.posts.filter((p) => p.postId !== action.postId)] };
+			return { ...state, posts: [...state.posts.filter((p) => p.id !== action.id)] };
 
 		case "UPDATED_POST":
-			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.post.postId);
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.id === action.post.id);
 			posts = [...state.posts];
 
 			posts[postBeingModifiedIndex].title = action.post.title;
@@ -55,7 +55,7 @@ export const appReducer = (state, action) => {
 			return { ...state, posts: posts };
 
 		case "TOGGLE_POST_HIDDEN":
-			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId === action.postId);
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.id === action.id);
 			posts = [...state.posts];
 
 			posts[postBeingModifiedIndex].isHidden = !posts[postBeingModifiedIndex].isHidden;
@@ -64,7 +64,7 @@ export const appReducer = (state, action) => {
 			return { ...state, posts: posts };
 
 		case "TOGGLED_USER":
-			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.postId == action.postId);
+			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.id == action.id);
 			posts = [...state.posts];
 
 			if (action.isAdded) posts[postBeingModifiedIndex].allowedUsers.push(action.username);
