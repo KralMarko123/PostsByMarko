@@ -9,6 +9,7 @@ namespace PostsByMarko.Host.Data.Models
         public override bool EmailConfirmed { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public byte[]? ProfilePicture { get; set; }
 
         [NotMapped]
         public List<string> PostIds { get; set; } = new List<string>();

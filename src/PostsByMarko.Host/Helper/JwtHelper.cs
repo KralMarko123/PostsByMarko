@@ -30,7 +30,7 @@ namespace PostsByMarko.Host.Helper
         private SigningCredentials GetSigningCredentials()
         {
             var jwtConfig = configuration.GetSection("JwtConfig");
-            var key = Encoding.UTF8.GetBytes(jwtConfig["secret"]);
+            var key = Encoding.UTF8.GetBytes(jwtConfig["secret"]!);
             var secret = new SymmetricSecurityKey(key);
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -41,8 +41,8 @@ namespace PostsByMarko.Host.Helper
             var jwtConfig = configuration.GetSection("JwtConfig");
             var token = new JwtSecurityToken
             (
-            issuer: jwtConfig.GetSection("validIssuers").Get<List<string>>().FirstOrDefault(),
-            audience: jwtConfig.GetSection("validAudiences").Get<List<string>>().FirstOrDefault(),
+            issuer: jwtConfig.GetSection("validIssuers")!.Get<List<string>>()!.FirstOrDefault(),
+            audience: jwtConfig.GetSection("validAudiences")!.Get<List<string>>()!.FirstOrDefault(),
             claims: claims,
             expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
             signingCredentials: signingCredentials

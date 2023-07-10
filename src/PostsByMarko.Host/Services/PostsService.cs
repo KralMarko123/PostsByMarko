@@ -29,20 +29,20 @@ namespace PostsByMarko.Host.Services
 
         public async Task<RequestResult> GetPostByIdAsync(string postId, RequestUser user)
         {
+            var notfoundRequest = new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
+            var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
             var post = await postsRepository.GetPostByIdAsync(postId);
 
-            if (post == null) return new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
-
-            if (post.IsHidden && !post.AllowedUsers.Contains(user.Email) && !user.Roles!.Contains(RoleConstants.ADMIN))
-                return new RequestResultBuilder().Unauthorized().WithMessage($"Post with Id: {postId} is hidden").Build();
+            if (post == null) return notfoundRequest;
+            if (post.IsHidden && !post.AllowedUsers.Contains(user.Email) && !user.Roles!.Contains(RoleConstants.ADMIN)) return unauthorizedRequest;
 
             var postAuthor = await usersRepository.GetUserByIdAsync(post.AuthorId!);
 
             return new RequestResultBuilder().Ok().WithPayload(new PostDetailsResponse
             {
                 Post = post,
-                AuthorFirstName = postAuthor.FirstName,
-                AuthorLastName = postAuthor.LastName,
+                AuthorFirstName = postAuthor?.FirstName,
+                AuthorLastName = postAuthor?.LastName,
             }).Build();
         }
 

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data;
-
 using PostsByMarko.Host.Extensions;
 using PostsByMarko.Host.Hubs;
 using Serilog;
@@ -23,14 +22,18 @@ builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 builder.WithCors(MiscConstants.CORS_POLICY_NAME, allowedOrigins!);
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString!));
 builder.WithServices();
 builder.WithIdentity();
 builder.Services.AddEndpointsApiExplorer();
@@ -64,7 +67,9 @@ if (isInLocalDevelopment)
 }
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
+
 if (!isInLocalDevelopment || isInDocker != null) app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<PostHub>("/postHub");
