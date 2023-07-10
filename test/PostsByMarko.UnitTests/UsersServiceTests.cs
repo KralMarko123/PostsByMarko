@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -49,7 +50,7 @@ namespace PostsByMarko.UnitTests
             var userToRegister = new UserRegistrationDto
             {
                 Email = "test_user@test.com",
-                Password = "test_password"
+                Password = "test_password",
             };
             var registeredUser = new User(userToRegister.Email);
 

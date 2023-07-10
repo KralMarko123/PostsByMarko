@@ -1,4 +1,4 @@
-# PostsASPProject
+# PostsByMarko
 
 > An ASP.NET/React solution that acts as a post sharing website. Users can register and create posts that others can view. Made with the purpose of being enhanced incrementally in order to demo the author's technical skills and knowledge of the SDLC.
 
