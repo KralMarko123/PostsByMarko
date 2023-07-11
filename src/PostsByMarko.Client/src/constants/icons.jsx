@@ -3,13 +3,16 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { MdAlternateEmail, MdDeleteForever } from "react-icons/md";
 import { AiFillFileText, AiFillEye, AiFillEyeInvisible, AiFillPushpin } from "react-icons/ai";
 import { BiSolidUserDetail, BiSolidPencil } from "react-icons/bi";
-
+import { BsPersonCircle, BsClockFill } from "react-icons/bs";
 //in milliseconds
 export const modalTransitionDuration = 300;
 
 export const ICONS = {
 	USER_ICON() {
 		return <FaUserAlt />;
+	},
+	USER_CIRCLE_ICON() {
+		return <BsPersonCircle />;
 	},
 	USER_INFO_ICON() {
 		return <BiSolidUserDetail />;
@@ -34,5 +37,8 @@ export const ICONS = {
 	},
 	DELETE_ICON() {
 		return <MdDeleteForever />;
+	},
+	CLOCK_ICON() {
+		return <BsClockFill />;
 	},
 };

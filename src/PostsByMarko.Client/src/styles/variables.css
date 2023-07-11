@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 :root {
 	/**COLORS*/
 	--dark: rgb(32, 32, 32);
@@ -12,9 +11,10 @@
 	--success: #50c878;
 
 	/**TEXT*/
-	--main-font: "Roboto", sans-serif;
-	--base-font-size: 18px;
+	--header-font: "Oswald", sans-serif;
+	--text-font: "Source Sans 3", sans-serif;
 	--text-color: #f9f5eb;
+	--base-font-size: 18px;
 
 	--s-text: 0.85rem;
 	--md-text: 1rem;
@@ -73,12 +73,6 @@
 }
 
 /**ANIMATIONS*/
-
-@keyframes fade-in-out {
-	50% {
-		opacity: 0.5;
-	}
-}
 
 @keyframes dot-buffer {
 	50% {

@@ -32,32 +32,29 @@ const Home = () => {
 	return (
 		<div className="home page">
 			<img src={logo} className="logo" alt="posm-logo" />
-
 			<Nav />
 
 			<Container
 				title="Today's Posts"
 				desc="Check out what's going on with the world. Create, edit & inspire"
 			>
-				{appContext.posts?.length > 0 ? (
-					<ul className="posts__list">
-						{posts.map((p, i) => (
-							<Post
-								key={p.id}
-								id={p.id}
-								authorId={p.userId}
-								title={p.title}
-								content={p.content}
-								isHidden={p.isHidden}
-								allowedUsers={p.allowedUsers}
-								createdDate={p.createdDate}
-								index={i}
-							/>
-						))}
-					</ul>
-				) : (
-					<h1>Seems there are no posts</h1>
-				)}
+				<ul className="posts-list">
+					{posts?.map((p, i) => (
+						<Post
+							key={p.id}
+							id={p.id}
+							authorId={p.userId}
+							title={p.title}
+							content={p.content}
+							isHidden={p.isHidden}
+							allowedUsers={p.allowedUsers}
+							createdDate={p.createdDate}
+							lastUpdatedDate={p.lastUpdatedDate}
+							index={i}
+						/>
+					))}
+				</ul>
+
 				<UpdatePostForm />
 				<DeletePostForm />
 			</Container>

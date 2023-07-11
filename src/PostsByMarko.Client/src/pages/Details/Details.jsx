@@ -7,38 +7,31 @@ import PostsService from "../../api/PostsService";
 import Nav from "../../components/Layout/Nav";
 import ToggleUserForPost from "../../components/Forms/ToggleUserForPost";
 import AppContext from "../../context/AppContext";
-import "./Details.css";
 import Container from "../../components/Layout/Container/Container";
+import logo from "../../assets/images/POSM_icon.png";
+import { ICONS } from "../../constants/icons";
+import "../Page.css";
+import "./Details.css";
 
 const Details = () => {
+	const navigate = useNavigate();
 	const params = useParams();
 	const postId = params.id;
-	const navigate = useNavigate();
-	const [postDetails, setPostDetails] = useState({
-		post: {
-			allowedUsers: [],
-		},
-		authorFirstName: "",
-		authorLastName: "",
-		isAuthor: false,
-	});
+	const [postDetails, setPostDetails] = useState({});
+	const [errorMessage, setErrorMessage] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
 	const { user, isAdmin } = useAuth();
 	const appContext = useContext(AppContext);
+	const postDetailsDate = HelperFunctions.getPostDetailsDate(postDetails.post?.createdDate);
 
 	const getPost = async () => {
 		await PostsService.getPostById(postId, user.token)
-			.then((response) => setPostDetails(response))
-			.catch((error) =>
-				setPostDetails({
-					post: {
-						title: "Cannot open post",
-						content: error.message,
-					},
-					authorFirstName: "Someone",
-					authorLastName: "Hypothetical",
-				})
-			)
+			.then((requestResult) => {
+				if (requestResult.statusCode === 200) {
+					setErrorMessage("");
+					setPostDetails(requestResult.payload);
+				} else setErrorMessage(requestResult.message);
+			})
 			.finally(() => setIsLoading(false));
 	};
 
@@ -56,37 +49,32 @@ const Details = () => {
 
 	return (
 		<div className="details page">
+			<img src={logo} className="logo" alt="posm-logo" />
 			<Nav />
+
 			<Container>
-				<span className="container__back" onClick={() => navigate(ROUTES.HOME)}>
-					Back
-				</span>
-				{isLoading ? (
-					<p className="info__message">Loading Post Details...</p>
-				) : (
+				{postDetails.post && (
 					<>
-						<h1 className="container__title">{postDetails.post.title}</h1>
-						<p className="container__description">{postDetails.post.content}</p>
-						{postDetails.post && (
-							<div className="container__footer">
-								{(postDetails.isAuthor || isAdmin) && (
-									<div className="footer__actions">
-										<div className="footer__action" onClick={() => openAddUsersModal()}>
-											Toggle Users
-										</div>
-									</div>
-								)}
-								<p className="footer__author">
-									BY {`${postDetails.authorFirstName} ${postDetails.authorLastName}`}
+						<div className="details-header">
+							<h1 className="details-title">{postDetails.post?.title}</h1>
+							<div className="author-container">
+								{ICONS.USER_CIRCLE_ICON()}
+								<p className="author">
+									By {postDetails.authorFirstName} {postDetails.authorLastName}
 								</p>
-								<span className="footer__date">
-									Created on {HelperFunctions.getDateAsReadableText(postDetails.post.createdDate)}
-								</span>
+								{ICONS.CLOCK_ICON()}
+								<p className="date">{postDetailsDate}</p>
 							</div>
-						)}
+						</div>
+						<div className="details-container">
+							<p className="content">{postDetails.post?.content}</p>
+						</div>
 					</>
 				)}
+
+				{errorMessage && <p className="error">{errorMessage}</p>}
 			</Container>
+
 			<ToggleUserForPost />
 		</div>
 	);

@@ -1,14 +1,14 @@
 .button {
 	width: 100%;
-	padding: 0.5em 0;
+	padding: 0.25em 0;
 
 	outline: none;
 	border: none;
 	background-color: var(--light-accent);
 	border-radius: var(--button-radius);
 
-	color: var(--text-color);
 	font-size: 2rem;
+	color: var(--text-color);
 
 	display: flex;
 	justify-content: center;

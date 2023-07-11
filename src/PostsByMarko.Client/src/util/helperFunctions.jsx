@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const HelperFunctions = {
 	getDateAsReadableText(date) {
 		const readableDate = new Date(Date.parse(date)).toLocaleDateString("en-UK");
@@ -42,5 +44,23 @@ export const HelperFunctions = {
 					return date1 > date2 ? -1 : 1;
 			  })
 			: null;
+	},
+
+	getDateAsLocalDate(date) {
+		return moment(moment.utc(date)).local();
+	},
+
+	getPostCardDate(date) {
+		const dateLocal = this.getDateAsLocalDate(date);
+		const dayAndMonth = moment(dateLocal).format("Do MMMM");
+		const hoursAndMinutes = moment(dateLocal).format("HH:mm");
+
+		return `${dayAndMonth} at ${hoursAndMinutes}`;
+	},
+
+	getPostDetailsDate(date) {
+		const dateLocal = this.getDateAsLocalDate(date);
+
+		return moment(dateLocal).format("DD MMMM YYYY");
 	},
 };

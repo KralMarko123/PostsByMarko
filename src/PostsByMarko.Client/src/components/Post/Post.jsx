@@ -6,7 +6,7 @@ import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
 import PostsService from "../../api/PostsService";
 import Card from "../Helper/Card/Card";
-import moment from "moment/moment";
+import { HelperFunctions } from "../../util/helperFunctions";
 import "./Post.css";
 
 const Post = ({ id, authorId, title, content, isHidden, createdDate, index }) => {
@@ -14,7 +14,7 @@ const Post = ({ id, authorId, title, content, isHidden, createdDate, index }) =>
 	const appContext = useContext(AppContext);
 	const { user, isAdmin, isEditor } = useAuth();
 	const isAuthor = authorId === user.userId;
-	const readableCreatedDate = moment(createdDate).format("Do MMMM YYYY");
+	const readableCreatedDate = HelperFunctions.getPostCardDate(createdDate);
 
 	const handlePostClick = () => {
 		navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
