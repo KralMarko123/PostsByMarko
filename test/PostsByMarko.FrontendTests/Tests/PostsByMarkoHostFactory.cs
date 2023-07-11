@@ -14,17 +14,14 @@ namespace PostsByMarko.FrontendTests.Tests
         private IBrowser? browser;
         public IPage page;
 
-        private string? hostDockerfilePath;
+        private const string hostDockerfilePathFromSln = "src/PostsByMarko.Host/Dockerfile";
         private IFutureDockerImage? hostImage;
         private IContainer? hostContainer;
 
 
         public async Task InitializeAsync()
         {
-            ReadDockerfile();
-            SetupHostImageAndContainer();
-            await hostImage!.CreateAsync().ConfigureAwait(false);
-            await hostContainer!.StartAsync().ConfigureAwait(false);
+            await SetupHostImageAndContainer();
 
             driver = new BrowserDriver();
             browser = await driver.GetChromeBrowserAsync();
@@ -39,30 +36,31 @@ namespace PostsByMarko.FrontendTests.Tests
             await driver!.DestroyPlaywrightAsync();
         }
 
-        private void ReadDockerfile()
-        {
-            var slnPath = FileHelper.FindFileDirectory(Directory.GetCurrentDirectory(), "PostsByMarko.sln");
-            var hostFiles = Directory.GetFiles(Path.Combine(slnPath!, $"src\\PostsByMarko.Host"));
-
-            hostDockerfilePath = hostFiles.First(f => f.EndsWith("Dockerfile"));
-        }
-
-        private void SetupHostImageAndContainer()
+        private async Task SetupHostImageAndContainer()
         {
             try
             {
                 hostImage = new ImageFromDockerfileBuilder()
-                .WithName("postsbymarko.host")
-                .WithDockerfile(hostDockerfilePath)
+                .WithName("postsbymarko.host:0.0.1")
+                .WithDockerfileDirectory(CommonDirectoryPath.GetSolutionDirectory(), string.Empty)
+                .WithDockerfile(hostDockerfilePathFromSln)
                 .WithDeleteIfExists(false)
+                .WithCleanUp(true)
+                .WithBuildArgument("RESOURCE_REAPER_SESSION_ID", ResourceReaper.DefaultSessionId.ToString("D"))
                 .Build();
 
+                await hostImage.CreateAsync().ConfigureAwait(false);
+
                 hostContainer = new ContainerBuilder()
+                .WithName("postsbymarkohost-container")
                 .WithImage(hostImage.FullName)
-                .WithPortBinding(7171, 7171)
                 .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+                .WithPortBinding(7171, 7171)
                 .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(7171))
+                .WithCleanUp(true)
                 .Build();
+
+                await hostContainer.StartAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

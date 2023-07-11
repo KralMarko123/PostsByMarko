@@ -1,13 +1,15 @@
 #Dockerfile
 
-FROM node:16-alpine AS base 
+FROM node:16-alpine AS build-env 
+ARG CLIENT_PATH="src/PostsByMarko.Client"
+
 ENV NODE_ENV development
 
-WORKDIR /src
+WORKDIR /app
 
-COPY "PostsByMarko.Client/package.json" .
-COPY "PostsByMarko.Client/package-lock.json" .
-COPY "PostsByMarko.Client/" .
+COPY ${CLIENT_PATH}/package.json .
+COPY ${CLIENT_PATH}/package-lock.json .
+COPY ${CLIENT_PATH}/ .
 
 EXPOSE 3000
 

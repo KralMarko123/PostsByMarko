@@ -24,7 +24,7 @@ services:
   postsbymarko.host:
     container_name: postsbymarkohost
     build:
-      dockerfile: PostsByMarko.host/Dockerfile
+      dockerfile: src/PostsByMarko.host/Dockerfile
     ports:
       - 7171:80
     depends_on:
@@ -40,7 +40,7 @@ services:
   postsbymarko.client:
     container_name: postsbymarkoclient
     build:
-      dockerfile: PostsByMarko.Client/Dockerfile
+      dockerfile: src/PostsByMarko.Client/Dockerfile
     ports:
       - 3000:3000
     depends_on:

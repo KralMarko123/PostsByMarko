@@ -1,24 +1,20 @@
 #Dockerfile
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+ARG CSPROJ_FILE_PATH="src/PostsByMarko.Host/PostsByMarko.Host.csproj"
+WORKDIR /app
+
+COPY . .
+
+RUN dotnet restore $CSPROJ_FILE_PATH
+
+RUN dotnet publish $CSPROJ_FILE_PATH  --configuration Release --output out
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 
 EXPOSE 7171
-ENV ASPNETCORE_URLS=http://*:7171
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY "PostsByMarko.Host/PostsByMarko.Host.csproj" .
-RUN dotnet restore "PostsByMarko.Host.csproj"
-
-COPY "PostsByMarko.Host/" .
-RUN dotnet build "PostsByMarko.Host.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "PostsByMarko.Host.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "PostsByMarko.Host.dll"]
 
