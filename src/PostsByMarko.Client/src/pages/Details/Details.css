@@ -57,6 +57,7 @@
 .details-container .content {
 	width: 75%;
 	font-size: 1rem;
+	white-space: pre-wrap;
 
 	text-align: justify;
 }
