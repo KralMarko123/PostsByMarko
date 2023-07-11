@@ -1,5 +1,4 @@
-﻿using ByteSizeLib;
-using PostsByMarko.Host.Builders;
+﻿using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
@@ -22,21 +21,11 @@ namespace PostsByMarko.Host.Services
         public async Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during user registration").Build();
-            var profilePictureBadRequest = new RequestResultBuilder().BadRequest().WithMessage("File must be less than 2MB").Build();
-
-            using (var memoryStream = new MemoryStream())
-            {
-                await userRegistration.ProfilePicture.CopyToAsync(memoryStream);
-
-                if (memoryStream.Length > ByteSize.FromMebiBytes(2).Bytes) return profilePictureBadRequest;
-
-                await memoryStream.DisposeAsync();
-            }
-
+            var successfulRequest = new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
             var newUser = new User(userRegistration.Email!);
             var result = await usersRepository.MapAndCreateUserAsync(newUser, userRegistration.Password!);
 
-            if (result) return new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
+            if (result) return successfulRequest;
             else return badRequest;
         }
 

@@ -11,18 +11,7 @@ namespace PostsByMarko.Host.Data.Models.Dtos
 
         public string Password { get; set; }
 
-        public IFormFile? ProfilePicture { get; set; }
-
         public UserRegistrationDto() { }
-
-        public UserRegistrationDto(string firstName, string lastName, string email, string password, IFormFile profilePicture)
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            Email = email;
-            Password = password;
-            ProfilePicture = profilePicture;
-        }
 
         public UserRegistrationDto(string firstName, string lastName, string email, string password)
         {
@@ -31,5 +20,6 @@ namespace PostsByMarko.Host.Data.Models.Dtos
             Email = email;
             Password = password;
         }
+
     }
 }
