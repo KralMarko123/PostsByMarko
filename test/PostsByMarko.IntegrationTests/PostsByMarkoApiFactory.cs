@@ -13,7 +13,7 @@ namespace PostsByMarko.IntegrationTests
 {
     public class PostsByMarkoApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
     {
-        public HttpClient client;
+        public HttpClient? client;
 
         public async Task InitializeAsync()
         {
@@ -28,18 +28,19 @@ namespace PostsByMarko.IntegrationTests
 
         public new Task DisposeAsync()
         {
-            client.Dispose();
+            client!.Dispose();
+
             return Task.CompletedTask;
         }
 
         private async Task ConfigureClientAuthentication()
         {
-            var result = await client.PostAsJsonAsync("/login", new UserLoginDto { Email = "test_user@test.com", Password = "@PostsByMarko123" });
+            var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = "test_user@test.com", Password = "@PostsByMarko123" });
             var typedResult = await result.Content.ReadFromJsonAsync<RequestResult>();
             var payload = JsonConvert.DeserializeObject<LoginResponse>(typedResult!.Payload!.ToString()!);
             var token = payload!.Token;
 
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
     }
 }

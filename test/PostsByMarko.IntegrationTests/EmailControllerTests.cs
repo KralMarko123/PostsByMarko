@@ -12,7 +12,7 @@ namespace PostsByMarko.IntegrationTests
         private readonly HttpClient client;
         public EmailControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.client;
+            client = postsByMarkoApiFactory.client!;
         }
 
         [Fact]

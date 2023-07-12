@@ -9,7 +9,7 @@ using Serilog;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
@@ -47,28 +47,15 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-if (isInLocalDevelopment)
+if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false))
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(swaggerUIOptions =>
-    {
-        swaggerUIOptions.DocumentTitle = "ASP.NET Posts Project";
-        swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API serving a posts model.");
-        swaggerUIOptions.RoutePrefix = string.Empty;
-    });
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        appDbContext.Database.EnsureDeleted();
-        appDbContext.Database.EnsureCreated();
-    }
+    app.WithSwaggerEnabled();
+    app.WithDatabaseReset();
 }
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
-if (!isInLocalDevelopment || isInDocker != null) app.UseHttpsRedirection();
+if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false)) app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -79,6 +66,7 @@ app.UseRateLimiting();
 #endregion
 
 app.Run();
+
 
 public partial class Program { }
 public interface IApiMarker { }

@@ -1,54 +1,53 @@
 version: "3.4"
 
-name: docker-compose
+name: postsbymarko-docker-compose
 
 networks:
-  postsBackendNetwork:
-  postsFrontendNetwork:
+  beNetwork:
+  feNetwork:
   
 services:
   #DATABASE
-  postsbymarko.database:
-    container_name: postsbymarkodb
+  sqlserver:
+    container_name: PostsByMarko.SqlServer
     image: mcr.microsoft.com/mssql/server:2022-latest
     user: root
     ports:
       - 1433:1433
     networks:
-      - postsBackendNetwork
+      - beNetwork
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "@PostsByMarko123"
    
-  #WEB API
-  postsbymarko.host:
-    container_name: postsbymarkohost
+  #HOST
+  host:
+    container_name: PostsByMarko.Host
     build:
       dockerfile: src/PostsByMarko.host/Dockerfile
     ports:
       - 7171:80
     depends_on:
-      - postsbymarko.database
+      - sqlserver
     networks:
-      - postsBackendNetwork
-      - postsFrontendNetwork
+      - beNetwork
+      - feNetwork
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://host.docker.internal:7171
 
   #CLIENT
-  postsbymarko.client:
-    container_name: postsbymarkoclient
+  client:
+    container_name: PostsByMarko.Client
     build:
       dockerfile: src/PostsByMarko.Client/Dockerfile
     ports:
       - 3000:3000
     depends_on:
-      - postsbymarko.host
+      - host
     volumes:
       - ./src:/app/src
     networks:
-      - postsFrontendNetwork
+      - feNetwork
     environment:
       - NODE_ENV=docker
 

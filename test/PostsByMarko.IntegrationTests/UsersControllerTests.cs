@@ -16,7 +16,7 @@ namespace PostsByMarko.IntegrationTests
         private readonly HttpClient client;
         public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.client;
+            client = postsByMarkoApiFactory.client!;
         }
 
         [Fact]

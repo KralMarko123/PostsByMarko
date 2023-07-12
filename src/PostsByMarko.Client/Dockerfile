@@ -3,9 +3,9 @@
 FROM node:16-alpine AS build-env 
 ARG CLIENT_PATH="src/PostsByMarko.Client"
 
-ENV NODE_ENV development
+ENV NODE_ENV docker
 
-WORKDIR /app
+WORKDIR /src
 
 COPY ${CLIENT_PATH}/package.json .
 COPY ${CLIENT_PATH}/package-lock.json .

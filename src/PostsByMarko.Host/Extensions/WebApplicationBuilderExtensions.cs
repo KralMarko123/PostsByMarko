@@ -13,7 +13,7 @@ using System.Text;
 
 namespace PostsByMarko.Host.Extensions
 {
-    public static class ServicesExtensions
+    public static class WebApplicationBuilderExtensions
     {
         public static void WithCors(this WebApplicationBuilder builder, string policyName, List<string> allowedOrigins)
         {

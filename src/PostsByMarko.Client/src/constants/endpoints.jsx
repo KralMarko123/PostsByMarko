@@ -1,5 +1,5 @@
 const BASE_URL_DEVELOPMENT = "http://localhost:7171";
-const BASE_URL_DOCKER = "http://host.docker.internal:7171";
+const BASE_URL_DOCKER = "http://localhost:7171";
 const ENDPOINTS = {
 	//POSTS
 	GET_ALL_POSTS: "getAllPosts",

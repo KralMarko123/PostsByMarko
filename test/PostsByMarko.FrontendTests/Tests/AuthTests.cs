@@ -12,9 +12,9 @@ namespace PostsByMarko.FrontendTests.Frontend
         private readonly IPage page;
         private LoginPage loginPage => new LoginPage(page);
 
-        public AuthTests(PostsByMarkoHostFactory postsByMarkoHostFactory)
+        public AuthTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
-            page = postsByMarkoHostFactory.page;
+            page = postsByMarkoHostFactory.page!;
         }
 
         [Fact]
