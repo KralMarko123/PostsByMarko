@@ -44,23 +44,5 @@ namespace PostsTesting.UI_Models.Pages
             await FillInPasswordInput(password);
             await ClickLoginButton();
         }
-
-        public async Task CheckForErrors(string expectedErrorTitle, List<string> expectedErrorMessages = null)
-        {
-            await errorMessage.WaitForAsync();
-
-            var errorTitleText = await errorMessage.TextContentAsync();
-            errorTitleText.Should().Be(expectedErrorTitle);
-
-            if (expectedErrorMessages != null)
-            {
-                var numberOfErrorMessages = await errorSubmessage.CountAsync();
-                for (int i = 0; i < numberOfErrorMessages; i++)
-                {
-                    var errorMessageText = await errorSubmessage.Nth(i).TextContentAsync();
-                    errorMessageText.Should().Be(expectedErrorMessages[i]);
-                }
-            }
-        }
     }
 }

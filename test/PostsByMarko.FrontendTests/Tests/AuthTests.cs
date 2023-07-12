@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Tests;
+using PostsByMarko.Shared.Constants;
 using PostsTesting.UI_Models.Pages;
 using Xunit;
 
@@ -11,6 +12,8 @@ namespace PostsByMarko.FrontendTests.Frontend
     {
         private readonly IPage page;
         private LoginPage loginPage => new LoginPage(page);
+        private HomePage homePage => new HomePage(page);
+
 
         public AuthTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
@@ -18,14 +21,14 @@ namespace PostsByMarko.FrontendTests.Frontend
         }
 
         [Fact]
-        public async Task Test()
+        public async Task should_show_home_page_after_login()
         {
             await loginPage.Visit();
-            await loginPage.Login("test_user@test.com", "some_password");
-            await loginPage.errorMessage.WaitForAsync();
+            await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
+            await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
-            var errorTitleText = await loginPage.errorMessage.TextContentAsync();
-            errorTitleText.Should().Be("Invalid password for the given account");
+            var homePageTitleText = await homePage.containerTitle.TextContentAsync();
+            homePageTitleText.Should().Be("Today's Posts");
         }
     }
 }

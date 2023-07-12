@@ -9,11 +9,8 @@ namespace PostsTesting.UI_Models.Pages
 
         public Page(IPage page) : base(page) { }
 
-        public ILocator title => page.Locator(".container__title");
-        public ILocator description => page.Locator(".container__description");
-        public ILocator footer => page.Locator(".container__footer");
-        public ILocator back => page.Locator(".container__back");
-        public ILocator errorMessage => page.Locator(".error");
-        public ILocator errorSubmessage => page.Locator(".error__message");
+        public ILocator containerTitle => page.Locator(".container-title");
+        public ILocator containerDescription => page.Locator(".container-description");
+        public ILocator error => page.Locator(".error");
     }
 }

@@ -66,35 +66,5 @@ namespace PostsTesting.UI_Models.Pages
             await FillInConfirmPasswordInput(password);
             await ClickRegisterButton();
         }
-
-        public async Task CheckForErrors(string expectedErrorTitle, List<string> expectedErrorMessages = null)
-        {
-            await errorMessage.WaitForAsync();
-
-            var errorTitleText = await errorMessage.TextContentAsync();
-            errorTitleText.Should().Be(expectedErrorTitle);
-
-            if (expectedErrorMessages != null)
-            {
-                var numberOfErrorMessages = await errorSubmessage.CountAsync();
-                for (int i = 0; i < numberOfErrorMessages; i++)
-                {
-                    var errorMessageText = await errorSubmessage.Nth(i).TextContentAsync();
-                    errorMessageText.Should().Be(expectedErrorMessages[i]);
-                }
-            }
-        }
-
-        public async Task CheckForSuccessfulRegistration()
-        {
-            await title.WaitForAsync();
-
-            var titleText = await title.TextContentAsync();
-            var descriptionText = await description.TextContentAsync();
-
-            titleText.Should().Be("Successfully Registered!");
-            descriptionText.Should().Be("Please check your email to confirm your account first. You can click on the button below to login");
-        }
-
     }
 }

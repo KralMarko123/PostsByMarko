@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsTesting.UI_Models.Components;
 
 namespace PostsTesting.UI_Models.Components
 {
@@ -18,20 +17,13 @@ namespace PostsTesting.UI_Models.Components
 
         public async Task SubmitModal(string buttonText = "Submit", string expectedMessage = null, bool shouldCloseModal = true)
         {
-            await GetButtonWithText(buttonText).ClickAsync();
             if (expectedMessage != null) await CheckSuccessMessage(expectedMessage);
             if (shouldCloseModal) await WaitForModalToBeRemoved();
         }
 
         public async Task CloseModal()
         {
-            await ClickCancel();
             await WaitForModalToBeRemoved();
-        }
-
-        public async Task ClickCancel()
-        {
-            await GetButtonWithText("Cancel").ClickAsync();
         }
 
         public async Task FillInTitleInput(string titleToBeEntered)

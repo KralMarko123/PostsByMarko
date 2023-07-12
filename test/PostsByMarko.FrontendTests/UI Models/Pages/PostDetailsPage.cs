@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 using PostsTesting.UI_Models.Components;
 
 namespace PostsTesting.UI_Models.Pages
@@ -26,25 +25,6 @@ namespace PostsTesting.UI_Models.Pages
         public async Task ClickOnToggleUsersButton()
         {
             await toggleUsersButton.ClickAsync();
-        }
-
-        public async Task ClickOnBackButton()
-        {
-            await back.ClickAsync();
-        }
-
-        public async Task CheckPostDetails(string expectedTitle, string expectedContent)
-        {
-            await title.WaitForAsync();
-
-            var detailsElementsAreDisplayed = await title.IsVisibleAsync() && await description.IsVisibleAsync();
-            var titleText = await title.TextContentAsync();
-            var descriptionText = await description.TextContentAsync();
-
-            detailsElementsAreDisplayed.Should().BeTrue();
-
-            titleText.Should().Be(expectedTitle);
-            descriptionText.Should().Be(expectedContent);
         }
     }
 }

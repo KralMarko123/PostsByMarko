@@ -14,10 +14,5 @@ namespace PostsTesting.UI_Models
         protected ILocator button => page.Locator(".button");
         protected ILocator link => page.Locator(".link");
 
-
-        public ILocator GetButtonWithText(string text)
-        {
-            return page.Locator(".button", new PageLocatorOptions { HasTextString = text });
-        }
     }
 }
