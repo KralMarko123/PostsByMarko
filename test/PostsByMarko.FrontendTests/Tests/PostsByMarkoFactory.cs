@@ -48,16 +48,20 @@ namespace PostsByMarko.FrontendTests.Tests
                 .FromFile(composeFiles)
                 .ForceRecreate()
                 .RemoveOrphans()
-                .WaitForPort("host", "7171/tcp", timeoutInMs)
-                .WaitForPort("client", "3000/tcp", timeoutInMs)
-                .WaitForHttp("host", "http://localhost:7171/index.html", timeoutInMs)
-                .WaitForHttp("client", "http://localhost:3000/login", timeoutInMs);
-
+                .WaitForPort("PostsByMarko.Host", "7171/tcp", timeoutInMs)
+                .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
+                .WaitForPort("PostsByMarko.Client", "3000/tcp", timeoutInMs)
+                .WaitForHttp("PostsByMarko.Client", "http://localhost:3000/login", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count));
 
             dockerServices = serviceBuilder.Build();
             dockerServices.Start();
         }
 
-        private static int CheckStatusCode(RequestResponse resp) => resp.Code == HttpStatusCode.OK ? 0 : 10000;
+        private static int CheckStatusCode(RequestResponse response, int count)
+        {
+            if (count > 5) return 0;
+
+            return response.Code == HttpStatusCode.OK ? 0 : 10000;
+        }
     }
 }

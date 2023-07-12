@@ -26,7 +26,7 @@ services:
     build:
       dockerfile: src/PostsByMarko.host/Dockerfile
     ports:
-      - 7171:80
+      - 7171:7171
     depends_on:
       - sqlserver
     networks:
@@ -34,6 +34,7 @@ services:
       - feNetwork
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:7171 
 
   #CLIENT
   client:

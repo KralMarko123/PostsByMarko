@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 		() => ({
 			user,
 			isAdmin,
-			isEditor,
 			login,
 			logout,
 		}),

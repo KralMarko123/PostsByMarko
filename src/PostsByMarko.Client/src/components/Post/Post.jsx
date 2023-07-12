@@ -12,7 +12,7 @@ import "./Post.css";
 const Post = ({ id, authorId, title, content, isHidden, createdDate, index }) => {
 	let navigate = useNavigate();
 	const appContext = useContext(AppContext);
-	const { user, isAdmin, isEditor } = useAuth();
+	const { user, isAdmin } = useAuth();
 	const isAuthor = authorId === user.userId;
 	const readableCreatedDate = HelperFunctions.getPostCardDate(createdDate);
 
@@ -52,7 +52,7 @@ const Post = ({ id, authorId, title, content, isHidden, createdDate, index }) =>
 						</span>
 					</>
 				)}
-				{(isAuthor || isAdmin || isEditor) && (
+				{(isAuthor || isAdmin) && (
 					<span className="post-icon update" onClick={(e) => handleModalToggle(e, "updatePost")}>
 						{ICONS.PENCIL_ICON()}
 					</span>

@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Constants;
@@ -64,6 +63,8 @@ app.MapControllers();
 app.UseRateLimiting();
 
 #endregion
+
+if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false)) Console.WriteLine("App is running locally or in a docker container!");
 
 app.Run();
 
