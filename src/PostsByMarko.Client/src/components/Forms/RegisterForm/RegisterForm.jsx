@@ -98,7 +98,7 @@ const RegisterForm = () => {
 			{errorMessage && <p className="error">{errorMessage}</p>}
 		</form>
 	) : (
-		<div className="form">
+		<div className="form confirmational">
 			<h1 className="form-title">Successfully Registered!</h1>
 			<p className="form-desc">
 				Please check your email to confirm your account first. You can click on the button below to
