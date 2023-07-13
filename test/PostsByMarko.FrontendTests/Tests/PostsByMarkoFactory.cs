@@ -11,14 +11,18 @@ namespace PostsByMarko.FrontendTests.Tests
 {
     public class PostsByMarkoFactory : IAsyncLifetime
     {
+        private static readonly int timeoutInMs = TimeSpan.FromSeconds(30).Milliseconds;
+
         private BrowserDriver? driver;
         private IBrowser? browser;
         public IPage? page;
 
+        private static string[]? composeFiles;
         private static ICompositeService? dockerServices;
 
         public async Task InitializeAsync()
         {
+            ReadComposeFiles();
             InitializeDockerContainers();
 
             driver = new BrowserDriver();
@@ -37,24 +41,33 @@ namespace PostsByMarko.FrontendTests.Tests
             dockerServices.Dispose();
         }
 
-        private void InitializeDockerContainers()
+        private static void ReadComposeFiles()
         {
-            var path = FileHelper.FindFileDirectory(Directory.GetCurrentDirectory(), "PostsByMarko.sln")!;
-            var composeFiles = Directory.GetFiles(path, "*compose*.yml");
-            var timeoutInMs = TimeSpan.FromSeconds(30).Milliseconds;
-            var serviceBuilder = new Builder()
-                .UseContainer()
-                .UseCompose()
-                .FromFile(composeFiles)
-                .ForceRecreate()
-                .RemoveOrphans()
-                .WaitForPort("PostsByMarko.Host", "7171/tcp", timeoutInMs)
-                .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
-                .WaitForPort("PostsByMarko.Client", "3000/tcp", timeoutInMs)
-                .WaitForHttp("PostsByMarko.Client", "http://localhost:3000/login", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count));
+            var solutionPath = FileHelper.FindFileDirectory(Directory.GetCurrentDirectory(), "PostsByMarko.sln")!;
+            composeFiles = Directory.GetFiles(solutionPath, "*compose*.yml");
+        }
 
-            dockerServices = serviceBuilder.Build();
-            dockerServices.Start();
+        private static void InitializeDockerContainers()
+        {
+            try
+            {
+                dockerServices = new Builder()
+                    .UseContainer()
+                    .UseCompose()
+                    .FromFile(composeFiles)
+                    .ForceBuild()
+                    .ForceRecreate()
+                    .RemoveOrphans()
+                    .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
+                    .WaitForHttp("PostsByMarko.Client", "http://localhost:3000/login", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
+                    .Build();
+
+                dockerServices.Start();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private static int CheckStatusCode(RequestResponse response, int count)
