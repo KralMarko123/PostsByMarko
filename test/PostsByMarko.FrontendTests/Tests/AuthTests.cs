@@ -11,9 +11,9 @@ namespace PostsByMarko.FrontendTests.Frontend
     public class AuthTests
     {
         private readonly IPage page;
-        private LoginPage loginPage => new LoginPage(page);
         private HomePage homePage => new HomePage(page);
-
+        private LoginPage loginPage => new LoginPage(page);
+        private RegisterPage registerPage => new RegisterPage(page);
 
         public AuthTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
@@ -28,7 +28,19 @@ namespace PostsByMarko.FrontendTests.Frontend
             await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
+
             homePageTitleText.Should().Be("Today's Posts");
+        }
+
+        [Fact]
+        public async Task should_show_confirmational_box_after_registering()
+        {
+            await registerPage.Visit();
+            await registerPage.Register("Test", "User", "test_email@domain.com", "@Test123");
+            await registerPage.confirmationalForm.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            var successfulRegisterText = await registerPage.formTitle.TextContentAsync();
+            successfulRegisterText.Should().Be("Successfully Registered!");
         }
     }
 }

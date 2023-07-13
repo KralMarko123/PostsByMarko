@@ -11,9 +11,11 @@ namespace PostsTesting.UI_Models.Pages
 
         public ILocator firstName => page.Locator("#firstName");
         public ILocator lastName => page.Locator("#lastName");
-        public ILocator username => page.Locator("#username");
+        public ILocator email => page.Locator("#email");
         public ILocator password => page.Locator("#password");
         public ILocator confirmPassword => page.Locator("#confirmPassword");
+        public ILocator confirmationalForm => page.Locator(".form.confirmational");
+        public ILocator formTitle => page.Locator(".register .form .form-title");
         public ILocator registerButton => button;
         public ILocator loginLink => link;
 
@@ -42,9 +44,9 @@ namespace PostsTesting.UI_Models.Pages
             await lastName.FillAsync(lastNameToBeEntered);
         }
 
-        public async Task FillInUsernameInput(string usernameToBeEntered)
+        public async Task FillInEmailInput(string emailToBeEntered)
         {
-            await username.FillAsync(usernameToBeEntered);
+            await email.FillAsync(emailToBeEntered);
         }
 
         public async Task FillInPasswordInput(string passwordToBeEntered)
@@ -57,11 +59,11 @@ namespace PostsTesting.UI_Models.Pages
             await confirmPassword.FillAsync(passwordToBeEntered);
         }
 
-        public async Task Register(string firstName, string lastName, string username, string password)
+        public async Task Register(string firstName, string lastName, string email, string password)
         {
             await FillInFirstNameInput(firstName);
             await FillInLastNameInput(lastName);
-            await FillInUsernameInput(username);
+            await FillInEmailInput(email);
             await FillInPasswordInput(password);
             await FillInConfirmPasswordInput(password);
             await ClickRegisterButton();
