@@ -8,18 +8,15 @@ namespace PostsTesting.UI_Models.Components
         public Modal(IPage page) : base(page) { }
 
 
-        public ILocator modal => page.Locator(".modal");
+        public ILocator modalContainer => page.Locator(".modal");
         public ILocator title => page.Locator(".modal__title");
         public ILocator titleInput => page.Locator("#title");
         public ILocator contentInput => page.Locator("#content");
         public ILocator messageFailure => page.Locator(".modal__message.fail");
         public ILocator messageSuccess => page.Locator(".modal__message.success");
+        public ILocator createButton => button.GetByText("Create");
 
-        public async Task SubmitModal(string buttonText = "Submit", string expectedMessage = null, bool shouldCloseModal = true)
-        {
-            if (expectedMessage != null) await CheckSuccessMessage(expectedMessage);
-            if (shouldCloseModal) await WaitForModalToBeRemoved();
-        }
+
 
         public async Task CloseModal()
         {
@@ -40,12 +37,11 @@ namespace PostsTesting.UI_Models.Components
         {
             await FillInTitleInput(titleToBeEntered);
             await FillInContentInput(contentToBeEntered);
-            await SubmitModal(expectedMessage: expectedMessage);
         }
 
         public async Task CheckVisibility(string expectedTitleText)
         {
-            var modalIsDisplayed = await modal.IsVisibleAsync() && await title.IsVisibleAsync();
+            var modalIsDisplayed = await modalContainer.IsVisibleAsync() && await title.IsVisibleAsync();
             var titleText = await title.TextContentAsync();
 
             modalIsDisplayed.Should().BeTrue();
@@ -70,7 +66,7 @@ namespace PostsTesting.UI_Models.Components
 
         public async Task WaitForModalToBeRemoved()
         {
-            await modal.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
+            await modalContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
         }
 
         public async Task WaitForSuccessMessage()
