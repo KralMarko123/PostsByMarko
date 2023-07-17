@@ -4,7 +4,7 @@ namespace PostsTesting.UI_Models
 {
     public class Shared
     {
-        protected IPage page;
+        public IPage page;
 
         public Shared(IPage page)
         {
