@@ -4,4 +4,5 @@ export const ROUTES = {
 	DETAILS: `${DETAILS_PREFIX}/:id`,
 	LOGIN: `/login`,
 	REGISTER: `/register`,
+	TEST: `/test`,
 };

@@ -1,4 +1,5 @@
 import moment from "moment";
+import DOMPurify from "dompurify";
 
 export const HelperFunctions = {
 	getDateAsReadableText(date) {
@@ -62,5 +63,9 @@ export const HelperFunctions = {
 		const dateLocal = this.getDateAsLocalDate(date);
 
 		return moment(dateLocal).format("DD MMMM YYYY");
+	},
+
+	getPurifiedHtml(html) {
+		return { __html: DOMPurify.sanitize(html) };
 	},
 };
