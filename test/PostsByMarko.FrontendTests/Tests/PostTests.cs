@@ -22,9 +22,13 @@ namespace PostsByMarko.FrontendTests.Frontend
         [Fact]
         public async Task should_be_able_to_create_post()
         {
-            await loginPage.Visit();
-            await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
-            await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            if (!await homePage.home.IsVisibleAsync())
+            {
+                await loginPage.Visit();
+                await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
+                await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            }
+
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.createPost.ClickAsync();
 

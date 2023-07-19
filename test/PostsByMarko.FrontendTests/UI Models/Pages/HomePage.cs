@@ -20,7 +20,7 @@ namespace PostsTesting.UI_Models.Pages
         public ILocator username => page.Locator(".nav__username");
         public ILocator postCard => page.Locator(".post");
         public ILocator postList => page.Locator(".posts-list");
-       
+
         public async Task Visit()
         {
             await page.GotoAsync(url);
