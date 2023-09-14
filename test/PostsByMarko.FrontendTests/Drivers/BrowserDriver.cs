@@ -13,24 +13,12 @@ namespace PostsByMarko.FrontendTests.Drivers
             return playwrightInstance;
         }
 
-        public async Task<IBrowser> GetChromeBrowserAsync(bool headless = false)
+        public async Task<IBrowser> GetChromeBrowserAsync()
         {
-
             browser ??= await GetPlaywrightAsync()
                 .Result
                 .Chromium
-                .LaunchAsync(new BrowserTypeLaunchOptions { Headless = headless });
-
-            return browser;
-        }
-
-        public async Task<IBrowser> GetFirefoxBrowserAsync(bool headless = false)
-        {
-
-            browser ??= await GetPlaywrightAsync()
-                .Result
-                .Firefox
-                .LaunchAsync(new BrowserTypeLaunchOptions { Headless = headless });
+                .LaunchAsync();
 
             return browser;
         }
