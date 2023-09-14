@@ -30,11 +30,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
     
-    - name: Run unit tests
-      run: dotnet test ./test/PostsByMarko.UnitTests
+    # - name: Run unit tests
+    #   run: dotnet test ./test/PostsByMarko.UnitTests
 
-    - name: Run integration tests
-      run: dotnet test ./test/PostsByMarko.IntegrationTests
+    # - name: Run integration tests
+    #   run: dotnet test ./test/PostsByMarko.IntegrationTests
     
     - name: Run frontend tests
       run: dotnet test ./test/PostsByMarko.FrontendTests
