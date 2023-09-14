@@ -18,7 +18,7 @@ services:
       - beNetwork
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${SQL_PASSWORD}
+      MSSQL_SA_PASSWORD: ${MASTER_PASSWORD}
    
   #HOST
   host:
