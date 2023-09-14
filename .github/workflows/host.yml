@@ -1,4 +1,4 @@
-name: PostsByMarko.Host docker workflow
+name: PostsByMarko.Host Docker Workflow
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths:
       - "src/PostsByMarko.Host/**"
 
-  #Allow manual workflow dispatching
+  # allow manual workflow dispatching
   workflow_dispatch:
 
 env:
@@ -40,18 +40,18 @@ jobs:
     
     - name: Build
       run: dotnet build
+    
+    - name: Run unit tests
+      run: dotnet test ./test/PostsByMarko.UnitTests
+
+    - name: Run integration tests
+      run: dotnet test ./test/PostsByMarko.IntegrationTests
 
     - name: Ensure browsers are installed
       run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net6.0/playwright.ps1 install --with-deps  
     
     - name: Run frontend tests
       run: dotnet test ./test/PostsByMarko.FrontendTests
-    
-    # - name: Run unit tests
-    #   run: dotnet test ./test/PostsByMarko.UnitTests
-
-    # - name: Run integration tests
-    #   run: dotnet test ./test/PostsByMarko.IntegrationTests
 
   build-and-push-to-docker:
     runs-on: ubuntu-latest
