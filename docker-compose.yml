@@ -22,6 +22,7 @@ services:
   host:
     container_name: PostsByMarko.Host
     build:
+      context: .
       dockerfile: src/PostsByMarko.Host/Dockerfile
     ports:
       - ${HOST_PORT}:${HOST_PORT}
@@ -38,6 +39,7 @@ services:
   client:
     container_name: PostsByMarko.Client
     build:
+      context: .
       dockerfile: src/PostsByMarko.Client/Dockerfile
     ports:
       - ${CLIENT_PORT}:${CLIENT_PORT}
