@@ -34,4 +34,4 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_REPOSITORY --password-stdin
 
       - name: Push Image to Docker Hub
-        run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:1.0.${{ steps.commit.outputs.short }}
+        run: docker push $DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
