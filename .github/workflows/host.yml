@@ -18,9 +18,9 @@ env:
 
 jobs:
 
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
+  run-tests:
+    timeout-minutes: 20
+    runs-on: windows-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -36,6 +36,7 @@ jobs:
 
   build-and-push-to-docker:
     runs-on: ubuntu-latest
+    needs: run-tests
     steps:
       - id: commit
         uses: pr-mpt/actions-commit-hash@v2
