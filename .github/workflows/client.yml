@@ -13,7 +13,7 @@ on:
 env:
   REGISTRY: docker.io
   DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}
-  IMAGE_NAME: PostsByMarko.Client
+  IMAGE_NAME: postsbymarko.client
   IMAGE_TAG: 1.0.${{ github.run_number }}
 
 jobs:
