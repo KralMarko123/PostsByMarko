@@ -11,7 +11,7 @@ namespace PostsByMarko.FrontendTests.Tests
 {
     public class PostsByMarkoFactory : IAsyncLifetime
     {
-        private static readonly int timeoutInMs = TimeSpan.FromSeconds(30).Milliseconds;
+        private int timeoutInMs = TimeSpan.FromSeconds(20).Milliseconds;
 
         private BrowserDriver? driver;
         private IBrowser? browser;
@@ -23,7 +23,7 @@ namespace PostsByMarko.FrontendTests.Tests
         public async Task InitializeAsync()
         {
             ReadComposeFiles();
-            InitializeDockerContainers();
+            InitializeDockerContainersThroughCompose();
 
             driver = new BrowserDriver();
             browser = await driver.GetChromeBrowserAsync();
@@ -41,13 +41,13 @@ namespace PostsByMarko.FrontendTests.Tests
             dockerServices.Dispose();
         }
 
-        private static void ReadComposeFiles()
+        private void ReadComposeFiles()
         {
             var solutionPath = FileHelper.FindFileDirectory(Directory.GetCurrentDirectory(), "PostsByMarko.sln")!;
             composeFiles = Directory.GetFiles(solutionPath, "*compose*.yml");
         }
 
-        private static void InitializeDockerContainers()
+        private void InitializeDockerContainersThroughCompose()
         {
             try
             {
@@ -57,9 +57,8 @@ namespace PostsByMarko.FrontendTests.Tests
                     .FromFile(composeFiles)
                     .ForceBuild()
                     .ForceRecreate()
-                    .RemoveOrphans()
-                    .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
-                    .WaitForHttp("PostsByMarko.Client", "http://localhost:3000/login", timeoutInMs, continuation: (response, count) => CheckStatusCode(response, count))
+                    .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, (response, retryIn) => CheckSwaggerIsEnabled(response))
+                    .WaitForHttp("PostsByMarko.Client", "http://localhost:3000", timeoutInMs, (response, retryIn) => CheckForIconOnUI(response))
                     .Build();
 
                 dockerServices.Start();
@@ -70,11 +69,14 @@ namespace PostsByMarko.FrontendTests.Tests
             }
         }
 
-        private static int CheckStatusCode(RequestResponse response, int count)
+        private int CheckSwaggerIsEnabled(RequestResponse response)
         {
-            if (count > 5) return 0;
+            return response.Code == HttpStatusCode.OK && response.Body.Contains("swagger") ? 0 : 1000;
+        }
 
-            return response.Code == HttpStatusCode.OK ? 0 : 10000;
+        private int CheckForIconOnUI(RequestResponse response)
+        {
+            return response.Code == HttpStatusCode.OK && response.Body.Contains("app") ? 0 : 1000;
         }
     }
 }

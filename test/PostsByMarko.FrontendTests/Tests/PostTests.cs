@@ -37,9 +37,9 @@ namespace PostsByMarko.FrontendTests.Frontend
             await homePage.modalComponent.FillInContentInput("Test content");
             await homePage.modalComponent.createButton.ClickAsync();
             await homePage.modalComponent.modalContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
-                       
-            var newPostTitlte = await homePage.postCard.Last.Locator("post-title").TextContentAsync();
-            var newPostContent = await homePage.postCard.Last.Locator("post-content").TextContentAsync();
+
+            var newPostTitlte = await homePage.postCard.Last.Locator(".post-title").TextContentAsync();
+            var newPostContent = await homePage.postCard.Last.Locator(".post-content").TextContentAsync();
 
             newPostTitlte.Should().Be("Test title");
             newPostContent.Should().Be("Test content");

@@ -13,20 +13,20 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     user: root
     ports:
-      - 1433:1433
+      - ${SQL_PORT}:${SQL_PORT}
     networks:
       - beNetwork
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "@PostsByMarko123"
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD}
    
   #HOST
   host:
     container_name: PostsByMarko.Host
     build:
-      dockerfile: src/PostsByMarko.host/Dockerfile
+      dockerfile: src/PostsByMarko.Host/Dockerfile
     ports:
-      - 7171:7171
+      - ${HOST_PORT}:${HOST_PORT}
     depends_on:
       - sqlserver
     networks:
@@ -34,7 +34,7 @@ services:
       - feNetwork
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://+:7171 
+      - ASPNETCORE_URLS=http://+:${HOST_PORT}
 
   #CLIENT
   client:
@@ -42,7 +42,7 @@ services:
     build:
       dockerfile: src/PostsByMarko.Client/Dockerfile
     ports:
-      - 3000:3000
+      - ${CLIENT_PORT}:${CLIENT_PORT}
     depends_on:
       - host
     volumes:
