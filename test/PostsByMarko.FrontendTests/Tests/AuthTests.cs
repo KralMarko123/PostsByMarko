@@ -2,8 +2,10 @@
 using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Tests;
 using PostsByMarko.Shared.Constants;
+using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;
 using Xunit;
+using static Microsoft.Playwright.Assertions;
 
 namespace PostsByMarko.FrontendTests.Frontend
 {
@@ -25,7 +27,8 @@ namespace PostsByMarko.FrontendTests.Frontend
         {
             await loginPage.Visit();
             await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
-            await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            //await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await Expect(homePage.home).ToBeVisibleAsync();
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
 
@@ -36,7 +39,7 @@ namespace PostsByMarko.FrontendTests.Frontend
         public async Task should_show_confirmational_box_after_registering()
         {
             await registerPage.Visit();
-            await registerPage.Register("Test", "User", "test_email@domain.com", "@Test123");
+            await registerPage.Register("Test", "User", $"test_{RandomHelper.GetRandomString(5)}@domain.com", "@Test123");
             await registerPage.confirmationalForm.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();

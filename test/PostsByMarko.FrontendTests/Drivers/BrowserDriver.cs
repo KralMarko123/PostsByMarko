@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using PostsByMarko.Shared.Constants;
 
 namespace PostsByMarko.FrontendTests.Drivers
 {
@@ -18,7 +19,7 @@ namespace PostsByMarko.FrontendTests.Drivers
             browser ??= await GetPlaywrightAsync()
                 .Result
                 .Chromium
-                .LaunchAsync();
+                .LaunchAsync( new BrowserTypeLaunchOptions { Headless = TestingConstants.HEADLESS_BROWSER });
 
             return browser;
         }

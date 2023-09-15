@@ -15,7 +15,8 @@ namespace PostsTesting.UI_Models.Components
         public ILocator messageFailure => page.Locator(".modal__message.fail");
         public ILocator messageSuccess => page.Locator(".modal__message.success");
         public ILocator createButton => button.GetByText("Create");
-
+        public ILocator deleteButton => button.GetByText("Delete");
+        public ILocator cancelButton => button.GetByText("Cancel");
 
 
         public async Task CloseModal()

@@ -26,17 +26,13 @@ namespace PostsByMarko.FrontendTests.Frontend
             {
                 await loginPage.Visit();
                 await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
-                await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
             }
 
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.createPost.ClickAsync();
-
-            await homePage.modalComponent.modalContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
             await homePage.modalComponent.FillInTitleInput("Test title");
             await homePage.modalComponent.FillInContentInput("Test content");
             await homePage.modalComponent.createButton.ClickAsync();
-            await homePage.modalComponent.modalContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
 
             var newPostTitlte = await homePage.postCard.Last.Locator(".post-title").TextContentAsync();
             var newPostContent = await homePage.postCard.Last.Locator(".post-content").TextContentAsync();
