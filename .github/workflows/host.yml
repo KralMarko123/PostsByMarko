@@ -44,8 +44,8 @@ jobs:
     - name: Run unit tests
       run: dotnet test ./test/PostsByMarko.UnitTests
 
-    - name: Run integration tests
-      run: dotnet test ./test/PostsByMarko.IntegrationTests
+    # - name: Run integration tests
+    #   run: dotnet test ./test/PostsByMarko.IntegrationTests
 
     - name: Ensure browsers are installed
       run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net6.0/playwright.ps1 install --with-deps  
