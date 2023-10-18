@@ -11,6 +11,6 @@ namespace PostsByMarko.Shared.Constants
         public const string DEV_CLIENT_ENDPOINT = "http://localhost:3000";
         public const string FIREFOX_BROWSER = "Firefox";
         public const string CHROME_BROWSER = "Chrome";
-        public const bool HEADLESS_BROWSER = true;
+        public const bool HEADLESS_BROWSER = false;
     }
 }

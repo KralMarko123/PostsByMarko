@@ -1,5 +1,6 @@
 .container {
 	width: var(--container-width);
+	height: fit-content;
 }
 
 .container-title {

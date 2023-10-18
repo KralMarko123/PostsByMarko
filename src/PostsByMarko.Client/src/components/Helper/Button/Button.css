@@ -17,8 +17,7 @@
 	cursor: pointer;
 }
 
-.button:hover,
-.button:focus {
+.button:hover {
 	opacity: 0.85;
 }
 

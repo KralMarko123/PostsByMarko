@@ -1,5 +1,6 @@
 .details {
 	align-items: center;
+	height: 100%;
 }
 
 .details-header {
@@ -46,7 +47,9 @@
 }
 
 .details-container {
+	position: relative;
 	width: 100%;
+	height: fit-content;
 
 	display: flex;
 	justify-content: center;
@@ -55,9 +58,67 @@
 }
 
 .details-container .content {
-	width: 75%;
+	width: 100%;
 	font-size: 1rem;
 	white-space: pre-wrap;
 
 	text-align: justify;
+	padding: var(--small-padding);
+}
+
+.details-container .content.disabled {
+	opacity: 0;
+}
+
+.details-update {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+
+	outline: none;
+	border: none;
+	background-color: transparent;
+
+	color: var(--text-color);
+	font-size: 1rem;
+	text-align: justify;
+	white-space: pre-wrap;
+
+	opacity: 0;
+	pointer-events: none;
+	resize: none;
+}
+
+.details-update.open {
+	opacity: 1;
+	pointer-events: visible;
+
+	background-color: var(--dark-accent);
+	border-radius: var(--card-radius);
+	padding: var(--small-padding);
+}
+
+.details-update-controls {
+	width: 100%;
+
+	margin-top: 1em;
+	display: flex;
+	justify-content: flex-start;
+	gap: 1em;
+
+	padding: var(--small-padding);
+}
+
+.update-control {
+	font-size: 1rem;
+	font-weight: bold;
+	text-transform: uppercase;
+
+	background-color: var(--light-accent);
+	padding: var(--small-padding);
+	border-radius: var(--button-radius);
+
+	width: fit-content;
+	font-family: var(--text-font);
 }
