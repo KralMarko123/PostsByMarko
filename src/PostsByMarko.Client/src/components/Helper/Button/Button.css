@@ -1,14 +1,18 @@
 .button {
 	width: 100%;
-	padding: 0.25em 0;
+	padding: var(--small-padding);
 
 	outline: none;
 	border: none;
 	background-color: var(--light-accent);
 	border-radius: var(--button-radius);
 
-	font-size: 2rem;
 	color: var(--text-color);
+	font-size: 1.5rem;
+	font-weight: bold;
+	font-family: var(--header-font);
+	text-transform: uppercase;
+	letter-spacing: 2px;
 
 	display: flex;
 	justify-content: center;

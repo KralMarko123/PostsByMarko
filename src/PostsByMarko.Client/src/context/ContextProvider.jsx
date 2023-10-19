@@ -40,7 +40,7 @@ export const appReducer = (state, action) => {
 		case "UPDATED_POST":
 			postBeingModifiedIndex = [...state.posts].findIndex((p) => p.id === action.post.id);
 			posts = [...state.posts];
-
+			
 			posts[postBeingModifiedIndex].title = action.post.title;
 			posts[postBeingModifiedIndex].content = action.post.content;
 			posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();

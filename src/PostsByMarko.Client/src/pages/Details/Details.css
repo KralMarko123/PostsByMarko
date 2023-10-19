@@ -39,17 +39,19 @@
 	fill: var(--light);
 }
 
-.details .error {
-	font-size: 2rem;
+.details .error,
+.details .success {
+	font-size: 1rem;
 	text-transform: uppercase;
 	font-family: var(--header-font);
-	align-self: center;
+
+	margin-top: 1em;
 }
 
 .details-container {
 	position: relative;
 	width: 100%;
-	height: fit-content;
+	height: auto;
 
 	display: flex;
 	justify-content: center;
@@ -62,63 +64,59 @@
 	font-size: 1rem;
 	white-space: pre-wrap;
 
+	background-color: rgba(var(--dark-accent-decimal), 0.25);
+	border-radius: var(--button-radius);
+
 	text-align: justify;
-	padding: var(--small-padding);
+	padding: var(--normal-padding);
+
+	overflow: scroll;
+	scrollbar-color: var(--light);
+	max-height: 500px;
+
+	scrollbar-color: var(--light) var(--dark-accent);
+	scrollbar-width: auto;
 }
 
 .details-container .content.disabled {
-	opacity: 0;
+	display: none;
 }
 
-.details-update {
-	position: absolute;
-	top: 0;
-	height: 100%;
+.details-container textarea {
 	width: 100%;
+	padding: var(--normal-padding);
 
 	outline: none;
 	border: none;
-	background-color: transparent;
+	background-color: var(--dark-accent);
+	border-radius: var(--button-radius);
+	box-shadow: var(--simple-shadow);
 
 	color: var(--text-color);
 	font-size: 1rem;
 	text-align: justify;
 	white-space: pre-wrap;
 
-	opacity: 0;
-	pointer-events: none;
 	resize: none;
+	display: none;
 }
 
-.details-update.open {
-	opacity: 1;
-	pointer-events: visible;
-
-	background-color: var(--dark-accent);
-	border-radius: var(--card-radius);
-	padding: var(--small-padding);
+.details-container textarea.open {
+	display: block;
 }
 
 .details-update-controls {
 	width: 100%;
 
 	margin-top: 1em;
+
 	display: flex;
 	justify-content: flex-start;
 	gap: 1em;
-
-	padding: var(--small-padding);
 }
 
 .update-control {
 	font-size: 1rem;
-	font-weight: bold;
-	text-transform: uppercase;
-
-	background-color: var(--light-accent);
-	padding: var(--small-padding);
-	border-radius: var(--button-radius);
 
 	width: fit-content;
-	font-family: var(--text-font);
 }

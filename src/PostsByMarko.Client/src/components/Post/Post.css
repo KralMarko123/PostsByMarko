@@ -1,6 +1,6 @@
 .post {
 	position: relative;
-	padding: 2em 1.5em 0em 1.5em;
+	padding: 2em var(--normal-padding);
 
 	background-color: var(--dark-accent);
 
