@@ -1,5 +1,5 @@
 import React from "react";
-import Loader from "../Loader";
+import Loader from "../Loader/Loader";
 import "./Button.css";
 
 const Button = ({ onButtonClick, text, loading, additionalClassNames }) => {

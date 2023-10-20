@@ -1,7 +1,7 @@
 .nav {
 	width: var(--container-width);
-	min-height: var(--header-height);
 
+	padding: 1em;
 	margin-bottom: 1em;
 
 	z-index: 1;

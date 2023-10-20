@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/components/Loader.css";
+import "./Loader.css";
 
 const Loader = () => {
 	const numberOfDots = 5;

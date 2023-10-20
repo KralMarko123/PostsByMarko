@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "../../styles/components/Select.css";
+import "./Select.css";
 
 const Select = ({ value, onChange, options }) => {
 	const [isOpen, setIsOpen] = useState(false);

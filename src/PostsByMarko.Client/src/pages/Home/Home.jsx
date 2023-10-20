@@ -3,7 +3,7 @@ import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import PostsService from "../../api/PostsService";
 import Post from "../../components/Post/Post";
-import Nav from "../../components/Layout/Nav";
+import Nav from "../../components/Layout/Nav/Nav";
 import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
 import UpdatePostForm from "../../components/Forms/UpdatePostForm/UpdatePostForm";
 import AppContext from "../../context/AppContext";

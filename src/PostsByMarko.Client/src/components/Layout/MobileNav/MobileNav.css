@@ -2,9 +2,8 @@
 @media (max-width: 1199px) {
 	.mobile__nav {
 		width: 100%;
-		min-height: var(--header-height);
 
-		padding: var(--small-padding) 0em;
+		padding: 1em;
 		padding-right: calc((100% - var(--container-width)) / 2);
 
 		display: flex;

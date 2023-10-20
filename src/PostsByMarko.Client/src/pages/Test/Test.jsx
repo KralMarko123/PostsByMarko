@@ -1,5 +1,5 @@
 import React from "react";
-import PostEditor from "../../components/PostEditor/PostEditor";
+import PostEditor from "../../components/InProgress/PostEditor/PostEditor";
 import "./Test.css";
 import "../Page.css";
 

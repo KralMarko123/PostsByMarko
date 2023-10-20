@@ -45,9 +45,3 @@ img {
 	max-width: 100%;
 	height: auto;
 }
-
-@media screen and (prefers-reduced-motion: reduce) {
-	* {
-		animation: none !important;
-	}
-}

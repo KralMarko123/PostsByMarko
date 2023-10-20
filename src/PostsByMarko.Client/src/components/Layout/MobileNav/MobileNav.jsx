@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
-import { useAuth } from "../../custom/useAuth";
-import AppContext from "../../context/AppContext";
-import "../../styles/components/MobileNav.css";
+import { useAuth } from "../../../custom/useAuth";
+import AppContext from "../../../context/AppContext";
+import "./MobileNav.css";
 
 const MobileNav = () => {
 	const appContext = useContext(AppContext);

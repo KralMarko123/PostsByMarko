@@ -35,7 +35,7 @@
 	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
 	--accent-shadow: 0px 1px 10px 0px rgba(96, 126, 170, 0.85);
 	--page-padding: var(--normal-padding) 0em;
-	--header-height: 3em;
+	--header-height: 100px;
 }
 
 /**TABLET*/

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { HelperFunctions } from "../../util/helperFunctions";
 import PostsService from "../../api/PostsService";
-import Nav from "../../components/Layout/Nav";
+import Nav from "../../components/Layout/Nav/Nav";
 import AppContext from "../../context/AppContext";
 import Container from "../../components/Layout/Container/Container";
 import logo from "../../assets/images/POSM_icon.png";
@@ -57,7 +57,7 @@ const Details = () => {
 		}
 
 		if (updatedContent === postDetails.post.content) {
-			setErrorMessage(`Content is the same`);
+			setErrorMessage(`You haven't made any changes`);
 			return;
 		}
 
@@ -80,7 +80,7 @@ const Details = () => {
 
 					setTimeout(() => {
 						setConfirmationalMessage(null);
-					}, 1000);
+					}, 3000);
 				} else setErrorMessage(requestResult.message);
 			})
 			.finally(() => setIsLoading(false));
@@ -154,7 +154,7 @@ const Details = () => {
 				)}
 
 				{errorMessage && <p className="error">{errorMessage}</p>}
-				{confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
+				{confirmationalMessage && <p className="success fade-out">{confirmationalMessage}</p>}
 			</Container>
 		</div>
 	);

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
-import CreatePostForm from "../Forms/CreatePostForm/CreatePostForm";
-import DesktopNav from "./DesktopNav";
-import MobileNav from "./MobileNav";
+import React, { useState, useEffect } from "react";
+import CreatePostForm from "../../Forms/CreatePostForm/CreatePostForm";
+import DesktopNav from "../DesktopNav/DesktopNav";
+import MobileNav from "../MobileNav/MobileNav";
 
 const Nav = () => {
 	const [width, setWidth] = useState(window.innerWidth);

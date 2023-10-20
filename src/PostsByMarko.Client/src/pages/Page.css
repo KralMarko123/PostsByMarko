@@ -19,18 +19,16 @@
 /**TABLET*/
 @media (max-width: 1199px) {
 	.logo {
-		width: 100px;
+		width: 60px;
 		position: absolute;
-		top: 1em;
-		left: 1em;
+		top: 0.5em;
 	}
 }
 
 /**MOBILE*/
 @media (max-width: 767px) {
 	.logo {
-		width: 25%;
-		position: static;
-		margin-bottom: 1em;
+		width: 50px;
+		top: 0.5em;
 	}
 }

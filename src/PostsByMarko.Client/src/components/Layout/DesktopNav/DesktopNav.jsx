@@ -1,8 +1,8 @@
 import { React, useContext } from "react";
-import { useAuth } from "../../custom/useAuth";
+import { useAuth } from "../../../custom/useAuth";
 import { AiOutlineArrowDown } from "react-icons/ai";
-import AppContext from "../../context/AppContext";
-import "../../styles/components/DesktopNav.css";
+import AppContext from "../../../context/AppContext";
+import "./DesktopNav.css";
 
 const DesktopNav = () => {
 	const { user, logout } = useAuth();
