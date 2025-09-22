@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "src/PostsByMarko.Host/**"
+      - "src/PostsByMarko.Client/**"
   workflow_dispatch:
 
 env:
