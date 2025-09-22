@@ -12,7 +12,7 @@ var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.E
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
-var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 #region ServicesConfiguration
 
@@ -32,7 +32,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString!));
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseNpgsql(connectionString!)
+);
 builder.WithServices();
 builder.WithIdentity();
 builder.Services.AddEndpointsApiExplorer();
