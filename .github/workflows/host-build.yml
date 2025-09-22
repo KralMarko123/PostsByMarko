@@ -21,10 +21,9 @@ env:
   HEADED: 0
 
 jobs:
-
   run-tests:
-    timeout-minutes: 15
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       database:
