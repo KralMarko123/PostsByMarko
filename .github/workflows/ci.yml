@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - "src/PostsByMarko.Host/**"
-
-  # allow manual workflow dispatching
   workflow_dispatch:
 
 env:
@@ -33,12 +31,12 @@ jobs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '9.0.x'
 
     - name: Install dependencies
       run: dotnet restore
     
-    - name: Build
+    - name: Build projects
       run: dotnet build
     
     - name: Run unit tests
@@ -48,7 +46,7 @@ jobs:
     #   run: dotnet test ./test/PostsByMarko.IntegrationTests
 
     - name: Ensure browsers are installed
-      run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net6.0/playwright.ps1 install --with-deps  
+      run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net9.0/playwright.ps1 install --with-deps  
     
     - name: Run frontend tests
       run: dotnet test ./test/PostsByMarko.FrontendTests
