@@ -1,4 +1,4 @@
-name: PostsByMarko.Client Docker Workflow
+name: PostsByMarko.Client Workflow
 
 on:
   pull_request:
@@ -6,10 +6,6 @@ on:
     branches:
       - main
       - develop
-    paths:
-      - "src/PostsByMarko.Client/**"
-
-  # allow manual workflow dispatching
   workflow_dispatch:
 
 env:
@@ -17,7 +13,8 @@ env:
   DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}
   IMAGE_NAME: postsbymarko.client
   IMAGE_TAG: 1.0.${{ github.run_number }}
-  MASTER_PASSWORD: ${{ secrets.MASTER_PASSWORD }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   SQL_PORT: ${{ vars.SQL_PORT }}
   HOST_PORT: ${{ vars.HOST_PORT }}
   CLIENT_PORT: ${{ vars.CLIENT_PORT }}

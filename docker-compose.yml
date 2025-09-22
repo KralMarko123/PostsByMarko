@@ -6,17 +6,22 @@ networks:
   
 services:
   #DATABASE
-  sqlserver:
-    container_name: PostsByMarko.SqlServer
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    user: root
+  database:
+    container_name: PostsByMarko.PostgresServer
+    image: postgres:17
+    environment: 
+      POSTGRES_DB: postsbymarko
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - ${SQL_PORT}:${SQL_PORT}
     networks:
       - beNetwork
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MASTER_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
    
   #HOST
   host:
@@ -27,7 +32,8 @@ services:
     ports:
       - ${HOST_PORT}:${HOST_PORT}
     depends_on:
-      - sqlserver
+      database:
+        condition: service_healthy
     networks:
       - beNetwork
       - feNetwork
