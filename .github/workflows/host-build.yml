@@ -1,12 +1,13 @@
 name: PostsByMarko.Host Docker Workflow
 
 on:
+  pull_request:
   push:
     branches:
       - main
+      - develop
     paths:
       - "src/PostsByMarko.Host/**"
-      - "src/PostsByMarko.Client/**"
   workflow_dispatch:
 
 env:
@@ -39,20 +40,15 @@ jobs:
     
     - name: Build projects
       run: dotnet build
-    
-    - name: Ensure browsers are installed
-      run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
     - name: Run unit tests
       run: dotnet test ./test/PostsByMarko.UnitTests
 
-    # - name: Run integration tests
-    #   run: dotnet test ./test/PostsByMarko.IntegrationTests
-    
-    - name: Run frontend tests
-      run: dotnet test ./test/PostsByMarko.FrontendTests
+    - name: Run integration tests
+      run: dotnet test ./test/PostsByMarko.IntegrationTests
 
   build-and-push-to-docker:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: run-tests
     steps:
