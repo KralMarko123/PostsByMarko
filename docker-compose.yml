@@ -13,16 +13,15 @@ services:
       POSTGRES_DB: postsbymarko
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    user: root
     ports:
       - ${SQL_PORT}:${SQL_PORT}
     networks:
       - beNetwork
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    options: >-
+      --health-cmd pg_isready
+      --health-interval 10s
+      --health-timeout 5s
+      --health-retries 5
    
   #HOST
   host:

@@ -28,18 +28,17 @@ jobs:
     services:
       database:
         image: postgres:17
-        environment: 
+        env: 
           POSTGRES_DB: postsbymarko
           POSTGRES_USER: ${DB_USER}
           POSTGRES_PASSWORD: ${DB_PASSWORD}
-        user: root
         ports:
-          - ${SQL_PORT}:${SQL_PORT}
-        healthcheck:
-          test: ["CMD-SHELL", "pg_isready"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
+         - ${SQL_PORT}:${SQL_PORT}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Checkout repository
