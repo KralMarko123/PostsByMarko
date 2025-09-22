@@ -23,7 +23,7 @@ env:
 jobs:
 
   run-tests:
-    timeout-minutes: 20
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -40,14 +40,14 @@ jobs:
     - name: Build projects
       run: dotnet build
     
+    - name: Ensure browsers are installed
+      run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net9.0/playwright.ps1 install --with-deps
+
     - name: Run unit tests
       run: dotnet test ./test/PostsByMarko.UnitTests
 
     # - name: Run integration tests
     #   run: dotnet test ./test/PostsByMarko.IntegrationTests
-
-    - name: Ensure browsers are installed
-      run: pwsh ./test/PostsByMarko.FrontendTests/bin/Debug/net9.0/playwright.ps1 install --with-deps  
     
     - name: Run frontend tests
       run: dotnet test ./test/PostsByMarko.FrontendTests
