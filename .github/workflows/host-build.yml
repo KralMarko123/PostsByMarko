@@ -25,6 +25,23 @@ jobs:
   run-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+
+    services:
+      database:
+        image: postgres:17
+        environment: 
+          POSTGRES_DB: postsbymarko
+          POSTGRES_USER: ${DB_USER}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+        user: root
+        ports:
+          - ${SQL_PORT}:${SQL_PORT}
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -44,6 +61,9 @@ jobs:
       run: dotnet test ./test/PostsByMarko.UnitTests
 
     - name: Run integration tests
+      depends_on:
+        database:
+          condition: service_healthy
       run: dotnet test ./test/PostsByMarko.IntegrationTests
 
   build-and-push-to-docker:
