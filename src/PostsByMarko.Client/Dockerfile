@@ -13,5 +13,5 @@ COPY ${CLIENT_PATH}/ .
 
 EXPOSE 3000
 
-RUN npm ci
+RUN npm i
 CMD [ "npm", "start" ]

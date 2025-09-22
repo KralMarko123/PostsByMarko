@@ -25,7 +25,7 @@ namespace PostsByMarko.Host.Helper
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
                 // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(MiscConstants.SERVER_EMAIL, "nba2k13ftw");
+                client.Authenticate(MiscConstants.SERVER_EMAIL, "@Ilovedrums123");
 
                 await client.SendAsync(message);
                 client.Disconnect(true);

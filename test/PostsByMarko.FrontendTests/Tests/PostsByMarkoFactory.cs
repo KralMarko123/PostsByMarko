@@ -13,9 +13,7 @@ namespace PostsByMarko.FrontendTests.Tests
     {
         private int timeoutInMs = TimeSpan.FromSeconds(20).Milliseconds;
 
-        private BrowserDriver? driver;
-        private IBrowser? browser;
-        public IPage? page;
+        public BrowserDriver? driver;
 
         private static string[]? composeFiles;
         private static ICompositeService? dockerServices;
@@ -26,15 +24,10 @@ namespace PostsByMarko.FrontendTests.Tests
             InitializeDockerContainersThroughCompose();
 
             driver = new BrowserDriver();
-            browser = await driver.GetChromeBrowserAsync();
-            page = await browser.NewPageAsync();
         }
 
         public async Task DisposeAsync()
         {
-            await page!.CloseAsync();
-            await browser!.CloseAsync();
-            await browser.DisposeAsync();
             await driver!.DestroyPlaywrightAsync();
 
             dockerServices!.Stop();

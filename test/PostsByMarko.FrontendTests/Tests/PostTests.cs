@@ -10,13 +10,15 @@ namespace PostsByMarko.FrontendTests.Frontend
     [Collection("Frontend Collection")]
     public class PostTests
     {
-        private readonly IPage page;
+        private IBrowser browser;
+        private IPage page;
         private HomePage homePage => new HomePage(page);
         private LoginPage loginPage => new LoginPage(page);
 
         public PostTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
-            page = postsByMarkoHostFactory.page!;
+            browser = postsByMarkoHostFactory.driver.GetFirefoxBrowserAsync().Result;
+            page = browser.NewPageAsync().Result;
         }
 
         [Fact]
@@ -39,6 +41,12 @@ namespace PostsByMarko.FrontendTests.Frontend
 
             newPostTitlte.Should().Be("Test title");
             newPostContent.Should().Be("Test content");
+        }
+
+        public async Task DisposeAsync()
+        {
+            await page.CloseAsync();
+            await browser.CloseAsync();
         }
     }
 }

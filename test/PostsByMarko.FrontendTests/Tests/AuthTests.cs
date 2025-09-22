@@ -12,14 +12,16 @@ namespace PostsByMarko.FrontendTests.Frontend
     [Collection("Frontend Collection")]
     public class AuthTests
     {
-        private readonly IPage page;
+        private IBrowser browser;
+        private IPage page;
         private HomePage homePage => new HomePage(page);
         private LoginPage loginPage => new LoginPage(page);
         private RegisterPage registerPage => new RegisterPage(page);
 
         public AuthTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
-            page = postsByMarkoHostFactory.page!;
+            browser = postsByMarkoHostFactory.driver.GetFirefoxBrowserAsync().Result;
+            page = browser.NewPageAsync().Result;
         }
 
         [Fact]
@@ -27,7 +29,6 @@ namespace PostsByMarko.FrontendTests.Frontend
         {
             await loginPage.Visit();
             await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
-            //await homePage.home.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
             await Expect(homePage.home).ToBeVisibleAsync();
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
@@ -44,6 +45,12 @@ namespace PostsByMarko.FrontendTests.Frontend
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();
             successfulRegisterText.Should().Be("Successfully Registered!");
+        }
+
+        public async Task DisposeAsync()
+        {
+            await page.CloseAsync();
+            await browser.CloseAsync();
         }
     }
 }
