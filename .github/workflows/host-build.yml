@@ -59,9 +59,6 @@ jobs:
       run: dotnet test ./test/PostsByMarko.UnitTests
 
     - name: Run integration tests
-      depends_on:
-        database:
-          condition: service_healthy
       run: dotnet test ./test/PostsByMarko.IntegrationTests
 
   build-and-push-to-docker:
