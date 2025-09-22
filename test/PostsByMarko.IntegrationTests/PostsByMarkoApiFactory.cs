@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -23,7 +24,10 @@ namespace PostsByMarko.IntegrationTests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.UseEnvironment("Development");
+            var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
+
+            if (isInDocker.GetValueOrDefault(false)) builder.UseEnvironment("Docker");
+            else builder.UseEnvironment("Development");
         }
 
         public new Task DisposeAsync()
