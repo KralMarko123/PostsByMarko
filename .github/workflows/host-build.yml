@@ -32,8 +32,7 @@ jobs:
           POSTGRES_DB: postsbymarko
           POSTGRES_USER: ${DB_USER}
           POSTGRES_PASSWORD: ${DB_PASSWORD}
-        ports:
-         - ${SQL_PORT}:${SQL_PORT}
+        ports: [${SQL_PORT}:${SQL_PORT}]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
