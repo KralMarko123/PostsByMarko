@@ -56,7 +56,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
             var user = await GetUserByEmailAsync(email);
             var roles = await userManager.GetRolesAsync(user);
 
-            return roles.ToList();
+            return [.. roles];
         }
 
         public async Task<bool> AddPostIdToUserAsync(string email, string postIdToAdd)
@@ -104,6 +104,27 @@ namespace PostsByMarko.Host.Data.Repos.Users
         public async Task<bool> ConfirmEmailForUserAsync(User user, string token)
         {
             var result = await userManager.ConfirmEmailAsync(user, token);
+
+            return result.Succeeded;
+        }
+
+        public async Task<List<string>> GetRolesForUserAsync(User user)
+        {
+            var roles = await userManager.GetRolesAsync(user);
+
+            return [.. roles];
+        }
+
+        public async Task<bool> AddRolesToUserAsync(User user, IEnumerable<string> roles)
+        {
+            var result = await userManager.AddToRolesAsync(user, roles);
+
+            return result.Succeeded;
+        }
+
+        public async Task<bool> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles)
+        {
+            var result = await userManager.RemoveFromRolesAsync(user, roles);
 
             return result.Succeeded;
         }

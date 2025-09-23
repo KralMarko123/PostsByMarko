@@ -26,5 +26,18 @@ namespace PostsByMarko.Host.Controllers
             LoadRequestClaims();
             return await usersService.GetAllUsersAsync();
         }
+
+        [HttpGet]
+        [Route("/getUserRoles")]
+        [Tags("Users Endpoint")]
+        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
+        public async Task<List<string>> GetUserRolesAsync()
+        {
+            LoadRequestClaims();
+
+            var userToSearch = await usersService.GetUserByIdAsync(user.UserId);
+
+            return await usersService.GetRolesForUserAsync(userToSearch!);
+        }
     }
 }

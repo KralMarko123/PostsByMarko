@@ -17,5 +17,8 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<bool> CheckPasswordForUserAsync(User user, string password);
         Task<bool> CheckIsEmailConfirmedForUserAsync(User user);
         Task<bool> ConfirmEmailForUserAsync(User user, string token);
+        Task<List<string>> GetRolesForUserAsync(User user);
+        Task<bool> AddRolesToUserAsync(User user, IEnumerable<string> roles);
+        Task<bool> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles);
     }
 }

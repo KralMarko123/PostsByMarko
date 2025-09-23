@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
+using PostsByMarko.Shared.Constants;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -39,7 +40,7 @@ namespace PostsByMarko.IntegrationTests
 
         private async Task ConfigureClientAuthentication()
         {
-            var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = "test_user@test.com", Password = "@Marko123" });
+            var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = TestingConstants.TEST_USER.Email, Password = TestingConstants.TEST_PASSWORD });
             var typedResult = await result.Content.ReadFromJsonAsync<RequestResult>();
             var payload = JsonConvert.DeserializeObject<LoginResponse>(typedResult!.Payload!.ToString()!);
             var token = payload!.Token;

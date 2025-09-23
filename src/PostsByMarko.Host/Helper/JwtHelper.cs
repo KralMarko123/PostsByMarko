@@ -22,9 +22,8 @@ namespace PostsByMarko.Host.Helper
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await usersRepository.GetClaimsAsync(user);
-            var token = GenerateToken(signingCredentials, claims);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return GenerateToken(signingCredentials, claims);
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -36,19 +35,23 @@ namespace PostsByMarko.Host.Helper
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
 
-        private JwtSecurityToken GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
+        private string GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var jwtConfig = configuration.GetSection("JwtConfig");
-            var token = new JwtSecurityToken
-            (
-            issuer: jwtConfig.GetSection("validIssuers")!.Get<List<string>>()!.FirstOrDefault(),
-            audience: jwtConfig.GetSection("validAudiences")!.Get<List<string>>()!.FirstOrDefault(),
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
-            signingCredentials: signingCredentials
-            );
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
+                Issuer = jwtConfig.GetSection("validIssuers")!.Get<List<string>>()!.FirstOrDefault(),
+                Audience = jwtConfig.GetSection("validAudiences")!.Get<List<string>>()!.FirstOrDefault(),
+                SigningCredentials = signingCredentials
 
-            return token;
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenAsString = tokenHandler.WriteToken(token);
+
+            return tokenAsString;
         }
     }
 }

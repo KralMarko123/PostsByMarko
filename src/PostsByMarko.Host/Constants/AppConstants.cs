@@ -15,8 +15,8 @@ namespace PostsByMarko.Host.Constants
 
         public static List<User> DEFAULT_USERS = new List<User>()
         {
-                new User("kralmarko123@gmail.com", "Marko", "Markovikj",true),
-                new User("test_user@test.com", "Test", "User",true),
+                new User("kralmarko123@gmail.com", "Marko", "Markovikj", true),
+                new User("test@test.com", "Test", "User", true),
         };
     }
 }

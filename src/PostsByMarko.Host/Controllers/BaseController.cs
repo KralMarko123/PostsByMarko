@@ -19,7 +19,7 @@ public class BaseController : ControllerBase
         {
             UserId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid),
             Email = HttpContext.User.FindFirstValue(ClaimTypes.Email),
-            Roles = HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList()
+            Roles = [.. HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value)]
         };
     }
 }

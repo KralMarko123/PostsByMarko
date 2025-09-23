@@ -69,9 +69,44 @@ namespace PostsByMarko.Host.Services
         {
             return await usersRepository.GenerateEmailConfirmationTokenForUserAsync(user);
         }
+
         public async Task<bool> ConfirmEmailForUserAsync(User user, string token)
         {
             return await usersRepository.ConfirmEmailForUserAsync(user, token);
+        }
+
+        public async Task<User> GetUserByIdAsync(string id)
+        {
+            return await usersRepository.GetUserByIdAsync(id);
+        }
+
+        public async Task<List<string>> GetRolesForUserAsync(User user)
+        {
+            return await usersRepository.GetRolesForUserAsync(user);
+        }
+
+        public async Task<RequestResult> AddRolesToUserAsync(User user, IEnumerable<string> roles)
+        {
+            var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during role addition").Build();
+            var rolesAdded = await usersRepository.AddRolesToUserAsync(user, roles);
+
+            if (rolesAdded)
+            {
+                return new RequestResultBuilder().Ok().WithMessage("Roles successfully added to user").Build();
+            }
+            else return badRequest;
+        }
+
+        public async Task<RequestResult> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles)
+        {
+            var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during role removal").Build();
+            var rolesRemoved = await usersRepository.RemoveRolesFromUserAsync(user, roles);
+
+            if (rolesRemoved)
+            {
+                return new RequestResultBuilder().Ok().WithMessage("Roles successfully removed from user").Build();
+            }
+            else return badRequest;
         }
     }
 }
