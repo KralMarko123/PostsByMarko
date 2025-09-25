@@ -15,149 +15,154 @@ import "../Page.css";
 import "./Details.css";
 
 const Details = () => {
-	const params = useParams();
-	const postId = params.id;
-	const { user } = useAuth();
-	const appContext = useContext(AppContext);
-	const [postDetails, setPostDetails] = useState({});
-	const [errorMessage, setErrorMessage] = useState(null);
-	const [confirmationalMessage, setConfirmationalMessage] = useState(null);
-	const [isEditing, setIsEditing] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [updatedContent, setUpdatedContent] = useState("");
-	const textAreaRef = useRef();
-	const { sendMessage } = useSignalR();
-	const postDetailsDate = HelperFunctions.getPostDetailsDate(postDetails.post?.createdDate);
+  const params = useParams();
+  const postId = params.id;
+  const { user } = useAuth();
+  const appContext = useContext(AppContext);
+  const [postDetails, setPostDetails] = useState({});
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [confirmationalMessage, setConfirmationalMessage] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [updatedContent, setUpdatedContent] = useState("");
+  const textAreaRef = useRef();
+  const { sendMessage } = useSignalR();
+  const postDetailsDate = HelperFunctions.getPostDetailsDate(
+    postDetails.post?.createdDate
+  );
 
-	const getPost = async () => {
-		await PostsService.getPostById(postId, user.token).then((requestResult) => {
-			if (requestResult.statusCode === 200) {
-				setErrorMessage(null);
-				setPostDetails(requestResult.payload);
-				setUpdatedContent(requestResult.payload.post.content);
-			} else setErrorMessage(requestResult.message);
-		});
-	};
+  const getPost = async () => {
+    await PostsService.getPostById(postId, user.token).then((requestResult) => {
+      if (requestResult.statusCode === 200) {
+        setErrorMessage(null);
+        setPostDetails(requestResult.payload);
+        setUpdatedContent(requestResult.payload.post.content);
+      } else setErrorMessage(requestResult.message);
+    });
+  };
 
-	const toggleEdit = (flag) => {
-		setIsEditing(flag);
-		textAreaRef.current.style.display = flag ? "block" : "none";
+  const toggleEdit = (flag) => {
+    setIsEditing(flag);
+    textAreaRef.current.style.display = flag ? "block" : "none";
 
-		if (!flag) {
-			textAreaRef.current.value = postDetails.post.content;
-			setUpdatedContent(postDetails.post.content);
-			setErrorMessage(null);
-		}
-	};
+    if (!flag) {
+      textAreaRef.current.value = postDetails.post.content;
+      setUpdatedContent(postDetails.post.content);
+      setErrorMessage(null);
+    }
+  };
 
-	const handleUpdatedPostContent = async () => {
-		if (updatedContent.length === 0) {
-			setErrorMessage(`Content can't be empty`);
-			return;
-		}
+  const handleUpdatedPostContent = async () => {
+    if (updatedContent.length === 0) {
+      setErrorMessage(`Content can't be empty`);
+      return;
+    }
 
-		if (updatedContent === postDetails.post.content) {
-			setErrorMessage(`You haven't made any changes`);
-			return;
-		}
+    if (updatedContent === postDetails.post.content) {
+      setErrorMessage(`You haven't made any changes`);
+      return;
+    }
 
-		updatePostContent();
-	};
+    updatePostContent();
+  };
 
-	const updatePostContent = async () => {
-		let updatedPost = postDetails.post;
-		updatedPost.content = updatedContent;
+  const updatePostContent = async () => {
+    let updatedPost = postDetails.post;
+    updatedPost.content = updatedContent;
 
-		setErrorMessage(null);
-		setIsLoading(true);
+    setErrorMessage(null);
+    setIsLoading(true);
 
-		await PostsService.updatePost(updatedPost, user.token)
-			.then((requestResult) => {
-				if (requestResult.statusCode === 200) {
-					sendMessage("Updated Post");
-					setConfirmationalMessage(requestResult.message);
-					toggleEdit(false);
+    await PostsService.updatePost(updatedPost, user.token)
+      .then((requestResult) => {
+        if (requestResult.statusCode === 200) {
+          sendMessage("Updated Post");
+          setConfirmationalMessage(requestResult.message);
+          toggleEdit(false);
 
-					setTimeout(() => {
-						setConfirmationalMessage(null);
-					}, 3000);
-				} else setErrorMessage(requestResult.message);
-			})
-			.finally(() => setIsLoading(false));
-	};
+          setTimeout(() => {
+            setConfirmationalMessage(null);
+          }, 3000);
+        } else setErrorMessage(requestResult.message);
+      })
+      .finally(() => setIsLoading(false));
+  };
 
-	useEffect(() => {
-		getPost();
+  useEffect(() => {
+    getPost();
 
-		appContext.dispatch({
-			type: "MODIFYING_POST",
-			post: { postId: postId },
-		});
-	}, []);
+    appContext.dispatch({
+      type: "MODIFYING_POST",
+      post: { postId: postId },
+    });
+  }, []);
 
-	return (
-		<div className="details page">
-			<img src={logo} className="logo" alt="posm-logo" />
-			<Nav />
+  return (
+    <div className="details page">
+      <img src={logo} className="logo" alt="posm-logo" />
+      <Nav />
 
-			<Container>
-				{postDetails.post && (
-					<>
-						<div className="details-header">
-							<h1 className="details-title">{postDetails.post?.title}</h1>
-							<div className="author-container">
-								{ICONS.USER_CIRCLE_ICON()}
-								<p className="author">
-									By {postDetails.authorFirstName} {postDetails.authorLastName}
-								</p>
-								{ICONS.CLOCK_ICON()}
-								<p className="date">{postDetailsDate}</p>
-							</div>
-						</div>
+      <Container>
+        <p>marko</p>
+        {postDetails.post && (
+          <>
+            <div className="details-header">
+              <h1 className="details-title">{postDetails.post?.title}</h1>
+              <div className="author-container">
+                {ICONS.USER_CIRCLE_ICON()}
+                <p className="author">
+                  By {postDetails.authorFirstName} {postDetails.authorLastName}
+                </p>
+                {ICONS.CLOCK_ICON()}
+                <p className="date">{postDetailsDate}</p>
+              </div>
+            </div>
 
-						<div className="details-container">
-							<p className={`content ${isEditing ? "disabled" : ""}`}>
-								{postDetails.post?.content}
-							</p>
-							<TextareaAutosize
-								defaultValue={postDetails.post?.content}
-								minRows={3}
-								maxRows={20}
-								ref={textAreaRef}
-								onChange={() => setUpdatedContent(textAreaRef.current.value)}
-							/>
-							<div className={`details-update-controls`}>
-								{isEditing ? (
-									<>
-										<Button
-											additionalClassNames={"update-control"}
-											text={"Save"}
-											onButtonClick={() => handleUpdatedPostContent()}
-											loading={isLoading}
-										/>
-										<Button
-											additionalClassNames={"update-control"}
-											text={"Cancel"}
-											onButtonClick={() => toggleEdit(false)}
-										/>
-									</>
-								) : (
-									<Button
-										additionalClassNames={"update-control"}
-										text={"Edit"}
-										onButtonClick={() => toggleEdit(true)}
-									/>
-								)}
-							</div>
-						</div>
-					</>
-				)}
+            <div className="details-container">
+              <p className={`content ${isEditing ? "disabled" : ""}`}>
+                {postDetails.post?.content}
+              </p>
+              <TextareaAutosize
+                defaultValue={postDetails.post?.content}
+                minRows={3}
+                maxRows={20}
+                ref={textAreaRef}
+                onChange={() => setUpdatedContent(textAreaRef.current.value)}
+              />
+              <div className={`details-update-controls`}>
+                {isEditing ? (
+                  <>
+                    <Button
+                      additionalClassNames={"update-control"}
+                      text={"Save"}
+                      onButtonClick={() => handleUpdatedPostContent()}
+                      loading={isLoading}
+                    />
+                    <Button
+                      additionalClassNames={"update-control"}
+                      text={"Cancel"}
+                      onButtonClick={() => toggleEdit(false)}
+                    />
+                  </>
+                ) : (
+                  <Button
+                    additionalClassNames={"update-control"}
+                    text={"Edit"}
+                    onButtonClick={() => toggleEdit(true)}
+                  />
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
-				{errorMessage && <p className="error">{errorMessage}</p>}
-				{confirmationalMessage && <p className="success fade-out">{confirmationalMessage}</p>}
-			</Container>
-		</div>
-	);
+        {errorMessage && <p className="error">{errorMessage}</p>}
+        {confirmationalMessage && (
+          <p className="success fade-out">{confirmationalMessage}</p>
+        )}
+      </Container>
+    </div>
+  );
 };
 
 export default Details;

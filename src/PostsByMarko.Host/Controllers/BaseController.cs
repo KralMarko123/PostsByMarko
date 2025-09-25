@@ -17,7 +17,7 @@ public class BaseController : ControllerBase
     {
         user = new RequestUser
         {
-            UserId = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid),
+            Id = HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid),
             Email = HttpContext.User.FindFirstValue(ClaimTypes.Email),
             Roles = [.. HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value)]
         };

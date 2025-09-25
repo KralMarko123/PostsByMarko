@@ -28,16 +28,15 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("/getUserRoles")]
+        [Route("/getEmailRoles/{email}")]
         [Tags("Users Endpoint")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<List<string>> GetUserRolesAsync()
+        [Authorize(Roles = "Admin")]
+        public async Task<RequestResult> GetEmailRolesAsync(string email)
         {
             LoadRequestClaims();
 
-            var userToSearch = await usersService.GetUserByIdAsync(user.UserId);
-
-            return await usersService.GetRolesForUserAsync(userToSearch!);
+            return await usersService.GetRolesForEmailAsync(email);
         }
     }
 }

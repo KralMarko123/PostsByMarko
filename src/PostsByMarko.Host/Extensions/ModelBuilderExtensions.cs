@@ -13,32 +13,22 @@ namespace PostsByMarko.Host.Extensions
             var appRoles = AppConstants.APP_ROLES;
             var defaultUsers = AppConstants.DEFAULT_USERS;
 
-            //seed roles
+            // seed roles
             builder.Entity<IdentityRole>().HasData(appRoles);
 
-            //seed users
+            // seed users
             builder.Entity<User>().HasData(defaultUsers);
 
-            //seed userRoles
-            List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
-
+            // set password hashes
             defaultUsers[0].PasswordHash = passwordHasher.HashPassword(defaultUsers[0], "@Marko123");
             defaultUsers[1].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
 
-            defaultUsers.ForEach(u =>
-            {
-                userRoles.Add(new IdentityUserRole<string>
-                {
-                    UserId = u.Id,
-                    RoleId = appRoles.First(q => q.Name == "Admin").Id
-                });
+            // seed userRoles
+            List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-                userRoles.Add(new IdentityUserRole<string>
-                {
-                    UserId = u.Id,
-                    RoleId = appRoles.First(q => q.Name == "User").Id
-                });
-            });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[0].Id, RoleId = appRoles[0].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[0].Id, RoleId = appRoles[1].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[1].Id, RoleId = appRoles[1].Id });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
         }

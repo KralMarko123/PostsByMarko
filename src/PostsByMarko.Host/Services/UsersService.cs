@@ -44,7 +44,7 @@ namespace PostsByMarko.Host.Services
                 UserId = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Roles = await GetRolesForEmailAsync(user.Email),
+                Roles = await usersRepository.GetRolesForEmailAsync(user.Email),
             }).Build();
         }
 
@@ -53,9 +53,12 @@ namespace PostsByMarko.Host.Services
             return await usersRepository.GetUserByEmailAsync(username);
         }
 
-        public async Task<List<string>> GetRolesForEmailAsync(string username)
+        public async Task<RequestResult> GetRolesForEmailAsync(string email)
         {
-            return await usersRepository.GetRolesForEmailAsync(username);
+            var roles = await usersRepository.GetRolesForEmailAsync(email);
+            var result = new RequestResultBuilder().Ok().WithPayload(roles).WithMessage(roles.Count > 0 ? "" : "Email has no roles associated with it").Build();
+
+            return result;
         }
 
         public async Task<RequestResult> GetAllUsersAsync()

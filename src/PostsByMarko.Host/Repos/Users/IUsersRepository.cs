@@ -10,8 +10,8 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<User> GetUserByEmailAsync(string email);
         Task<List<string>> GetRolesForEmailAsync(string email);
         Task<User> GetUserByIdAsync(string id);
-        Task<bool> AddPostIdToUserAsync(string username, string postIdToAdd);
-        Task<bool> RemovePostIdFromUserAsync(string username, string postIdToRemove);
+        Task<bool> AddPostToUserAsync(string username, Post post);
+        Task<bool> RemovePostFromUserAsync(string username, Post post);
         Task<List<string>> GetAllUsersAsync();
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<bool> CheckPasswordForUserAsync(User user, string password);

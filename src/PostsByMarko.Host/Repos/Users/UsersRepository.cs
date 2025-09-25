@@ -53,28 +53,33 @@ namespace PostsByMarko.Host.Data.Repos.Users
 
         public async Task<List<string>> GetRolesForEmailAsync(string email)
         {
+            var roles = new List<string>();
             var user = await GetUserByEmailAsync(email);
-            var roles = await userManager.GetRolesAsync(user);
 
-            return [.. roles];
+            if (user != null)
+            {
+                roles.AddRange(await userManager.GetRolesAsync(user));
+            }
+
+            return roles;
         }
 
-        public async Task<bool> AddPostIdToUserAsync(string email, string postIdToAdd)
+        public async Task<bool> AddPostToUserAsync(string email, Post post)
         {
             var user = await GetUserByEmailAsync(email);
 
-            user.PostIds.Add(postIdToAdd);
+            user.Posts.Add(post);
 
             var result = await userManager.UpdateAsync(user);
 
             return result.Succeeded;
         }
 
-        public async Task<bool> RemovePostIdFromUserAsync(string email, string postIdToRemove)
+        public async Task<bool> RemovePostFromUserAsync(string email, Post post)
         {
             var user = await GetUserByEmailAsync(email);
 
-            user.PostIds.Remove(postIdToRemove);
+            user.Posts.Remove(post);
 
             var result = await userManager.UpdateAsync(user);
 
@@ -110,9 +115,14 @@ namespace PostsByMarko.Host.Data.Repos.Users
 
         public async Task<List<string>> GetRolesForUserAsync(User user)
         {
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = new List<string>();
 
-            return [.. roles];
+            if(user != null)
+            {
+                roles.AddRange(await userManager.GetRolesAsync(user));
+            }
+
+            return roles;
         }
 
         public async Task<bool> AddRolesToUserAsync(User user, IEnumerable<string> roles)

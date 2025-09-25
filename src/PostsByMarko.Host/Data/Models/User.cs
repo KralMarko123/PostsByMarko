@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostsByMarko.Host.Data.Models
 {
@@ -10,9 +9,7 @@ namespace PostsByMarko.Host.Data.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public byte[]? ProfilePicture { get; set; }
-
-        [NotMapped]
-        public List<string> PostIds { get; set; } = new List<string>();
+        public ICollection<Post> Posts { get; set; }
 
         public User(string email)
         {
