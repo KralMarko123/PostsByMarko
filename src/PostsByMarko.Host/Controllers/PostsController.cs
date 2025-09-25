@@ -71,13 +71,4 @@ public class PostsController : BaseController
         LoadRequestClaims();
         return await postsService.TogglePostVisibilityAsync(postId, user);
     }
-
-    [HttpPost]
-    [Route("/toggleUserForPost/{postId}")]
-    [Tags("Posts Endpoint")]
-    public async Task<RequestResult> ToggleUserForPost(string postId, [FromBody] string username)
-    {
-        LoadRequestClaims();
-        return await postsService.ToggleUserForPostAsync(postId, username, user);
-    }
 }

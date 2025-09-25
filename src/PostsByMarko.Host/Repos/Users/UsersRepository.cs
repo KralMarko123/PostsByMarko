@@ -79,7 +79,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
         {
             var user = await GetUserByEmailAsync(email);
 
-            user.Posts.Remove(post);
+            user.Posts!.Remove(post);
 
             var result = await userManager.UpdateAsync(user);
 

@@ -19,7 +19,13 @@ const CreatePostForm = () => {
 	const { user } = useAuth();
 	const { sendMessage } = useSignalR();
 	const [newPostData, setNewPostData] = useState({
-		authorId: user.userId,
+		authorId: user.id,
+		author: {
+			id: user.id,
+			email: user.email,
+			firstName: user.firstName,
+			lastName: user.lastName
+		},
 		title: "",
 		content: "",
 	});

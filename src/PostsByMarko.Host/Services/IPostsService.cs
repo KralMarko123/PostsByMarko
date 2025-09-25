@@ -10,6 +10,5 @@ namespace PostsByMarko.Host.Services
         Task<RequestResult> UpdatePostAsync(Post updatedPost, RequestUser user);
         Task<RequestResult> DeletePostByIdAsync(string postId, RequestUser user);
         Task<RequestResult> TogglePostVisibilityAsync(string postId, RequestUser user);
-        Task<RequestResult> ToggleUserForPostAsync(string postId, string username, RequestUser user);
     }
 }

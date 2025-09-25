@@ -12,6 +12,18 @@ const UsersService = {
 			.then((requestResult) => requestResult.payload)
 			.catch((error) => console.log(error));
 	},
+
+	async getUser(userToken) {
+		return await fetch(ENDPOINT__URLS.GET_USER, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${userToken}`,
+			},
+		})
+			.then((response) => response.json())
+			.then((requestResult) => requestResult.payload)
+			.catch((error) => console.log(error));
+	},
 };
 
 export default UsersService;

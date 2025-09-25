@@ -13,13 +13,15 @@ import TextareaAutosize from "react-textarea-autosize";
 import { useSignalR } from "../../custom/useSignalR";
 import "../Page.css";
 import "./Details.css";
+import UsersService from "../../api/UsersService";
 
 const Details = () => {
   const params = useParams();
   const postId = params.id;
   const { user } = useAuth();
   const appContext = useContext(AppContext);
-  const [postDetails, setPostDetails] = useState({});
+  const [post, setPost] = useState({});
+  const [author, setAuthor] = useState({})
   const [errorMessage, setErrorMessage] = useState(null);
   const [confirmationalMessage, setConfirmationalMessage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -27,16 +29,24 @@ const Details = () => {
   const [updatedContent, setUpdatedContent] = useState("");
   const textAreaRef = useRef();
   const { sendMessage } = useSignalR();
-  const postDetailsDate = HelperFunctions.getPostDetailsDate(
-    postDetails.post?.createdDate
+  const postCreatedDate = HelperFunctions.getPostDetailsDate(
+    post?.createdDate
   );
 
   const getPost = async () => {
     await PostsService.getPostById(postId, user.token).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setErrorMessage(null);
-        setPostDetails(requestResult.payload);
-        setUpdatedContent(requestResult.payload.post.content);
+        setPost(requestResult.payload);
+        setUpdatedContent(requestResult.payload.content);
+      } else setErrorMessage(requestResult.message);
+    });
+
+    await UsersService.getPostById(postId, user.token).then((requestResult) => {
+      if (requestResult.statusCode === 200) {
+        setErrorMessage(null);
+        setPost(requestResult.payload);
+        setUpdatedContent(requestResult.payload.content);
       } else setErrorMessage(requestResult.message);
     });
   };
@@ -46,8 +56,8 @@ const Details = () => {
     textAreaRef.current.style.display = flag ? "block" : "none";
 
     if (!flag) {
-      textAreaRef.current.value = postDetails.post.content;
-      setUpdatedContent(postDetails.post.content);
+      textAreaRef.current.value = post.content;
+      setUpdatedContent(post.content);
       setErrorMessage(null);
     }
   };
@@ -58,7 +68,7 @@ const Details = () => {
       return;
     }
 
-    if (updatedContent === postDetails.post.content) {
+    if (updatedContent === post.content) {
       setErrorMessage(`You haven't made any changes`);
       return;
     }
@@ -67,7 +77,7 @@ const Details = () => {
   };
 
   const updatePostContent = async () => {
-    let updatedPost = postDetails.post;
+    let updatedPost = post;
     updatedPost.content = updatedContent;
 
     setErrorMessage(null);
@@ -103,27 +113,26 @@ const Details = () => {
       <Nav />
 
       <Container>
-        <p>marko</p>
-        {postDetails.post && (
+        {post.title && (
           <>
             <div className="details-header">
-              <h1 className="details-title">{postDetails.post?.title}</h1>
+              <h1 className="details-title">{post.title}</h1>
               <div className="author-container">
                 {ICONS.USER_CIRCLE_ICON()}
                 <p className="author">
-                  By {postDetails.authorFirstName} {postDetails.authorLastName}
+                  By {post.authorFirstName} {post.authorLastName}
                 </p>
                 {ICONS.CLOCK_ICON()}
-                <p className="date">{postDetailsDate}</p>
+                <p className="date">{postCreatedDate}</p>
               </div>
             </div>
 
             <div className="details-container">
               <p className={`content ${isEditing ? "disabled" : ""}`}>
-                {postDetails.post?.content}
+                {post.content}
               </p>
               <TextareaAutosize
-                defaultValue={postDetails.post?.content}
+                defaultValue={post.content}
                 minRows={3}
                 maxRows={20}
                 ref={textAreaRef}

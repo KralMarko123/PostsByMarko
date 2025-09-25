@@ -136,30 +136,5 @@ namespace PostsByMarko.Host.Services
             }
             else return unauthorizedRequest;
         }
-
-        public async Task<RequestResult> ToggleUserForPostAsync(string postId, string email, RequestUser requestUser)
-        {
-            var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while toggling user for post").Build();
-            var unauthorizedRequest = new RequestResultBuilder().Unauthorized().WithMessage($"Unauthorized to toggle user for post").Build();
-            var post = await postsRepository.GetPostByIdAsync(postId);
-
-            if (post.AuthorId == requestUser.Id || requestUser.Roles!.Contains(RoleConstants.ADMIN))
-            {
-                var user = await usersRepository.GetUserByEmailAsync(email);
-
-                if (user != null)
-                {
-                    if (!post.AllowedUsers.Contains(user.Email)) post.AllowedUsers.Add(user.Email);
-                    else post.AllowedUsers.Remove(user.Email);
-
-                    var postUpdatedSuccessfully = await postsRepository.UpdatePostAsync(post);
-
-                    if (postUpdatedSuccessfully) return new RequestResultBuilder().Ok().WithMessage($"User was toggled successfully").Build();
-                    else return badRequest;
-                }
-                else return badRequest;
-            }
-            else return unauthorizedRequest;
-        }
     }
 }

@@ -9,7 +9,7 @@ export const HelperFunctions = {
 	},
 
 	noEmptyFields(data) {
-		return Object.values(data).every((field) => field.length > 0);
+		return Object.values(data).every((field) => field.length > 0 || typeof field === 'object');
 	},
 
 	isValidPassword(password) {

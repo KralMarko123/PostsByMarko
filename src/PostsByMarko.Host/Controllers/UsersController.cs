@@ -28,6 +28,16 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
+        [Route("/getUser/{id}")]
+        [Tags("Users Endpoint")]
+        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
+        public async Task<RequestResult> GetUserAsync(string id)
+        {
+            LoadRequestClaims();
+            return await usersService.GetUserByIdAsync(id);
+        }
+
+        [HttpGet]
         [Route("/getEmailRoles/{email}")]
         [Tags("Users Endpoint")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]

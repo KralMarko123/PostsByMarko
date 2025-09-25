@@ -1,7 +1,9 @@
 ﻿using PostsByMarko.Host.Builders;
+using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
+using PostsByMarko.Host.Data.Repos.Posts;
 using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
 
@@ -41,7 +43,7 @@ namespace PostsByMarko.Host.Services
             {
                 Token = await jwtHelper.CreateTokenAsync(user),
                 Email = user.Email,
-                UserId = user.Id,
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Roles = await usersRepository.GetRolesForEmailAsync(user.Email),
@@ -78,9 +80,18 @@ namespace PostsByMarko.Host.Services
             return await usersRepository.ConfirmEmailForUserAsync(user, token);
         }
 
-        public async Task<User> GetUserByIdAsync(string id)
+        public async Task<RequestResult> GetUserByIdAsync(string id)
         {
-            return await usersRepository.GetUserByIdAsync(id);
+            var notfoundRequest = new RequestResultBuilder().NotFound().WithMessage($"User with Id: {id} was not found").Build();
+            var user = await usersRepository.GetUserByIdAsync(id);
+
+            if (user == null)
+                return notfoundRequest;
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(user)
+                .Build();
         }
 
         public async Task<List<string>> GetRolesForUserAsync(User user)

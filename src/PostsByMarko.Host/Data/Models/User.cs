@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 
 namespace PostsByMarko.Host.Data.Models
 {
@@ -9,7 +10,7 @@ namespace PostsByMarko.Host.Data.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public byte[]? ProfilePicture { get; set; }
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
 
         public User(string email)
         {
