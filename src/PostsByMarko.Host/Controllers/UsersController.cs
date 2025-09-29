@@ -47,5 +47,18 @@ namespace PostsByMarko.Host.Controllers
             LoadRequestClaims();
             return await usersService.GetRolesForEmailAsync(email);
         }
+
+        [HttpGet]
+        [Route("/getAdminDashboard")]
+        [Tags("Users Endpoint")]
+        [Authorize(Roles = "Admin")]
+        public async Task<RequestResult> GetAdminDashboard()
+        {
+            LoadRequestClaims();
+            
+            var admin = await usersService.GetUserByEmailAsync(user.Email);
+
+            return await usersService.GetAdminDashboard(admin);
+        }
     }
 }

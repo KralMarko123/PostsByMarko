@@ -16,5 +16,6 @@ namespace PostsByMarko.Host.Services
         Task<List<string>> GetRolesForUserAsync(User user);
         Task<RequestResult> AddRolesToUserAsync(User user, IEnumerable<string> roles);
         Task<RequestResult> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles);
+        Task<RequestResult> GetAdminDashboard(User admin);
     }
 }

@@ -11,13 +11,14 @@ import { ICONS } from "../../constants/icons";
 import Button from "../../components/Helper/Button/Button";
 import TextareaAutosize from "react-textarea-autosize";
 import { useSignalR } from "../../custom/useSignalR";
+import { ROUTES } from "../../constants/routes";
 import "../Page.css";
 import "./Details.css";
 
 const Details = () => {
   const params = useParams();
   const postId = params.id;
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const appContext = useContext(AppContext);
   const [post, setPost] = useState({});
   const [author, setAuthor] = useState({});
@@ -28,7 +29,9 @@ const Details = () => {
   const [updatedContent, setUpdatedContent] = useState("");
   const textAreaRef = useRef();
   const { sendMessage } = useSignalR();
+  const navigate = useNavigate();
   const postCreatedDate = HelperFunctions.getPostDetailsDate(post?.createdDate);
+  const isAuthor = author.id === user.id;
 
   const getPost = async () => {
     let authorId;
@@ -110,7 +113,12 @@ const Details = () => {
 
   return (
     <div className="details page">
-      <img src={logo} className="logo" alt="posm-logo" />
+      <img
+        src={logo}
+        className="logo"
+        alt="posm-logo"
+        onClick={() => navigate(ROUTES.HOME)}
+      />
       <Nav />
 
       <Container>
@@ -155,12 +163,20 @@ const Details = () => {
                     />
                   </>
                 ) : (
-                  <Button
-                    additionalClassNames={"update-control"}
-                    text={"Edit"}
-                    onButtonClick={() => toggleEdit(true)}
-                  />
+                  (isAuthor || isAdmin) && (
+                    <Button
+                      additionalClassNames={"update-control"}
+                      text={"Edit"}
+                      onButtonClick={() => toggleEdit(true)}
+                    />
+                  )
                 )}
+
+                <Button
+                  additionalClassNames={"update-control"}
+                  text={"Back"}
+                  onButtonClick={() => navigate(ROUTES.HOME)}
+                />
               </div>
             </div>
           </>

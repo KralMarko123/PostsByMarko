@@ -17,6 +17,7 @@ namespace PostsByMarko.Host.Constants
         {
                 new User("kralmarko123@gmail.com", "Marko", "Markovikj", true),
                 new User("test@test.com", "Test", "User", true),
+                new User("ryanfirth@generic.com", "Ryan", "Firth", true),
         };
     }
 }

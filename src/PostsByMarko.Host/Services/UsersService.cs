@@ -1,4 +1,6 @@
-﻿using PostsByMarko.Host.Builders;
+﻿using System.Linq;
+using NuGet.Versioning;
+using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -121,6 +123,39 @@ namespace PostsByMarko.Host.Services
                 return new RequestResultBuilder().Ok().WithMessage("Roles successfully removed from user").Build();
             }
             else return badRequest;
+        }
+
+        public async Task<RequestResult> GetAdminDashboard(User admin)
+        {
+            var noDataRequest = new RequestResultBuilder().NoContent().WithMessage("No data available").Build();
+            var users = await usersRepository.GetAllUsersAsync();
+
+            users = users.FindAll(u => u.Id != admin.Id);
+
+            if (users == null || users.Count == 0)
+                return noDataRequest;
+
+
+            var result = new List<AdminDashboardResponse>();
+
+            foreach (var user in users)
+            {
+                var roles = await usersRepository.GetRolesForEmailAsync(user.Email);
+                result.Add(new AdminDashboardResponse
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    NumberOfPosts = user.Posts.Count,
+                    LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedDate)?.LastUpdatedDate,
+                    Roles = roles
+                });
+
+            }
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(result)
+                .Build();
         }
     }
 }

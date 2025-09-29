@@ -45,6 +45,12 @@ namespace PostsByMarko.Host.Builders
             return this;
         }
 
+        public RequestResultBuilder NoContent()
+        {
+            requestResult.StatusCode = HttpStatusCode.NoContent;
+            return this;
+        }
+
         public RequestResultBuilder WithMessage(string message)
         {
             requestResult.Message = message;

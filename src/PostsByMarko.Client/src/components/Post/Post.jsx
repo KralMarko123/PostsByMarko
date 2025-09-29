@@ -2,6 +2,7 @@ import { React, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
+import { useSignalR } from "../../custom/useSignalR";
 import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
 import PostsService from "../../api/PostsService";
@@ -22,9 +23,8 @@ const Post = ({
   const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
   const isAuthor = authorId === user.id;
-  const readableCreatedDate = HelperFunctions.getPostCardDate(createdDate);
-
-  console.log(isAuthor, isAdmin);
+  const readableCreatedDate = HelperFunctions.getReadablePostDate(createdDate);
+  const { sendMessage } = useSignalR();
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
@@ -44,8 +44,10 @@ const Post = ({
 
     await PostsService.togglePostVisibility(id, user.token).then(
       (requestResult) => {
-        if (requestResult.statusCode === 200)
+        if (requestResult.statusCode === 200) {
           appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });
+          sendMessage("Modified Post Visibility", true);
+        }
       }
     );
   };
@@ -58,14 +60,12 @@ const Post = ({
         style={{ animationDelay: `${index * 0.15}s` }}
       >
         {(isAuthor || isAdmin) && (
-          <>
-            <span
-              className="post-icon hide"
-              onClick={(e) => handleHiddenToggle(e)}
-            >
-              {ICONS.EYE_ICON(isHidden)}
-            </span>
-          </>
+          <span
+            className="post-icon hide"
+            onClick={(e) => handleHiddenToggle(e)}
+          >
+            {ICONS.EYE_ICON(isHidden)}
+          </span>
         )}
         {(isAuthor || isAdmin) && (
           <span
@@ -83,10 +83,10 @@ const Post = ({
             {ICONS.DELETE_ICON()}
           </span>
         )}
+
         <span className="post-date">{readableCreatedDate}</span>
         <h1 className="post-title">{title}</h1>
         <p className="post-content">{content}</p>
-        <span className="post-author"></span>
       </div>
     </Card>
   );

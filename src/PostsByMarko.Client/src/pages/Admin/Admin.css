@@ -1,0 +1,33 @@
+.admin {
+  align-items: center;
+  height: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-style: hidden;
+
+  border-radius: 2rem;
+
+  box-shadow: var(--simple-shadow);
+}
+
+.table thead {
+  background-color: var(--light-accent);
+}
+
+.table tbody tr {
+  background-color: var(--dark-accent);
+}
+
+.table tbody tr.odd {
+  background-color: var(--accent);
+}
+
+.table th,
+.table td {
+  text-align: start;
+
+  padding: var(--normal-padding);
+}

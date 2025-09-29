@@ -24,7 +24,7 @@ namespace PostsByMarko.Host.Services
 
             if (!user.Roles!.Contains(RoleConstants.ADMIN))
             {
-                allPosts.RemoveAll(p => p.IsHidden);
+                allPosts.RemoveAll(p => p.IsHidden && p.AuthorId != user.Id);
             }
 
             return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();

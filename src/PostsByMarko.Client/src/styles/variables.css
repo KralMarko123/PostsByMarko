@@ -1,82 +1,83 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 :root {
-	/**COLORS*/
-	--dark: rgb(32, 32, 32);
-	--dark-accent: rgb(51, 53, 51);
-	--dark-accent-decimal: 51, 53, 51;
-	--light: rgb(173, 221, 208);
-	--light-accent: rgb(96, 126, 170);
-	--light-accent-decimal: 96, 126, 170;
-	--error: #ff2800;
-	--success: #50c878;
+  /**COLORS*/
+  --dark: rgb(32, 32, 32);
+  --accent: rgb(82, 86, 82);
+  --dark-accent: rgb(51, 53, 51);
+  --dark-accent-decimal: 51, 53, 51;
+  --light: rgb(173, 221, 208);
+  --light-accent: rgb(96, 126, 170);
+  --light-accent-decimal: 96, 126, 170;
+  --error: #ff2800;
+  --success: #50c878;
 
-	/**TEXT*/
-	--header-font: "Oswald", sans-serif;
-	--text-font: "Source Sans 3", sans-serif;
-	--text-color: #f9f5eb;
-	--base-font-size: 18px;
+  /**TEXT*/
+  --header-font: "Oswald", sans-serif;
+  --text-font: "Source Sans 3", sans-serif;
+  --text-color: #f9f5eb;
+  --base-font-size: 18px;
 
-	--s-text: 0.85rem;
-	--md-text: 1rem;
-	--lg-text: 1.25rem;
-	--big-text: 1.75rem;
-	--huge-text: 2.5rem;
+  --s-text: 0.85rem;
+  --md-text: 1rem;
+  --lg-text: 1.25rem;
+  --big-text: 1.75rem;
+  --huge-text: 2.5rem;
 
-	/**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
-	--container-width: 75%;
-	--normal-gap: 1em;
-	--small-gap: 0.25em;
-	--small-padding: 0.5em;
-	--normal-padding: 1em;
+  /**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
+  --container-width: 75%;
+  --normal-gap: 1em;
+  --small-gap: 0.25em;
+  --small-padding: 0.5em;
+  --normal-padding: 1em;
 
-	/**UTILITY*/
-	--card-radius: 0.5em;
-	--button-radius: 0.25em;
-	--simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
-	--accent-shadow: 0px 1px 10px 0px rgba(96, 126, 170, 0.85);
-	--page-padding: var(--normal-padding) 0em;
-	--header-height: 100px;
+  /**UTILITY*/
+  --card-radius: 0.5em;
+  --button-radius: 0.25em;
+  --simple-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.25);
+  --accent-shadow: 0px 1px 10px 0px rgba(96, 126, 170, 0.85);
+  --page-padding: var(--normal-padding) 0em;
+  --header-height: 100px;
 }
 
 /**TABLET*/
 @media (min-width: 768px) and (max-width: 1199px) {
-	:root {
-		/**WIDTHS, HEIGHTS, GAPS*/
-		--container-width: 90%;
-		--normal-gap: 0.75em;
-		--small-gap: 0.25em;
+  :root {
+    /**WIDTHS, HEIGHTS, GAPS*/
+    --container-width: 90%;
+    --normal-gap: 0.75em;
+    --small-gap: 0.25em;
 
-		/**TEXT*/
-		--s-text: 0.75em;
-		--md-text: 1em;
-		--lg-text: 1.15em;
-		--big-text: 1.5em;
-		--huge-text: 2.15em;
-	}
+    /**TEXT*/
+    --s-text: 0.75em;
+    --md-text: 1em;
+    --lg-text: 1.15em;
+    --big-text: 1.5em;
+    --huge-text: 2.15em;
+  }
 }
 
 /**TABLET*/
 @media (max-width: 767px) {
-	:root {
-		/**WIDTHS, HEIGHTS, GAPS*/
-		--container-width: 90%;
-		--normal-gap: 0.5em;
-		--small-gap: 0.25em;
+  :root {
+    /**WIDTHS, HEIGHTS, GAPS*/
+    --container-width: 90%;
+    --normal-gap: 0.5em;
+    --small-gap: 0.25em;
 
-		/**TEXT*/
-		--s-text: 0.75em;
-		--md-text: 0.95em;
-		--lg-text: 1.15em;
-		--big-text: 1.35em;
-		--huge-text: 1.85em;
-	}
+    /**TEXT*/
+    --s-text: 0.75em;
+    --md-text: 0.95em;
+    --lg-text: 1.15em;
+    --big-text: 1.35em;
+    --huge-text: 1.85em;
+  }
 }
 
 /**ANIMATIONS*/
 
 @keyframes dot-buffer {
-	50% {
-		opacity: 0.25;
-		transform: scale(0.75);
-	}
+  50% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
 }

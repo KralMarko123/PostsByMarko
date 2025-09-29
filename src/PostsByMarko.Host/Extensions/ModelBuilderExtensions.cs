@@ -22,6 +22,7 @@ namespace PostsByMarko.Host.Extensions
             // set password hashes
             defaultUsers[0].PasswordHash = passwordHasher.HashPassword(defaultUsers[0], "@Marko123");
             defaultUsers[1].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
+            defaultUsers[2].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
 
             // seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
@@ -29,6 +30,7 @@ namespace PostsByMarko.Host.Extensions
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[0].Id });
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[1].Id });
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("test"))!.Id, RoleId = appRoles[1].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("ryan"))!.Id, RoleId = appRoles[1].Id });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
         }

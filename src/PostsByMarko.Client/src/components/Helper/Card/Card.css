@@ -1,5 +1,9 @@
 .card {
-	box-shadow: var(--simple-shadow);
-	border-radius: var(--card-radius);
-	overflow: hidden;
+  box-shadow: var(--simple-shadow);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.card.small-radius {
+  border-radius: var(--button-radius);
 }

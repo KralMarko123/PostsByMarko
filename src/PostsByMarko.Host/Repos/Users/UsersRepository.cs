@@ -16,7 +16,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
             this.userManager = userManager;
         }
 
-        public async Task<List<string>> GetAllUsersAsync()
+        public async Task<List<string>> GetAllEmailsAsync()
         {
             return await appDbContext.Users.Select(u => u.Email).ToListAsync();
         }
@@ -137,6 +137,13 @@ namespace PostsByMarko.Host.Data.Repos.Users
             var result = await userManager.RemoveFromRolesAsync(user, roles);
 
             return result.Succeeded;
+        }
+
+        public Task<List<User>> GetAllUsersAsync()
+        {
+            var result = appDbContext.Users.Include(u => u.Posts).ToListAsync();
+
+            return result;
         }
     }
 }
