@@ -71,4 +71,13 @@ public class PostsController : BaseController
         LoadRequestClaims();
         return await postsService.TogglePostVisibilityAsync(postId, user);
     }
+
+    [HttpGet]
+    [Route("/getPostAuthor/{postId}")]
+    [Tags("Posts Endpoint")]
+    public async Task<RequestResult> GetPostAuthor(string postId)
+    {
+        LoadRequestClaims();
+        return await postsService.GetPostAuthorDetails(postId);
+    }
 }

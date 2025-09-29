@@ -13,53 +13,53 @@ import "../Page.css";
 import "./Home.css";
 
 const Home = () => {
-	const appContext = useContext(AppContext);
-	const { user } = useAuth();
-	const { lastMessageRegistered } = useSignalR();
-	const [posts, setPosts] = useState([]);
+  const appContext = useContext(AppContext);
+  const { user } = useAuth();
+  const { lastMessageRegistered } = useSignalR();
+  const [posts, setPosts] = useState([]);
 
-	const getPosts = async () => {
-		await PostsService.getAllPosts(user.token).then((requestResult) => {
-			setPosts(requestResult.payload);
-			appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
-		});
-	};
+  const getPosts = async () => {
+    await PostsService.getAllPosts(user.token).then((requestResult) => {
+      setPosts(requestResult.payload);
+      appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
+    });
+  };
 
-	useEffect(() => {
-		getPosts();
-	}, [lastMessageRegistered, appContext.posts.length]);
+  useEffect(() => {
+    getPosts();
+  }, [lastMessageRegistered, appContext.posts.length]);
 
-	return (
-		<div className="home page">
-			<img src={logo} className="logo" alt="posm-logo" />
-			<Nav />
+  return (
+    <div className="home page">
+      <img src={logo} className="logo" alt="posm-logo" />
+      <Nav />
 
-			<Container
-				title="Today's Posts"
-				desc="Check out what's going on with the world. Create, edit & inspire"
-			>
-				<ul className="posts-list">
-					{posts?.map((p, i) => (
-						<Post
-							key={p.id}
-							id={p.id}
-							authorId={p.userId}
-							title={p.title}
-							content={p.content}
-							isHidden={p.isHidden}
-							allowedUsers={p.allowedUsers}
-							createdDate={p.createdDate}
-							lastUpdatedDate={p.lastUpdatedDate}
-							index={i}
-						/>
-					))}
-				</ul>
+      <Container
+        title="Today's Posts"
+        desc="Check out what's going on with the world. Create, edit & inspire"
+      >
+        <ul className="posts-list">
+          {posts?.map((p, i) => (
+            <Post
+              key={p.id}
+              id={p.id}
+              authorId={p.authorId}
+              title={p.title}
+              content={p.content}
+              isHidden={p.isHidden}
+              allowedUsers={p.allowedUsers}
+              createdDate={p.createdDate}
+              lastUpdatedDate={p.lastUpdatedDate}
+              index={i}
+            />
+          ))}
+        </ul>
 
-				<UpdatePostForm />
-				<DeletePostForm />
-			</Container>
-		</div>
-	);
+        <UpdatePostForm />
+        <DeletePostForm />
+      </Container>
+    </div>
+  );
 };
 
 export default Home;

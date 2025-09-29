@@ -21,8 +21,10 @@ const Post = ({
   let navigate = useNavigate();
   const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
-  const isAuthor = authorId === user.userId;
+  const isAuthor = authorId === user.id;
   const readableCreatedDate = HelperFunctions.getPostCardDate(createdDate);
+
+  console.log(isAuthor, isAdmin);
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);

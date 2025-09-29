@@ -136,5 +136,27 @@ namespace PostsByMarko.Host.Services
             }
             else return unauthorizedRequest;
         }
+
+        public async Task<RequestResult> GetPostAuthorDetails(string postId)
+        {
+            var postNotfoundRequest = new RequestResultBuilder().NotFound().WithMessage($"Post with Id: {postId} was not found").Build();
+            var post = await postsRepository.GetPostByIdAsync(postId);
+
+            if (post == null)
+                return postNotfoundRequest;
+
+            var authorNotFoundRequest = new RequestResultBuilder().NotFound().WithMessage($"Author with Id: {post.AuthorId} was not found").Build();
+            var author = await usersRepository.GetUserByIdAsync(post.AuthorId);
+
+            if (author == null)
+                return authorNotFoundRequest;
+
+            var authorResponse = new AuthorDetailsResponse(author);
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(authorResponse)
+                .Build();
+        }
     }
 }

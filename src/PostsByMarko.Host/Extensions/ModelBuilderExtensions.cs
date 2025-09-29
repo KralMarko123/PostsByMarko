@@ -26,9 +26,9 @@ namespace PostsByMarko.Host.Extensions
             // seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[0].Id, RoleId = appRoles[0].Id });
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[0].Id, RoleId = appRoles[1].Id });
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers[1].Id, RoleId = appRoles[1].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[0].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[1].Id });
+            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("test"))!.Id, RoleId = appRoles[1].Id });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
         }

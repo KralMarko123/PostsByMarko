@@ -45,7 +45,6 @@ namespace PostsByMarko.Host.Controllers
         public async Task<RequestResult> GetEmailRolesAsync(string email)
         {
             LoadRequestClaims();
-
             return await usersService.GetRolesForEmailAsync(email);
         }
     }

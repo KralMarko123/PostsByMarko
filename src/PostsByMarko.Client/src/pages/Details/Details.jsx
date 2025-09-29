@@ -13,7 +13,6 @@ import TextareaAutosize from "react-textarea-autosize";
 import { useSignalR } from "../../custom/useSignalR";
 import "../Page.css";
 import "./Details.css";
-import UsersService from "../../api/UsersService";
 
 const Details = () => {
   const params = useParams();
@@ -21,7 +20,7 @@ const Details = () => {
   const { user } = useAuth();
   const appContext = useContext(AppContext);
   const [post, setPost] = useState({});
-  const [author, setAuthor] = useState({})
+  const [author, setAuthor] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [confirmationalMessage, setConfirmationalMessage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,26 +28,28 @@ const Details = () => {
   const [updatedContent, setUpdatedContent] = useState("");
   const textAreaRef = useRef();
   const { sendMessage } = useSignalR();
-  const postCreatedDate = HelperFunctions.getPostDetailsDate(
-    post?.createdDate
-  );
+  const postCreatedDate = HelperFunctions.getPostDetailsDate(post?.createdDate);
 
   const getPost = async () => {
+    let authorId;
+
     await PostsService.getPostById(postId, user.token).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setErrorMessage(null);
         setPost(requestResult.payload);
         setUpdatedContent(requestResult.payload.content);
+        authorId = requestResult.payload.authorId;
       } else setErrorMessage(requestResult.message);
     });
 
-    await UsersService.getPostById(postId, user.token).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
-        setErrorMessage(null);
-        setPost(requestResult.payload);
-        setUpdatedContent(requestResult.payload.content);
-      } else setErrorMessage(requestResult.message);
-    });
+    await PostsService.getPostAuthor(postId, user.token).then(
+      (requestResult) => {
+        if (requestResult.statusCode === 200) {
+          setErrorMessage(null);
+          setAuthor(requestResult.payload);
+        } else setErrorMessage(requestResult.message);
+      }
+    );
   };
 
   const toggleEdit = (flag) => {
@@ -120,7 +121,7 @@ const Details = () => {
               <div className="author-container">
                 {ICONS.USER_CIRCLE_ICON()}
                 <p className="author">
-                  By {post.authorFirstName} {post.authorLastName}
+                  By {author.firstName} {author.lastName}
                 </p>
                 {ICONS.CLOCK_ICON()}
                 <p className="date">{postCreatedDate}</p>
