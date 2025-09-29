@@ -66,9 +66,20 @@
 }
 
 .table-button.success {
+  color: var(--text-color);
   background-color: var(--success-flat);
 }
 
 .table-button.error {
+  color: var(--text-color);
   background-color: var(--error-flat);
+}
+
+.table-button.warning {
+  color: var(--text-color);
+  background-color: var(--warning);
+}
+
+.admin .messages {
+  margin: var(--normal-gap) 0;
 }

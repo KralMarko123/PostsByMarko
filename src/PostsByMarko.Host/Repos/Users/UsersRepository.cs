@@ -125,16 +125,9 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return roles;
         }
 
-        public async Task<bool> AddRolesToUserAsync(User user, IEnumerable<string> roles)
+        public async Task<bool> AddRoleToUserAsync(User user, string role)
         {
-            var result = await userManager.AddToRolesAsync(user, roles);
-
-            return result.Succeeded;
-        }
-
-        public async Task<bool> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles)
-        {
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
+            var result = await userManager.AddToRoleAsync(user, role);
 
             return result.Succeeded;
         }
@@ -144,6 +137,20 @@ namespace PostsByMarko.Host.Data.Repos.Users
             var result = appDbContext.Users.Include(u => u.Posts).ToListAsync();
 
             return result;
+        }
+
+        public async Task<bool> DeleteUserAsync(User user)
+        {
+            var result = await userManager.DeleteAsync(user);
+            
+            return result.Succeeded;
+        }
+
+        public async Task<bool> RemoveRoleFromUserAsync(User user, string role)
+        {
+            var result = await userManager.RemoveFromRoleAsync(user, role);
+
+            return result.Succeeded;
         }
     }
 }

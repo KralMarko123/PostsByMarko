@@ -52,13 +52,46 @@ namespace PostsByMarko.Host.Controllers
         [Route("/getAdminDashboard")]
         [Tags("Users Endpoint")]
         [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> GetAdminDashboard()
+        public async Task<RequestResult> GetAdminDashboardAsync()
         {
             LoadRequestClaims();
             
             var admin = await usersService.GetUserByEmailAsync(user.Email);
 
             return await usersService.GetAdminDashboard(admin);
+        }
+
+        [HttpDelete]
+        [Route("/deleteUser/{userId}")]
+        [Tags("Users Endpoint")]
+        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
+        [Authorize(Roles = "Admin")]
+        public async Task<RequestResult> DeleteUserAsync(string userId)
+        {
+            LoadRequestClaims();
+            return await usersService.DeleteUser(userId);
+        }
+
+        [HttpPost]
+        [Route("/addRoleToUser/{userId}/{role}")]
+        [Tags("Users Endpoint")]
+        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
+        [Authorize(Roles = "Admin")]
+        public async Task<RequestResult> AddRoleToUserAsync(string userId, string role)
+        {
+            LoadRequestClaims();
+            return await usersService.AddRoleToUserAsync(userId, role);
+        }
+
+        [HttpPost]
+        [Route("/removeRoleFromUser/{userId}/{role}")]
+        [Tags("Users Endpoint")]
+        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
+        [Authorize(Roles = "Admin")]
+        public async Task<RequestResult> RemoveRoleFromUserAsync(string userId, string role)
+        {
+            LoadRequestClaims();
+            return await usersService.RemoveRoleFromUserAsync(userId, role);
         }
     }
 }

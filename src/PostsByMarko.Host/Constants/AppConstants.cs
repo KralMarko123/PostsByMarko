@@ -8,8 +8,8 @@ namespace PostsByMarko.Host.Constants
 
         public static List<IdentityRole> APP_ROLES = new List<IdentityRole>()
         {
-                new IdentityRole { Name = RoleConstants.ADMIN },
-                new IdentityRole { Name = RoleConstants.USER }
+                new IdentityRole { Name = RoleConstants.ADMIN, NormalizedName = RoleConstants.ADMIN.ToUpper() },
+                new IdentityRole { Name = RoleConstants.USER, NormalizedName = RoleConstants.USER.ToUpper() }
         };
 
 

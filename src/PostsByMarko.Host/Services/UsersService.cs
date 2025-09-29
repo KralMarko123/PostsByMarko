@@ -1,11 +1,7 @@
-﻿using System.Linq;
-using NuGet.Versioning;
-using PostsByMarko.Host.Builders;
-using PostsByMarko.Host.Constants;
+﻿using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
-using PostsByMarko.Host.Data.Repos.Posts;
 using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
 
@@ -101,28 +97,44 @@ namespace PostsByMarko.Host.Services
             return await usersRepository.GetRolesForUserAsync(user);
         }
 
-        public async Task<RequestResult> AddRolesToUserAsync(User user, IEnumerable<string> roles)
+        public async Task<RequestResult> AddRoleToUserAsync(string userId, string role)
         {
+            var notfoundRequest = new RequestResultBuilder().NotFound().WithMessage($"User with Id: {userId} was not found").Build();
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during role addition").Build();
-            var rolesAdded = await usersRepository.AddRolesToUserAsync(user, roles);
 
-            if (rolesAdded)
-            {
-                return new RequestResultBuilder().Ok().WithMessage("Roles successfully added to user").Build();
-            }
-            else return badRequest;
+            var user = await usersRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                return notfoundRequest;
+
+            var roleAdded = await usersRepository.AddRoleToUserAsync(user, role);
+
+            if (!roleAdded)
+                return badRequest;
+                
+            return new RequestResultBuilder()
+                .Ok()
+                .WithMessage("Role successfully added to user")
+                .Build();
         }
 
-        public async Task<RequestResult> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles)
+        public async Task<RequestResult> RemoveRoleFromUserAsync(string userId, string role)
         {
+            var notfoundRequest = new RequestResultBuilder().NotFound().WithMessage($"User with Id: {userId} was not found").Build();
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during role removal").Build();
-            var rolesRemoved = await usersRepository.RemoveRolesFromUserAsync(user, roles);
 
-            if (rolesRemoved)
-            {
-                return new RequestResultBuilder().Ok().WithMessage("Roles successfully removed from user").Build();
-            }
-            else return badRequest;
+            var user = await usersRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                return notfoundRequest;
+
+            var roleRemoved = await usersRepository.RemoveRoleFromUserAsync(user, role);
+
+            if (!roleRemoved)
+                return badRequest;
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithMessage("Role successfully removed from user")
+                .Build();
         }
 
         public async Task<RequestResult> GetAdminDashboard(User admin)
@@ -155,6 +167,26 @@ namespace PostsByMarko.Host.Services
             return new RequestResultBuilder()
                 .Ok()
                 .WithPayload(result)
+                .Build();
+        }
+
+        public async Task<RequestResult> DeleteUser(string userId)
+        {
+            var badRequest = new RequestResultBuilder().BadRequest().WithMessage($"Error while removing user with id: {userId}").Build();
+            var notFoundRequest = new RequestResultBuilder().NotFound().WithMessage($"User with Id: {userId} was not found").Build();
+            var user = await usersRepository.GetUserByIdAsync(userId);
+
+            if (user == null)
+                return notFoundRequest;
+
+            var userRemovedSuccessfully = await usersRepository.DeleteUserAsync(user);
+
+            if(!userRemovedSuccessfully)
+                return badRequest;
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithMessage($"User with Id: {userId} removed successfully")
                 .Build();
         }
     }

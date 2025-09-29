@@ -14,8 +14,9 @@ namespace PostsByMarko.Host.Services
         Task<bool> ConfirmEmailForUserAsync(User user, string token);
         Task<RequestResult> GetUserByIdAsync(string id);
         Task<List<string>> GetRolesForUserAsync(User user);
-        Task<RequestResult> AddRolesToUserAsync(User user, IEnumerable<string> roles);
-        Task<RequestResult> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles);
+        Task<RequestResult> AddRoleToUserAsync(string userId, string role);
+        Task<RequestResult> RemoveRoleFromUserAsync(string userId, string role);
         Task<RequestResult> GetAdminDashboard(User admin);
+        Task<RequestResult> DeleteUser(string userId);
     }
 }

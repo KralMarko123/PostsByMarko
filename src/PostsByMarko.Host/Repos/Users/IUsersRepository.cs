@@ -19,7 +19,8 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<bool> CheckIsEmailConfirmedForUserAsync(User user);
         Task<bool> ConfirmEmailForUserAsync(User user, string token);
         Task<List<string>> GetRolesForUserAsync(User user);
-        Task<bool> AddRolesToUserAsync(User user, IEnumerable<string> roles);
-        Task<bool> RemoveRolesFromUserAsync(User user, IEnumerable<string> roles);
+        Task<bool> AddRoleToUserAsync(User user, string role);
+        Task<bool> DeleteUserAsync(User user);
+        Task<bool> RemoveRoleFromUserAsync(User user, string role);
     }
 }

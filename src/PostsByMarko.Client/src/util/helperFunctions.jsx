@@ -73,4 +73,12 @@ export const HelperFunctions = {
   getPurifiedHtml(html) {
     return { __html: DOMPurify.sanitize(html) };
   },
+
+  getCurrentMonthDayNumber() {
+    return moment().daysInMonth();
+  },
+
+  getDayOfMonthFromDate(date) {
+    return moment(date).format("DD");
+  },
 };

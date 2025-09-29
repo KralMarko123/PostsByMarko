@@ -36,6 +36,45 @@ const UsersService = {
       .then((requestResult) => requestResult)
       .catch((error) => console.log(error));
   },
+
+  async DeleteUser(userId, userToken) {
+    return await fetch(`${ENDPOINT__URLS.DELETE_USER}/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((requestResult) => requestResult)
+      .catch((error) => console.log(error));
+  },
+
+  async addRoleToUser(userId, role, userToken) {
+    return await fetch(`${ENDPOINT__URLS.ADD_ROLE_TO_USER}/${userId}/${role}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((requestResult) => requestResult)
+      .catch((error) => console.log(error));
+  },
+
+  async removeRoleFromUser(userId, role, userToken) {
+    return await fetch(
+      `${ENDPOINT__URLS.REMOVE_ROLE_FROM_USER}/${userId}/${role}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((requestResult) => requestResult)
+      .catch((error) => console.log(error));
+  },
 };
 
 export default UsersService;
