@@ -17,6 +17,12 @@
   background-color: var(--light-accent);
 }
 
+.table thead th {
+  text-transform: uppercase;
+  font-size: var(--md-text);
+  letter-spacing: 1px;
+}
+
 .table tbody tr {
   background-color: var(--dark-accent);
 }
@@ -30,4 +36,39 @@
   text-align: start;
 
   padding: var(--normal-padding);
+}
+
+.table-badge {
+  margin: 0em var(--small-gap);
+  padding: var(--xs-padding);
+  background-color: var(--light-accent);
+  border-radius: var(--button-radius);
+
+  font-size: var(--s-text);
+  text-transform: uppercase;
+}
+
+.table-button {
+  margin: 0em var(--small-gap);
+  padding: var(--small-padding);
+  border-radius: var(--button-radius);
+
+  color: var(--text-color);
+  font-size: var(--md-text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+.table-button:hover {
+  opacity: 0.75;
+}
+
+.table-button.success {
+  background-color: var(--success-flat);
+}
+
+.table-button.error {
+  background-color: var(--error-flat);
 }

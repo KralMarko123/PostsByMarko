@@ -7,9 +7,11 @@ import { useAuth } from "../../custom/useAuth";
 import { HelperFunctions } from "../../util/helperFunctions";
 import { useSignalR } from "../../custom/useSignalR";
 import AppContext from "../../context/AppContext";
+import Card from "../../components/Helper/Card/Card";
+import { ROUTES } from "../../constants/routes";
+import { useNavigate } from "react-router";
 import "../Page.css";
 import "./Admin.css";
-import Card from "../../components/Helper/Card/Card";
 
 const Admin = () => {
   const appContext = useContext(AppContext);
@@ -17,6 +19,7 @@ const Admin = () => {
   const { lastMessageRegistered } = useSignalR();
   const [data, setData] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+  const navigate = useNavigate();
 
   const getAdminDashboard = async () => {
     await UsersService.GetAdminDashboard(user.token).then((requestResult) => {
@@ -43,7 +46,7 @@ const Admin = () => {
 
       <Container
         title="Admin Dashboard"
-        desc="Manage users and view permissions"
+        desc="Manage users and view statistics"
       >
         {errorMessage && <p className="error">{errorMessage}</p>}
 
@@ -69,8 +72,15 @@ const Admin = () => {
                       ? HelperFunctions.getReadablePostDate(d.lastPostedAt)
                       : ""}
                   </td>
-                  <td>{d.roles}</td>
-                  <td>Delete</td>
+                  <td>
+                    {d.roles.map((r) => (
+                      <span className="table-badge">{r}</span>
+                    ))}
+                  </td>
+                  <td>
+                    <span className="table-button error">Delete</span>
+                    <span className="table-button success">Make Admin</span>
+                  </td>
                 </tr>
               ))}
             </tbody>

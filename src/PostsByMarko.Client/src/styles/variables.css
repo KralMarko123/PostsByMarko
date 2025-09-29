@@ -9,7 +9,9 @@
   --light-accent: rgb(96, 126, 170);
   --light-accent-decimal: 96, 126, 170;
   --error: #ff2800;
+  --error-flat: #9e2a2b;
   --success: #50c878;
+  --success-flat: #5e8c61;
 
   /**TEXT*/
   --header-font: "Oswald", sans-serif;
@@ -27,6 +29,7 @@
   --container-width: 75%;
   --normal-gap: 1em;
   --small-gap: 0.25em;
+  --xs-padding: 0.25em;
   --small-padding: 0.5em;
   --normal-padding: 1em;
 
