@@ -23,8 +23,17 @@ const Admin = () => {
   const [posts, setPosts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
-
   const navigate = useNavigate();
+  const chartLabels = [
+    ...Array(HelperFunctions.getCurrentMonthDayNumber()).keys(),
+  ].map((i) => i + 1);
+  const chartData = chartLabels.map(
+    (l) =>
+      posts.filter(
+        (p) =>
+          HelperFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
+      ).length
+  );
 
   const getAdminDashboard = async () => {
     await UsersService.GetAdminDashboard(user.token).then((requestResult) => {
@@ -178,7 +187,11 @@ const Admin = () => {
           )}
         </div>
 
-        <BarChart posts={posts} />
+        <BarChart
+          title={"Number of posts this month"}
+          labels={chartLabels}
+          data={chartData}
+        />
       </Container>
     </div>
   );

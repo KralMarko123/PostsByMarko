@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Bogus;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Constants;
 using PostsByMarko.Host.Data.Models;
@@ -33,6 +34,53 @@ namespace PostsByMarko.Host.Extensions
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("ryan"))!.Id, RoleId = appRoles[1].Id });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
+
+            if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                // generate random users
+                GenerateRandomData(builder, passwordHasher, 5);
+            }
+        }
+
+
+        public static void GenerateRandomData(ModelBuilder builder, PasswordHasher<User> hasher, int numberOfUsers)
+        {
+            var userFaker = new Faker<User>()
+                .CustomInstantiator(f => new User(
+                    f.Internet.Email(),
+                    f.Name.FirstName(),
+                    f.Name.LastName(),
+                    true
+                ));
+
+            var postFaker = new Faker<Post>()
+                .CustomInstantiator(f => new Post
+                {
+                    Title = f.Lorem.Text(),
+                    Content = f.Lorem.Paragraphs(1, 4),
+                    CreatedDate = f.Date.Recent(30, DateTime.UtcNow),
+                    LastUpdatedDate = f.Date.Recent(30, DateTime.UtcNow),
+                    IsHidden = f.Random.Bool(0.1f)
+                });
+
+
+            var fakeUsers = userFaker.Generate(numberOfUsers);
+            var userRoles = new List<IdentityUserRole<string>>();
+            var fakePosts = new List<Post>();
+
+            fakeUsers.ForEach(u =>
+            {
+                u.PasswordHash = hasher.HashPassword(u, "@Marko123");
+                userRoles.Add(new IdentityUserRole<string> { UserId = u.Id, RoleId = AppConstants.APP_ROLES[1].Id });
+                
+                var postsToAdd = postFaker.Generate(new Random().Next(1, 10));
+                postsToAdd.ForEach(p => p.AuthorId = u.Id);
+                fakePosts.AddRange(postsToAdd);
+            });
+
+            builder.Entity<User>().HasData(fakeUsers);
+            builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
+            builder.Entity<Post>().HasData(fakePosts);
         }
     }
 }

@@ -9,7 +9,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { HelperFunctions } from "../../util/helperFunctions";
 
 ChartJS.register(
   CategoryScale,
@@ -22,6 +21,13 @@ ChartJS.register(
 
 export const options = {
   responsive: true,
+  scales: {
+    y: {
+      ticks: {
+        stepSize: 1,
+      },
+    },
+  },
   plugins: {
     legend: {
       position: "top",
@@ -29,31 +35,19 @@ export const options = {
   },
 };
 
-const labels = [
-  ...Array(HelperFunctions.getCurrentMonthDayNumber()).keys(),
-].map((i) => i + 1);
-
-const BarChart = ({ posts }) => {
-  const data = labels.map(
-    (l) =>
-      posts.filter(
-        (p) =>
-          HelperFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
-      ).length
-  );
-
+const BarChart = ({ title, labels, data }) => {
   const chartData = {
     labels: labels,
     datasets: [
       {
-        label: "Number of posts this month",
+        label: title,
         data: data,
         backgroundColor: "rgb(96, 126, 170)",
       },
     ],
   };
 
-  useEffect(() => {}, [posts.length]);
+  useEffect(() => {}, [data.length]);
 
   return <Bar options={options} data={chartData} />;
 };

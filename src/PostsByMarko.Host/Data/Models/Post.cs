@@ -20,6 +20,16 @@ namespace PostsByMarko.Host.Data.Models
             Content = content;
         }
 
+        public Post(string title, string content, string authorId, DateTime createdDate, DateTime updatedDate, bool isHidden)
+        {
+            Title = title;
+            Content = content;
+            AuthorId = authorId;
+            CreatedDate = createdDate;
+            LastUpdatedDate = updatedDate;
+            IsHidden = isHidden;
+        }
+
         public Post() { }
     }
 }
