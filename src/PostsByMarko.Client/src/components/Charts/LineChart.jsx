@@ -3,17 +3,20 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
+import { callback } from "chart.js/helpers";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend
@@ -42,25 +45,47 @@ export const options = {
   plugins: {
     legend: {
       position: "top",
+      labels: {
+        padding: 20,
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        label: function (context) {
+          return ` ${context.parsed.y} users registered`;
+        },
+
+        title: function (context) {
+          return context[0].label;
+        },
+      },
     },
   },
 };
 
-const BarChart = ({ title, labels, data }) => {
+const LineChart = ({ title, labels, data }) => {
   const chartData = {
     labels: labels,
     datasets: [
       {
         label: title,
         data: data,
-        backgroundColor: "rgba(96, 126, 170, 0.5)",
         borderColor: "rgb(96, 126, 170)",
         borderWidth: 2,
+        tension: 0.3,
       },
     ],
   };
 
-  return <Bar options={options} data={chartData} />;
+  useEffect(() => {}, [data.length]);
+
+  return <Line options={options} data={chartData} />;
 };
 
-export default BarChart;
+export default LineChart;

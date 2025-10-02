@@ -37,20 +37,14 @@ namespace PostsByMarko.Host.Data.Repos.Posts
         {
             appDbContext.Posts.Update(postToUpdate);
 
-            var postUpdatedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
-
-            if (postUpdatedSuccessfully) return true;
-            else return false;
+            return await appDbContext.SaveChangesAsync() >= 1;
         }
 
         public async Task<bool> DeletePostAsync(Post postToDelete)
         {
             appDbContext.Remove(postToDelete);
 
-            var postDeletedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
-
-            if (postDeletedSuccessfully) return true;
-            else return false;
+            return await appDbContext.SaveChangesAsync() >= 1;
         }
     }
 }

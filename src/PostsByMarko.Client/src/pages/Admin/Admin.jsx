@@ -12,6 +12,7 @@ import Card from "../../components/Helper/Card/Card";
 import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router";
 import BarChart from "../../components/Charts/BarChart";
+import LineChart from "../../components/Charts/LineChart";
 import "../Page.css";
 import "./Admin.css";
 
@@ -24,16 +25,28 @@ const Admin = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
   const navigate = useNavigate();
-  const chartLabels = [
+  const barChartLabels = [
     ...Array(HelperFunctions.getCurrentMonthDayNumber()).keys(),
   ].map((i) => i + 1);
-  const chartData = chartLabels.map(
+  const barChartData = barChartLabels.map(
     (l) =>
       posts.filter(
         (p) =>
           HelperFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
       ).length
   );
+
+  const lineChartLabels = HelperFunctions.getThisMonthsDates();
+  console.log(lineChartLabels);
+
+  const lineChartData = lineChartLabels.map(
+    (l) =>
+      users.filter(
+        (u) =>
+          HelperFunctions.getDateTimeInFormat(u.createdAt, "D/M/YYYY") === l
+      ).length
+  );
+  console.log(lineChartData);
 
   const getAdminDashboard = async () => {
     await UsersService.GetAdminDashboard(user.token).then((requestResult) => {
@@ -187,11 +200,19 @@ const Admin = () => {
           )}
         </div>
 
-        <BarChart
-          title={"Number of posts this month"}
-          labels={chartLabels}
-          data={chartData}
-        />
+        <div className="chart-container">
+          {/* <BarChart
+            title={"Posts this month"}
+            labels={chartLabels}
+            data={chartData}
+          /> */}
+
+          <LineChart
+            title={"Registered users this month"}
+            labels={lineChartLabels}
+            data={lineChartData}
+          />
+        </div>
       </Container>
     </div>
   );

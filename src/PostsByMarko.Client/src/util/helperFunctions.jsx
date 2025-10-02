@@ -81,4 +81,21 @@ export const HelperFunctions = {
   getDayOfMonthFromDate(date) {
     return moment(date).format("DD");
   },
+
+  getThisMonthsDates() {
+    const dates = [];
+    let current = moment().startOf("month");
+    const end = moment().endOf("month");
+
+    while (current.isSameOrBefore(end, "day")) {
+      dates.push(moment(current.clone()).format("D/M/YYYY")); // Clone to avoid modifying the original date in the loop
+      current.add(1, "day");
+    }
+
+    return dates;
+  },
+
+  getDateTimeInFormat(dateTime, format) {
+    return moment(dateTime).format(format);
+  },
 };

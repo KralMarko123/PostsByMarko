@@ -157,6 +157,7 @@ namespace PostsByMarko.Host.Services
                 {
                     Id = user.Id,
                     Email = user.Email,
+                    CreatedAt = user.CreatedAt,
                     NumberOfPosts = user.Posts.Count,
                     LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedDate)?.LastUpdatedDate,
                     Roles = roles

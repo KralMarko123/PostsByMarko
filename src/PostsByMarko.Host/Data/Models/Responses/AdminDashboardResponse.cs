@@ -6,6 +6,7 @@
         public string Email { get; set; }
         public int NumberOfPosts { get; set; }
         public DateTime? LastPostedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<string> Roles { get; set; }
     }
 }

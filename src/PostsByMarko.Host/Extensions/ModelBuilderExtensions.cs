@@ -23,7 +23,6 @@ namespace PostsByMarko.Host.Extensions
             // set password hashes
             defaultUsers[0].PasswordHash = passwordHasher.HashPassword(defaultUsers[0], "@Marko123");
             defaultUsers[1].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
-            defaultUsers[2].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
 
             // seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
@@ -31,36 +30,38 @@ namespace PostsByMarko.Host.Extensions
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[0].Id });
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[1].Id });
             userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("test"))!.Id, RoleId = appRoles[1].Id });
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("ryan"))!.Id, RoleId = appRoles[1].Id });
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
 
             if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 // generate random users
-                GenerateRandomData(builder, passwordHasher, 5);
+                GenerateRandomData(builder, passwordHasher, 10);
             }
         }
 
 
         public static void GenerateRandomData(ModelBuilder builder, PasswordHasher<User> hasher, int numberOfUsers)
         {
+            var halfOfMonthHasGoneBy = DateTime.UtcNow.Day >= 15;
+
             var userFaker = new Faker<User>()
                 .CustomInstantiator(f => new User(
                     f.Internet.Email(),
                     f.Name.FirstName(),
                     f.Name.LastName(),
-                    true
+                    true,
+                    halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow)
                 ));
 
             var postFaker = new Faker<Post>()
                 .CustomInstantiator(f => new Post
                 {
-                    Title = f.Lorem.Text(),
-                    Content = f.Lorem.Paragraphs(1, 4),
-                    CreatedDate = f.Date.Recent(30, DateTime.UtcNow),
-                    LastUpdatedDate = f.Date.Recent(30, DateTime.UtcNow),
-                    IsHidden = f.Random.Bool(0.1f)
+                    Title = f.Commerce.ProductName(),
+                    Content = f.Rant.Review(f.Commerce.ProductName()),
+                    CreatedDate = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
+                    LastUpdatedDate = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
+                    IsHidden = f.Random.Bool(0.25f)
                 });
 
 
@@ -73,7 +74,7 @@ namespace PostsByMarko.Host.Extensions
                 u.PasswordHash = hasher.HashPassword(u, "@Marko123");
                 userRoles.Add(new IdentityUserRole<string> { UserId = u.Id, RoleId = AppConstants.APP_ROLES[1].Id });
                 
-                var postsToAdd = postFaker.Generate(new Random().Next(1, 10));
+                var postsToAdd = postFaker.Generate(new Random().Next(1, 3));
                 postsToAdd.ForEach(p => p.AuthorId = u.Id);
                 fakePosts.AddRange(postsToAdd);
             });

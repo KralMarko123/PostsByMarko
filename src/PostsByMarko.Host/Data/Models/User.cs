@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Text.Json.Serialization;
 
 namespace PostsByMarko.Host.Data.Models
 {
@@ -10,6 +9,7 @@ namespace PostsByMarko.Host.Data.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public byte[]? ProfilePicture { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Post> Posts { get; set; } = new List<Post>();
 
         public User(string email)
@@ -31,7 +31,7 @@ namespace PostsByMarko.Host.Data.Models
             EmailConfirmed = false;
         }
 
-        public User(string email, string firstName, string lastName, bool emailConfirmed)
+        public User(string email, string firstName, string lastName, bool emailConfirmed, DateTime createdAt)
         {
             Email = email;
             NormalizedEmail = email.ToUpper();
@@ -40,6 +40,7 @@ namespace PostsByMarko.Host.Data.Models
             FirstName = firstName;
             LastName = lastName;
             EmailConfirmed = emailConfirmed;
+            CreatedAt = createdAt;
         }
     }
 }

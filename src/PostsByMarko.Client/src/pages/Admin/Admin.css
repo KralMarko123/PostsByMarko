@@ -83,3 +83,11 @@
 .admin .messages {
   margin: var(--normal-gap) 0;
 }
+
+.admin .chart-container {
+  display: flex;
+  place-content: center;
+
+  background-color: var(--dark-accent);
+  max-height: 50vh;
+}
