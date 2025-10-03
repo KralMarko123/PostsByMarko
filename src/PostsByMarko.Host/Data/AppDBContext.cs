@@ -8,6 +8,8 @@ namespace PostsByMarko.Host.Data
     public class AppDbContext : IdentityDbContext<User>
     {
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
@@ -22,7 +24,14 @@ namespace PostsByMarko.Host.Data
                 .HasForeignKey(p => p.AuthorId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Chat>()
+                .HasMany(c => c.Messages)
+                .WithOne()
+                .HasForeignKey(m => m.ChatId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Seed();
         }
     }

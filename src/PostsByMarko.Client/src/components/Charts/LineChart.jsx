@@ -57,7 +57,11 @@ export const options = {
       enabled: true,
       callbacks: {
         label: function (context) {
-          return ` ${context.parsed.y} users registered`;
+          var numberOfUsers = context.parsed.y;
+
+          return ` ${numberOfUsers} ${
+            numberOfUsers === 1 ? "user registered" : "users registered"
+          }`;
         },
 
         title: function (context) {
