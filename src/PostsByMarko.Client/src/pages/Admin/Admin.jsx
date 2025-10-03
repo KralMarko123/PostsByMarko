@@ -5,7 +5,6 @@ import Nav from "../../components/Layout/Nav/Nav";
 import UsersService from "../../api/UsersService";
 import PostsService from "../../api/PostsService";
 import { useAuth } from "../../custom/useAuth";
-import { HelperFunctions } from "../../util/helperFunctions";
 import { useSignalR } from "../../custom/useSignalR";
 import AppContext from "../../context/AppContext";
 import Card from "../../components/Helper/Card/Card";
@@ -13,6 +12,8 @@ import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router";
 import BarChart from "../../components/Charts/BarChart";
 import LineChart from "../../components/Charts/LineChart";
+import Footer from "../../components/Layout/Footer/Footer";
+import { DateFunctions } from "../../util/dateFunctions";
 import "../Page.css";
 import "./Admin.css";
 
@@ -25,28 +26,24 @@ const Admin = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
   const navigate = useNavigate();
+
   const barChartLabels = [
-    ...Array(HelperFunctions.getCurrentMonthDayNumber()).keys(),
+    ...Array(DateFunctions.getCurrentMonthDayNumber()).keys(),
   ].map((i) => i + 1);
   const barChartData = barChartLabels.map(
     (l) =>
       posts.filter(
         (p) =>
-          HelperFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
+          DateFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
       ).length
   );
-
-  const lineChartLabels = HelperFunctions.getThisMonthsDates();
-  console.log(lineChartLabels);
-
+  const lineChartLabels = DateFunctions.getThisMonthsDates();
   const lineChartData = lineChartLabels.map(
     (l) =>
       users.filter(
-        (u) =>
-          HelperFunctions.getDateTimeInFormat(u.createdAt, "D/M/YYYY") === l
+        (u) => DateFunctions.getDateTimeInFormat(u.createdAt, "D/M/YYYY") === l
       ).length
   );
-  console.log(lineChartData);
 
   const getAdminDashboard = async () => {
     await UsersService.GetAdminDashboard(user.token).then((requestResult) => {
@@ -151,7 +148,7 @@ const Admin = () => {
                     <td>{user.numberOfPosts}</td>
                     <td>
                       {user.lastPostedAt
-                        ? HelperFunctions.getReadablePostDate(user.lastPostedAt)
+                        ? DateFunctions.getReadableDateTime(user.lastPostedAt)
                         : ""}
                     </td>
                     <td>
@@ -200,20 +197,26 @@ const Admin = () => {
           )}
         </div>
 
-        <div className="chart-container">
-          {/* <BarChart
-            title={"Posts this month"}
-            labels={chartLabels}
-            data={chartData}
-          /> */}
+        <div className="charts-container">
+          <div className="chart">
+            <BarChart
+              title={"Posts this month"}
+              labels={barChartLabels}
+              data={barChartData}
+            />
+          </div>
 
-          <LineChart
-            title={"Registered users this month"}
-            labels={lineChartLabels}
-            data={lineChartData}
-          />
+          <div className="chart">
+            <LineChart
+              title={"Registered users this month"}
+              labels={lineChartLabels}
+              data={lineChartData}
+            />
+          </div>
         </div>
       </Container>
+
+      <Footer />
     </div>
   );
 };

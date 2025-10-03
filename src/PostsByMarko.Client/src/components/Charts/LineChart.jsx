@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +10,6 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { callback } from "chart.js/helpers";
 
 ChartJS.register(
   CategoryScale,
@@ -82,8 +81,6 @@ const LineChart = ({ title, labels, data }) => {
       },
     ],
   };
-
-  useEffect(() => {}, [data.length]);
 
   return <Line options={options} data={chartData} />;
 };

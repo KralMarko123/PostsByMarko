@@ -1,13 +1,6 @@
-import moment from "moment";
 import DOMPurify from "dompurify";
 
 export const HelperFunctions = {
-  getDateAsReadableText(date) {
-    const readableDate = new Date(Date.parse(date)).toLocaleDateString("en-UK");
-    if (readableDate !== "Invalid Date") return readableDate;
-    else return "what most likely was a Friday";
-  },
-
   noEmptyFields(data) {
     return Object.values(data).every(
       (field) => field.length > 0 || typeof field === "object"
@@ -52,50 +45,7 @@ export const HelperFunctions = {
       : null;
   },
 
-  getDateAsLocalDate(date) {
-    return moment(moment.utc(date)).local();
-  },
-
-  getReadablePostDate(date) {
-    const dateLocal = this.getDateAsLocalDate(date);
-    const dayAndMonth = moment(dateLocal).format("Do MMMM");
-    const hoursAndMinutes = moment(dateLocal).format("HH:mm");
-
-    return `${dayAndMonth} at ${hoursAndMinutes}`;
-  },
-
-  getPostDetailsDate(date) {
-    const dateLocal = this.getDateAsLocalDate(date);
-
-    return moment(dateLocal).format("DD MMMM YYYY");
-  },
-
   getPurifiedHtml(html) {
     return { __html: DOMPurify.sanitize(html) };
-  },
-
-  getCurrentMonthDayNumber() {
-    return moment().daysInMonth();
-  },
-
-  getDayOfMonthFromDate(date) {
-    return moment(date).format("DD");
-  },
-
-  getThisMonthsDates() {
-    const dates = [];
-    let current = moment().startOf("month");
-    const end = moment().endOf("month");
-
-    while (current.isSameOrBefore(end, "day")) {
-      dates.push(moment(current.clone()).format("D/M/YYYY")); // Clone to avoid modifying the original date in the loop
-      current.add(1, "day");
-    }
-
-    return dates;
-  },
-
-  getDateTimeInFormat(dateTime, format) {
-    return moment(dateTime).format(format);
   },
 };

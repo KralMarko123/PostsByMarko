@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +9,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { DateFunctions } from "../../util/dateFunctions";
 
 ChartJS.register(
   CategoryScale,
@@ -42,6 +43,26 @@ export const options = {
   plugins: {
     legend: {
       position: "top",
+      labels: {
+        padding: 20,
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        label: function (context) {
+          return ` ${context.parsed.y} posts were created`;
+        },
+
+        title: function (context) {
+          return `${context[0].label} ${DateFunctions.getThisMonthAsText()}`;
+        },
+      },
     },
   },
 };

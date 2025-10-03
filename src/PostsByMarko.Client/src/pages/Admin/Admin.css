@@ -84,10 +84,14 @@
   margin: var(--normal-gap) 0;
 }
 
-.admin .chart-container {
+.admin .charts-container {
+  width: 100%;
   display: flex;
-  place-content: center;
+  align-items: center;
+  gap: 1em;
+  justify-content: space-between;
+}
 
-  background-color: var(--dark-accent);
-  max-height: 50vh;
+.admin .chart {
+  width: calc(50% - var(--normal-gap));
 }

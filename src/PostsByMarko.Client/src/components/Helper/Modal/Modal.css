@@ -1,62 +1,62 @@
 .modal,
 .modal-container {
-	transition: all 300ms ease-in-out;
+  transition: all var(--modal-transition-duration) ease-in-out;
 }
 
 .modal {
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 
-	background-color: rgba(0, 0, 0, 0.75);
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-	z-index: 999;
-	opacity: 0;
+  z-index: 999;
+  opacity: 0;
 }
 
 .modal-container {
-	height: fit-content;
+  height: fit-content;
 
-	background-color: var(--dark-accent);
-	border-radius: var(--card-radius);
+  background-color: var(--dark-accent);
+  border-radius: var(--card-radius);
 
-	display: flex;
-	flex-direction: column;
-	gap: var(--normal-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--normal-gap);
 
-	transform: translateY(-1000px);
+  transform: translateY(-1000px);
 }
 
 .modal-title {
-	color: var(--text-color);
-	font-size: var(--huge-text);
-	font-weight: bold;
-	text-transform: uppercase;
+  color: var(--text-color);
+  font-size: var(--huge-text);
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 /** ENTER CSS */
 
 .modal.enter-done {
-	opacity: 1;
-	pointer-events: visible;
+  opacity: 1;
+  pointer-events: visible;
 }
 
 .modal.enter-done .modal-container {
-	transform: translateY(0);
+  transform: translateY(0);
 }
 
 /** EXIT CSS */
 .modal.exit-active {
-	opacity: 0;
+  opacity: 0;
 }
 
 .modal.exit-active .modal-container {
-	transform: translateY(-1000px);
+  transform: translateY(-1000px);
 }
 
 /**TABLET*/

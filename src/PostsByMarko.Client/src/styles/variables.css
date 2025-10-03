@@ -41,6 +41,7 @@
   --accent-shadow: 0px 1px 10px 0px rgba(96, 126, 170, 0.85);
   --page-padding: var(--normal-padding) 0em;
   --header-height: 100px;
+  --modal-transition-duration: 300ms; /* should mimic modalTransitionDurationInMilliseconds in misc.jsx */
 }
 
 /**TABLET*/

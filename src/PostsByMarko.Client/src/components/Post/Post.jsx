@@ -7,7 +7,7 @@ import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
 import PostsService from "../../api/PostsService";
 import Card from "../Helper/Card/Card";
-import { HelperFunctions } from "../../util/helperFunctions";
+import { DateFunctions } from "../../util/dateFunctions";
 import "./Post.css";
 
 const Post = ({
@@ -23,7 +23,7 @@ const Post = ({
   const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
   const isAuthor = authorId === user.id;
-  const readableCreatedDate = HelperFunctions.getReadablePostDate(createdDate);
+  const readableCreatedDate = DateFunctions.getReadableDateTime(createdDate);
   const { sendMessage } = useSignalR();
 
   const handlePostClick = () => {

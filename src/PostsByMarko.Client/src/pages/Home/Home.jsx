@@ -13,6 +13,7 @@ import logo from "../../assets/images/POSM_icon.png";
 import { ROUTES } from "../../constants/routes";
 import "../Page.css";
 import "./Home.css";
+import Footer from "../../components/Layout/Footer/Footer";
 
 const Home = () => {
   const appContext = useContext(AppContext);
@@ -66,6 +67,7 @@ const Home = () => {
         <UpdatePostForm />
         <DeletePostForm />
       </Container>
+      <Footer />
     </div>
   );
 };

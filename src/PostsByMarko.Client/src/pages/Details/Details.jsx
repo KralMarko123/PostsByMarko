@@ -1,7 +1,6 @@
 import { React, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import { HelperFunctions } from "../../util/helperFunctions";
 import PostsService from "../../api/PostsService";
 import Nav from "../../components/Layout/Nav/Nav";
 import AppContext from "../../context/AppContext";
@@ -12,6 +11,8 @@ import Button from "../../components/Helper/Button/Button";
 import TextareaAutosize from "react-textarea-autosize";
 import { useSignalR } from "../../custom/useSignalR";
 import { ROUTES } from "../../constants/routes";
+import { DateFunctions } from "../../util/dateFunctions";
+import Footer from "../../components/Layout/Footer/Footer";
 import "../Page.css";
 import "./Details.css";
 
@@ -30,7 +31,10 @@ const Details = () => {
   const textAreaRef = useRef();
   const { sendMessage } = useSignalR();
   const navigate = useNavigate();
-  const postCreatedDate = HelperFunctions.getPostDetailsDate(post?.createdDate);
+  const postCreatedDate = DateFunctions.getLocalDateInFormat(
+    post?.createdDate,
+    "DD MMMM YYYY"
+  );
   const isAuthor = author.id === user.id;
 
   const getPost = async () => {
@@ -187,6 +191,8 @@ const Details = () => {
           <p className="success fade-out">{confirmationalMessage}</p>
         )}
       </Container>
+
+      <Footer />
     </div>
   );
 };

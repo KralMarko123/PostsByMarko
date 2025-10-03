@@ -1,0 +1,35 @@
+.footer {
+  width: var(--container-width);
+
+  padding: 5em 0 2em 0;
+  margin-top: auto;
+
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.footer-link {
+  display: grid;
+  place-content: center;
+  padding: var(--normal-padding);
+
+  background-color: var(--accent);
+  border-radius: var(--button-radius);
+
+  cursor: pointer;
+}
+
+.footer-link:hover {
+  opacity: 0.75;
+}
+
+.footer-link svg {
+  color: var(--light);
+  font-size: var(--huge-text);
+}
+
+.copyright {
+  font-size: var(--md-text);
+  letter-spacing: 1px;
+}
