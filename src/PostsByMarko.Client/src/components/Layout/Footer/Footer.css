@@ -26,10 +26,10 @@
 
 .footer-link svg {
   color: var(--light);
-  font-size: var(--huge-text);
+  font-size: var(--big-text);
 }
 
 .copyright {
-  font-size: var(--md-text);
+  font-size: var(--s-text);
   letter-spacing: 1px;
 }

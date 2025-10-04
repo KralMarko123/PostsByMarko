@@ -6,7 +6,6 @@ using PostsByMarko.Host.Services;
 
 namespace PostsByMarko.Host.Controllers;
 
-[Route("")]
 [Authorize]
 public class PostsController : BaseController
 {
@@ -18,7 +17,7 @@ public class PostsController : BaseController
 
     [HttpGet]
     [Route("/getAllPosts")]
-    [Tags("Posts Endpoint")]
+    [Tags("Posts Endpoints")]
     public async Task<RequestResult> GetAllPostsAsync()
     {
         LoadRequestClaims();

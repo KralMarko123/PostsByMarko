@@ -6,9 +6,9 @@ namespace PostsByMarko.Host.Services
 {
     public class MessagingService : IMessagingService
     {
-        private readonly MessagingRepository messagingRepository;
+        private readonly IMessagingRepository messagingRepository;
         
-        public MessagingService(MessagingRepository messagingRepository)
+        public MessagingService(IMessagingRepository messagingRepository)
         {
             this.messagingRepository = messagingRepository;
         }

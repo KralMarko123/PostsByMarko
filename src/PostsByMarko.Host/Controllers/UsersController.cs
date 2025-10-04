@@ -7,7 +7,6 @@ using PostsByMarko.Host.Services;
 namespace PostsByMarko.Host.Controllers
 {
 
-    [Route("")]
     [Authorize]
     public class UsersController : BaseController
     {
@@ -19,7 +18,7 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("/getAllUsers")]
-        [Tags("Users Endpoint")]
+        [Tags("Users Endpoints")]
         [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
         public async Task<RequestResult> GetAllUsersAsync()
         {

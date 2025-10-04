@@ -4,7 +4,6 @@ using PostsByMarko.Host.Services;
 
 namespace PostsByMarko.Host.Controllers
 {
-    [Route("")]
     public class EmailController : BaseController
     {
         private readonly IUsersService usersService;
@@ -18,7 +17,7 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("/confirmEmail")]
-        [Tags("Auth Endpoint")]
+        [Tags("Auth Endpoints")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {

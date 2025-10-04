@@ -10,6 +10,7 @@ import {
 } from "react-icons/ai";
 import { BiSolidUserDetail, BiSolidPencil } from "react-icons/bi";
 import { BsPersonCircle, BsClockFill } from "react-icons/bs";
+import { IoMdSend } from "react-icons/io";
 
 export const ICONS = {
   USER_ICON() {
@@ -47,5 +48,8 @@ export const ICONS = {
   },
   GITHUB_ICON() {
     return <FaGithub />;
+  },
+  SEND_ICON() {
+    return <IoMdSend />;
   },
 };

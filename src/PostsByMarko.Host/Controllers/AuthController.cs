@@ -8,7 +8,6 @@ using System.Net;
 
 namespace PostsByMarko.Host.Controllers;
 
-[Route("")]
 [AllowAnonymous]
 public class AuthController : BaseController
 {
@@ -23,7 +22,7 @@ public class AuthController : BaseController
 
     [HttpPost]
     [Route("/register")]
-    [Tags("Auth Endpoint")]
+    [Tags("Auth Endpoints")]
     public async Task<RequestResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
     {
         var result = await usersService.MapAndCreateUserAsync(userRegistration);

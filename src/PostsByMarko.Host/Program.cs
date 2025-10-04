@@ -56,7 +56,10 @@ if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false))
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
-if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false)) app.UseHttpsRedirection();
+if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

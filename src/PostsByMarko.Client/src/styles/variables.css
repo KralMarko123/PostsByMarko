@@ -23,8 +23,8 @@
   --s-text: 0.85rem;
   --md-text: 1rem;
   --lg-text: 1.25rem;
-  --big-text: 1.75rem;
-  --huge-text: 2.5rem;
+  --big-text: 1.5rem;
+  --huge-text: 2rem;
 
   /**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
   --container-width: 75%;

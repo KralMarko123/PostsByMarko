@@ -1,89 +1,89 @@
 .nav {
-	width: var(--container-width);
+  width: var(--container-width);
 
-	padding: 1em;
-	margin-bottom: 1em;
+  padding: 1em;
+  margin-bottom: 1em;
 
-	z-index: 1;
+  z-index: 1;
 }
 
 .nav__content {
-	width: 100%;
+  width: 100%;
 
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	gap: var(--normal-gap);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--normal-gap);
 }
 
 .nav__username {
-	color: var(--text-color);
-	white-space: nowrap;
-	font-size: var(--big-text);
-	text-transform: capitalize;
+  color: var(--text-color);
+  white-space: nowrap;
+  font-size: var(--big-text);
+  text-transform: capitalize;
 }
 
 .nav__username span {
-	color: var(--light);
-	font-weight: bold;
+  color: var(--light);
+  font-weight: bold;
 }
 
 .nav__separator {
-	width: 0.25em;
+  width: 0.25em;
 
-	background-color: var(--text-color);
-	border-radius: var(--card-radius);
-	align-self: stretch;
+  background-color: var(--text-color);
+  border-radius: var(--card-radius);
+  align-self: stretch;
 }
 
 .nav__actions {
-	position: relative;
-	padding: 0.25em var(--small-padding);
-	background-color: var(--dark-accent);
-	border-radius: var(--button-radius) var(--button-radius) 0 0;
-	box-shadow: var(--simple-shadow);
+  position: relative;
+  padding: 0.25em var(--small-padding);
+  background-color: var(--dark-accent);
+  border-radius: var(--button-radius) var(--button-radius) 0 0;
+  box-shadow: var(--simple-shadow);
 
-	display: flex;
-	align-items: center;
-	text-transform: uppercase;
-	gap: var(--small-gap);
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  gap: var(--small-gap);
 
-	font-size: var(--big-text);
-	text-transform: uppercase;
+  font-size: var(--big-text);
+  text-transform: uppercase;
 
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .nav__actions:hover .actions__items,
 .nav__actions:focus,
 .actions__items {
-	display: flex;
+  display: flex;
 }
 
 .actions__items {
-	width: 100%;
-	position: absolute;
-	top: 100%;
-	left: 0%;
+  width: 100%;
+  position: absolute;
+  top: 100%;
+  left: 0%;
 
-	background-color: var(--light-accent);
-	border-radius: 0 0 var(--button-radius) var(--button-radius);
+  background-color: var(--light-accent);
+  border-radius: 0 0 var(--button-radius) var(--button-radius);
 
-	display: none;
-	flex-direction: column;
-	gap: var(--small-gap);
+  display: none;
+  flex-direction: column;
+  gap: var(--small-gap);
 
-	z-index: 100;
+  z-index: 100;
 }
 
 .action__item {
-	width: 100%;
-	padding: var(--small-padding);
+  width: 100%;
+  padding: var(--small-padding);
 
-	font-size: var(--md-text);
-	cursor: pointer;
+  font-size: var(--md-text);
+  cursor: pointer;
 }
 
 .action__item:hover {
-	background-color: rgba(var(--dark-accent-decimal), 0.75);
+  background-color: rgba(var(--dark-accent-decimal), 0.75);
 }

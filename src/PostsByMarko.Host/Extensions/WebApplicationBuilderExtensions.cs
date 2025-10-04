@@ -8,6 +8,7 @@ using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Repos.Posts;
 using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
+using PostsByMarko.Host.Repos.Messaging;
 using PostsByMarko.Host.Services;
 using System.Text;
 
@@ -138,10 +139,17 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<IPostsService, PostsService>();
-            builder.Services.AddScoped<IUsersService, UsersService>();
+            // Repos
             builder.Services.AddScoped<IPostsRepository, PostsRepository>();
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+            builder.Services.AddScoped<IMessagingRepository, MessagingRepository>();
+
+            // Services
+            builder.Services.AddScoped<IPostsService, PostsService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IMessagingService, MessagingService>();
+
+            // Helpers
             builder.Services.AddScoped<IJwtHelper, JwtHelper>();
             builder.Services.AddScoped<IEmailHelper, EmailHelper>();
         }

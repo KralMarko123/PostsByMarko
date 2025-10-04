@@ -4,9 +4,12 @@
 
 .chat-container {
   width: 100%;
-  height: 50vh;
+  height: 70vh;
 
   background-color: var(--dark-accent);
+
+  display: flex;
+  align-items: center;
 }
 
 .user-list {
@@ -14,8 +17,6 @@
   height: 100%;
 
   background-color: var(--accent);
-  max-height: 50vh;
-
   overflow-y: scroll;
 }
 
@@ -51,6 +52,109 @@
 }
 
 .user-name {
-  font-size: var(--lg-text);
+  font-size: var(--md-text);
   letter-spacing: 1px;
+}
+
+.messages {
+  width: 80%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.info-message {
+  margin-top: var(--normal-gap);
+  color: var(--light);
+}
+
+.message-container {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+}
+
+.handle {
+  padding: var(--normal-padding);
+  background-color: rgba(32, 32, 32, 0.75);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.handle .user-icon {
+  margin: 0;
+  margin-bottom: var(--small-gap);
+  background-color: var(--light-accent);
+}
+
+.handle .user-name {
+  font-size: var(--s-text);
+  font-weight: bold;
+}
+
+.message-list {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--small-gap);
+}
+
+.message-area {
+  padding: var(--normal-padding);
+  position: absolute;
+  bottom: 0;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--normal-gap);
+}
+
+.message-input {
+  width: 100%;
+  margin: 0;
+  padding: var(--small-padding) var(--normal-padding);
+
+  background-color: rgba(32, 32, 32, 0.75);
+  border: none;
+  border-radius: var(--card-radius);
+  outline: none;
+
+  color: var(--text);
+  font-size: var(--md-text);
+}
+
+.message-input.empty {
+  border: solid 2px var(--error-flat);
+}
+
+.send-icon {
+  display: grid;
+  place-content: center;
+  padding: 1em;
+
+  border-radius: 50%;
+
+  font-size: var(--lg-text);
+
+  cursor: pointer;
+}
+
+.send-icon:hover {
+  background-color: rgba(32, 32, 32, 0.75);
+}
+
+.send-icon svg {
+  transform: translateX(15%);
 }
