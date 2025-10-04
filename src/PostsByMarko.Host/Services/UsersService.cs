@@ -63,9 +63,20 @@ namespace PostsByMarko.Host.Services
 
         public async Task<RequestResult> GetAllUsersAsync()
         {
-            var allUsernames = await usersRepository.GetAllUsersAsync();
+            var users = await usersRepository.GetAllUsersAsync();
 
-            return new RequestResultBuilder().Ok().WithPayload(allUsernames).Build();
+            return new RequestResultBuilder().Ok().WithPayload(users).Build();
+        }
+
+        public async Task<RequestResult> GetOtherUsersAsync(string userIdToExclude)
+        {
+            var users = await usersRepository.GetAllUsersAsync();
+            var otherUsers = users.FindAll(u => u.Id != userIdToExclude).Select(u => new AuthorDetailsResponse(u));
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(otherUsers)
+                .Build();
         }
 
         public async Task<string> GenerateEmailConfirmationTokenForUserAsync(User user)

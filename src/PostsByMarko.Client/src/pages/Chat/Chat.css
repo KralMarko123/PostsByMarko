@@ -1,0 +1,56 @@
+.chat {
+  align-items: center;
+}
+
+.chat-container {
+  width: 100%;
+  height: 50vh;
+
+  background-color: var(--dark-accent);
+}
+
+.user-list {
+  width: 20%;
+  height: 100%;
+
+  background-color: var(--accent);
+  max-height: 50vh;
+
+  overflow-y: scroll;
+}
+
+.user-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  padding: var(--normal-padding);
+
+  cursor: pointer;
+}
+
+.user-card.active {
+  background-color: rgba(32, 32, 32, 0.75);
+}
+
+.user-card:hover {
+  background-color: rgba(32, 32, 32, 0.75);
+}
+
+.user-icon {
+  width: 1em;
+  height: 1em;
+  padding: 1.5em;
+  margin-right: var(--normal-gap);
+
+  background-color: var(--dark);
+  border-radius: 50%;
+
+  display: grid;
+  place-content: center;
+}
+
+.user-name {
+  font-size: var(--lg-text);
+  letter-spacing: 1px;
+}

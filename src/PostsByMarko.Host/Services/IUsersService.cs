@@ -8,6 +8,7 @@ namespace PostsByMarko.Host.Services
         Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration);
         Task<RequestResult> ValidateUserAsync(UserLoginDto userLogin);
         Task<RequestResult> GetAllUsersAsync();
+        Task<RequestResult> GetOtherUsersAsync(string userIdToExclude);
         Task<User> GetUserByEmailAsync(string email);
         Task<RequestResult> GetRolesForEmailAsync(string email);
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);

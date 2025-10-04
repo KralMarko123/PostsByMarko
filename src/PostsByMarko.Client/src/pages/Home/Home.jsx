@@ -1,7 +1,6 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
-import { useNavigate } from "react-router-dom";
 import PostsService from "../../api/PostsService";
 import Post from "../../components/Post/Post";
 import Nav from "../../components/Layout/Nav/Nav";
@@ -9,18 +8,16 @@ import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm
 import UpdatePostForm from "../../components/Forms/UpdatePostForm/UpdatePostForm";
 import AppContext from "../../context/AppContext";
 import Container from "../../components/Layout/Container/Container";
-import logo from "../../assets/images/POSM_icon.png";
-import { ROUTES } from "../../constants/routes";
+import Footer from "../../components/Layout/Footer/Footer";
+import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Home.css";
-import Footer from "../../components/Layout/Footer/Footer";
 
 const Home = () => {
   const appContext = useContext(AppContext);
   const { user } = useAuth();
-  const { lastMessageRegistered } = useSignalR();
+  const { lastMessageRegistered } = useSignalR(true);
   const [posts, setPosts] = useState([]);
-  const navigate = useNavigate();
 
   const getPosts = async () => {
     await PostsService.getAllPosts(user.token).then((requestResult) => {
@@ -35,12 +32,7 @@ const Home = () => {
 
   return (
     <div className="home page">
-      <img
-        src={logo}
-        className="logo"
-        alt="posm-logo"
-        onClick={() => navigate(ROUTES.HOME)}
-      />
+      <Logo />
       <Nav />
 
       <Container
@@ -67,6 +59,7 @@ const Home = () => {
         <UpdatePostForm />
         <DeletePostForm />
       </Container>
+
       <Footer />
     </div>
   );

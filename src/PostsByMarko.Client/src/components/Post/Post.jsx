@@ -24,7 +24,7 @@ const Post = ({
   const { user, isAdmin } = useAuth();
   const isAuthor = authorId === user.id;
   const readableCreatedDate = DateFunctions.getReadableDateTime(createdDate);
-  const { sendMessage } = useSignalR();
+  const { sendMessage } = useSignalR(true);
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import Container from "../../components/Layout/Container/Container";
-import logo from "../../assets/images/POSM_icon.png";
 import Nav from "../../components/Layout/Nav/Nav";
 import UsersService from "../../api/UsersService";
 import PostsService from "../../api/PostsService";
@@ -8,12 +7,12 @@ import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import AppContext from "../../context/AppContext";
 import Card from "../../components/Helper/Card/Card";
-import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router";
 import BarChart from "../../components/Charts/BarChart";
 import LineChart from "../../components/Charts/LineChart";
 import Footer from "../../components/Layout/Footer/Footer";
 import { DateFunctions } from "../../util/dateFunctions";
+import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Admin.css";
 
@@ -116,12 +115,7 @@ const Admin = () => {
 
   return (
     <div className="admin page">
-      <img
-        src={logo}
-        className="logo"
-        alt="posm-logo"
-        onClick={() => navigate(ROUTES.HOME)}
-      />
+      <Logo />
       <Nav />
 
       <Container

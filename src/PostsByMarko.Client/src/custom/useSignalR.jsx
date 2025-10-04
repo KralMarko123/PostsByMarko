@@ -1,17 +1,14 @@
 import { React, useState, useEffect } from "react";
-import {
-  HttpTransportType,
-  HubConnectionBuilder,
-  LogLevel,
-} from "@microsoft/signalr";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import ENDPOINT__URLS from "../constants/endpoints";
 import { useAuth } from "./useAuth";
 
-export const useSignalR = () => {
+export const useSignalR = (posts = true) => {
+  const hubUrl = posts ? ENDPOINT__URLS.POST_HUB : ENDPOINT__URLS.MESSAGE_HUB;
   const { user } = useAuth();
   const [signalR, setSignalR] = useState({
     connection: new HubConnectionBuilder()
-      .withUrl(ENDPOINT__URLS.HUB, {
+      .withUrl(hubUrl, {
         accessTokenFactory: () => user.token,
       })
       .configureLogging(LogLevel.Information)
@@ -31,7 +28,6 @@ export const useSignalR = () => {
         .start()
         .then(() => {
           signalR.connection.on("ReceiveMessage", (message) => {
-            console.log(message);
             setSignalR({ ...signalR, lastMessageRegistered: message });
           });
         })

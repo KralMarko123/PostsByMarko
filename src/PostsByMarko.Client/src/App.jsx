@@ -8,7 +8,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import AppProvider from "./context/ContextProvider";
 import Admin from "./pages/Admin/Admin";
-import Test from "./pages/Test/Test";
+import Chat from "./pages/Chat/Chat";
 
 const App = () => {
   return (
@@ -38,9 +38,16 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path={ROUTES.CHAT}
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        />
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
-        <Route path={ROUTES.TEST} element={<Test />} />
       </Routes>
     </AppProvider>
   );

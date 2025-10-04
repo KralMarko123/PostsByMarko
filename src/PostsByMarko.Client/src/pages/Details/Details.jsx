@@ -5,7 +5,6 @@ import PostsService from "../../api/PostsService";
 import Nav from "../../components/Layout/Nav/Nav";
 import AppContext from "../../context/AppContext";
 import Container from "../../components/Layout/Container/Container";
-import logo from "../../assets/images/POSM_icon.png";
 import { ICONS } from "../../constants/icons";
 import Button from "../../components/Helper/Button/Button";
 import TextareaAutosize from "react-textarea-autosize";
@@ -13,6 +12,7 @@ import { useSignalR } from "../../custom/useSignalR";
 import { ROUTES } from "../../constants/routes";
 import { DateFunctions } from "../../util/dateFunctions";
 import Footer from "../../components/Layout/Footer/Footer";
+import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Details.css";
 
@@ -29,7 +29,7 @@ const Details = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [updatedContent, setUpdatedContent] = useState("");
   const textAreaRef = useRef();
-  const { sendMessage } = useSignalR();
+  const { sendMessage } = useSignalR(true);
   const navigate = useNavigate();
   const postCreatedDate = DateFunctions.getLocalDateInFormat(
     post?.createdDate,
@@ -117,12 +117,7 @@ const Details = () => {
 
   return (
     <div className="details page">
-      <img
-        src={logo}
-        className="logo"
-        alt="posm-logo"
-        onClick={() => navigate(ROUTES.HOME)}
-      />
+      <Logo />
       <Nav />
 
       <Container>

@@ -61,6 +61,7 @@ if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false)) app.UseHttpsR
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<PostHub>("/postHub");
+app.MapHub<MessageHub>("/messageHub");
 app.MapControllers();
 app.UseRateLimiting();
 

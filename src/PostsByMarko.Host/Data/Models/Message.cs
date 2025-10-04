@@ -16,11 +16,11 @@ namespace PostsByMarko.Host.Data.Models
         public Message()
         {
         }
-        public Message(string content, string senderId, int chatId)
+        public Message(int chatId, string senderId, string content)
         {
-            Content = content;
-            SenderId = senderId;
             ChatId = chatId;
+            SenderId = senderId;
+            Content = content;
             CreatedAt = DateTime.UtcNow;
         }
     }

@@ -4,7 +4,7 @@ using PostsByMarko.Host.Data.Models;
 
 namespace PostsByMarko.Host.Repos.Messaging
 {
-    public class MessagingRepository
+    public class MessagingRepository : IMessagingRepository
     {
         private readonly AppDbContext appDbContext;
 

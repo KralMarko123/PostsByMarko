@@ -17,5 +17,12 @@ namespace PostsByMarko.Host.Data.Models
         {
 
         }
+
+        public Chat(List<string> participantIds)
+        {
+            ParticipantIds = participantIds;
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

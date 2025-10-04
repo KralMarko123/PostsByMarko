@@ -1,0 +1,25 @@
+.logo {
+  width: 100px;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+
+  cursor: pointer;
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+  .logo {
+    width: 60px;
+    position: absolute;
+    top: 0.5em;
+  }
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+  .logo {
+    width: 50px;
+    top: 0.5em;
+  }
+}
