@@ -7,4 +7,5 @@ export const ROUTES = {
   REGISTER: `/register`,
   ADMIN: "/admin",
   TEST: `/test`,
+  NOT_FOUND: "*",
 };

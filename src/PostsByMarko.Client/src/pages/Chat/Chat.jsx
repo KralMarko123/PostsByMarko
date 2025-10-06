@@ -10,7 +10,6 @@ import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
 import { ICONS } from "../../constants/icons";
 import { HelperFunctions } from "../../util/helperFunctions";
-import { DateFunctions } from "../../util/dateFunctions";
 import "../Page.css";
 import "./Chat.css";
 
@@ -18,7 +17,7 @@ const Chat = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState({});
   const { user } = useAuth();
-  const { lastMessageRegistered } = useSignalR(false);
+  const { sendMessage, lastMessageRegistered } = useSignalR(false);
   const [openChat, setOpenChat] = useState(null);
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
@@ -46,6 +45,11 @@ const Chat = () => {
   };
 
   const handleUserClick = (u) => {
+    if (newMessage.length > 0 && selectedUser !== u) {
+      setNewMessage("");
+      messageInputRef.current.value = "";
+    }
+
     setSelectedUser(u);
     getChat(u.id);
   };
@@ -73,6 +77,8 @@ const Chat = () => {
 
           messageInputRef.current.value = "";
           setNewMessage("");
+
+          sendMessage(openChat.participantIds);
         }
       }
     );
@@ -115,7 +121,9 @@ const Chat = () => {
             <div className="user-list">
               {users.map((u) => (
                 <div
-                  className={`user-card${u === selectedUser ? " active" : ""}`}
+                  className={`user-card${
+                    openChat?.participantIds.includes(u.id) ? " active" : ""
+                  }`}
                   key={u.id}
                   onClick={() => handleUserClick(u)}
                 >
@@ -146,7 +154,9 @@ const Chat = () => {
                           >
                             {index === 0 && (
                               <span className="message-date">
-                                {DateFunctions.getReadableDateTime(m.createdAt)}
+                                {HelperFunctions.getMessageTimeLabelAccordingToToday(
+                                  m.createdAt
+                                )}
                               </span>
                             )}
 

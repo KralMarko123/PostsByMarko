@@ -3,8 +3,10 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import ENDPOINT__URLS from "../constants/endpoints";
 import { useAuth } from "./useAuth";
 
-export const useSignalR = (posts = true) => {
-  const hubUrl = posts ? ENDPOINT__URLS.POST_HUB : ENDPOINT__URLS.MESSAGE_HUB;
+export const useSignalR = (isForPostHub = true) => {
+  const hubUrl = isForPostHub
+    ? ENDPOINT__URLS.POST_HUB
+    : ENDPOINT__URLS.MESSAGE_HUB;
   const { user } = useAuth();
   const [signalR, setSignalR] = useState({
     connection: new HubConnectionBuilder()
@@ -15,8 +17,10 @@ export const useSignalR = (posts = true) => {
       .withAutomaticReconnect()
       .build(),
 
-    async sendMessage(message, toAll = true) {
-      await sendMessageToHub(message, toAll);
+    async sendMessage(payload, toAll = true) {
+      if (isForPostHub) {
+        await sendMessageToPostHub(payload, toAll);
+      } else notifyUserIdsForNewMessage(payload);
     },
 
     lastMessageRegistered: "",
@@ -37,13 +41,24 @@ export const useSignalR = (posts = true) => {
     }
   }, [signalR.connection]);
 
-  const sendMessageToHub = async (message, toAll = false) => {
+  const sendMessageToPostHub = async (message, toAll = false) => {
     if (signalR.connection) {
       try {
         await signalR.connection.invoke(
           toAll ? "SendMessageToAll" : "SendMessageToOthers",
           message
         );
+      } catch (error) {
+        console.error(error);
+      }
+    } else
+      console.log("A connection to the server hasn't been established yet!");
+  };
+
+  const notifyUserIdsForNewMessage = async (userIds) => {
+    if (signalR.connection) {
+      try {
+        await signalR.connection.invoke("NotifyUsersAboutNewMessage", userIds);
       } catch (error) {
         console.error(error);
       }

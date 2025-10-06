@@ -1,5 +1,6 @@
 import DOMPurify from "dompurify";
 import moment from "moment";
+import { DateFunctions } from "./dateFunctions";
 
 export const HelperFunctions = {
   noEmptyFields(data) {
@@ -64,5 +65,13 @@ export const HelperFunctions = {
     });
 
     return messagesByDay;
+  },
+
+  getMessageTimeLabelAccordingToToday(messageDate) {
+    const now = moment();
+    let date = moment(messageDate);
+    let format = date.isSame(now, "day") ? "h:mm A" : "MMM Do YYYY, h:mm A";
+
+    return DateFunctions.getLocalDateInFormat(date, format);
   },
 };

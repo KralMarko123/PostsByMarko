@@ -9,6 +9,7 @@ import Register from "./pages/Register/Register";
 import AppProvider from "./context/ContextProvider";
 import Admin from "./pages/Admin/Admin";
 import Chat from "./pages/Chat/Chat";
+import NotFound from "./pages/NotFound/NotFound";
 
 const App = () => {
   return (
@@ -48,6 +49,7 @@ const App = () => {
         />
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
+        <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
       </Routes>
     </AppProvider>
   );

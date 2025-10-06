@@ -5,7 +5,7 @@ namespace PostsByMarko.Host.Hubs
 {
     public class MessageHub : Hub<IMessageClient>
     {
-        public async Task SendMessageToUsers(string[] userIds)
+        public async Task NotifyUsersAboutNewMessage(string[] userIds)
         {
             await Clients.Users(userIds).ReceiveMessage($"Message has been sent to users: {string.Join(", ", userIds)}");
         }
