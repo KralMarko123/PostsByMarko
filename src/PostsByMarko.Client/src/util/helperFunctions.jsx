@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import moment from "moment";
 
 export const HelperFunctions = {
   noEmptyFields(data) {
@@ -47,5 +48,21 @@ export const HelperFunctions = {
 
   getPurifiedHtml(html) {
     return { __html: DOMPurify.sanitize(html) };
+  },
+
+  groupMessagesByDay(messages) {
+    const messagesByDay = {};
+
+    messages.forEach((m) => {
+      const date = moment(m.createdDate);
+      const dayKey = date.startOf("day").format("YYYY-MM-DD"); // Format to get a consistent key for each day
+
+      if (!messagesByDay[dayKey]) {
+        messagesByDay[dayKey] = [];
+      }
+      messagesByDay[dayKey].push(m);
+    });
+
+    return messagesByDay;
   },
 };

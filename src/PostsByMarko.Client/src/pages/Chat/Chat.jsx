@@ -9,8 +9,10 @@ import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
 import { ICONS } from "../../constants/icons";
-import "./Chat.css";
+import { HelperFunctions } from "../../util/helperFunctions";
+import { DateFunctions } from "../../util/dateFunctions";
 import "../Page.css";
+import "./Chat.css";
 
 const Chat = () => {
   const [users, setUsers] = useState([]);
@@ -98,6 +100,10 @@ const Chat = () => {
     else return false;
   };
 
+  const getMessagesGroupedByDayToMap = () => {
+    return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
+  };
+
   return (
     <div className="page chat">
       <Logo />
@@ -127,28 +133,39 @@ const Chat = () => {
                   </div>
 
                   <div className="message-list">
-                    {openChat.messages.map((m, index) => {
-                      let isMessageAuthor = m.senderId == user.id;
-                      return (
-                        <div
-                          className={`message${
-                            isMessageAuthor ? " author" : ""
-                          }`}
-                          key={m.id}
-                        >
-                          {!isMessageAuthor && (
-                            <span
-                              className={`message-handle${
-                                isLastMessageFromRecipientInSeries(m, index)
-                                  ? " show"
-                                  : ""
-                              }`}
-                            >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
-                          )}
-                          <div className="message-content">{m.content}</div>
-                        </div>
-                      );
-                    })}
+                    {getMessagesGroupedByDayToMap().map((ml) =>
+                      ml.map((m, index) => {
+                        let isMessageAuthor = m.senderId == user.id;
+
+                        return (
+                          <div
+                            className={`message${
+                              isMessageAuthor ? " author" : ""
+                            }`}
+                            key={m.id}
+                          >
+                            {index === 0 && (
+                              <span className="message-date">
+                                {DateFunctions.getReadableDateTime(m.createdAt)}
+                              </span>
+                            )}
+
+                            <div className="message-box">
+                              {!isMessageAuthor && (
+                                <span
+                                  className={`message-handle${
+                                    isLastMessageFromRecipientInSeries(m, index)
+                                      ? " show"
+                                      : ""
+                                  }`}
+                                >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                              )}
+                              <div className="message-content">{m.content}</div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
 
                   <div className="message-area">
