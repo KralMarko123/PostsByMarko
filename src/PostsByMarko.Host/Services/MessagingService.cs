@@ -1,5 +1,6 @@
 ﻿using PostsByMarko.Host.Builders;
 using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Repos.Messaging;
 
 namespace PostsByMarko.Host.Services
@@ -19,6 +20,8 @@ namespace PostsByMarko.Host.Services
 
             if (existingChat != null)
             {
+                existingChat.Messages = await messagingRepository.GetChatMessagesAsync(existingChat);
+                
                 return new RequestResultBuilder()
                     .Ok()
                     .WithPayload(existingChat)
@@ -33,7 +36,7 @@ namespace PostsByMarko.Host.Services
                 .Build();
         }
 
-        public async Task<RequestResult> SendMessageAsync(int chatId, string senderId, string content)
+        public async Task<RequestResult> SendMessageAsync(MessageDto messageDto)
         {
             var forbiddenRequest = new RequestResultBuilder()
                 .Forbidden()
@@ -41,17 +44,30 @@ namespace PostsByMarko.Host.Services
                 .Build();
             var notFoundRequest = new RequestResultBuilder()
                 .NotFound()
-                .WithMessage($"Chat with Id: {chatId} was not found")
+                .WithMessage($"Chat with Id: {messageDto.ChatId} was not found")
                 .Build();
-            var chat = await messagingRepository.GetChatByIdAsync(chatId);
+            var badRequest = new RequestResultBuilder()
+                .BadRequest()
+                .WithMessage("Error during chat update")
+                .Build();
+
+            var chat = await messagingRepository.GetChatByIdAsync(messageDto.ChatId);
 
             if (chat == null)
                 return notFoundRequest;
 
-            if (!chat.ParticipantIds.Contains(senderId))
+            if (!chat.ParticipantIds.Contains(messageDto.SenderId))
                 return forbiddenRequest;
 
-            var createdMessage = await messagingRepository.CreateMessageAsync(new Message(chatId, senderId, content));
+            var createdMessage = await messagingRepository.CreateMessageAsync(new Message(messageDto));
+
+            chat.Messages.Add(createdMessage);
+            chat.UpdatedAt = DateTime.UtcNow;
+
+            var chatUpdatedSuccessfully = await messagingRepository.UpdateChatAsync(chat);
+
+            if (!chatUpdatedSuccessfully)
+                return badRequest;
 
             return new RequestResultBuilder()
                 .Ok()

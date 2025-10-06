@@ -32,6 +32,13 @@ namespace PostsByMarko.Host.Repos.Messaging
             else throw new Exception("Error during chat creation");
         }
 
+        public async Task<bool> UpdateChatAsync(Chat chat)
+        {
+            appDbContext.Chats.Update(chat);
+
+            return await appDbContext.SaveChangesAsync() >= 1;
+        }
+
         public async Task<Message> CreateMessageAsync(Message message)
         {
             var result = await appDbContext.Messages.AddAsync(message);
@@ -46,6 +53,17 @@ namespace PostsByMarko.Host.Repos.Messaging
             appDbContext.Messages.Remove(message);
 
             return await appDbContext.SaveChangesAsync() >= 1;
+        }
+
+        public async Task<List<Message>> GetChatMessagesAsync(Chat chat)
+        {
+            var noMessages = !await appDbContext.Messages.AnyAsync();
+
+            if(noMessages) return [];
+
+            var chatMessages = await appDbContext.Messages.Where(m => m.ChatId == chat.Id).ToListAsync();
+
+            return chatMessages;
         }
     }
 }

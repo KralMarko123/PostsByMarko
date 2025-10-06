@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Services;
 
 namespace PostsByMarko.Host.Controllers
@@ -22,6 +23,15 @@ namespace PostsByMarko.Host.Controllers
         {
             LoadRequestClaims();
             return await messagingService.StartChatAsync(participantIds);
+        }
+
+        [HttpPost]
+        [Route("/sendMessage")]
+        [Tags("Messaging Endpoints")]
+        public async Task<RequestResult> SendMessageAsync([FromBody] MessageDto messageDto)
+        {
+            LoadRequestClaims();
+            return await messagingService.SendMessageAsync(messageDto);
         }
     }
 }

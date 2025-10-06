@@ -36,7 +36,7 @@ namespace PostsByMarko.Host.Extensions
             if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 // generate random users
-                GenerateRandomData(builder, passwordHasher, 15);
+                GenerateRandomData(builder, passwordHasher, 5);
             }
         }
 

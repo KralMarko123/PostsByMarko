@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PostsByMarko.Host.Data.Models.Dtos;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostsByMarko.Host.Data.Models
@@ -15,12 +16,22 @@ namespace PostsByMarko.Host.Data.Models
 
         public Message()
         {
+
         }
+
         public Message(int chatId, string senderId, string content)
         {
             ChatId = chatId;
             SenderId = senderId;
             Content = content;
+            CreatedAt = DateTime.UtcNow;
+        }
+
+        public Message(MessageDto messageDto)
+        {
+            ChatId = messageDto.ChatId;
+            SenderId = messageDto.SenderId;
+            Content = messageDto.Content;
             CreatedAt = DateTime.UtcNow;
         }
     }

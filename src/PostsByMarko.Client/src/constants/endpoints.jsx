@@ -28,6 +28,7 @@ const ENDPOINTS = {
 
   // MESSAGING
   START_CHAT: "startChat",
+  SEND_MESSAGE: "sendMessage",
 };
 
 const developmentEndpoints = {
@@ -57,7 +58,8 @@ const developmentEndpoints = {
   MESSAGE_HUB: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.MESSAGE_HUB}`,
 
   // MESSAGING
-  START_CHAT: `${BASE_URL_DOCKER}/${ENDPOINTS.START_CHAT}`,
+  START_CHAT: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.START_CHAT}`,
+  SEND_MESSAGE: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.SEND_MESSAGE}`,
 };
 
 const dockerEndpoints = {
@@ -88,6 +90,7 @@ const dockerEndpoints = {
 
   // MESSAGING
   START_CHAT: `${BASE_URL_DOCKER}/${ENDPOINTS.START_CHAT}`,
+  SEND_MESSAGE: `${BASE_URL_DOCKER}/${ENDPOINTS.SEND_MESSAGE}`,
 };
 
 let ENDPOINT_URLS;

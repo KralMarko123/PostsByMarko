@@ -1,10 +1,11 @@
 ﻿using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Models.Dtos;
 
 namespace PostsByMarko.Host.Services
 {
     public interface IMessagingService
     {
         Task<RequestResult> StartChatAsync(string[] participantIds);
-        Task<RequestResult> SendMessageAsync(int chatId, string senderId, string content);
+        Task<RequestResult> SendMessageAsync(MessageDto messageDto);
     }
 }

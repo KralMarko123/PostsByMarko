@@ -9,5 +9,7 @@ namespace PostsByMarko.Host.Repos.Messaging
         Task<Chat> CreateChatAsync(Chat chat);
         Task<Message> CreateMessageAsync(Message message);
         Task<bool> DeleteMessageAsync(Message message);
+        Task<bool> UpdateChatAsync(Chat chat);
+        Task<List<Message>> GetChatMessagesAsync(Chat chat);
     }
 }

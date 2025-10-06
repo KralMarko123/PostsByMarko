@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
@@ -8,9 +8,9 @@ import UsersService from "../../api/UsersService";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
-import "../Page.css";
-import "./Chat.css";
 import { ICONS } from "../../constants/icons";
+import "./Chat.css";
+import "../Page.css";
 
 const Chat = () => {
   const [users, setUsers] = useState([]);
@@ -20,6 +20,7 @@ const Chat = () => {
   const [openChat, setOpenChat] = useState(null);
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
+  const messageInputRef = useRef(null);
 
   const getUsers = async () => {
     await UsersService.getOtherUsers(user.token).then((requestResult) => {
@@ -47,17 +48,55 @@ const Chat = () => {
     getChat(u.id);
   };
 
-  const handleMessageSend = () => {
+  const handleMessageSend = async () => {
     if (newMessage.length === 0) {
-      console.log("here");
       setIsMessageEmpty(true);
       return;
+    }
+
+    const messageToSend = {
+      chatId: openChat.id,
+      senderId: user.id,
+      content: newMessage,
+    };
+
+    await MessagingService.sendMessage(messageToSend, user.token).then(
+      (requestResult) => {
+        if (requestResult.statusCode === 200) {
+          const newMessage = requestResult.payload;
+
+          let updatedChat = openChat;
+          updatedChat.messages.push(newMessage);
+          setOpenChat(updatedChat);
+
+          messageInputRef.current.value = "";
+          setNewMessage("");
+        }
+      }
+    );
+  };
+
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      await handleMessageSend();
     }
   };
 
   useEffect(() => {
     getUsers();
-  }, [lastMessageRegistered]);
+  }, [lastMessageRegistered, openChat?.messages?.length]);
+
+  const isLastMessageFromRecipientInSeries = (message, index) => {
+    if (message.senderId == user.id) return false;
+
+    let nextMessage = openChat.messages[index + 1];
+
+    if (!nextMessage) return true;
+
+    if (nextMessage.senderId == user.id) return true;
+    else return false;
+  };
 
   return (
     <div className="page chat">
@@ -88,8 +127,27 @@ const Chat = () => {
                   </div>
 
                   <div className="message-list">
-                    {openChat.messages.map((m) => {
-                      <div className="message">{m}</div>;
+                    {openChat.messages.map((m, index) => {
+                      let isMessageAuthor = m.senderId == user.id;
+                      return (
+                        <div
+                          className={`message${
+                            isMessageAuthor ? " author" : ""
+                          }`}
+                          key={m.id}
+                        >
+                          {!isMessageAuthor && (
+                            <span
+                              className={`message-handle${
+                                isLastMessageFromRecipientInSeries(m, index)
+                                  ? " show"
+                                  : ""
+                              }`}
+                            >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                          )}
+                          <div className="message-content">{m.content}</div>
+                        </div>
+                      );
                     })}
                   </div>
 
@@ -100,10 +158,12 @@ const Chat = () => {
                         isMessageEmpty ? " empty" : ""
                       }`}
                       placeholder="Aa"
+                      ref={messageInputRef}
                       onChange={(e) => {
                         setNewMessage(e.currentTarget.value);
                         setIsMessageEmpty(false);
                       }}
+                      onKeyDown={(e) => handleKeyDown(e)}
                     />
                     <span
                       className="send-icon"
