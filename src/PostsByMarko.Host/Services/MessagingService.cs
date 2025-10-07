@@ -74,5 +74,23 @@ namespace PostsByMarko.Host.Services
                 .WithPayload(createdMessage)
                 .Build();
         }
+
+        public async Task<RequestResult> GetUserChatsAsync(string userId)
+        {
+            var chats = await messagingRepository.GetUserChatsAsync(userId);
+
+            if(chats != null)
+            {
+                foreach (var chat in chats)
+                {
+                    chat.Messages = await messagingRepository.GetChatMessagesAsync(chat);
+                }
+            }
+
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(chats)
+                .Build();
+        }
     }
 }

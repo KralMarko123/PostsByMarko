@@ -65,5 +65,10 @@ namespace PostsByMarko.Host.Repos.Messaging
 
             return chatMessages;
         }
+
+        public async Task<List<Chat>> GetUserChatsAsync(string userId)
+        {
+            return await appDbContext.Chats.Where(c => c.ParticipantIds.Contains(userId)).ToListAsync();
+        }
     }
 }

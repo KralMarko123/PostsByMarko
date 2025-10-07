@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
@@ -10,15 +10,18 @@ import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
 import { ICONS } from "../../constants/icons";
 import { HelperFunctions } from "../../util/helperFunctions";
+import AppContext from "../../context/AppContext";
 import "../Page.css";
 import "./Chat.css";
 
 const Chat = () => {
+  const appContext = useContext(AppContext);
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openChat, setOpenChat] = useState(null);
   const { user } = useAuth();
   const { sendMessage, lastMessageRegistered } = useSignalR(false);
-  const [openChat, setOpenChat] = useState(null);
+  const [chats, setChats] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
   const messageInputRef = useRef(null);
@@ -31,6 +34,13 @@ const Chat = () => {
     });
   };
 
+  const getChats = async () => {
+    await MessagingService.getChats(user.token).then((requestResult) => {
+      setChats(requestResult.payload);
+      appContext.dispatch({ type: "LOAD_CHATS", chats: requestResult.payload });
+    });
+  };
+
   const getChat = async (recipientId) => {
     let participantIds = [user.id, recipientId];
 
@@ -40,6 +50,11 @@ const Chat = () => {
     ).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setOpenChat(requestResult.payload);
+
+        appContext.dispatch({
+          type: "STARTED_CHAT",
+          chat: requestResult.payload,
+        });
       }
     });
   };
@@ -71,14 +86,15 @@ const Chat = () => {
         if (requestResult.statusCode === 200) {
           const newMessage = requestResult.payload;
 
-          let updatedChat = openChat;
-          updatedChat.messages.push(newMessage);
-          setOpenChat(updatedChat);
-
           messageInputRef.current.value = "";
           setNewMessage("");
 
           sendMessage(openChat.participantIds);
+
+          appContext.dispatch({
+            type: "SENT_MESSAGE",
+            message: newMessage,
+          });
         }
       }
     );
@@ -91,10 +107,6 @@ const Chat = () => {
     }
   };
 
-  useEffect(() => {
-    getUsers();
-  }, [lastMessageRegistered, openChat?.messages?.length]);
-
   const isLastMessageFromRecipientInSeries = (message, index) => {
     if (message.senderId == user.id) return false;
 
@@ -105,6 +117,18 @@ const Chat = () => {
     if (nextMessage.senderId == user.id) return true;
     else return false;
   };
+
+  useEffect(() => {
+    getUsers();
+    getChats();
+
+    if (selectedUser) {
+      getChat(selectedUser.id);
+    }
+  }, [
+    lastMessageRegistered,
+    appContext.chats.map((c) => c.messages).concat().length,
+  ]);
 
   const getMessagesGroupedByDayToMap = () => {
     return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
@@ -122,7 +146,7 @@ const Chat = () => {
               {users.map((u) => (
                 <div
                   className={`user-card${
-                    openChat?.participantIds.includes(u.id) ? " active" : ""
+                    openChat?.participantIds?.includes(u.id) ? " active" : ""
                   }`}
                   key={u.id}
                   onClick={() => handleUserClick(u)}
@@ -133,7 +157,7 @@ const Chat = () => {
               ))}
             </div>
             <div className="messages">
-              {openChat ? (
+              {selectedUser && openChat ? (
                 <div className="message-container">
                   <div className="handle">
                     <span className="user-icon">{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>

@@ -11,5 +11,6 @@ namespace PostsByMarko.Host.Repos.Messaging
         Task<bool> DeleteMessageAsync(Message message);
         Task<bool> UpdateChatAsync(Chat chat);
         Task<List<Message>> GetChatMessagesAsync(Chat chat);
+        Task<List<Chat>> GetUserChatsAsync(string userId);
     }
 }

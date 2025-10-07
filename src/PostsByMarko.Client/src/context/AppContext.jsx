@@ -14,6 +14,7 @@ const AppContext = createContext({
     content: "",
     index: null,
   },
+  chats: [],
 });
 
 export default AppContext;

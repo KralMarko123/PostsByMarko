@@ -1,6 +1,18 @@
 import ENDPOINT__URLS from "../constants/endpoints";
 
 const MessagingService = {
+  async getChats(userToken) {
+    return await fetch(ENDPOINT__URLS.GET_CHATS, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((requestResult) => requestResult)
+      .catch((error) => console.log(error));
+  },
+
   async getChatByParticipantIds(participantIds, userToken) {
     return await fetch(ENDPOINT__URLS.START_CHAT, {
       method: "POST",

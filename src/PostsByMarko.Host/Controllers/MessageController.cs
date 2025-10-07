@@ -16,6 +16,15 @@ namespace PostsByMarko.Host.Controllers
             this.messagingService = messagingService;
         }
 
+        [HttpGet]
+        [Route("/getChats")]
+        [Tags("Messaging Endpoints")]
+        public async Task<RequestResult> GetChatsAsync()
+        {
+            LoadRequestClaims();
+            return await messagingService.GetUserChatsAsync(user.Id);
+        }
+
         [HttpPost]
         [Route("/startChat")]
         [Tags("Messaging Endpoints")]

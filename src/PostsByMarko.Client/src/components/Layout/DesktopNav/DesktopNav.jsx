@@ -45,6 +45,12 @@ const DesktopNav = () => {
                   Dashboard
                 </li>
               )}
+              <li
+                className="action__item"
+                onClick={() => navigate(ROUTES.CHAT)}
+              >
+                Chat
+              </li>
               <li className="action__item" onClick={() => logout()}>
                 Logout
               </li>

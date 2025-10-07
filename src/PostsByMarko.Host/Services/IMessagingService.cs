@@ -7,5 +7,6 @@ namespace PostsByMarko.Host.Services
     {
         Task<RequestResult> StartChatAsync(string[] participantIds);
         Task<RequestResult> SendMessageAsync(MessageDto messageDto);
+        Task<RequestResult> GetUserChatsAsync(string userId);
     }
 }

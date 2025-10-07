@@ -32,6 +32,7 @@ export const useSignalR = (isForPostHub = true) => {
         .start()
         .then(() => {
           signalR.connection.on("ReceiveMessage", (message) => {
+            console.log(message);
             setSignalR({ ...signalR, lastMessageRegistered: message });
           });
         })
