@@ -178,113 +178,109 @@ const Chat = () => {
       <Nav />
 
       <Container>
-        <Card>
-          <div className="chat-container">
-            <div className="user-list">
-              {users.map((u) => {
-                let isActiveChat = openChat?.participantIds?.includes(u.id);
-                let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
-                let numberOfUnreadMessages = unreadChats.filter(
-                  (id) => id == u.id
-                ).length;
+        <div className="chat-container">
+          <div className="user-list">
+            {users.map((u) => {
+              let isActiveChat = openChat?.participantIds?.includes(u.id);
+              let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
+              let numberOfUnreadMessages = unreadChats.filter(
+                (id) => id == u.id
+              ).length;
 
-                return (
-                  <div
-                    className={`user-card${isActiveChat ? " active" : ""}${
-                      hasUnreadMessages ? " unread" : ""
-                    }`}
-                    key={u.id}
-                    onClick={() => handleUserClick(u)}
-                  >
-                    <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
-                    <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
-                    {hasUnreadMessages && (
-                      <span className="user-unreads">
-                        {numberOfUnreadMessages > 4
-                          ? `+4`
-                          : numberOfUnreadMessages}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <div className="messages">
-              {selectedUser && openChat ? (
-                <div className="message-container">
-                  <div className="handle">
-                    <span className="user-icon">{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
-                    <span className="user-name">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
-                  </div>
-
-                  <div className="message-list" ref={messageListRef}>
-                    {getMessagesGroupedByDayToMap().map((ml) =>
-                      ml.map((m, index) => {
-                        let isMessageAuthor = m.senderId == user.id;
-
-                        return (
-                          <div
-                            className={`message${
-                              isMessageAuthor ? " author" : ""
-                            }`}
-                            key={m.id}
-                          >
-                            {index === 0 && (
-                              <span className="message-date">
-                                {HelperFunctions.getMessageTimeLabelAccordingToToday(
-                                  m.createdAt
-                                )}
-                              </span>
-                            )}
-
-                            <div className="message-box">
-                              {!isMessageAuthor && (
-                                <span
-                                  className={`message-handle${
-                                    isLastMessageFromRecipientInSeries(m, index)
-                                      ? " show"
-                                      : ""
-                                  }`}
-                                >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
-                              )}
-                              <div className="message-content">{m.content}</div>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-
-                  <div className="message-area">
-                    <input
-                      type="text"
-                      className={`message-input${
-                        isMessageEmpty ? " empty" : ""
-                      }`}
-                      placeholder="Aa"
-                      ref={messageInputRef}
-                      onChange={(e) => {
-                        setNewMessage(e.currentTarget.value);
-                        setIsMessageEmpty(false);
-                      }}
-                      onKeyDown={(e) => handleKeyDown(e)}
-                    />
-                    <span
-                      className="send-icon"
-                      onClick={() => handleMessageSend()}
-                    >
-                      {ICONS.SEND_ICON()}
+              return (
+                <div
+                  className={`user-card${isActiveChat ? " active" : ""}${
+                    hasUnreadMessages ? " unread" : ""
+                  }`}
+                  key={u.id}
+                  onClick={() => handleUserClick(u)}
+                >
+                  <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
+                  <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
+                  {hasUnreadMessages && (
+                    <span className="user-unreads">
+                      {numberOfUnreadMessages > 4
+                        ? `+4`
+                        : numberOfUnreadMessages}
                     </span>
-                  </div>
+                  )}
                 </div>
-              ) : (
-                <span className="info-message">
-                  Start chatting right away by clicking on another user
-                </span>
-              )}
-            </div>
+              );
+            })}
           </div>
-        </Card>
+          <div className="messages">
+            {selectedUser && openChat ? (
+              <div className="message-container">
+                <div className="handle">
+                  <span className="user-icon">{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                  <span className="user-name">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
+                </div>
+
+                <div className="message-list" ref={messageListRef}>
+                  {getMessagesGroupedByDayToMap().map((ml) =>
+                    ml.map((m, index) => {
+                      let isMessageAuthor = m.senderId == user.id;
+
+                      return (
+                        <div
+                          className={`message${
+                            isMessageAuthor ? " author" : ""
+                          }`}
+                          key={m.id}
+                        >
+                          {index === 0 && (
+                            <span className="message-date">
+                              {HelperFunctions.getMessageTimeLabelAccordingToToday(
+                                m.createdAt
+                              )}
+                            </span>
+                          )}
+
+                          <div className="message-box">
+                            {!isMessageAuthor && (
+                              <span
+                                className={`message-handle${
+                                  isLastMessageFromRecipientInSeries(m, index)
+                                    ? " show"
+                                    : ""
+                                }`}
+                              >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                            )}
+                            <div className="message-content">{m.content}</div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="message-area">
+                  <input
+                    type="text"
+                    className={`message-input${isMessageEmpty ? " empty" : ""}`}
+                    placeholder="Aa"
+                    ref={messageInputRef}
+                    onChange={(e) => {
+                      setNewMessage(e.currentTarget.value);
+                      setIsMessageEmpty(false);
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e)}
+                  />
+                  <span
+                    className="send-icon"
+                    onClick={() => handleMessageSend()}
+                  >
+                    {ICONS.SEND_ICON()}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <span className="info-message">
+                Start chatting right away by clicking on another user
+              </span>
+            )}
+          </div>
+        </div>
       </Container>
 
       <Footer />
