@@ -25,6 +25,8 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
   const messageInputRef = useRef(null);
+  const messageListRef = useRef(null);
+  const [messageIsSending, setMessageIsSending] = useState(false);
 
   const getUsers = async () => {
     await UsersService.getOtherUsers(user.token).then((requestResult) => {
@@ -46,10 +48,7 @@ const Chat = () => {
             (id) => id !== user.id
           )[0];
 
-          setUnreadChats((prev) => {
-            if (prev.includes(userIdWithNewMessage)) return prev;
-            return [...prev, userIdWithNewMessage];
-          });
+          setUnreadChats([...unreadChats, userIdWithNewMessage]);
         }
       });
 
@@ -87,10 +86,14 @@ const Chat = () => {
   };
 
   const handleMessageSend = async () => {
-    if (newMessage.length === 0) {
+    if (newMessage.trim().length === 0) {
       setIsMessageEmpty(true);
       return;
+    } else if (messageIsSending) {
+      return;
     }
+
+    setMessageIsSending(true);
 
     const messageToSend = {
       chatId: openChat.id,
@@ -98,8 +101,8 @@ const Chat = () => {
       content: newMessage,
     };
 
-    await MessagingService.sendMessage(messageToSend, user.token).then(
-      (requestResult) => {
+    await MessagingService.sendMessage(messageToSend, user.token)
+      .then((requestResult) => {
         if (requestResult.statusCode === 200) {
           const newMessage = requestResult.payload;
 
@@ -118,8 +121,12 @@ const Chat = () => {
             message: newMessage,
           });
         }
-      }
-    );
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setMessageIsSending(false);
+        }, 800);
+      });
   };
 
   const handleKeyDown = async (event) => {
@@ -140,6 +147,18 @@ const Chat = () => {
     else return false;
   };
 
+  const getMessagesGroupedByDayToMap = () => {
+    return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
+  };
+
+  const scrollMessagesToBottom = () => {
+    const list = messageListRef.current;
+
+    if (list) {
+      list.scrollTop = list.scrollHeight;
+    }
+  };
+
   useEffect(() => {
     getUsers();
     getChats();
@@ -149,9 +168,9 @@ const Chat = () => {
     }
   }, [lastMessageRegistered]);
 
-  const getMessagesGroupedByDayToMap = () => {
-    return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
-  };
+  useEffect(() => {
+    scrollMessagesToBottom();
+  }, [openChat?.messages?.length]);
 
   return (
     <div className="page chat">
@@ -165,6 +184,9 @@ const Chat = () => {
               {users.map((u) => {
                 let isActiveChat = openChat?.participantIds?.includes(u.id);
                 let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
+                let numberOfUnreadMessages = unreadChats.filter(
+                  (id) => id == u.id
+                ).length;
 
                 return (
                   <div
@@ -176,6 +198,13 @@ const Chat = () => {
                   >
                     <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
                     <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
+                    {hasUnreadMessages && (
+                      <span className="user-unreads">
+                        {numberOfUnreadMessages > 4
+                          ? `+4`
+                          : numberOfUnreadMessages}
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -188,7 +217,7 @@ const Chat = () => {
                     <span className="user-name">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
                   </div>
 
-                  <div className="message-list">
+                  <div className="message-list" ref={messageListRef}>
                     {getMessagesGroupedByDayToMap().map((ml) =>
                       ml.map((m, index) => {
                         let isMessageAuthor = m.senderId == user.id;

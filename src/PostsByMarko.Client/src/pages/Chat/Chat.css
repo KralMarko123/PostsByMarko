@@ -60,6 +60,19 @@
   letter-spacing: 1px;
 }
 
+.user-unreads {
+  width: 1em;
+  height: 1em;
+  padding: 1em;
+  display: grid;
+  place-content: center;
+
+  margin-left: var(--normal-gap);
+
+  background-color: var(--light-accent);
+  border-radius: 50%;
+}
+
 .messages {
   width: 80%;
   height: 100%;
