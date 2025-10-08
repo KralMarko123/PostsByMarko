@@ -70,7 +70,9 @@ const ToggleUserForPost = () => {
             postId: appContext.postBeingModified.postId,
           });
 
-          sendMessage("Toggled User For Post");
+          sendMessage(
+            `Toggled user for post with Id: ${appContext.postBeingModified.postId}`
+          );
           setMessage(response);
 
           setTimeout(() => {

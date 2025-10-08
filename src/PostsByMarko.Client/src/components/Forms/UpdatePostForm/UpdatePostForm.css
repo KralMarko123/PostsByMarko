@@ -1,13 +1,13 @@
 .update-post .input {
-	font-size: 1rem;
-	padding-left: 2.5em;
+  font-size: 1rem;
+  padding-left: 2.5em;
 }
 
 .update-post .input-text {
-	font-size: 0.85rem;
-	padding-left: 1em;
+  font-size: 0.85rem;
+  padding-left: 1em;
 }
 
 .modal-container {
-	width: 40%;
+  width: 40%;
 }

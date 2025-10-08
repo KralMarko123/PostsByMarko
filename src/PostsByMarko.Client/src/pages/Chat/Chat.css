@@ -34,6 +34,10 @@
   background-color: rgba(32, 32, 32, 0.75);
 }
 
+.user-card.unread {
+  font-weight: bold;
+}
+
 .user-card:hover {
   background-color: rgba(32, 32, 32, 0.75);
 }

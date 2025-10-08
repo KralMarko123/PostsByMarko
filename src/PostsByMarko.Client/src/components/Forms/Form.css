@@ -1,76 +1,76 @@
 .form {
-	padding: 2em;
-	width: 100%;
+  padding: 2em;
+  width: 100%;
 
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-title {
-	color: var(--text-color);
-	font-weight: bold;
-	font-size: 2rem;
+  color: var(--text-color);
+  font-weight: bold;
+  font-size: 2rem;
 }
 
 .form-desc {
-	font-size: 1rem;
-	color: var(--text-color);
+  font-size: 1rem;
+  color: var(--text-color);
 }
 
 .form-group {
-	position: relative;
-	width: 100%;
+  position: relative;
+  width: 100%;
 
-	background-color: var(--text-color);
-	margin: 0.5em 0;
-	border-radius: 0.25em;
-	overflow: hidden;
+  background-color: var(--text-color);
+  margin: 0.5em 0;
+  border-radius: 0.25em;
+  overflow: hidden;
 }
 
 .form-group.text {
-	overflow-y: auto;
+  overflow-y: auto;
 }
 
 .form-group:focus-within {
-	box-shadow: var(--accent-shadow);
+  box-shadow: var(--accent-shadow);
 }
 
 .form-group svg {
-	position: absolute;
-	top: 50%;
-	left: 1em;
-	transform: translateY(-50%) scale(1.5);
-	fill: var(--dark-accent);
+  position: absolute;
+  top: 50%;
+  left: 1em;
+  transform: translateY(-50%) scale(1.5);
+  fill: var(--dark-accent);
 }
 
 .input {
-	width: 100%;
-	height: 100%;
-	padding: 1em;
-	padding-left: 2em;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  padding-left: 2em;
 
-	background-color: inherit;
-	border: none;
-	outline: none;
-	resize: none;
+  background-color: inherit;
+  border: none;
+  outline: none;
+  resize: none;
 
-	font-size: 1.5rem;
-	color: var(--dark);
+  font-size: 1.5rem;
+  color: var(--dark);
 }
 
 .input:focus + svg {
-	fill: var(--light-accent);
+  fill: var(--light-accent);
 }
 
 .form-actions {
-	width: 100%;
+  width: 100%;
 
-	margin-top: 1em;
-	margin-bottom: 0.5em;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
 
-	display: flex;
-	flex-direction: column;
-	gap: var(--normal-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--normal-gap);
 }
 
 /**TABLET*/
@@ -79,26 +79,26 @@
 
 /**MOBILE*/
 @media (max-width: 767px) {
-	.form-title {
-		font-size: 1.5rem;
-	}
+  .form-title {
+    font-size: 1.5rem;
+  }
 
-	.form-desc {
-		font-size: 0.85rem;
-	}
+  .form-desc {
+    font-size: 0.85rem;
+  }
 
-	.form-group {
-		margin: 0.25em 0;
-	}
+  .form-group {
+    margin: 0.25em 0;
+  }
 
-	.form-group svg {
-		left: 0.25em;
-		transform: translateY(-50%) scale(1);
-	}
+  .form-group svg {
+    left: 0.25em;
+    transform: translateY(-50%) scale(1);
+  }
 
-	.input {
-		font-size: 1rem;
-		padding: 0.5em;
-		padding-left: 1.5em;
-	}
+  .input {
+    font-size: 1rem;
+    padding: 0.5em;
+    padding-left: 1.5em;
+  }
 }

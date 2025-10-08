@@ -18,10 +18,10 @@ const Chat = () => {
   const appContext = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [unreadChats, setUnreadChats] = useState([]);
   const [openChat, setOpenChat] = useState(null);
   const { user } = useAuth();
   const { sendMessage, lastMessageRegistered } = useSignalR(false);
-  const [chats, setChats] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
   const messageInputRef = useRef(null);
@@ -36,7 +36,23 @@ const Chat = () => {
 
   const getChats = async () => {
     await MessagingService.getChats(user.token).then((requestResult) => {
-      setChats(requestResult.payload);
+      appContext.chats.forEach((chat) => {
+        let existingChat = requestResult.payload.find(
+          (c) => c.id === chat.id && c.id !== openChat?.id
+        );
+
+        if (existingChat && existingChat.updatedAt > chat.updatedAt) {
+          let userIdWithNewMessage = existingChat.participantIds.filter(
+            (id) => id !== user.id
+          )[0];
+
+          setUnreadChats((prev) => {
+            if (prev.includes(userIdWithNewMessage)) return prev;
+            return [...prev, userIdWithNewMessage];
+          });
+        }
+      });
+
       appContext.dispatch({ type: "LOAD_CHATS", chats: requestResult.payload });
     });
   };
@@ -67,6 +83,7 @@ const Chat = () => {
 
     setSelectedUser(u);
     getChat(u.id);
+    setUnreadChats(unreadChats.filter((id) => id !== u.id));
   };
 
   const handleMessageSend = async () => {
@@ -89,7 +106,12 @@ const Chat = () => {
           messageInputRef.current.value = "";
           setNewMessage("");
 
-          sendMessage(openChat.participantIds);
+          setOpenChat({
+            ...openChat,
+            messages: [...openChat.messages, newMessage],
+          });
+
+          sendMessage({ userIds: openChat.participantIds });
 
           appContext.dispatch({
             type: "SENT_MESSAGE",
@@ -125,10 +147,7 @@ const Chat = () => {
     if (selectedUser) {
       getChat(selectedUser.id);
     }
-  }, [
-    lastMessageRegistered,
-    appContext.chats.map((c) => c.messages).concat().length,
-  ]);
+  }, [lastMessageRegistered]);
 
   const getMessagesGroupedByDayToMap = () => {
     return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
@@ -143,18 +162,23 @@ const Chat = () => {
         <Card>
           <div className="chat-container">
             <div className="user-list">
-              {users.map((u) => (
-                <div
-                  className={`user-card${
-                    openChat?.participantIds?.includes(u.id) ? " active" : ""
-                  }`}
-                  key={u.id}
-                  onClick={() => handleUserClick(u)}
-                >
-                  <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
-                  <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
-                </div>
-              ))}
+              {users.map((u) => {
+                let isActiveChat = openChat?.participantIds?.includes(u.id);
+                let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
+
+                return (
+                  <div
+                    className={`user-card${isActiveChat ? " active" : ""}${
+                      hasUnreadMessages ? " unread" : ""
+                    }`}
+                    key={u.id}
+                    onClick={() => handleUserClick(u)}
+                  >
+                    <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
+                    <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
+                  </div>
+                );
+              })}
             </div>
             <div className="messages">
               {selectedUser && openChat ? (

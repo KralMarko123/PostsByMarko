@@ -14,13 +14,13 @@ export const useSignalR = (isForPostHub = true) => {
         accessTokenFactory: () => user.token,
       })
       .configureLogging(LogLevel.Information)
-      .withAutomaticReconnect()
+      .withAutomaticReconnect([0, 2, 4, 6, 8, 10, 15, 20, 30])
       .build(),
 
-    async sendMessage(payload, toAll = true) {
+    async sendMessage({ message = "", toAll = true, userIds = [] }) {
       if (isForPostHub) {
-        await sendMessageToPostHub(payload, toAll);
-      } else notifyUserIdsForNewMessage(payload);
+        await sendMessageToPostHub(message, toAll);
+      } else notifyUserIdsForNewMessage(userIds);
     },
 
     lastMessageRegistered: "",

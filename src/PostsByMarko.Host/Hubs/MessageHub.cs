@@ -7,7 +7,7 @@ namespace PostsByMarko.Host.Hubs
     {
         public async Task NotifyUsersAboutNewMessage(string[] userIds)
         {
-            await Clients.Users(userIds).ReceiveMessage($"Message has been sent to users: {string.Join(", ", userIds)}");
+            await Clients.Users(userIds).ReceiveMessage($"New message for users: '{string.Join(", ", userIds)}' at {DateTime.UtcNow}");
         }
     }
 }

@@ -46,7 +46,10 @@ const Post = ({
       (requestResult) => {
         if (requestResult.statusCode === 200) {
           appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });
-          sendMessage("Modified Post Visibility", true);
+          sendMessage({
+            message: `Modified visibility for post with Id: ${id}`,
+            toAll: true,
+          });
         }
       }
     );

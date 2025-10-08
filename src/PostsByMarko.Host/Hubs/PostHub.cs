@@ -7,12 +7,12 @@ namespace PostsByMarko.Host.Hubs
     {
         public async Task SendMessageToAll(string message)
         {
-            await Clients.All.ReceiveMessage($"Received Message: {message} with Message Id: {Guid.NewGuid()}");
+            await Clients.All.ReceiveMessage($"Received Message: '{message}' at {DateTime.UtcNow}");
         }
 
         public async Task SendMessageToOthers(string message)
         {
-            await Clients.Others.ReceiveMessage($"Received Message: {message} with Message Id: {Guid.NewGuid()}");
+            await Clients.Others.ReceiveMessage($"Received Message: '{message}' at {DateTime.UtcNow}");
         }
     }
 }
