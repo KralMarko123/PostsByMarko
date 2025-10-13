@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace PostsByMarko.IntegrationTests
 {
@@ -15,10 +16,12 @@ namespace PostsByMarko.IntegrationTests
     {
         private readonly HttpClient client;
         private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly ITestOutputHelper outputHelper;
 
-        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory, ITestOutputHelper outputHelper)
         {
             client = postsByMarkoApiFactory.client!;
+            this.outputHelper = outputHelper;
         }
 
         [Fact]
@@ -29,6 +32,9 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsJsonAsync("/createPost", post);
+
+            await OutputResponseToTestLogs(response);
+
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
             var createdPost = JsonConvert.DeserializeObject<Post>(requestResult.Payload.ToString());
 
@@ -52,6 +58,10 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PutAsJsonAsync("/updatePost", post);
+
+            await OutputResponseToTestLogs(response);
+
+
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
@@ -73,6 +83,10 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
+
+            await OutputResponseToTestLogs(response);
+
+
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
@@ -93,6 +107,11 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.DeleteAsync($"/deletePost/{post.Id}");
+
+
+            await OutputResponseToTestLogs(response);
+
+
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
@@ -103,6 +122,14 @@ namespace PostsByMarko.IntegrationTests
             
             postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
+        }
+
+        private async Task OutputResponseToTestLogs(HttpResponseMessage response)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            outputHelper.WriteLine($"Response was: {response}");
+            outputHelper.WriteLine($"Response content was: {responseContent}");
         }
     }
 }
