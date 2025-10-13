@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
 using System.Net;
