@@ -32,7 +32,7 @@ namespace PostsByMarko.IntegrationTests
             var response = await client.PostAsJsonAsync("/createPost", post);
             var responseContent = await response.Content.ReadAsStringAsync();
             var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
-            var createdPost = JObject.Parse(requestResult!.Payload!.ToString()!).ToObject<Post>();
+            var createdPost = JsonConvert.DeserializeObject<Post>(requestResult.Payload.ToString());
 
             // Assert
             requestResult.StatusCode.Should().Be(HttpStatusCode.Created);
