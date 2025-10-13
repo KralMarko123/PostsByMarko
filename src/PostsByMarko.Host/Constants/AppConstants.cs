@@ -13,10 +13,15 @@ namespace PostsByMarko.Host.Constants
         };
 
 
-        public static List<User> DEFAULT_USERS = new List<User>()
+        public static List<User> ADMINS = new List<User>()
         {
                 new User("kralmarko123@gmail.com", "Marko", "Markovikj", true, DateTime.UtcNow),
-                new User("test@test.com", "Test", "User", true, DateTime.UtcNow),
+                new User("test_admin@test.com", "Test", "Admin", true, DateTime.UtcNow)
+        };
+
+        public static List<User> USERS = new List<User>()
+        {
+                new User("test@test.com", "Test", "User", true, DateTime.UtcNow)
         };
     }
 }

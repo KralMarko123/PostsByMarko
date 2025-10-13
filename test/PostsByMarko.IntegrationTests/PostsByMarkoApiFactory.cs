@@ -19,7 +19,7 @@ namespace PostsByMarko.IntegrationTests
     {
         public HttpClient? client;
 
-        public User testUser = TestingConstants.TEST_USER;
+        public User testAdmin = TestingConstants.TEST_ADMIN;
 
         public async Task InitializeAsync()
         {
@@ -53,7 +53,7 @@ namespace PostsByMarko.IntegrationTests
             {
                 try
                 {
-                    var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = testUser.Email, Password = TestingConstants.TEST_PASSWORD });
+                    var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
 
                     if (result.IsSuccessStatusCode)
                     {

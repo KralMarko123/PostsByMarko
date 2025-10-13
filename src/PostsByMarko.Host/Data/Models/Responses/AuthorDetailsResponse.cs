@@ -8,6 +8,8 @@
         public string? Email { get; set; }
         public string? UserName { get; set; }
 
+        public AuthorDetailsResponse() { }
+
         public AuthorDetailsResponse(User user)
         {
             Id = user.Id;

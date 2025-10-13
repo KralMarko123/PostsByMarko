@@ -12,34 +12,41 @@ namespace PostsByMarko.Host.Extensions
         {
             var passwordHasher = new PasswordHasher<User>();
             var appRoles = AppConstants.APP_ROLES;
-            var defaultUsers = AppConstants.DEFAULT_USERS;
+            var admins = AppConstants.ADMINS;
+            var users = AppConstants.USERS;
 
             // seed roles
             builder.Entity<IdentityRole>().HasData(appRoles);
 
             // seed users
-            builder.Entity<User>().HasData(defaultUsers);
+            builder.Entity<User>().HasData(admins);
+            builder.Entity<User>().HasData(users);
 
             // set password hashes
-            defaultUsers[0].PasswordHash = passwordHasher.HashPassword(defaultUsers[0], "@Marko123");
-            defaultUsers[1].PasswordHash = passwordHasher.HashPassword(defaultUsers[1], "@Marko123");
+
+            foreach (var user in admins.Concat(users)) 
+            {
+                user.PasswordHash = passwordHasher.HashPassword(user, "@Marko123");
+            }
 
             // seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[0].Id });
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("marko"))!.Id, RoleId = appRoles[1].Id });
-            userRoles.Add(new IdentityUserRole<string> { UserId = defaultUsers.Find(u => u.Email.Contains("test"))!.Id, RoleId = appRoles[1].Id });
+            foreach (var user in admins.Concat(users))
+            {
+                if(admins.Contains(user)) userRoles.Add(new IdentityUserRole<string> { UserId = user.Id, RoleId = appRoles[0].Id });
+
+                userRoles.Add(new IdentityUserRole<string> { UserId = user.Id, RoleId = appRoles[1].Id });
+            }
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
 
+            // generate random data for local development
             if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
-                // generate random users
                 GenerateRandomData(builder, passwordHasher, 5);
             }
         }
-
 
         public static void GenerateRandomData(ModelBuilder builder, PasswordHasher<User> hasher, int numberOfUsers)
         {

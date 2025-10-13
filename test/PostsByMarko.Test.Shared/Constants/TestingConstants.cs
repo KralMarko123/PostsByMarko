@@ -5,7 +5,8 @@ namespace PostsByMarko.Shared.Constants
 {
     public static class TestingConstants
     {
-        public static readonly User TEST_USER = AppConstants.DEFAULT_USERS.Last();
+        public static readonly User TEST_ADMIN = AppConstants.ADMINS[1];
+        public static readonly User TEST_USER = AppConstants.USERS[0];
         public const string TEST_PASSWORD = "@Marko123";
         public const string DEVELOPMENT_HOST_ENDPOINT = "http://localhost:7171";
         public const string DEV_CLIENT_ENDPOINT = "http://localhost:3000";

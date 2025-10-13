@@ -143,7 +143,7 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task get_user_by_username_should_return_user()
+        public async Task get_user_by_email_should_return_user()
         {
             // Arrange
             var user = new User("test_user@test.com");
@@ -159,7 +159,7 @@ namespace PostsByMarko.UnitTests
 
 
         [Fact]
-        public async Task get_all_usernames_should_return_ok_with_payload_of_all_usernames()
+        public async Task get_all_users_should_return_ok_with_payload_of_all_users()
         {
             // Arrange
             var users = new List<User> { new User("test_user@test.com"), new User("other_user@test.com") };
@@ -171,8 +171,8 @@ namespace PostsByMarko.UnitTests
             var resultPayload = result.Payload as List<User>;
 
             // Assert
-            resultPayload.Should().BeEquivalentTo(users);
             result.StatusCode.Should().Be(HttpStatusCode.OK);
+            resultPayload.Should().BeEquivalentTo(users);
         }
 
         [Fact]
@@ -207,5 +207,21 @@ namespace PostsByMarko.UnitTests
             result.Should().BeTrue();
         }
 
+        [Fact]
+        public async Task get_roles_for_user_should_return_list_of_user_roles()
+        {
+            // Arrange
+            var expectedRoles = new List<string> { "USER", "ADMIN" };
+            var user = new User("test_user@test.com");
+
+            usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => expectedRoles);
+
+            // Act
+            var result = await service.GetRolesForUserAsync(user);
+
+            // Assert
+            result.Should().NotBeNullOrEmpty();
+            result.Should().BeEquivalentTo(expectedRoles);
+        }
     }
 }

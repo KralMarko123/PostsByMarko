@@ -15,6 +15,7 @@ namespace PostsByMarko.IntegrationTests
     public class PostsControllerTests
     {
         private readonly HttpClient client;
+        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
         private readonly User testUser = TestingConstants.TEST_USER;
         private readonly ITestOutputHelper outputHelper;
 
@@ -25,7 +26,7 @@ namespace PostsByMarko.IntegrationTests
         }
 
         [Fact]
-        public async Task should_successfully_create_a_post()
+        public async Task should_create_a_post()
         {
             // Arrange
             var post = new Post("Title", "Content");
@@ -43,11 +44,11 @@ namespace PostsByMarko.IntegrationTests
             createdPost.Should().NotBeNull();
             createdPost.Title.Should().Be(post.Title);
             createdPost.Content.Should().Be(post.Content);
-            createdPost.AuthorId.Should().Be(testUser.Id);
+            createdPost.AuthorId.Should().Be(testAdmin.Id);
         }
 
         [Fact]
-        public async Task should_successfully_update_a_post()
+        public async Task should_update_a_post()
         {
             // Arrange
             var post = new Post("Title", "Content");
@@ -74,7 +75,7 @@ namespace PostsByMarko.IntegrationTests
         }
 
         [Fact]
-        public async Task should_successfully_hide_a_post()
+        public async Task should_hide_a_post()
         {
             // Arrange
             var post = new Post("Title", "Content");
@@ -97,7 +98,7 @@ namespace PostsByMarko.IntegrationTests
         }
 
         [Fact]
-        public async Task should_successfully_delete_a_post()
+        public async Task should_delete_a_post()
         {
             // Arrange
             var post = new Post("Title", "Content");
@@ -117,14 +118,6 @@ namespace PostsByMarko.IntegrationTests
             postResponse.Should().NotBeNull();
             postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
-        }
-
-        private async Task OutputResponseToTestLogs(HttpResponseMessage response)
-        {
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            outputHelper.WriteLine($"Response was: {response}");
-            outputHelper.WriteLine($"Response content was: {responseContent}");
         }
     }
 }

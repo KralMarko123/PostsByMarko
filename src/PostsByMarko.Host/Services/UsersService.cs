@@ -21,12 +21,16 @@ namespace PostsByMarko.Host.Services
         public async Task<RequestResult> MapAndCreateUserAsync(UserRegistrationDto userRegistration)
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during user registration").Build();
-            var successfulRequest = new RequestResultBuilder().Created().WithMessage("Successfully Registered").Build();
+
             var newUser = new User(userRegistration.Email!);
             var result = await usersRepository.MapAndCreateUserAsync(newUser, userRegistration.Password!);
 
-            if (result) return successfulRequest;
-            else return badRequest;
+            if (!result) return badRequest;
+
+            return new RequestResultBuilder()
+                .Created()
+                .WithMessage("Successfully Registered")
+                .Build();
         }
 
         public async Task<RequestResult> ValidateUserAsync(UserLoginDto userLogin)
@@ -56,16 +60,22 @@ namespace PostsByMarko.Host.Services
         public async Task<RequestResult> GetRolesForEmailAsync(string email)
         {
             var roles = await usersRepository.GetRolesForEmailAsync(email);
-            var result = new RequestResultBuilder().Ok().WithPayload(roles).WithMessage(roles.Count > 0 ? "" : "Email has no roles associated with it").Build();
-
-            return result;
+            
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(roles)
+                .WithMessage(roles.Count > 0 ? "" : "Email has no roles associated with it")
+                .Build();
         }
 
         public async Task<RequestResult> GetAllUsersAsync()
         {
             var users = await usersRepository.GetAllUsersAsync();
 
-            return new RequestResultBuilder().Ok().WithPayload(users).Build();
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(users)
+                .Build();
         }
 
         public async Task<RequestResult> GetOtherUsersAsync(string userIdToExclude)
