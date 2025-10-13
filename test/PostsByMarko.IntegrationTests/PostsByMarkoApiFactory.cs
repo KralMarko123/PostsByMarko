@@ -40,7 +40,7 @@ namespace PostsByMarko.IntegrationTests
 
         public new Task DisposeAsync()
         {
-            client!.Dispose();
+            client?.Dispose();
 
             return Task.CompletedTask;
         }
@@ -70,7 +70,7 @@ namespace PostsByMarko.IntegrationTests
                 }
                 catch { /* ignore and retry */ }
 
-                await Task.Delay(2000); // wait 2 seconds before next try
+                await Task.Delay(3000); // wait 3 seconds before next try
             }
 
             throw new Exception("Failed to authenticate test client after multiple retries.");
