@@ -32,16 +32,16 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsJsonAsync("/createPost", post);
-
-            await OutputResponseToTestLogs(response);
-
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
             var createdPost = JsonConvert.DeserializeObject<Post>(requestResult.Payload.ToString());
 
             // Assert
+            requestResult.Should().NotBeNull();
             requestResult.StatusCode.Should().Be(HttpStatusCode.Created);
             requestResult.Message.Should().Be("Post was created successfully");
-            createdPost!.Title.Should().Be(post.Title);
+
+            createdPost.Should().NotBeNull();
+            createdPost.Title.Should().Be(post.Title);
             createdPost.Content.Should().Be(post.Content);
             createdPost.AuthorId.Should().Be(testUser.Id);
         }
@@ -58,19 +58,18 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PutAsJsonAsync("/updatePost", post);
-
-            await OutputResponseToTestLogs(response);
-
-
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
             var updatedPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
 
             // Assert
+            requestResult.Should().NotBeNull();
             requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
             requestResult.Message.Should().Be("Post was updated successfully");
-            updatedPost!.Title.Should().Be(post.Title);
+
+            updatedPost.Should().NotBeNull();
+            updatedPost.Title.Should().Be(post.Title);
             updatedPost.Content.Should().Be(post.Content);
         }
 
@@ -83,19 +82,18 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
-
-            await OutputResponseToTestLogs(response);
-
-
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
             var hiddenPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
 
             // Assert
+            requestResult.Should().NotBeNull();
             requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
             requestResult.Message.Should().Be("Post visibility was toggled successfully");
-            hiddenPost!.IsHidden.Should().BeTrue();
+
+            hiddenPost.Should().NotBeNull();
+            hiddenPost.IsHidden.Should().BeTrue();
         }
 
         [Fact]
@@ -107,19 +105,16 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.DeleteAsync($"/deletePost/{post.Id}");
-
-
-            await OutputResponseToTestLogs(response);
-
-
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
 
             // Assert
+            requestResult.Should().NotBeNull();
             requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
             requestResult.Message.Should().Be("Post was deleted successfully");
-            
+
+            postResponse.Should().NotBeNull();
             postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
         }

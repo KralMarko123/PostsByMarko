@@ -77,6 +77,5 @@ if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false)) Console.WriteLi
 
 app.Run();
 
-
 public partial class Program { }
 public interface IApiMarker { }

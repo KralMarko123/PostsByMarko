@@ -62,7 +62,4 @@ jobs:
       run: dotnet test ./test/PostsByMarko.UnitTests
 
     - name: Run integration tests
-      env:
-        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=postsbymarko;Username=${{ env.DB_USER }};Password=${{ env.DB_PASSWORD }}"
-        ASPNETCORE_ENVIRONMENT: Test
       run: dotnet test ./test/PostsByMarko.IntegrationTests
