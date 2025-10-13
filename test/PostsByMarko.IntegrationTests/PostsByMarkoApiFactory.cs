@@ -25,20 +25,6 @@ namespace PostsByMarko.IntegrationTests
             await ConfigureClientAuthentication();
         }
 
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
-
-            if (isInDocker.GetValueOrDefault(false))
-            {
-                builder.UseEnvironment("Docker");
-            }
-            else
-            {
-                builder.UseEnvironment("Development");
-            }
-        }
-
         public new Task DisposeAsync()
         {
             client!.Dispose();
