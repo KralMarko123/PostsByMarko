@@ -52,7 +52,7 @@ namespace PostsByMarko.Host.Services
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post creation").Build();
 
-            if (postToCreate.Title.Length > 0 || postToCreate.Content.Length > 0)
+            if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
             {
                 postToCreate.AuthorId = user.Id;
                 postToCreate.CreatedDate = DateTime.UtcNow;
