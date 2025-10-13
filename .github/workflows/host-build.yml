@@ -13,6 +13,7 @@ env:
   SQL_PORT: ${{ vars.SQL_PORT }}
   HOST_PORT: ${{ vars.HOST_PORT }}
   CLIENT_PORT: ${{ vars.CLIENT_PORT }}
+  ASPNETCORE_ENVIRONMENT: Test
 
 jobs:
   run-tests:

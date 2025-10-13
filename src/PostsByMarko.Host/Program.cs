@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
+var isInTest = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Test");
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
 var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -48,7 +49,9 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
-if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false))
+
+
+if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false) || isInTest.GetValueOrDefault(false))
 {
     app.WithSwaggerEnabled();
     app.WithDatabaseReset();
@@ -56,7 +59,7 @@ if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false))
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
-if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false))
+if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false) && !isInTest.GetValueOrDefault(false))
 {
     app.UseHttpsRedirection();
 }
