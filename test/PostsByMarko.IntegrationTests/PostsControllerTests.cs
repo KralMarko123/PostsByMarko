@@ -1,7 +1,10 @@
+using Bogus;
 using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -23,6 +26,30 @@ namespace PostsByMarko.IntegrationTests
         {
             client = postsByMarkoApiFactory.client!;
             this.outputHelper = outputHelper;
+        }
+
+        [Fact]
+        public async Task should_return_all_posts()
+        {
+            // Arrange
+            var randomTitle = new Faker().Commerce.ProductName();
+            var posts = new List<Post>() { new Post(randomTitle, "Content"), new Post(randomTitle, "Materials") };
+
+            foreach (var post in posts)
+            {
+                await client.PostAsJsonAsync("/createPost", post);
+            }
+
+            // Act
+            var requestResult = await client.GetFromJsonAsync<RequestResult>("/getAllPosts");
+            var allPosts = JsonConvert.DeserializeObject<List<Post>>(requestResult.Payload.ToString());
+
+            // Assert
+            requestResult.Should().NotBeNull();
+            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            allPosts.Should().NotBeNullOrEmpty();
+            allPosts.Select(p => p.Title).Should().Contain(randomTitle);
         }
 
         [Fact]

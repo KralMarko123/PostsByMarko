@@ -173,10 +173,9 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_add_a_role_to_a_user()
         {
             // Arrange
-            var randomRole = new Faker().Name.JobTitle().Trim().ToUpper();
 
             // Act
-            var response = await client.PostAsync($"/addRoleToUser/{testUser.Id}/{randomRole}", null);
+            var response = await client.PostAsync($"/addRoleToUser/{testUser.Id}/Admin", null);
             var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var rolesResponse = await client.GetFromJsonAsync<RequestResult>($"/getEmailRoles/{testUser.Email}");
@@ -187,7 +186,7 @@ namespace PostsByMarko.IntegrationTests
             requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
             requestResult.Message.Should().Be("Role successfully added to user");
 
-            roles.Should().Contain(randomRole);
+            roles.Should().Contain("Admin");
         }
 
         [Fact]

@@ -27,7 +27,10 @@ namespace PostsByMarko.Host.Services
                 allPosts.RemoveAll(p => p.IsHidden && p.AuthorId != user.Id);
             }
 
-            return new RequestResultBuilder().Ok().WithPayload(allPosts).Build();
+            return new RequestResultBuilder()
+                .Ok()
+                .WithPayload(allPosts)
+                .Build();
         }
 
         public async Task<RequestResult> GetPostByIdAsync(string postId, RequestUser user)

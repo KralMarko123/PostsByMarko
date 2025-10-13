@@ -14,17 +14,17 @@ namespace PostsByMarko.Host.Extensions
             var appRoles = AppConstants.APP_ROLES;
             var admins = AppConstants.ADMINS;
             var users = AppConstants.USERS;
+            var allUsers = admins.Concat(users);
 
             // seed roles
             builder.Entity<IdentityRole>().HasData(appRoles);
 
             // seed users
-            builder.Entity<User>().HasData(admins);
-            builder.Entity<User>().HasData(users);
+            builder.Entity<User>().HasData(allUsers);
 
             // set password hashes
 
-            foreach (var user in admins.Concat(users)) 
+            foreach (var user in allUsers) 
             {
                 user.PasswordHash = passwordHasher.HashPassword(user, "@Marko123");
             }
@@ -32,7 +32,7 @@ namespace PostsByMarko.Host.Extensions
             // seed userRoles
             List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
 
-            foreach (var user in admins.Concat(users))
+            foreach (var user in allUsers)
             {
                 if(admins.Contains(user)) userRoles.Add(new IdentityUserRole<string> { UserId = user.Id, RoleId = appRoles[0].Id });
 
