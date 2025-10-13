@@ -29,8 +29,14 @@ namespace PostsByMarko.IntegrationTests
         {
             var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
 
-            if (isInDocker.GetValueOrDefault(false)) builder.UseEnvironment("Docker");
-            else builder.UseEnvironment("Development");
+            if (isInDocker.GetValueOrDefault(false))
+            {
+                builder.UseEnvironment("Docker");
+            }
+            else
+            {
+                builder.UseEnvironment("Development");
+            }
         }
 
         public new Task DisposeAsync()
