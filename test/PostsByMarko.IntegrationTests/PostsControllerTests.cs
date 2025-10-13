@@ -29,8 +29,7 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsJsonAsync("/createPost", post);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
             var createdPost = JsonConvert.DeserializeObject<Post>(requestResult.Payload.ToString());
 
             // Assert
@@ -53,8 +52,7 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PutAsJsonAsync("/updatePost", post);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
             var updatedPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
@@ -75,8 +73,7 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
             var hiddenPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
@@ -96,8 +93,7 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.DeleteAsync($"/deletePost/{post.Id}");
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
 
             var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
@@ -30,6 +31,11 @@ namespace PostsByMarko.IntegrationTests
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
             builder.UseEnvironment("Test");
+
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddEnvironmentVariables();
+            });
         }
 
         public new Task DisposeAsync()
@@ -41,12 +47,33 @@ namespace PostsByMarko.IntegrationTests
 
         private async Task ConfigureClientAuthentication()
         {
-            var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = TestingConstants.TEST_USER.Email, Password = TestingConstants.TEST_PASSWORD });
-            var typedResult = await result.Content.ReadFromJsonAsync<RequestResult>();
-            var payload = JsonConvert.DeserializeObject<LoginResponse>(typedResult!.Payload!.ToString()!);
-            var token = payload!.Token;
+            const int maxRetries = 5;
 
-            client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = testUser.Email, Password = TestingConstants.TEST_PASSWORD });
+
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var requestResult = await result.Content.ReadFromJsonAsync<RequestResult>();
+
+                        if (requestResult?.Payload != null)
+                        {
+                            var payload = JsonConvert.DeserializeObject<LoginResponse>(requestResult.Payload.ToString()!);
+                            var token = payload!.Token;
+                            client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                            return;
+                        }
+                    }
+                }
+                catch { /* ignore and retry */ }
+
+                await Task.Delay(2000); // wait 2 seconds before next try
+            }
+
+            throw new Exception("Failed to authenticate test client after multiple retries.");
         }
     }
 }
