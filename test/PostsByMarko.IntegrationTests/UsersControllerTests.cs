@@ -1,7 +1,9 @@
 using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Shared.Constants;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -31,6 +33,7 @@ namespace PostsByMarko.IntegrationTests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             users.Should().NotBeNullOrEmpty();
+            users.Select(u => u.Email).Should().Contain(TestingConstants.TEST_USER.Email);
         }
     }
 }
