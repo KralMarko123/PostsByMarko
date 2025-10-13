@@ -369,3 +369,5 @@ aspnetserver/Data/AppDB.db
 *.db
 
 .env
+CoverageHistory
+coveragereport
