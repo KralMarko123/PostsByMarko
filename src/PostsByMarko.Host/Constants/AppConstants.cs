@@ -21,7 +21,8 @@ namespace PostsByMarko.Host.Constants
 
         public static List<User> USERS = new List<User>()
         {
-                new User("test@test.com", "Test", "User", true, DateTime.UtcNow)
+                new User("test@test.com", "Test", "User", true, DateTime.UtcNow),
+                new User("user@user.com", "User", "Userson", true, DateTime.UtcNow)
         };
     }
 }

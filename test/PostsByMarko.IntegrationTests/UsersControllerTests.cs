@@ -20,6 +20,7 @@ namespace PostsByMarko.IntegrationTests
     {
         private readonly HttpClient client;
         private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly User randomUser = TestingConstants.RANDOM_USER;
 
         public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
@@ -146,12 +147,12 @@ namespace PostsByMarko.IntegrationTests
             // Arrange
 
             // Act
-            var response = await client.DeleteFromJsonAsync<RequestResult>($"/deleteUser/{testUser.Id}");
+            var response = await client.DeleteFromJsonAsync<RequestResult>($"/deleteUser/{randomUser.Id}");
 
             // Assert
             response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Message.Should().Be($"User with Id: {testUser.Id} removed successfully");
+            response.Message.Should().Be($"User with Id: {randomUser.Id} removed successfully");
         }
 
         [Fact]

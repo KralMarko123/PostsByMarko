@@ -7,6 +7,7 @@ namespace PostsByMarko.Shared.Constants
     {
         public static readonly User TEST_ADMIN = AppConstants.ADMINS[1];
         public static readonly User TEST_USER = AppConstants.USERS[0];
+        public static readonly User RANDOM_USER = AppConstants.USERS[1];
         public const string TEST_PASSWORD = "@Marko123";
         public const string DEVELOPMENT_HOST_ENDPOINT = "http://localhost:7171";
         public const string DEV_CLIENT_ENDPOINT = "http://localhost:3000";
