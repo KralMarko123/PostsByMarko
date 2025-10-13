@@ -24,12 +24,11 @@ namespace PostsByMarko.Host.Data.Repos.Posts
 
         public async Task<Post> CreatePostAsync(Post postToCreate)
         {
-            await appDbContext.Posts.AddAsync(postToCreate);
+            var result = await appDbContext.Posts.AddAsync(postToCreate);
+            
+            await appDbContext.SaveChangesAsync();
 
-            var postAddedSuccessfully = await appDbContext.SaveChangesAsync() >= 1;
-
-            if (postAddedSuccessfully) return await GetPostByIdAsync(postToCreate.Id);
-            else throw new Exception("Error during post creation");
+            return result.Entity;
         }
 
 

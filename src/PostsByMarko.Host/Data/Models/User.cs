@@ -12,6 +12,8 @@ namespace PostsByMarko.Host.Data.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Post> Posts { get; set; } = new List<Post>();
 
+        public User() { }
+
         public User(string email)
         {
             Email = email;

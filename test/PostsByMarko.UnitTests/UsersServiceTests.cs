@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -72,7 +71,7 @@ namespace PostsByMarko.UnitTests
             var userLogin = new UserLoginDto { Email = user.Email, Password = "test_password" };
             var jwtToken = "some_jwt_token";
             var userRoles = new List<string> { "User" };
-            var loginResponse = new LoginResponse { Token = jwtToken, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, UserId = user.Id, Roles = userRoles };
+            var loginResponse = new LoginResponse { Token = jwtToken, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, Id = user.Id, Roles = userRoles };
 
             jwtHelperMock.Setup(h => h.CreateTokenAsync(user)).ReturnsAsync(jwtToken);
             usersRepositoryMock.Setup(r => r.GetRolesForEmailAsync(user.Email)).ReturnsAsync(userRoles);
@@ -163,16 +162,16 @@ namespace PostsByMarko.UnitTests
         public async Task get_all_usernames_should_return_ok_with_payload_of_all_usernames()
         {
             // Arrange
-            var usernames = new List<string> { "test_user", "other_user", "one_more_user" };
+            var users = new List<User> { new User("test_user@test.com"), new User("other_user@test.com") };
 
-            usersRepositoryMock.Setup(r => r.GetAllUsersAsync()).ReturnsAsync(usernames);
+            usersRepositoryMock.Setup(r => r.GetAllUsersAsync()).ReturnsAsync(users);
 
             // Act
             var result = await service.GetAllUsersAsync();
-            var resultPayload = result.Payload as List<string>;
+            var resultPayload = result.Payload as List<User>;
 
             // Assert
-            resultPayload.Should().BeEquivalentTo(usernames);
+            resultPayload.Should().BeEquivalentTo(users);
             result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 

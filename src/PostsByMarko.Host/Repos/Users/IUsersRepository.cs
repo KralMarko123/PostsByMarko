@@ -11,7 +11,7 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<List<string>> GetRolesForEmailAsync(string email);
         Task<User> GetUserByIdAsync(string id);
         Task<List<User>> GetAllUsersAsync();
-        Task<bool> AddPostToUserAsync(string username, Post post);
+        Task<bool> AddPostToUserAsync(User user, Post post);
         Task<bool> RemovePostFromUserAsync(string username, Post post);
         Task<List<string>> GetAllEmailsAsync();
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);

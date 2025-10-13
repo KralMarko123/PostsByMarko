@@ -17,6 +17,8 @@ namespace PostsByMarko.IntegrationTests
     {
         public HttpClient? client;
 
+        public User testUser = TestingConstants.TEST_USER;
+
         public async Task InitializeAsync()
         {
             client = CreateClient();

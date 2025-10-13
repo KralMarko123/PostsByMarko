@@ -39,7 +39,7 @@ namespace PostsByMarko.Host.Services
             if (post == null) 
                 return notfoundRequest;
             
-            if (post.IsHidden && !user.Roles!.Contains(RoleConstants.ADMIN)) 
+            if (post.IsHidden && (!user.Roles!.Contains(RoleConstants.ADMIN) && post.AuthorId != user.Id)) 
                 return unauthorizedRequest;
 
             return new RequestResultBuilder()
@@ -52,7 +52,7 @@ namespace PostsByMarko.Host.Services
         {
             var badRequest = new RequestResultBuilder().BadRequest().WithMessage("Error during post creation").Build();
 
-            if (postToCreate.Title.Length > 0 && postToCreate.Content.Length > 0)
+            if (postToCreate.Title.Length > 0 || postToCreate.Content.Length > 0)
             {
                 postToCreate.AuthorId = user.Id;
                 postToCreate.CreatedDate = DateTime.UtcNow;
@@ -63,16 +63,23 @@ namespace PostsByMarko.Host.Services
                     postToCreate.Id = Guid.NewGuid().ToString();
                 }
 
-                var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
-                var postSuccessfullyAddedToUser = await usersRepository.AddPostToUserAsync(user.Email, newlyCreatedPost);
+                try
+                {
+                    var actualUser = await usersRepository.GetUserByIdAsync(user.Id);
+                    var newlyCreatedPost = await postsRepository.CreatePostAsync(postToCreate);
+                    var postSuccessfullyAddedToUser = await usersRepository.AddPostToUserAsync(actualUser, newlyCreatedPost);
 
-                if (postSuccessfullyAddedToUser) 
                     return new RequestResultBuilder()
                         .Created()
                         .WithMessage("Post was created successfully")
                         .WithPayload(newlyCreatedPost)
                         .Build();
-                else return badRequest;
+                }
+                catch (Exception)
+                {
+                    return badRequest;
+                }
+
             }
             else return badRequest;
         }

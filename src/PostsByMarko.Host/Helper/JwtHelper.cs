@@ -20,10 +20,9 @@ namespace PostsByMarko.Host.Helper
 
         public async Task<string> CreateTokenAsync(User user)
         {
-            var signingCredentials = GetSigningCredentials();
-            var claims = await usersRepository.GetClaimsAsync(user);
+            var userClaims = await usersRepository.GetClaimsAsync(user);
 
-            return GenerateToken(signingCredentials, claims);
+            return GenerateToken(userClaims);
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -35,7 +34,7 @@ namespace PostsByMarko.Host.Helper
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
 
-        private string GenerateToken(SigningCredentials signingCredentials, List<Claim> claims)
+        private string GenerateToken(List<Claim> claims)
         {
             var jwtConfig = configuration.GetSection("JwtConfig");
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -44,7 +43,7 @@ namespace PostsByMarko.Host.Helper
                 Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
                 Issuer = jwtConfig.GetSection("validIssuers")!.Get<List<string>>()!.FirstOrDefault(),
                 Audience = jwtConfig.GetSection("validAudiences")!.Get<List<string>>()!.FirstOrDefault(),
-                SigningCredentials = signingCredentials
+                SigningCredentials = GetSigningCredentials()
 
             };
             var tokenHandler = new JwtSecurityTokenHandler();

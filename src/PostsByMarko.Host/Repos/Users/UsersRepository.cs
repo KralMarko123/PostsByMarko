@@ -65,10 +65,8 @@ namespace PostsByMarko.Host.Data.Repos.Users
             return roles;
         }
 
-        public async Task<bool> AddPostToUserAsync(string email, Post post)
+        public async Task<bool> AddPostToUserAsync(User user, Post post)
         {
-            var user = await GetUserByEmailAsync(email);
-
             user.Posts.Add(post);
 
             var result = await userManager.UpdateAsync(user);

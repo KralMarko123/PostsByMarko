@@ -1,10 +1,9 @@
 using FluentAssertions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Shared.Constants;
-using System;
-using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -16,46 +15,98 @@ namespace PostsByMarko.IntegrationTests
     public class PostsControllerTests
     {
         private readonly HttpClient client;
+        private readonly User testUser = TestingConstants.TEST_USER;
+
         public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
             client = postsByMarkoApiFactory.client!;
         }
 
         [Fact]
-        public async Task should_create_then_update_then_toggle_and_then_finally_delete_a_post()
+        public async Task should_successfully_create_a_post()
         {
             // Arrange
-            var post = new Post { Id = Guid.NewGuid().ToString(), IsHidden = false, Title = "title", Content = "content", AuthorId = Guid.NewGuid().ToString() };
-            var testEmail = TestingConstants.TEST_USER.Email;
+            var post = new Post("Title", "Content");
 
             // Act
-            await client.PostAsJsonAsync("/createPost", post);
-
-            post.Title = "updated_title";
-            post.Content = "updated_content";
-
-            await client.PutAsJsonAsync("/updatePost", post);
-            await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
-            await client.PostAsJsonAsync($"/toggleUserForPost/{post.Id}", testEmail);
-
-            var result = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
-            var postDetails = JsonConvert.DeserializeObject<PostDetailsResponse>(result!.Payload!.ToString()!);
-
-            post = postDetails!.Post;
+            var response = await client.PostAsJsonAsync("/createPost", post);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+            var createdPost = JObject.Parse(requestResult!.Payload!.ToString()!).ToObject<Post>();
 
             // Assert
-            post!.Title.Should().Be("updated_title");
-            post.Content.Should().Be("updated_content");
-            post.IsHidden.Should().BeTrue();
-            post.AllowedUsers.Should().Contain(testEmail);
+            requestResult.StatusCode.Should().Be(HttpStatusCode.Created);
+            requestResult.Message.Should().Be("Post was created successfully");
+            createdPost!.Title.Should().Be(post.Title);
+            createdPost.Content.Should().Be(post.Content);
+            createdPost.AuthorId.Should().Be(testUser.Id);
+        }
 
-            await client.DeleteAsync($"/deletePost/{post.Id}");
+        [Fact]
+        public async Task should_successfully_update_a_post()
+        {
+            // Arrange
+            var post = new Post("Title", "Content");
+            await client.PostAsJsonAsync("/createPost", post);
 
-            result = await client.GetFromJsonAsync<RequestResult>("/getAllPosts");
+            post.Title = "Updated title";
+            post.Content = "Updated content";
+            // Act
+            var response = await client.PutAsJsonAsync("/updatePost", post);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
 
-            var allPosts = JsonConvert.DeserializeObject<List<Post>>(result!.Payload!.ToString()!);
+            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
+            var updatedPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
 
-            allPosts.Should().NotContain(post);
+            // Assert
+            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            requestResult.Message.Should().Be("Post was updated successfully");
+            updatedPost!.Title.Should().Be(post.Title);
+            updatedPost.Content.Should().Be(post.Content);
+        }
+
+        [Fact]
+        public async Task should_successfully_hide_a_post()
+        {
+            // Arrange
+            var post = new Post("Title", "Content");
+            await client.PostAsJsonAsync("/createPost", post);
+
+            // Act
+            var response = await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+
+            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
+            var hiddenPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
+
+            // Assert
+            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            requestResult.Message.Should().Be("Post visibility was toggled successfully");
+            hiddenPost!.IsHidden.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task should_successfully_delete_a_post()
+        {
+            // Arrange
+            var post = new Post("Title", "Content");
+            await client.PostAsJsonAsync("/createPost", post);
+
+            // Act
+            var response = await client.DeleteAsync($"/deletePost/{post.Id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var requestResult = JsonConvert.DeserializeObject<RequestResult>(responseContent);
+
+            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
+
+            // Assert
+            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            requestResult.Message.Should().Be("Post was deleted successfully");
+            
+            postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
         }
     }
 }
