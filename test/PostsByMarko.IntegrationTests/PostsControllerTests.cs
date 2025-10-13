@@ -2,7 +2,6 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Shared.Constants;
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -25,8 +24,6 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_successfully_create_a_post()
         {
-            Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
-
             // Arrange
             var post = new Post("Title", "Content");
 
@@ -47,8 +44,6 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_successfully_update_a_post()
         {
-            Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
-
             // Arrange
             var post = new Post("Title", "Content");
             await client.PostAsJsonAsync("/createPost", post);
@@ -74,8 +69,6 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_successfully_hide_a_post()
         {
-            Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
-
             // Arrange
             var post = new Post("Title", "Content");
             await client.PostAsJsonAsync("/createPost", post);
@@ -97,8 +90,6 @@ namespace PostsByMarko.IntegrationTests
         [Fact]
         public async Task should_successfully_delete_a_post()
         {
-            Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
-
             // Arrange
             var post = new Post("Title", "Content");
             await client.PostAsJsonAsync("/createPost", post);

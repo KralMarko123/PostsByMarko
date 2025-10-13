@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
@@ -23,6 +24,12 @@ namespace PostsByMarko.IntegrationTests
         {
             client = CreateClient();
             await ConfigureClientAuthentication();
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+            builder.UseEnvironment("Test");
         }
 
         public new Task DisposeAsync()
