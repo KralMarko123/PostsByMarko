@@ -62,6 +62,7 @@ app.UseCors(MiscConstants.CORS_POLICY_NAME);
 if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false) && !isInTest.GetValueOrDefault(false))
 {
     app.UseHttpsRedirection();
+    app.UseRateLimiting();
 }
 
 app.UseAuthentication();
@@ -69,7 +70,6 @@ app.UseAuthorization();
 app.MapHub<PostHub>("/postHub");
 app.MapHub<MessageHub>("/messageHub");
 app.MapControllers();
-app.UseRateLimiting();
 
 #endregion
 
