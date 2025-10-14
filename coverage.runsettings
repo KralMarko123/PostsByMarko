@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <!-- Exclude specific folders by file path (relative to repo root or project folders) -->
+          <ExcludeByFile>**/src/PostsByMarko.Host/Builders/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/src/PostsByMarko.Host/Constants/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/src/PostsByMarko.Host/Data/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/src/PostsByMarko.Host/Extensions/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/src/PostsByMarko.Host/Middlewares/*.cs</ExcludeByFile>
+
+          <!-- Also exclude by assembly/class name to be safe -->
+          <Exclude>
+            [PostsByMarko.Host]*Builders*
+            [PostsByMarko.Host]*Constants*
+            [PostsByMarko.Host]*Data*
+            [PostsByMarko.Host]*Extensions*
+            [PostsByMarko.Host]*Middlewares*
+          </Exclude>
+
+          <!-- Ignore compiler-generated or designer-generated code -->
+          <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
+          <ExcludeByAttribute>CompilerGeneratedAttribute</ExcludeByAttribute>
+
+          <!-- Output format -->
+          <Format>cobertura</Format>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -1,21 +1,46 @@
+# Go to repo root
 cd ..
-dotnet tool install -g dotnet-reportgenerator-globaltool
 
-$dir = pwd
+# Ensure ReportGenerator is installed globally
+dotnet tool install -g dotnet-reportgenerator-globaltool | Out-Null
 
-Remove-Item -Recurse -Force $dir/TestResults/
+# Add global .NET tools path to current session
+$env:PATH += ";$env:USERPROFILE\.dotnet\tools"
 
-$output = [string] (& dotnet test ./PostsByMarko.sln --collect:"XPlat Code Coverage" 2>&1)
-Write-Host "Last Exit Code: $lastexitcode"
-Write-Host $output
+$unitTestsProj = "test/PostsByMarko.UnitTests/PostsByMarko.UnitTests.csproj"
+$integrationTestsProj = "test/PostsByMarko.IntegrationTests/PostsByMarko.IntegrationTests.csproj"
+$coverageOutputDir = "TestResults/Coverage"
+$reportOutputDir = "$coverageOutputDir\Report"
 
-Remove-Item -Recurse -Force $dir/coveragereport/
+Write-Host "=== Running Unit Tests with Coverage ==="
+dotnet test $unitTestsProj `
+    --settings coverage.runsettings `
+    --collect "XPlat Code Coverage" `
+    --results-directory "$coverageOutputDir\Unit"
 
-reportgenerator -reports:"$dir/**/coverage.cobertura.xml" -targetdir:"$dir/coveragereport" -reporttypes:Html -historydir:$dir/CoverageHistory 
+Write-Host "=== Running Integration Tests with Coverage ==="
+dotnet test $integrationTestsProj `
+    --settings coverage.runsettings `
+    --collect "XPlat Code Coverage" `
+    --results-directory "$coverageOutputDir\Integration"
 
+Write-Host "=== Generating merged and filtered coverage report ==="
+
+# Combine coverage results and filter out unwanted namespaces
+reportgenerator `
+    -reports:"$coverageOutputDir\Unit\**\coverage.cobertura.xml;$coverageOutputDir\Integration\**\coverage.cobertura.xml" `
+    -targetdir:"$reportOutputDir" `
+    -reporttypes:Html `
+    -assemblyfilters:"+PostsByMarko.*;-PostsByMarko.Host.Builders*;-PostsByMarko.Host.Constants*;-PostsByMarko.Host.Data*;-PostsByMarko.Host.Extensions*;-PostsByMarko.Host.Middlewares*" `
+    -classfilters:"-*.Builders.*;-*.Constants.*;-*.Data.*;-*.Extensions.*;-*.Middlewares.*"
+
+Write-Host "`n✅ Coverage report generated under: $reportOutputDir"
+
+# Optional: open in browser (only if you're on Windows Desktop)
 $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
 if ($osInfo.ProductType -eq 1) {
-    (& "$dir/coveragereport/index.html")
+    Start-Process "$reportOutputDir\index.html"
 }
 
+# Return to scripts directory
 cd ./scripts

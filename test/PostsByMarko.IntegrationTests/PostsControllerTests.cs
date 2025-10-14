@@ -2,7 +2,9 @@ using Bogus;
 using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Shared.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -145,6 +147,47 @@ namespace PostsByMarko.IntegrationTests
             postResponse.Should().NotBeNull();
             postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
+        }
+
+        [Fact]
+        public async Task should_return_post_author()
+        {
+            // Arrange
+            var post = new Post("Title", "Content");
+            await client.PostAsJsonAsync("/createPost", post);
+
+            // Act
+            var response = await client.GetFromJsonAsync<RequestResult>($"/getPostAuthor/{post.Id}");
+            var postAuthor = JsonConvert.DeserializeObject<AuthorDetailsResponse>(response!.Payload!.ToString()!);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            postAuthor.Should().NotBeNull();
+            postAuthor.Should().BeEquivalentTo(new AuthorDetailsResponse(testAdmin));
+        }
+
+        [Fact]
+        public async Task should_return_not_found_if_post_does_not_exist()
+        {
+            // Arrange
+            var randomId = Guid.NewGuid().ToString();
+
+            // Act
+            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{randomId}");
+            var authorResponse = await client.GetFromJsonAsync<RequestResult>($"/getPostAuthor/{randomId}");
+
+            // Assert
+            postResponse.Should().NotBeNull();
+            postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            postResponse.Message.Should().Be($"Post with Id: {randomId} was not found");
+            postResponse.Payload.Should().BeNull();
+
+            authorResponse.Should().NotBeNull();
+            authorResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            authorResponse.Message.Should().Be($"Post with Id: {randomId} was not found");
+            authorResponse.Payload.Should().BeNull();
         }
     }
 }
