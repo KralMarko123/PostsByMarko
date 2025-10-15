@@ -81,6 +81,9 @@ jobs:
         format: markdown
         output: both
 
+    - name: show coverage JSON
+      run:  cat code-coverage-results.json
+
     # Create a badge file in the repo (coverage.svg)
     - name: Create coverage badge
       uses: schneegans/dynamic-badges-action@v1.6.0
@@ -89,5 +92,6 @@ jobs:
         gistID: ${{ secrets.COVERAGE_GIST_ID }}
         filename: coverage-badge.json
         label: Coverage
-        message: ${{ steps.coverage.outputs.badge }}
-        color: ${{ steps.coverage.outputs.color }}
+        message: ${{ steps.coverage.outputs.badge || 'N/A' }}
+        color: ${{ steps.coverage.outputs.color || 'lightgrey' }}
+
