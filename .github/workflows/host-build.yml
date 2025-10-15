@@ -82,14 +82,29 @@ jobs:
         format: markdown
         output: both
 
+    - name: Debug GIST_TOKEN presence
+      run: |
+        if [ -z "${{ secrets.GIST_TOKEN }}" ]; then
+          echo "❌ GIST_TOKEN is empty"
+        else
+          echo "✅ GIST_TOKEN is set"
+        fi
+
+    - name: Verify Gist API access
+      run: |
+        curl -s -o /dev/null -w "%{http_code}\n" \
+          -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+          https://api.github.com/gists/${{ secrets.COVERAGE_GIST_ID }}
+
+
     # Create a badge file in the repo (coverage.svg)
     - name: Create coverage badge
+      if: github.ref == 'refs/heads/main' && secrets.GIST_TOKEN != ''
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.GIST_TOKEN }}
         gistID: ${{ secrets.COVERAGE_GIST_ID }}
-        filename: postsbymarko-coverage.json 
+        filename: postsbymarko-coverage.json
         label: Coverage
         message: ${{ steps.coverage.outputs.badge || 'N/A' }}
         color: ${{ steps.coverage.outputs.color || 'lightgrey' }}
-
