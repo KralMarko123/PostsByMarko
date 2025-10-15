@@ -99,7 +99,7 @@ jobs:
 
     # Create a badge file in the repo (coverage.svg)
     - name: Create coverage badge
-      if: github.ref == 'refs/heads/main' && secrets.GIST_TOKEN != ''
+      if: github.ref == 'refs/heads/main'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.GIST_TOKEN }}
