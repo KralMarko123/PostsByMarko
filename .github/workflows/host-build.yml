@@ -82,29 +82,54 @@ jobs:
         format: markdown
         output: both
 
-    - name: Debug GIST_TOKEN presence
+    # Generate badge JSON manually and update the Gist
+    - name: Update coverage badge gist
+      if: github.ref == 'refs/heads/main'
       run: |
-        if [ -z "${{ secrets.GIST_TOKEN }}" ]; then
-          echo "❌ GIST_TOKEN is empty"
-        else
-          echo "✅ GIST_TOKEN is set"
-        fi
+        echo "🟢 Generating badge JSON..."
+        jq -n --arg msg "${{ steps.coverage.outputs.badge || 'N/A' }}" \
+              --arg col "${{ steps.coverage.outputs.color || 'lightgrey' }}" \
+              '{schemaVersion:1,label:"Coverage",message:$msg,color:$col}' > badge.json
 
-    - name: Verify Gist API access
-      run: |
-        curl -s -o /dev/null -w "%{http_code}\n" \
+        echo "🟢 Patching Gist..."
+        curl -s -X PATCH \
           -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+          -d "{\"files\": { \"postsbymarko-coverage.json\": {\"content\": $(jq -Rs . badge.json) }}}" \
           https://api.github.com/gists/${{ secrets.COVERAGE_GIST_ID }}
 
+        echo "✅ Gist badge updated successfully!"
 
-    # Create a badge file in the repo (coverage.svg)
-    - name: Create coverage badge
+    # Update README badge only if coverage value changed
+    - name: Update README badge if needed
       if: github.ref == 'refs/heads/main'
-      uses: schneegans/dynamic-badges-action@v1.6.0
-      with:
-        auth: ${{ secrets.GIST_TOKEN }}
-        gistID: ${{ secrets.COVERAGE_GIST_ID }}
-        filename: postsbymarko-coverage.json
-        label: Coverage
-        message: ${{ steps.coverage.outputs.badge || 'N/A' }}
-        color: ${{ steps.coverage.outputs.color || 'lightgrey' }}
+      run: |
+        echo "🟢 Checking if README badge update is needed..."
+
+        BADGE_URL="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KralMarko123/${{ secrets.COVERAGE_GIST_ID }}/raw/postsbymarko-coverage.json"
+        COVERAGE_VALUE="${{ steps.coverage.outputs.badge || 'N/A' }}"
+
+        # Find current badge coverage value in README
+        CURRENT_VALUE=$(grep -oP 'Coverage.*\)\K[^\)]*' README.md | grep -oP '[0-9]+%' || echo "none")
+
+        echo "Current coverage in README: $CURRENT_VALUE"
+        echo "New coverage from report: $COVERAGE_VALUE"
+
+        if [ "$CURRENT_VALUE" != "$COVERAGE_VALUE" ]; then
+          echo "🟢 Updating README badge..."
+          if grep -q "img.shields.io/endpoint" README.md; then
+            sed -i "s|!\[Coverage\](.*)|![Coverage](${BADGE_URL})|" README.md
+          else
+            echo "\n![Coverage](${BADGE_URL})" >> README.md
+          fi
+
+          echo "🟢 Committing README badge update..."
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add README.md
+          git commit -m "chore: update coverage badge to ${COVERAGE_VALUE} [skip ci]" || echo "No changes to commit"
+          git push origin main
+        else
+          echo "✅ Coverage unchanged ($COVERAGE_VALUE) — skipping README update."
+        fi
+
+
