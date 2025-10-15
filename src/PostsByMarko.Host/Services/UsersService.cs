@@ -2,8 +2,8 @@
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
-using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
+using PostsByMarko.Host.Repos.Users;
 
 namespace PostsByMarko.Host.Services
 {

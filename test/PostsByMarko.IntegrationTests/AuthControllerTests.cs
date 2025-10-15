@@ -17,6 +17,7 @@ namespace PostsByMarko.IntegrationTests
     {
         private readonly HttpClient client;
         private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
 
         public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
@@ -42,7 +43,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_login()
         {
             // Arrange
-            var loginDto = new UserLoginDto { Email = testUser.Email, Password = TestingConstants.TEST_PASSWORD };
+            var loginDto = new UserLoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD };
 
             // Act
             var response = await client.PostAsJsonAsync("/login", loginDto);
@@ -55,9 +56,9 @@ namespace PostsByMarko.IntegrationTests
             requestResult.Message.Should().Be("Successfully Logged In");
 
             loginResponse.Should().NotBeNull();
-            loginResponse.Email.Should().Be(testUser.Email);
+            loginResponse.Email.Should().Be(testAdmin.Email);
             loginResponse.Token.Should().NotBeNullOrEmpty();
-            loginResponse.Roles.Should().Contain("User");
+            loginResponse.Roles.Should().Contain("User", "Admin");
         }
     }
 }

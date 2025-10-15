@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Models;
 using System.Security.Claims;
 
-namespace PostsByMarko.Host.Data.Repos.Users
+namespace PostsByMarko.Host.Repos.Users
 {
     public class UsersRepository : IUsersRepository
     {
@@ -14,11 +15,6 @@ namespace PostsByMarko.Host.Data.Repos.Users
         {
             this.appDbContext = appDbContext;
             this.userManager = userManager;
-        }
-
-        public async Task<List<string>> GetAllEmailsAsync()
-        {
-            return await appDbContext.Users.Select(u => u.Email).ToListAsync();
         }
 
         public async Task<bool> MapAndCreateUserAsync(User userToCreate, string passwordForUser)

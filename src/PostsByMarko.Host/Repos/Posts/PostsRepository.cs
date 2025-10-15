@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Models;
 
-namespace PostsByMarko.Host.Data.Repos.Posts
+namespace PostsByMarko.Host.Repos.Posts
 {
     public class PostsRepository : IPostsRepository
     {

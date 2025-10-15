@@ -1,6 +1,6 @@
 ﻿using PostsByMarko.Host.Data.Models;
 
-namespace PostsByMarko.Host.Data.Repos.Posts
+namespace PostsByMarko.Host.Repos.Posts
 {
     public interface IPostsRepository
     {

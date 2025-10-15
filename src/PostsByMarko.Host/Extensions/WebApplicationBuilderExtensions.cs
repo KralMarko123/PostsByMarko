@@ -5,10 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Repos.Posts;
-using PostsByMarko.Host.Data.Repos.Users;
 using PostsByMarko.Host.Helper;
 using PostsByMarko.Host.Repos.Messaging;
+using PostsByMarko.Host.Repos.Posts;
+using PostsByMarko.Host.Repos.Users;
 using PostsByMarko.Host.Services;
 using System.Text;
 

@@ -1,7 +1,7 @@
 ﻿using PostsByMarko.Host.Data.Models;
 using System.Security.Claims;
 
-namespace PostsByMarko.Host.Data.Repos.Users
+namespace PostsByMarko.Host.Repos.Users
 {
     public interface IUsersRepository
     {
@@ -13,7 +13,6 @@ namespace PostsByMarko.Host.Data.Repos.Users
         Task<List<User>> GetAllUsersAsync();
         Task<bool> AddPostToUserAsync(User user, Post post);
         Task<bool> RemovePostFromUserAsync(string username, Post post);
-        Task<List<string>> GetAllEmailsAsync();
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<bool> CheckPasswordForUserAsync(User user, string password);
         Task<bool> CheckIsEmailConfirmedForUserAsync(User user);

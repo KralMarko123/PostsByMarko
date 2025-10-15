@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Repos.Users;
+using PostsByMarko.Host.Repos.Users;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
