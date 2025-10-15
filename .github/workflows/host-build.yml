@@ -76,14 +76,13 @@ jobs:
       run: |
         echo "Listing coverage files:"
         find TestResults -type f -name "*.xml" || true
-
         
     # Generate summary JSON for badge
     - name: Generate coverage summary
       id: coverage
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: TestResults/Coverage/Report/**/[Cc]obertura.xml
+        filename: TestResults/Coverage/Report/Cobertura.xml
         badge: true
         format: markdown
         output: both
