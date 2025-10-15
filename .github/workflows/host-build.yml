@@ -148,8 +148,8 @@ jobs:
 
         # Store for next step through the environment file
         echo "COVERAGE_VALUE=${COVERAGE_VALUE}" >> $GITHUB_ENV
-        
-    - name: Update README badge if needed
+
+    - name: Update README badge
       if: github.ref == 'refs/heads/main'
       run: |
         set -e
@@ -157,25 +157,15 @@ jobs:
         BADGE_URL="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KralMarko123/${{ secrets.COVERAGE_GIST_ID }}/raw/postsbymarko-coverage.json"
         echo "Badge URL: $BADGE_URL"
 
-        # Replace any existing Coverage badge line or append if missing.
+        # Replace or append badge line every time
         if grep -qE '^!\[Coverage\]\(' README.md; then
-          # Replace the whole line that starts with ![Coverage](
           sed -i -E "s|^!\[Coverage\]\([^)]+\)|![Coverage](${BADGE_URL})|g" README.md
         else
           printf "\n![Coverage](%s)\n" "$BADGE_URL" >> README.md
         fi
 
-        echo "🟢 Show README diff (if any)"
-        git diff -- README.md || true
-
-        # Commit only if README actually changed
-        if git diff --quiet -- README.md; then
-          echo "✅ README unchanged — skip commit"
-        else
-          echo "🟢 Committing README change"
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add README.md
-          git commit -m "chore: update coverage badge to ${COVERAGE_VALUE}% [skip ci]"
-          git push origin main
-        fi
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add README.md
+        git commit -m "chore: refresh coverage badge to ${COVERAGE_VALUE}% [skip ci]" || echo "No changes"
+        git push origin main
