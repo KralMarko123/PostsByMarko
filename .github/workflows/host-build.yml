@@ -77,14 +77,10 @@ jobs:
       id: coverage
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: TestResults/Coverage/Report/Cobertura.xml
+        filename: TestResults/Coverage/Report/**/[Cc]obertura.xml
         badge: true
         format: markdown
         output: both
-    
-    # View generated JSON for badge
-    - name: Show coverage JSON
-      run: cat code-coverage-results.json
 
     # Create a badge file in the repo (coverage.svg)
     - name: Create coverage badge
