@@ -84,12 +84,24 @@ jobs:
 
     # Generate badge JSON manually and update the Gist
     - name: Update coverage badge gist
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main
       run: |
-        echo "🟢 Generating badge JSON..."
-        jq -n --arg msg "${{ steps.coverage.outputs.badge }}" \
-              --arg col "${{ steps.coverage.outputs.color }}" \
-              '{schemaVersion:1,label:"Coverage",message:$msg,color:$col}' > badge.json
+        echo "🟢 Badge value: '${{ steps.coverage.outputs.badge }}'"
+        echo "🟢 Color value: '${{ steps.coverage.outputs.color }}'"
+
+        # Use safe fallbacks
+        BADGE_MSG="${{ steps.coverage.outputs.badge }}"
+        BADGE_COLOR="${{ steps.coverage.outputs.color }}"
+        if [ -z "$BADGE_MSG" ]; then BADGE_MSG="N/A"; fi
+        if [ -z "$BADGE_COLOR" ]; then BADGE_COLOR="lightgrey"; fi
+
+        jq -n \
+          --arg msg "$BADGE_MSG" \
+          --arg col "$BADGE_COLOR" \
+          '{schemaVersion:1,label:"Coverage",message:$msg,color:$col}' > badge.json
+
+        echo "🟢 badge.json content:"
+        cat badge.json
 
         echo "🟢 Patching Gist..."
         curl -s -X PATCH \
