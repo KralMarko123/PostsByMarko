@@ -87,8 +87,8 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: |
         echo "🟢 Generating badge JSON..."
-        jq -n --arg msg "${{ steps.coverage.outputs.badge || 'N/A' }}" \
-              --arg col "${{ steps.coverage.outputs.color || 'lightgrey' }}" \
+        jq -n --arg msg "${{ steps.coverage.outputs.badge }}" \
+              --arg col "${{ steps.coverage.outputs.color }}" \
               '{schemaVersion:1,label:"Coverage",message:$msg,color:$col}' > badge.json
 
         echo "🟢 Patching Gist..."
