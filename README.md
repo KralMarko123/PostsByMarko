@@ -6,4 +6,4 @@
 
 ### Coverage
 
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KralMarko123/0ef4d0d98804a7e9ebc34336cdc82484/raw/coverage-badge.json)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KralMarko123/d3a54e4ca76749db84b05c1aa272dbe0/raw/postsbymarko-coverage.json)
