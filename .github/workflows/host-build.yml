@@ -84,7 +84,7 @@ jobs:
 
     # Generate badge JSON manually and update the Gist
     - name: Update coverage badge gist
-      if: github.ref == 'refs/heads/main
+      if: github.ref == 'refs/heads/main'
       run: |
         echo "🟢 Badge value: '${{ steps.coverage.outputs.badge }}'"
         echo "🟢 Color value: '${{ steps.coverage.outputs.color }}'"
