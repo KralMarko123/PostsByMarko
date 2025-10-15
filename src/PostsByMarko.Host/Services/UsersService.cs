@@ -41,7 +41,10 @@ namespace PostsByMarko.Host.Services
             if (!await usersRepository.CheckPasswordForUserAsync(user, userLogin.Password!)) return new RequestResultBuilder().BadRequest().WithMessage("Invalid password for the given account").Build();
             if (!await usersRepository.CheckIsEmailConfirmedForUserAsync(user)) return new RequestResultBuilder().Forbidden().WithMessage("Please check your email and confirm your account before logging in").Build();
 
-            return new RequestResultBuilder().Ok().WithMessage("Successfully Logged In").WithPayload(new LoginResponse
+            return new RequestResultBuilder()
+                .Ok()
+                .WithMessage("Successfully Logged In")
+                .WithPayload(new LoginResponse
             {
                 Token = await jwtHelper.CreateTokenAsync(user),
                 Email = user.Email,

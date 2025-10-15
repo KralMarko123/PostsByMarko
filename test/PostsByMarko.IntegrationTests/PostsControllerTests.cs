@@ -12,7 +12,6 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace PostsByMarko.IntegrationTests
 {
@@ -21,13 +20,10 @@ namespace PostsByMarko.IntegrationTests
     {
         private readonly HttpClient client;
         private readonly User testAdmin = TestingConstants.TEST_ADMIN;
-        private readonly User testUser = TestingConstants.TEST_USER;
-        private readonly ITestOutputHelper outputHelper;
 
-        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory, ITestOutputHelper outputHelper)
+        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
             client = postsByMarkoApiFactory.client!;
-            this.outputHelper = outputHelper;
         }
 
         [Fact]
