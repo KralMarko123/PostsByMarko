@@ -36,9 +36,8 @@ reportgenerator `
 
 Write-Host "`n✅ Coverage report generated under: $reportOutputDir"
 
-# Optional: open in browser (only if you're on Windows Desktop)
-$osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
-if ($osInfo.ProductType -eq 1) {
+# Optional: open in browser (only if you're on Windows)
+if ($env:OS -eq "Windows_NT") {
     Start-Process "$reportOutputDir\index.html"
 }
 
