@@ -175,5 +175,35 @@ namespace PostsByMarko.UnitTests
             result.Message.Should().Be("Error during chat update");
             result.Payload.Should().BeNull();
         }
+
+        [Fact]
+        public async Task get_user_chats_should_return_chats_with_loaded_messages_for_a_user()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            var firstParticipantId = Guid.NewGuid().ToString();
+            var secondParticipantId = Guid.NewGuid().ToString();
+            var participantIds = new string[] { firstParticipantId, secondParticipantId };
+            var existingChats = new List<Chat>() { new Chat([userId, firstParticipantId]), new Chat([userId, secondParticipantId]) };
+            var expectedMessages = new List<Message>() { new Message(existingChats[0].Id, userId, "Test"), new Message(existingChats[1].Id, userId, "Test") };
+       
+
+            messagingRepositoryMock.Setup(r => r.GetUserChatsAsync(userId)).ReturnsAsync(() => existingChats);
+            messagingRepositoryMock.Setup(r => r.GetChatMessagesAsync(It.IsAny<Chat>())).ReturnsAsync(() => expectedMessages);
+
+            // Act
+            var result = await service.GetUserChatsAsync(userId);
+            var chats = result.Payload as List<Chat>;
+
+            // Assert
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            chats.Should().NotBeNull();
+            chats.Count.Should().Be(existingChats.Count);
+            chats.Select(c => c.Id).Should().BeEquivalentTo(existingChats.Select(c => c.Id));
+            chats[0].Messages.Should().BeEquivalentTo(expectedMessages);
+            chats[1].Messages.Should().BeEquivalentTo(expectedMessages);
+        }
     }
 }
