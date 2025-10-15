@@ -72,6 +72,12 @@ jobs:
         name: coverage-report
         path: TestResults/Coverage/Report
 
+    - name: Debug coverage files
+      run: |
+        echo "Listing coverage files:"
+        find TestResults -type f -name "*.xml" || true
+
+        
     # Generate summary JSON for badge
     - name: Generate coverage summary
       id: coverage
