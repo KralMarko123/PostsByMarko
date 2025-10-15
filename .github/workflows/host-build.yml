@@ -76,7 +76,7 @@ jobs:
     - name: Generate coverage summary
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: TestResults/Coverage/Integration/**/coverage.cobertura.xml
+        filename: TestResults/Coverage/Report/Cobertura.xml
         badge: true
         format: markdown
         output: both
@@ -85,7 +85,7 @@ jobs:
     - name: Create coverage badge
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
+        auth: ${{ secrets.GIST_TOKEN }}
         gistID: ${{ secrets.COVERAGE_GIST_ID }}
         filename: coverage-badge.json
         label: Coverage
