@@ -11,6 +11,7 @@
           <ExcludeByFile>**/src/PostsByMarko.Host/Extensions/*.cs</ExcludeByFile>
           <ExcludeByFile>**/src/PostsByMarko.Host/Middlewares/*.cs</ExcludeByFile>
           <ExcludeByFile>**/src/PostsByMarko.Host/Hubs/*.cs</ExcludeByFile>
+          <ExcludeByFile>**/test/PostsByMarko.Test.Shared/**</ExcludeByFile>
 
           <!-- Also exclude by assembly/class name to be safe -->
           <Exclude>
@@ -20,6 +21,7 @@
             [PostsByMarko.Host]*Extensions*
             [PostsByMarko.Host]*Middlewares*
             [PostsByMarko.Host]*Hubs*
+            [PostsByMarko.Test.Shared]*Helper*
           </Exclude>
 
           <!-- Ignore compiler-generated or designer-generated code -->
