@@ -72,11 +72,6 @@ jobs:
         name: coverage-report
         path: TestResults/Coverage/Report
 
-    - name: Debug coverage files
-      run: |
-        echo "Listing coverage files:"
-        find TestResults -type f -name "*.xml" || true
-        
     # Generate summary JSON for badge
     - name: Generate coverage summary
       id: coverage
@@ -91,9 +86,8 @@ jobs:
     - name: Create coverage badge
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
-        auth: ${{ secrets.GIST_TOKEN }}
         gistID: ${{ secrets.COVERAGE_GIST_ID }}
-        filename: coverage-badge.json
+        filename: postsbymarko-coverage.json 
         label: Coverage
         message: ${{ steps.coverage.outputs.badge || 'N/A' }}
         color: ${{ steps.coverage.outputs.color || 'lightgrey' }}
