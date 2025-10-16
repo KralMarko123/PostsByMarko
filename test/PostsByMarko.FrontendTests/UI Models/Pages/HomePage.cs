@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using PostsByMarko.FrontendTests.Helpers;
 using PostsByMarko.FrontendTests.UI_Models.Components;
 using PostsTesting.UI_Models.Components;
 
@@ -20,6 +21,11 @@ namespace PostsTesting.UI_Models.Pages
         public ILocator username => page.Locator(".nav__username");
         public ILocator postCard => page.Locator(".post");
         public ILocator postList => page.Locator(".posts-list");
+
+        public async Task WaitForPostListSizeToChange()
+        {
+            await PlaywrightHelpers.WaitForChildrenCountToChange(postList);
+        }
 
         public async Task Visit()
         {

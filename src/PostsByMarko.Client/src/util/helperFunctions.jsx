@@ -36,6 +36,17 @@ export const HelperFunctions = {
     }
   },
 
+  sortPostsByCreatedDate(posts) {
+    posts.length > 0
+      ? posts.sort((p1, p2) => {
+          const date1 = Date.parse(p1.createdDate);
+          const date2 = Date.parse(p2.createdDate);
+
+          return date1 > date2 ? -1 : 1;
+        })
+      : null;
+  },
+
   sortPostsByLastUpdatedDate(posts) {
     posts.length > 0
       ? posts.sort((p1, p2) => {

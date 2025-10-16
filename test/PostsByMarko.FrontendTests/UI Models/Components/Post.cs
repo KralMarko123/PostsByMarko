@@ -1,12 +1,11 @@
-﻿using FluentAssertions;
-using Microsoft.Playwright;
-using PostsTesting.UI_Models.Components;
+﻿using Microsoft.Playwright;
+using PostsByMarko.FrontendTests.Helpers;
 
 namespace PostsTesting.UI_Models.Components
 {
     public class Post : Component
     {
-        private ILocator post;
+        public ILocator post;
         public readonly Modal modal;
 
         public Post(IPage page, ILocator post) : base(page)
@@ -15,13 +14,31 @@ namespace PostsTesting.UI_Models.Components
             modal = new Modal(page);
         }
 
-        public ILocator title => post.Locator(".post__title");
-        public ILocator content => post.Locator(".post__content");
-        public ILocator idIcon => post.Locator(".post__id");
-        public ILocator updateIcon => post.Locator(".post__update");
-        public ILocator deleteIcon => post.Locator(".post__delete");
-        public ILocator hideIcon => post.Locator(".post__hidden");
+        public string Id => post.GetAttributeAsync("id").Result!;
+        public ILocator title => post.Locator(".post-title");
+        public ILocator content => post.Locator(".post-content");
+        public ILocator updateIcon => post.Locator(".post-icon.update");
+        public ILocator deleteIcon => post.Locator(".post-icon.delete");
+        public ILocator hideIcon => post.Locator(".post-icon.hide");
 
+        public void Refresh()
+        {
+            post = page.Locator($"#{Id}");
+        }
+
+        public async Task WaitForPostContentsToChange()
+        {
+            await PlaywrightHelpers.WaitForTextToChange(post);
+            Refresh();
+        }
+
+        public async Task WaitForPostVisibilityToToggle(bool isHidden = false)
+        {
+            Refresh();
+
+            if (isHidden) await PlaywrightHelpers.WaitForClassToBeRemoved(post, "hidden");
+            else await PlaywrightHelpers.WaitForClassToBePresent(post, "hidden");
+        }
 
         public async Task ClickOnPost()
         {
@@ -38,33 +55,9 @@ namespace PostsTesting.UI_Models.Components
             await deleteIcon.ClickAsync();
         }
 
-        public async Task ClickOnHideICon()
+        public async Task ClickOnHideIcon()
         {
             await hideIcon.ClickAsync();
-        }
-
-        public async Task CheckPostState()
-        {
-            await post.WaitForAsync();
-
-            var postIsDisplayed = await title.IsVisibleAsync() && await content.IsVisibleAsync();
-            postIsDisplayed.Should().BeTrue();
-
-            await ClickOnUpdateIcon();
-            await modal.CheckVisibility("Update Post");
-            await modal.CloseModal();
-            await ClickOnDeleteIcon();
-            await modal.CheckVisibility("Delete Post");
-            await modal.CloseModal();
-        }
-
-        public async Task CheckPostTitleAndContent(string expectedTitle, string expectedContent)
-        {
-            var postTitle = await title.TextContentAsync();
-            var contentTitle = await content.TextContentAsync();
-
-            postTitle.Should().Be(expectedTitle);
-            contentTitle.Should().Be(expectedContent);
         }
     }
 }

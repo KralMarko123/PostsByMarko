@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Host.Data.Models.Responses;
-using PostsByMarko.Shared.Constants;
+using PostsByMarko.Test.Shared.Constants;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;

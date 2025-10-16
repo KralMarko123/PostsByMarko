@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Tests;
-using PostsByMarko.Shared.Constants;
+using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;
 using Xunit;

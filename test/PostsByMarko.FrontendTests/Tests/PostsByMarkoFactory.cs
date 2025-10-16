@@ -1,5 +1,4 @@
 ﻿using Ductus.FluentDocker.Services;
-using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Drivers;
 using PostsByMarko.Test.Shared.Helper;
 using Xunit;
@@ -20,8 +19,13 @@ namespace PostsByMarko.FrontendTests.Tests
 
         public async Task InitializeAsync()
         {
-            ReadComposeFiles();
-            InitializeDockerContainersThroughCompose();
+            bool.TryParse(Environment.GetEnvironmentVariable("IsLocalDevelopment"), out bool isLocalDevelopment);
+
+            if (!isLocalDevelopment)
+            {
+                ReadComposeFiles();
+                InitializeDockerContainersThroughCompose();
+            }
 
             driver = new BrowserDriver();
         }
@@ -30,8 +34,13 @@ namespace PostsByMarko.FrontendTests.Tests
         {
             await driver!.DestroyPlaywrightAsync();
 
-            dockerServices!.Stop();
-            dockerServices.Dispose();
+            bool.TryParse(Environment.GetEnvironmentVariable("IsLocalDevelopment"), out bool isLocalDevelopment);
+
+            if (!isLocalDevelopment)
+            {
+                dockerServices!.Stop();
+                dockerServices.Dispose();
+            }
         }
 
         private void ReadComposeFiles()

@@ -58,6 +58,7 @@ const Post = ({
   return (
     <Card>
       <div
+        id={`post-${id}`}
         className={`post ${isHidden ? "hidden" : ""}`}
         onClick={() => handlePostClick()}
         style={{ animationDelay: `${index * 0.15}s` }}

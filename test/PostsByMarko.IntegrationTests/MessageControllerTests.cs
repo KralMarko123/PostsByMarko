@@ -3,7 +3,7 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Shared.Constants;
+using PostsByMarko.Test.Shared.Constants;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;

@@ -15,6 +15,7 @@ namespace PostsTesting.UI_Models.Components
         public ILocator messageFailure => page.Locator(".modal__message.fail");
         public ILocator messageSuccess => page.Locator(".modal__message.success");
         public ILocator createButton => button.GetByText("Create");
+        public ILocator updateButton => button.GetByText("Update");
         public ILocator deleteButton => button.GetByText("Delete");
         public ILocator cancelButton => button.GetByText("Cancel");
 
@@ -38,31 +39,6 @@ namespace PostsTesting.UI_Models.Components
         {
             await FillInTitleInput(titleToBeEntered);
             await FillInContentInput(contentToBeEntered);
-        }
-
-        public async Task CheckVisibility(string expectedTitleText)
-        {
-            var modalIsDisplayed = await modalContainer.IsVisibleAsync() && await title.IsVisibleAsync();
-            var titleText = await title.TextContentAsync();
-
-            modalIsDisplayed.Should().BeTrue();
-            titleText.Should().Be(expectedTitleText);
-        }
-
-        public async Task CheckSuccessMessage(string expectedSuccessMessage)
-        {
-            await WaitForSuccessMessage();
-
-            var successMessage = await messageSuccess.TextContentAsync();
-            successMessage.Should().Be(expectedSuccessMessage);
-        }
-
-        public async Task CheckFailureMessage(string expectedErrorMessage)
-        {
-            await WaitForFailureMessage();
-
-            var errorMessage = await messageFailure.TextContentAsync();
-            errorMessage.Should().Be(expectedErrorMessage);
         }
 
         public async Task WaitForModalToBeRemoved()

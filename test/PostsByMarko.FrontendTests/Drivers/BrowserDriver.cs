@@ -1,5 +1,5 @@
 ﻿using Microsoft.Playwright;
-using PostsByMarko.Shared.Constants;
+using PostsByMarko.Test.Shared.Constants;
 
 namespace PostsByMarko.FrontendTests.Drivers
 {

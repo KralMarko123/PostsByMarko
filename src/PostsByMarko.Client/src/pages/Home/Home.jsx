@@ -12,6 +12,7 @@ import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Home.css";
+import { HelperFunctions } from "../../util/helperFunctions";
 
 const Home = () => {
   const appContext = useContext(AppContext);
@@ -21,8 +22,11 @@ const Home = () => {
 
   const getPosts = async () => {
     await PostsService.getAllPosts(user.token).then((requestResult) => {
-      setPosts(requestResult.payload);
-      appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
+      let posts = requestResult.payload;
+      HelperFunctions.sortPostsByCreatedDate(posts);
+
+      setPosts(posts);
+      appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
     });
   };
 
