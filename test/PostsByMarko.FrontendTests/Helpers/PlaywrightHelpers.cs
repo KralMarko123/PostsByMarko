@@ -31,5 +31,10 @@ namespace PostsByMarko.FrontendTests.Helpers
         {
             await Assertions.Expect(locator).Not.ToHaveClassAsync(new Regex($@"\b{Regex.Escape(className)}\b"), new() { Timeout = timeoutMs });
         }
+
+        public static async Task WaitForElementToVisible(ILocator locator)
+        {
+            await Assertions.Expect(locator).ToBeVisibleAsync(new() { Timeout = timeoutMs });
+        }
     }
 }

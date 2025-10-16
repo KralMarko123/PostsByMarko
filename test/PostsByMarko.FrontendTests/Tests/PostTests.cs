@@ -118,6 +118,9 @@ namespace PostsByMarko.FrontendTests.Tests
             await createdPost.ClickOnPost();
             
             var detailsPage = new DetailsPage(page);
+
+            await detailsPage.WaitForPage();
+
             var detailsTitle = await detailsPage.title.TextContentAsync();
             var detailsAuthor = await detailsPage.author.TextContentAsync();
             var detailsDate = await detailsPage.date.TextContentAsync();
@@ -128,6 +131,39 @@ namespace PostsByMarko.FrontendTests.Tests
             detailsContent.Should().Be(expectedContent);
             detailsAuthor.Should().Be($"By {testAdmin.FirstName} {testAdmin.LastName}");
             detailsDate.Should().Be(DateTime.Today.ToString("d MMMM yyyy"));
+        }
+
+        [Fact]
+        public async Task should_edit_a_post()
+        {
+            await LoginWithUser(testAdmin);
+
+            var post = new Post(page, homePage.postCard.Last);
+            var postContent = await post.content.TextContentAsync();
+            var postId = post.Id[5..];
+
+            await post.ClickOnPost();
+
+            var detailsPage = new DetailsPage(page);
+            var newContent = $"{new Faker().Commerce.ProductDescription} with {new Faker().Commerce.Ean13()}";
+
+            await detailsPage.editButton.ClickAsync();
+            await detailsPage.textArea.FillAsync(newContent);
+            await detailsPage.saveButton.ClickAsync();
+            await detailsPage.WaitForSuccessMessage();
+
+            var successMessageText = await detailsPage.successMessage.TextContentAsync();
+            var detailsContent = await detailsPage.content.TextContentAsync();
+
+            successMessageText.Should().Be("Post was updated successfully");
+            detailsContent.Should().Be(newContent);
+            
+            await detailsPage.backButton.ClickAsync();
+            post.Refresh();
+
+            var postCardContent = await post.content.TextContentAsync();
+
+            postCardContent.Should().Be(newContent);
         }
 
         private async Task CreatePost(string title, string content)

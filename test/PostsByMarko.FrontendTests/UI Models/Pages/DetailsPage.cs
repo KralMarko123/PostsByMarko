@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using PostsByMarko.FrontendTests.Helpers;
 using PostsTesting.UI_Models.Components;
 
 namespace PostsTesting.UI_Models.Pages
@@ -13,6 +14,7 @@ namespace PostsTesting.UI_Models.Pages
             modal = new Modal(page);
         }
 
+        public ILocator header => page.Locator(".details-header");
         public ILocator title => page.Locator(".details-title");
         public ILocator author => page.Locator(".author");
         public ILocator date => page.Locator(".date");
@@ -21,10 +23,22 @@ namespace PostsTesting.UI_Models.Pages
         public ILocator backButton => button.GetByText("Back");
         public ILocator saveButton => button.GetByText("Save");
         public ILocator cancelButton => button.GetByText("Cancel");
+        public ILocator textArea => page.Locator("textarea[style*='display: block']").Filter(new LocatorFilterOptions { Visible = true });
+        public ILocator successMessage => page.Locator(".success.fade-out");
 
         public async Task Visit(string postId)
         {
             await page.GotoAsync($"{url}/{postId}");
+        }
+
+        public async Task WaitForSuccessMessage()
+        {
+            await PlaywrightHelpers.WaitForElementToVisible(successMessage);
+        }
+
+        public async Task WaitForPage()
+        {
+            await PlaywrightHelpers.WaitForElementToVisible(header);
         }
     }
 }

@@ -13,6 +13,5 @@ namespace PostsTesting.UI_Models
 
         protected ILocator button => page.Locator(".button");
         protected ILocator link => page.Locator(".link");
-
     }
 }
