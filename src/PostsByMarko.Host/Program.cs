@@ -8,7 +8,6 @@ using Serilog;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-var isInDocker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Docker");
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
 var isInTest = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Test");
 var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
@@ -51,7 +50,7 @@ var app = builder.Build();
 
 
 
-if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false) || isInTest.GetValueOrDefault(false))
+if (isInLocalDevelopment || isInTest.GetValueOrDefault(false))
 {
     app.WithSwaggerEnabled();
     app.WithDatabaseReset();
@@ -59,7 +58,7 @@ if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false) || isInTest.GetV
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
-if (!isInLocalDevelopment && !isInDocker.GetValueOrDefault(false) && !isInTest.GetValueOrDefault(false))
+if (!isInLocalDevelopment && !isInTest.GetValueOrDefault(false))
 {
     app.UseHttpsRedirection();
     app.UseRateLimiting();
@@ -73,7 +72,7 @@ app.MapControllers();
 
 #endregion
 
-if (isInLocalDevelopment || isInDocker.GetValueOrDefault(false)) Console.WriteLine("App is running locally or in a docker container!");
+if (isInLocalDevelopment) Console.WriteLine("App is running locally!");
 
 app.Run();
 

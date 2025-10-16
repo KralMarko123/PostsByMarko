@@ -41,8 +41,9 @@ namespace PostsByMarko.Host.Extensions
 
             builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
 
-            // generate random data for local development
-            if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            // generate random data for local development & tests
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment == "Development" || environment == "Test")
             {
                 GenerateRandomData(builder, passwordHasher, 5);
             }

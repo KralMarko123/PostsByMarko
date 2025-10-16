@@ -21,7 +21,7 @@ namespace PostsByMarko.FrontendTests.Tests
 
         public PostTests(PostsByMarkoFactory postsByMarkoHostFactory)
         {
-            browser = postsByMarkoHostFactory.driver.GetFirefoxBrowserAsync().Result;
+            browser = postsByMarkoHostFactory.driver!.GetFirefoxBrowserAsync().Result;
             page = browser.NewPageAsync().Result;
         }
 
@@ -33,12 +33,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var expectedTitle = new Faker().Commerce.Product();
             var expectedContent = new Faker().Commerce.ProductDescription();
 
-            await homePage.navComponent.dropdownMenu.HoverAsync();
-            await homePage.navComponent.createPost.ClickAsync();
-            await homePage.modalComponent.FillInTitleInput(expectedTitle);
-            await homePage.modalComponent.FillInContentInput(expectedContent);
-            await homePage.modalComponent.createButton.ClickAsync();
-            await homePage.WaitForPostListSizeToChange();
+            await CreatePost(expectedTitle, expectedContent);
 
             var createdPost = new Post(page, homePage.postCard.First);
             var title = await createdPost.title.TextContentAsync();
@@ -105,6 +100,44 @@ namespace PostsByMarko.FrontendTests.Tests
             var postClassnames = await visiblePost.post.GetAttributeAsync("class");
             
             postClassnames.Should().Contain("hidden");
+        }
+
+        [Fact]
+        public async Task should_view_created_post()
+        {
+            await LoginWithUser(testAdmin);
+
+            var expectedTitle = new Faker().Commerce.Product();
+            var expectedContent = new Faker().Commerce.ProductDescription();
+
+            await CreatePost(expectedTitle, expectedContent);
+
+            var createdPost = new Post(page, homePage.postCard.First);
+            var postId = createdPost.Id[5..];
+
+            await createdPost.ClickOnPost();
+            
+            var detailsPage = new DetailsPage(page);
+            var detailsTitle = await detailsPage.title.TextContentAsync();
+            var detailsAuthor = await detailsPage.author.TextContentAsync();
+            var detailsDate = await detailsPage.date.TextContentAsync();
+            var detailsContent = await detailsPage.content.TextContentAsync();
+
+            detailsPage.page.Url.Should().Contain(postId);
+            detailsTitle.Should().Be(expectedTitle);
+            detailsContent.Should().Be(expectedContent);
+            detailsAuthor.Should().Be($"By {testAdmin.FirstName} {testAdmin.LastName}");
+            detailsDate.Should().Be(DateTime.Today.ToString("d MMMM yyyy"));
+        }
+
+        private async Task CreatePost(string title, string content)
+        {
+            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.createPost.ClickAsync();
+            await homePage.modalComponent.FillInTitleInput(title);
+            await homePage.modalComponent.FillInContentInput(content);
+            await homePage.modalComponent.createButton.ClickAsync();
+            await homePage.WaitForPostListSizeToChange();
         }
 
         private async Task LoginWithUser(User user)

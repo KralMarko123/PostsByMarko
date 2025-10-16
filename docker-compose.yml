@@ -38,8 +38,9 @@ services:
       - beNetwork
       - feNetwork
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:${HOST_PORT}
+      - ASPNETCORE_ENVIRONMENT=Test
+      - ConnectionStrings__DefaultConnection=Host=database;Port=5432;Database=postsbymarko;Username=${DB_USER};Password=${DB_PASSWORD}
 
   #CLIENT
   client:
