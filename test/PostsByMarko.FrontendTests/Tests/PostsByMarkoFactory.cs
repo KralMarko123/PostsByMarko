@@ -5,6 +5,7 @@ using Xunit;
 using Ductus.FluentDocker.Builders;
 using System.Net;
 using Ductus.FluentDocker.Common;
+using Microsoft.Playwright;
 
 namespace PostsByMarko.FrontendTests.Tests
 {
@@ -13,7 +14,7 @@ namespace PostsByMarko.FrontendTests.Tests
         private int timeoutInMs = TimeSpan.FromSeconds(20).Milliseconds;
 
         public BrowserDriver? driver;
-
+        public IBrowser browser;
         private static string[]? composeFiles;
         private static ICompositeService? dockerServices;
 
@@ -28,6 +29,7 @@ namespace PostsByMarko.FrontendTests.Tests
             }
 
             driver = new BrowserDriver();
+            browser = await driver.GetFirefoxBrowserAsync();
         }
 
         public async Task DisposeAsync()

@@ -10,19 +10,33 @@ using Post = PostsTesting.UI_Models.Components.Post;
 namespace PostsByMarko.FrontendTests.Tests
 {
     [Collection("Frontend Collection")]
-    public class PostTests
+    public class PostTests : IAsyncLifetime
     {
-        private IBrowser browser;
+        private readonly PostsByMarkoFactory postsByMarkoFactory;
         private IPage page;
-        private HomePage homePage => new HomePage(page);
-        private LoginPage loginPage => new LoginPage(page);
+        private HomePage homePage;
+        private LoginPage loginPage;
         private readonly User testUser = TestingConstants.TEST_USER;
         private readonly User testAdmin = TestingConstants.TEST_ADMIN;
 
-        public PostTests(PostsByMarkoFactory postsByMarkoHostFactory)
+        public PostTests(PostsByMarkoFactory postsByMarkoFactory)
         {
-            browser = postsByMarkoHostFactory.driver!.GetFirefoxBrowserAsync().Result;
-            page = browser.NewPageAsync().Result;
+            this.postsByMarkoFactory = postsByMarkoFactory;
+        }
+
+        // Setup
+        public async Task InitializeAsync()
+        {
+            page = await postsByMarkoFactory.browser.NewPageAsync();
+
+            homePage = new HomePage(page);
+            loginPage = new LoginPage(page);
+        }
+
+        // Teardown
+        public async Task DisposeAsync()
+        {
+            if(page != null) await page.CloseAsync();
         }
 
         [Fact]
@@ -181,12 +195,6 @@ namespace PostsByMarko.FrontendTests.Tests
             await loginPage.Visit();
             await loginPage.Login(user.Email, TestingConstants.TEST_PASSWORD);
             await homePage.username.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-        }
-
-        public async Task DisposeAsync()
-        {
-            await page.CloseAsync();
-            await browser.CloseAsync();
         }
     }
 }

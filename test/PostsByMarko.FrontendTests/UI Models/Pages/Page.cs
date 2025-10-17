@@ -13,5 +13,6 @@ namespace PostsTesting.UI_Models.Pages
         }
 
         public ILocator containerTitle => page.Locator(".container-title");
+        public ILocator containerDescription => page.Locator(".container-desc");
     }
 }

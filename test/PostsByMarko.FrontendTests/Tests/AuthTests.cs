@@ -10,18 +10,33 @@ using static Microsoft.Playwright.Assertions;
 namespace PostsByMarko.FrontendTests.Frontend
 {
     [Collection("Frontend Collection")]
-    public class AuthTests
+    public class AuthTests : IAsyncLifetime
     {
-        private IBrowser browser;
+        private readonly PostsByMarkoFactory postsByMarkoFactory;
         private IPage page;
-        private HomePage homePage => new HomePage(page);
-        private LoginPage loginPage => new LoginPage(page);
-        private RegisterPage registerPage => new RegisterPage(page);
+        private HomePage homePage;
+        private LoginPage loginPage;
+        private RegisterPage registerPage;
 
-        public AuthTests(PostsByMarkoFactory postsByMarkoHostFactory)
+        public AuthTests(PostsByMarkoFactory postsByMarkoFactory)
         {
-            browser = postsByMarkoHostFactory.driver.GetFirefoxBrowserAsync().Result;
-            page = browser.NewPageAsync().Result;
+            this.postsByMarkoFactory = postsByMarkoFactory;
+        }
+
+        // Setup
+        public async Task InitializeAsync()
+        {
+            page = await postsByMarkoFactory.browser.NewPageAsync();
+
+            homePage = new HomePage(page);
+            loginPage = new LoginPage(page);
+            registerPage = new RegisterPage(page);
+        }
+
+        // Teardown
+        public async Task DisposeAsync()
+        {
+            if (page != null) await page.CloseAsync();
         }
 
         [Fact]
@@ -45,12 +60,6 @@ namespace PostsByMarko.FrontendTests.Frontend
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();
             successfulRegisterText.Should().Be("Successfully Registered!");
-        }
-
-        public async Task DisposeAsync()
-        {
-            await page.CloseAsync();
-            await browser.CloseAsync();
         }
     }
 }
