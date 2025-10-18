@@ -17,9 +17,16 @@ namespace PostsByMarko.FrontendTests.Helpers
 
         public static async Task WaitForTextToChange(ILocator locator)
         {
-            var initialContent = await locator.InnerTextAsync();
+            var initialText = await locator.InnerTextAsync();
 
-            await Assertions.Expect(locator).Not.ToHaveTextAsync(initialContent, new() { Timeout = timeoutMs });
+            await Assertions.Expect(locator).Not.ToHaveTextAsync(initialText, new() { Timeout = timeoutMs });
+        }
+
+        public static async Task WaitForInnerHtmlToChange(ILocator locator)
+        {
+            var initialHtml = await locator.InnerHTMLAsync();
+
+            await Assertions.Expect(locator).Not.ToHaveJSPropertyAsync("innerHTML", initialHtml, new() { Timeout = timeoutMs });
         }
 
         public static async Task WaitForClassToBePresent(ILocator locator, string className)

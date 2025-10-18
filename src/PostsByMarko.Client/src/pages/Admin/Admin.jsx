@@ -137,7 +137,11 @@ const Admin = () => {
 
               <tbody>
                 {users.map((user, index) => (
-                  <tr key={user.id} className={index % 2 != 0 ? "odd" : ""}>
+                  <tr
+                    key={user.id}
+                    className={index % 2 != 0 ? "odd" : ""}
+                    data-email={user.email}
+                  >
                     <td>{user.email}</td>
                     <td>{user.numberOfPosts}</td>
                     <td>
