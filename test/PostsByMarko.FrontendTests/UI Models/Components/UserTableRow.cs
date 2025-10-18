@@ -26,9 +26,10 @@ namespace PostsByMarko.FrontendTests.UI_Models.Components
             userTableRow = page.Locator($"[data-email='{user}']");
         }
 
-        public async Task WaitForRowContentsToChange()
+        public async Task WaitForSuccessMessageToShowAndDisappear()
         {
-            await PlaywrightHelpers.WaitForInnerHtmlToChange(userTableRow);
+            await PlaywrightHelpers.WaitForElementToVisible(successMessage);
+            await PlaywrightHelpers.WaitForElementToBeHidden(successMessage);
             Refresh();
         }
     }

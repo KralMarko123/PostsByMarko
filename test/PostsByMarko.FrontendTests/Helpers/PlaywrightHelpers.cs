@@ -43,5 +43,10 @@ namespace PostsByMarko.FrontendTests.Helpers
         {
             await Assertions.Expect(locator).ToBeVisibleAsync(new() { Timeout = timeoutMs });
         }
+
+        public static async Task WaitForElementToBeHidden(ILocator locator)
+        {
+            await Assertions.Expect(locator).ToBeHiddenAsync(new() { Timeout = timeoutMs });
+        }
     }
 }

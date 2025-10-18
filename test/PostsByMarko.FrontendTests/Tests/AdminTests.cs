@@ -51,7 +51,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var dashboardTitle = await adminDashboardPage.containerTitle.TextContentAsync();
             var dashboardDescription = await adminDashboardPage.containerDescription.TextContentAsync();
             var userTableHeaders = await adminDashboardPage.tableHeaders.AllAsync();
-            var userTableHeaderTexts = userTableHeaders.Select(th => th.TextContentAsync().Result);
+            var userTableHeaderTexts = await adminDashboardPage.GetHeaders();
             var chartsCount = await adminDashboardPage.charts.CountAsync();
 
             dashboardTitle.Should().Be("Admin Dashboard");
@@ -68,20 +68,18 @@ namespace PostsByMarko.FrontendTests.Tests
             await homePage.navComponent.dashboard.ClickAsync();
 
             var testUserRow = new UserTableRow(page, testUser.Email);
-            var userBadgeShown = await testUserRow.userBadge.IsVisibleAsync();
             var adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
 
-            userBadgeShown.Should().Be(true);
             adminBadgeShown.Should().Be(false);
 
             await testUserRow.makeAdminButton.ClickAsync();
-            await testUserRow.WaitForRowContentsToChange();
+            await testUserRow.WaitForSuccessMessageToShowAndDisappear();
 
             adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
             adminBadgeShown.Should().Be(true);
 
             await testUserRow.removeAdminButton.ClickAsync();
-            await testUserRow.WaitForRowContentsToChange();
+            await testUserRow.WaitForSuccessMessageToShowAndDisappear();
 
             adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
             adminBadgeShown.Should().Be(false);

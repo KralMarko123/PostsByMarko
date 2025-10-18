@@ -17,5 +17,19 @@ namespace PostsByMarko.FrontendTests.UI_Models.Pages
         {
             await page.GotoAsync(url);
         }
+
+        public async Task<List<string>> GetHeaders()
+        {
+            var headerTexts = new List<string>();
+            var headers = await tableHeaders.AllAsync();
+
+            foreach (var header in headers)
+            {
+                var text = await header.TextContentAsync();
+                headerTexts.Add(text);
+            }
+
+            return headerTexts;
+        }
     }
 }
