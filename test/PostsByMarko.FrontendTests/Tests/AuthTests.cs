@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;
 using Xunit;
-using static Microsoft.Playwright.Assertions;
 
 namespace PostsByMarko.FrontendTests.Tests
 {
@@ -16,6 +16,7 @@ namespace PostsByMarko.FrontendTests.Tests
         private HomePage homePage;
         private LoginPage loginPage;
         private RegisterPage registerPage;
+        private readonly User testUser = TestingConstants.TEST_USER;
 
         public AuthTests(PostsByMarkoFactory postsByMarkoFactory)
         {
@@ -39,11 +40,9 @@ namespace PostsByMarko.FrontendTests.Tests
         }
 
         [Fact]
-        public async Task should_show_home_page_after_login()
+        public async Task should_login()
         {
-            await loginPage.Visit();
-            await loginPage.Login(TestingConstants.TEST_USER.Email, TestingConstants.TEST_PASSWORD);
-            await Expect(homePage.home).ToBeVisibleAsync();
+            await LoginWithUser(testUser);
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
 
@@ -51,7 +50,7 @@ namespace PostsByMarko.FrontendTests.Tests
         }
 
         [Fact]
-        public async Task should_show_confirmational_box_after_registering()
+        public async Task should_register()
         {
             await registerPage.Visit();
             await registerPage.Register("Test", "User", $"test_{RandomHelper.GetRandomString(5)}@domain.com", "@Test123");
@@ -59,6 +58,23 @@ namespace PostsByMarko.FrontendTests.Tests
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();
             successfulRegisterText.Should().Be("Successfully Registered!");
+        }
+
+        [Fact]
+        public async Task should_logout()
+        {
+            await LoginWithUser(testUser);
+
+            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.logout.ClickAsync();
+            await loginPage.loginButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+        }
+
+        private async Task LoginWithUser(User user)
+        {
+            await loginPage.Visit();
+            await loginPage.Login(user.Email, TestingConstants.TEST_PASSWORD);
+            await homePage.username.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
     }
 }
