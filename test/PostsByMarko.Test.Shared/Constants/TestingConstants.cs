@@ -5,6 +5,7 @@ namespace PostsByMarko.Test.Shared.Constants
 {
     public static class TestingConstants
     {
+        public static readonly User MARKO = AppConstants.ADMINS[0];
         public static readonly User TEST_ADMIN = AppConstants.ADMINS[1];
         public static readonly User TEST_USER = AppConstants.USERS[0];
         public static readonly User RANDOM_USER = AppConstants.USERS[1];
