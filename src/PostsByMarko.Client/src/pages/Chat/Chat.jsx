@@ -180,12 +180,19 @@ const Chat = () => {
       <Container>
         <div className="chat-container">
           <div className="user-list">
-            {users.map((u) => {
+            {users?.map((u) => {
               let isActiveChat = openChat?.participantIds?.includes(u.id);
               let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
-              let numberOfUnreadMessages = unreadChats.filter(
+              let numberOfUnreadMessages = unreadChats?.filter(
                 (id) => id == u.id
               ).length;
+              let unknownName = !u.firstName || !u.lastName;
+              let userInitials = unknownName
+                ? "??"
+                : `${u.firstName[0]}${u.lastName[0]}`;
+              let userName = unknownName
+                ? u.email
+                : `${u.firstName} ${u.lastName}`;
 
               return (
                 <div
@@ -195,8 +202,8 @@ const Chat = () => {
                   key={u.id}
                   onClick={() => handleUserClick(u)}
                 >
-                  <span className="user-icon">{`${u.firstName[0]}${u.lastName[0]}`}</span>
-                  <span className="user-name">{`${u.firstName} ${u.lastName}`}</span>
+                  <span className="user-icon">{userInitials}</span>
+                  <span className="user-name">{userName}</span>
                   {hasUnreadMessages && (
                     <span className="user-unreads">
                       {numberOfUnreadMessages > 4

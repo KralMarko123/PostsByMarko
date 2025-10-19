@@ -1,13 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsByMarko.FrontendTests.Tests;
 using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;
 using Xunit;
 using static Microsoft.Playwright.Assertions;
 
-namespace PostsByMarko.FrontendTests.Frontend
+namespace PostsByMarko.FrontendTests.Tests
 {
     [Collection("Frontend Collection")]
     public class AuthTests : IAsyncLifetime

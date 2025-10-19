@@ -17,8 +17,9 @@ namespace PostsByMarko.FrontendTests.Tests
         private AdminDashboardPage adminDashboardPage;
         private LoginPage loginPage;
         private HomePage homePage;
-        private readonly User testUser = TestingConstants.TEST_USER;
         private readonly User testAdmin = TestingConstants.TEST_ADMIN;
+        private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly User marko = TestingConstants.MARKO;
 
         public AdminTests(PostsByMarkoFactory postsByMarkoFactory)
         {
@@ -47,10 +48,10 @@ namespace PostsByMarko.FrontendTests.Tests
             await LoginWithUser(testAdmin);
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.dashboard.ClickAsync();
+            await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
             var dashboardTitle = await adminDashboardPage.containerTitle.TextContentAsync();
             var dashboardDescription = await adminDashboardPage.containerDescription.TextContentAsync();
-            var userTableHeaders = await adminDashboardPage.tableHeaders.AllAsync();
             var userTableHeaderTexts = await adminDashboardPage.GetHeaders();
             var chartsCount = await adminDashboardPage.charts.CountAsync();
 
@@ -66,23 +67,52 @@ namespace PostsByMarko.FrontendTests.Tests
             await LoginWithUser(testAdmin);
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.dashboard.ClickAsync();
+            await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
-            var testUserRow = new UserTableRow(page, testUser.Email);
-            var adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
+            var emailsNotToToggle = new List<string> { testAdmin.Email, marko.Email, testUser.Email };
+            var emails = await adminDashboardPage.GetEmails();
+
+            emails = [.. emails.Except(emailsNotToToggle)];
+
+            var userRow = new UserTableRow(page, emails[new Random().Next(emails.Count)]);
+            var adminBadgeShown = await userRow.adminBadge.IsVisibleAsync();
 
             adminBadgeShown.Should().Be(false);
 
-            await testUserRow.makeAdminButton.ClickAsync();
-            await testUserRow.WaitForSuccessMessageToShowAndDisappear();
+            await userRow.makeAdminButton.ClickAsync();
+            await userRow.WaitForSuccessMessageToShowAndDisappear();
 
-            adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
+            adminBadgeShown = await userRow.adminBadge.IsVisibleAsync();
             adminBadgeShown.Should().Be(true);
 
-            await testUserRow.removeAdminButton.ClickAsync();
-            await testUserRow.WaitForSuccessMessageToShowAndDisappear();
+            await userRow.removeAdminButton.ClickAsync();
+            await userRow.WaitForSuccessMessageToShowAndDisappear();
 
-            adminBadgeShown = await testUserRow.adminBadge.IsVisibleAsync();
+            adminBadgeShown = await userRow.adminBadge.IsVisibleAsync();
             adminBadgeShown.Should().Be(false);
+        }
+
+        [Fact]
+        public async Task should_delete_a_user()
+        {
+            await LoginWithUser(testAdmin);
+            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dashboard.ClickAsync();
+            await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            var emailsNotToDelete = new List<string> { testAdmin.Email, marko.Email, testUser.Email };
+            var emails = await adminDashboardPage.GetEmails();
+
+            emails = [.. emails.Except(emailsNotToDelete)];
+
+            var userRow = new UserTableRow(page, emails[new Random().Next(emails.Count)]);
+
+            await userRow.deleteButton.ClickAsync();
+            await userRow.WaitForSuccessMessageToShowAndDisappear();
+            
+            var isUserRowVisible = await userRow.userTableRow.IsVisibleAsync();
+
+            isUserRowVisible.Should().Be(false);
         }
 
         private async Task LoginWithUser(User user)
