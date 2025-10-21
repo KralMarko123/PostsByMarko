@@ -15,6 +15,13 @@ namespace PostsByMarko.FrontendTests.Helpers
             await Assertions.Expect(parentLocator.Locator(":scope > *")).Not.ToHaveCountAsync(initialCount, new() { Timeout = timeoutMs });
         }
 
+        public static async Task WaitForCountToChange(ILocator locator)
+        {
+            var initialCount = await locator.CountAsync();
+
+            await Assertions.Expect(locator).Not.ToHaveCountAsync(initialCount, new() { Timeout = timeoutMs });
+        }
+
         public static async Task WaitForTextToChange(ILocator locator)
         {
             var initialText = await locator.InnerTextAsync();

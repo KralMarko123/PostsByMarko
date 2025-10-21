@@ -14,5 +14,10 @@ namespace PostsTesting.UI_Models.Pages
 
         public ILocator containerTitle => page.Locator(".container-title");
         public ILocator containerDescription => page.Locator(".container-desc");
+
+        public async Task BringToFront()
+        {
+            await page.BringToFrontAsync();
+        }
     }
 }

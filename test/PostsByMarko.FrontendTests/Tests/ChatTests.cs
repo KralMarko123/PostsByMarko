@@ -45,31 +45,23 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_view_chats()
         {
-            await LoginWithUser(testUser);
-
-            await homePage.navComponent.dropdownMenu.HoverAsync();
-            await homePage.navComponent.chat.ClickAsync();
-            await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await LoginWithUser(testUser, loginPage, homePage);
+            await NavigateToChatPage(homePage, chatPage);   
 
             var usernames = await chatPage.GetUsernames();
             var infoMessageText = await chatPage.infoMessage.TextContentAsync();
 
             infoMessageText.Should().Be("Start chatting right away by clicking on another user");
-            usernames.Should().NotBeEmpty();
             usernames.Should().Contain([$"{marko.FirstName} {marko.LastName}", $"{testAdmin.FirstName} {testAdmin.LastName}"]);
         }
 
         [Fact]
         public async Task should_send_a_message()
         {
-            await LoginWithUser(testAdmin);
+            await LoginWithUser(testAdmin, loginPage, homePage);
+            await NavigateToChatPage(homePage, chatPage);
 
-            await homePage.navComponent.dropdownMenu.HoverAsync();
-            await homePage.navComponent.chat.ClickAsync();
-            await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-
-            var testUsername = $"{testUser.FirstName} {testUser.LastName}";
-            var userCard = chatPage.userCard.GetByText(testUsername);
+            var userCard = chatPage.GetUserCard($"{marko.FirstName} {marko.LastName}");
 
             await userCard.ClickAsync();
             await chatPage.messageInput.FillAsync("Hello from admin!");
@@ -85,11 +77,8 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task shoild_not_send_empty_message()
         {
-            await LoginWithUser(testAdmin);
-
-            await homePage.navComponent.dropdownMenu.HoverAsync();
-            await homePage.navComponent.chat.ClickAsync();
-            await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await LoginWithUser(testAdmin, loginPage, homePage);
+            await NavigateToChatPage(homePage, chatPage);
 
             var testUsername = $"{testUser.FirstName} {testUser.LastName}";
             var userCard = chatPage.userCard.GetByText(testUsername);
@@ -107,12 +96,55 @@ namespace PostsByMarko.FrontendTests.Tests
             sentMessagesAfterClick.Should().Be(sentMessages);
         }
 
+        [Fact]
+        public async Task should_receive_a_message()
+        {
+            await LoginWithUser(testAdmin, loginPage, homePage);
+            await NavigateToChatPage(homePage, chatPage);
 
-        private async Task LoginWithUser(User user)
+            var newPage = await postsByMarkoFactory.browser.NewPageAsync();
+            var secondLoginPage = new LoginPage(newPage);
+            var secondHomePage = new HomePage(newPage);
+            var secondChatPage = new ChatPage(newPage);
+
+            await LoginWithUser(testUser, secondLoginPage, secondHomePage);
+            await NavigateToChatPage(secondHomePage, secondChatPage);
+
+            var adminUserCard = secondChatPage.GetUserCard($"{testAdmin.FirstName} {testAdmin.LastName}");
+            
+            await adminUserCard.ClickAsync();
+            await secondChatPage.messageInput.FillAsync("Hello from test user!");
+            await secondChatPage.sendButton.ClickAsync();
+
+            await chatPage.WaitForNotificationToRegister();
+            await chatPage.BringToFront();
+
+            var testUserCard = chatPage.GetUserCard($"{testUser.FirstName} {testUser.LastName}");
+            var unreadMessages = await testUserCard.Locator(".user-unreads").TextContentAsync();
+
+            await testUserCard.ClickAsync();
+            await chatPage.messageList.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            var lastMessageReceived = new Message(page, chatPage.message.Last);
+            var messageText = await lastMessageReceived.content.TextContentAsync();
+
+            unreadMessages.Should().NotBeNullOrEmpty();
+            messageText.Should().Be("Hello from test user!");
+        }
+
+
+        private async Task LoginWithUser(User user, LoginPage loginPage, HomePage homePage)
         {
             await loginPage.Visit();
             await loginPage.Login(user.Email, TestingConstants.TEST_PASSWORD);
             await homePage.username.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+        }
+
+        private async Task NavigateToChatPage(HomePage homePage, ChatPage chatPage)
+        {
+            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.chat.ClickAsync();
+            await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
     }
 }
