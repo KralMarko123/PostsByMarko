@@ -145,6 +145,7 @@ namespace PostsByMarko.FrontendTests.Tests
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.chat.ClickAsync();
             await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await chatPage.userList.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
     }
 }

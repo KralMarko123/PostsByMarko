@@ -74,7 +74,9 @@ namespace PostsByMarko.FrontendTests.Tests
             await homePage.modalComponent.FillInTitleInput(newTitle);
             await homePage.modalComponent.FillInContentInput(newContent);
             await homePage.modalComponent.updateButton.ClickAsync();
-            await post.WaitForPostContentsToChange();
+            await homePage.modalComponent.WaitForSuccessMessageToShowAndDisappear();
+            
+            post.Refresh();
 
             var updatedTitle = await post.title.TextContentAsync();
             var updatedContent = await post.content.TextContentAsync();

@@ -26,12 +26,6 @@ namespace PostsTesting.UI_Models.Components
             post = page.Locator($"#{Id}");
         }
 
-        public async Task WaitForPostContentsToChange()
-        {
-            await PlaywrightHelpers.WaitForInnerHtmlToChange(post);
-            Refresh();
-        }
-
         public async Task WaitForPostVisibilityToToggle(bool isHidden = false)
         {
             Refresh();
