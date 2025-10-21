@@ -23,19 +23,20 @@ namespace PostsByMarko.FrontendTests.UI_Models.Pages
 
         public async Task<List<string>> GetUsernames()
         {
-            var usernames = new List<string>();
-            var userCards = await userCard.AllAsync();
+            var result = new List<string>();
+            var usernames = await username.AllAsync();
 
-            foreach (var card in userCards)
+            foreach (var username in usernames)
             { 
-                var name = await card.Locator(".user-name").TextContentAsync();
+                var name = await username.TextContentAsync();
+
                 if (name != null)
                 {
-                    usernames.Add(name);
+                    result.Add(name);
                 }
             }
 
-            return [.. usernames];
+            return result;
         }
 
         public ILocator GetUserCard(string withUsername)

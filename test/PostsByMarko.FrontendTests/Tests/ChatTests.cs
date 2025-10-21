@@ -51,8 +51,8 @@ namespace PostsByMarko.FrontendTests.Tests
             var usernames = await chatPage.GetUsernames();
             var infoMessageText = await chatPage.infoMessage.TextContentAsync();
 
-            infoMessageText.Should().Be("Start chatting right away by clicking on another user");
             usernames.Should().Contain([$"{marko.FirstName} {marko.LastName}", $"{testAdmin.FirstName} {testAdmin.LastName}"]);
+            infoMessageText.Should().Be("Start chatting right away by clicking on another user");
         }
 
         [Fact]

@@ -28,7 +28,7 @@ namespace PostsTesting.UI_Models.Components
 
         public async Task WaitForPostContentsToChange()
         {
-            await PlaywrightHelpers.WaitForTextToChange(post);
+            await PlaywrightHelpers.WaitForInnerHtmlToChange(post);
             Refresh();
         }
 
