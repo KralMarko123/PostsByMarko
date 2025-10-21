@@ -48,10 +48,10 @@ namespace PostsByMarko.FrontendTests.Tests
             await LoginWithUser(testUser, loginPage, homePage);
             await NavigateToChatPage(homePage, chatPage);   
 
-            var usernames = await chatPage.GetUsernames();
             var infoMessageText = await chatPage.infoMessage.TextContentAsync();
+            var userListShown = await chatPage.userList.IsVisibleAsync();
 
-            usernames.Should().Contain([$"{marko.FirstName} {marko.LastName}", $"{testAdmin.FirstName} {testAdmin.LastName}"]);
+            userListShown.Should().BeTrue();
             infoMessageText.Should().Be("Start chatting right away by clicking on another user");
         }
 

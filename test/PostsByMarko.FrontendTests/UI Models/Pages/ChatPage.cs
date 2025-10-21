@@ -21,24 +21,6 @@ namespace PostsByMarko.FrontendTests.UI_Models.Pages
         public ILocator unreads => page.Locator(".user-unreads");
         public ILocator username => page.Locator(".user-name");
 
-        public async Task<List<string>> GetUsernames()
-        {
-            var result = new List<string>();
-            var usernames = await username.AllAsync();
-
-            foreach (var username in usernames)
-            { 
-                var name = await username.TextContentAsync();
-
-                if (name != null)
-                {
-                    result.Add(name);
-                }
-            }
-
-            return result;
-        }
-
         public ILocator GetUserCard(string withUsername)
         {
             return userCard.Filter(new LocatorFilterOptions { HasText = withUsername });
