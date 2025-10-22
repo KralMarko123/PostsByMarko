@@ -63,7 +63,7 @@
 .user-unreads {
   width: 1em;
   height: 1em;
-  padding: 1em;
+  padding: var(--normal-padding);
   display: grid;
   place-content: center;
 
@@ -127,7 +127,7 @@
 
   display: flex;
   flex-direction: column;
-  gap: var(--small-gap);
+  gap: 0.5em;
 
   overflow-y: scroll;
 }
@@ -236,4 +236,144 @@
 
 .send-icon svg {
   transform: translateX(15%);
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+  .chat {
+    align-items: center;
+  }
+
+  .chat-container {
+    gap: 0;
+  }
+
+  .user-list {
+    border-radius: 0;
+  }
+
+  .user-card {
+    position: relative;
+    flex-direction: column;
+
+    gap: var(--small-gap);
+    padding: var(--small-padding);
+  }
+
+  .user-icon {
+    width: 0.5em;
+    height: 0.5em;
+    padding: var(--normal-padding);
+    margin-right: 0;
+
+    font-size: var(--xs-text);
+  }
+
+  .user-name {
+    text-align: center;
+    font-size: var(--xs-text);
+    letter-spacing: 0px;
+  }
+
+  .user-unreads {
+    position: absolute;
+    right: 0;
+    top: 0;
+    left: 65%;
+
+    width: 0.75em;
+    height: 0.75em;
+    padding: 0.65em;
+    margin: 0;
+
+    font-size: var(--xs-text);
+
+    transform: translateX(-50%);
+  }
+
+  .messages {
+    border-radius: 0;
+  }
+
+  .info-message {
+    margin-top: var(--normal-gap);
+    padding: var(--small-padding);
+
+    text-align: center;
+  }
+
+  .handle {
+    padding: var(--small-padding);
+
+    display: flex;
+    flex-direction: row;
+    gap: var(--normal-gap);
+  }
+
+  .handle .user-icon {
+    margin: 0;
+  }
+
+  .handle .user-name {
+    font-size: var(--s-text);
+  }
+
+  .message-list {
+    padding: var(--small-padding);
+  }
+
+  .message-date {
+    font-size: var(--s-text);
+  }
+
+  .message.author {
+    align-items: end;
+  }
+
+  .message-content {
+    padding: var(--small-padding);
+    font-size: var(--s-text);
+  }
+
+  .message-handle {
+    margin-right: var(--small-gap);
+
+    font-size: var(--xs-text);
+  }
+
+  .message-area {
+    padding: var(--normal-padding);
+    position: absolute;
+    bottom: 0;
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: var(--normal-gap);
+  }
+
+  .message-input {
+    width: 100%;
+    padding: var(--small-padding);
+
+    font-size: var(--s-text);
+  }
+
+  .message-input.empty {
+    border: solid 2px var(--error-flat);
+  }
+
+  .send-icon {
+    padding: 0.5em;
+    background-color: rgba(32, 32, 32, 0.75);
+
+    font-size: var(--s-text);
+  }
 }

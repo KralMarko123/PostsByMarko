@@ -3,7 +3,6 @@ import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
-import Card from "../../components/Helper/Card/Card";
 import UsersService from "../../api/UsersService";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
