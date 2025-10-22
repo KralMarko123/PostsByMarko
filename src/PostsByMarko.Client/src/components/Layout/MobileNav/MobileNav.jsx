@@ -47,6 +47,15 @@ const MobileNav = () => {
               Dashboard
             </li>
           )}
+          <li
+            className="actions__item"
+            onClick={() => {
+              navigate(ROUTES.CHAT);
+              setIsExpanded(false);
+            }}
+          >
+            Chat
+          </li>
           <li className="actions__item" onClick={() => logout()}>
             Logout
           </li>

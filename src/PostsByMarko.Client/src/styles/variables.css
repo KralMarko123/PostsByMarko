@@ -22,9 +22,9 @@
 
   --s-text: 0.85rem;
   --md-text: 1rem;
-  --lg-text: 1.25rem;
-  --big-text: 1.5rem;
-  --huge-text: 2rem;
+  --lg-text: 1.5rem;
+  --big-text: 2rem;
+  --huge-text: 3rem;
 
   /**WIDTHS, HEIGHTS, GAPS, PADDINGS*/
   --container-width: 75%;
@@ -53,15 +53,15 @@
     --small-gap: 0.25em;
 
     /**TEXT*/
-    --s-text: 0.75em;
-    --md-text: 1em;
-    --lg-text: 1.15em;
-    --big-text: 1.5em;
-    --huge-text: 2.15em;
+    --s-text: 0.85rem;
+    --md-text: 1.15rem;
+    --lg-text: 1.35rem;
+    --big-text: 1.75rem;
+    --huge-text: 2.15rem;
   }
 }
 
-/**TABLET*/
+/**MOBILE*/
 @media (max-width: 767px) {
   :root {
     /**WIDTHS, HEIGHTS, GAPS*/
@@ -70,11 +70,11 @@
     --small-gap: 0.25em;
 
     /**TEXT*/
-    --s-text: 0.75em;
-    --md-text: 0.95em;
-    --lg-text: 1.15em;
-    --big-text: 1.35em;
-    --huge-text: 1.85em;
+    --s-text: 0.85rem;
+    --md-text: 1rem;
+    --lg-text: 1.2rem;
+    --big-text: 1.5rem;
+    --huge-text: 2rem;
   }
 }
 

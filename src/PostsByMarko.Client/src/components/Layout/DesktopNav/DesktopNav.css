@@ -1,8 +1,8 @@
 .nav {
   width: var(--container-width);
 
-  padding: 1em;
-  margin-bottom: 1em;
+  margin-bottom: var(--normal-gap);
+  padding: var(--normal-padding);
 
   z-index: 1;
 }
@@ -38,7 +38,7 @@
 
 .nav__actions {
   position: relative;
-  padding: 0.25em var(--small-padding);
+  padding: var(--xs-padding) var(--small-padding);
   background-color: var(--dark-accent);
   border-radius: var(--button-radius) var(--button-radius) 0 0;
   box-shadow: var(--simple-shadow);

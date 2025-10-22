@@ -95,3 +95,41 @@
 .admin .chart {
   width: calc(50% - var(--normal-gap));
 }
+
+/**TABLET*/
+@media (max-width: 1199px) {
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+  .table {
+    display: block;
+    border-radius: var(--card-radius);
+
+    overflow-x: scroll;
+    white-space: nowrap;
+  }
+
+  .table thead th {
+    font-size: var(--s-text);
+  }
+
+  .table-button {
+    margin: 0em var(--small-gap);
+    padding: var(--small-padding);
+    font-size: var(--s-text);
+    letter-spacing: 0px;
+  }
+
+  .admin .messages {
+    margin: var(--normal-gap) 0;
+  }
+
+  .admin .charts-container {
+    flex-direction: column;
+  }
+
+  .admin .chart {
+    width: 100%;
+  }
+}

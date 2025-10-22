@@ -1,13 +1,28 @@
 .update-post .input {
-  font-size: 1rem;
+  font-size: var(--md-text);
   padding-left: 2.5em;
 }
 
 .update-post .input-text {
-  font-size: 0.85rem;
+  font-size: var(--s-text);
   padding-left: 1em;
 }
 
 .modal-container {
   width: 40%;
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+  .update-post .input {
+    padding-left: 1.5em;
+  }
+
+  .update-post .input-text {
+    padding-left: 0.5em;
+  }
 }

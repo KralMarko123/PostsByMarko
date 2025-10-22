@@ -1,8 +1,8 @@
 .logo {
   width: 100px;
   position: absolute;
-  top: 1em;
-  left: 1em;
+  top: var(--normal-gap);
+  left: var(--normal-gap);
 
   cursor: pointer;
 }

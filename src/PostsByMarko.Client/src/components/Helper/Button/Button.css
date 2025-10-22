@@ -1,34 +1,34 @@
 .button {
-	width: 100%;
-	padding: var(--small-padding);
+  width: 100%;
+  padding: var(--small-padding);
 
-	outline: none;
-	border: none;
-	background-color: var(--light-accent);
-	border-radius: var(--button-radius);
+  outline: none;
+  border: none;
+  background-color: var(--light-accent);
+  border-radius: var(--button-radius);
 
-	color: var(--text-color);
-	font-size: 1.5rem;
-	font-weight: bold;
-	font-family: var(--header-font);
-	text-transform: uppercase;
-	letter-spacing: 2px;
+  color: var(--text-color);
+  font-size: var(--lg-text);
+  font-weight: bold;
+  font-family: var(--header-font);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .button:hover {
-	opacity: 0.85;
+  opacity: 0.85;
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
 }
 
 /**MOBILE*/
 @media (max-width: 767px) {
-	.button {
-		font-size: 1.5rem;
-		padding: 0.25em 0em;
-	}
 }

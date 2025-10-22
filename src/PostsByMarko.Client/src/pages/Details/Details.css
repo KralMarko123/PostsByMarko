@@ -16,10 +16,10 @@
 .details-title {
   width: fit-content;
   border-bottom: solid 3px;
-  padding-bottom: 0.125em;
+  padding-bottom: var(--small-padding);
   margin-bottom: 0.5em;
 
-  font-size: 3rem;
+  font-size: var(--huge-text);
   font-weight: bold;
   text-align: center;
 }
@@ -31,11 +31,18 @@
   justify-content: center;
   align-items: center;
 
-  gap: 1em;
+  gap: 2em;
+}
+
+.details-header .box {
+  display: flex;
+  align-items: center;
+
+  gap: var(--normal-gap);
 }
 
 .details-header .author-container svg {
-  transform: scale(1.25);
+  transform: scale(1.5);
   fill: var(--light);
 }
 
@@ -51,6 +58,7 @@
 .details-container {
   position: relative;
   width: 100%;
+
   height: auto;
 
   display: flex;
@@ -61,21 +69,21 @@
 
 .details-container .content {
   width: 100%;
-  font-size: 1rem;
-  white-space: pre-wrap;
+  min-height: 20vh;
+  max-height: 40vh;
+
+  padding: var(--normal-padding);
 
   background-color: rgba(var(--dark-accent-decimal), 0.25);
   border-radius: var(--button-radius);
 
+  font-size: var(--md-text);
   text-align: justify;
-  padding: var(--normal-padding);
+  white-space: pre-wrap;
 
-  overflow: scroll;
-  scrollbar-color: var(--light);
-  max-height: 500px;
-
+  overflow-y: scroll;
+  overflow-x: hidden;
   scrollbar-color: var(--light) var(--dark-accent);
-  scrollbar-width: auto;
 }
 
 .details-container .content.disabled {
@@ -84,16 +92,19 @@
 
 .details-container textarea {
   width: 100%;
+  min-height: 20vh;
+  max-height: 40vh;
+
   padding: var(--normal-padding);
 
-  outline: none;
   border: none;
   background-color: var(--dark-accent);
   border-radius: var(--button-radius);
   box-shadow: var(--simple-shadow);
+  outline: none;
 
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: var(--md-text);
   text-align: justify;
   white-space: pre-wrap;
 
@@ -108,15 +119,59 @@
 .details-update-controls {
   width: 100%;
 
-  margin-top: 1em;
+  margin-top: var(--normal-gap);
 
   display: flex;
   justify-content: flex-start;
-  gap: 1em;
+  gap: var(--normal-gap);
 }
 
 .update-control {
-  font-size: 1.5rem;
-
   width: fit-content;
+}
+
+/**TABLET*/
+@media (max-width: 1199px) {
+}
+
+/**MOBILE*/
+@media (max-width: 767px) {
+  .author-container .box .author,
+  .author-container .box .date {
+    font-size: var(--s-text);
+  }
+
+  .details-header .author-container svg {
+    transform: scale(1.25);
+  }
+
+  .details-container {
+    position: relative;
+    width: 100%;
+
+    height: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .details-container .content {
+    padding: var(--small-padding);
+  }
+
+  .details-container textarea {
+    padding: var(--small-padding);
+  }
+
+  .details-update-controls {
+    width: 100%;
+
+    margin-top: var(--normal-gap);
+
+    display: flex;
+    justify-content: flex-start;
+    gap: var(--normal-gap);
+  }
 }

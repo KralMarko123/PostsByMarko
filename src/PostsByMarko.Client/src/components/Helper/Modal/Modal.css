@@ -65,4 +65,7 @@
 
 /**MOBILE*/
 @media (max-width: 767px) {
+  .modal-container {
+    width: 90% !important;
+  }
 }

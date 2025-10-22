@@ -126,12 +126,16 @@ const Details = () => {
             <div className="details-header">
               <h1 className="details-title">{post.title}</h1>
               <div className="author-container">
-                {ICONS.USER_CIRCLE_ICON()}
-                <p className="author">
-                  By {author.firstName} {author.lastName}
-                </p>
-                {ICONS.CLOCK_ICON()}
-                <p className="date">{postCreatedDate}</p>
+                <div className="box">
+                  {ICONS.USER_CIRCLE_ICON()}
+                  <p className="author">
+                    By {author.firstName} {author.lastName}
+                  </p>
+                </div>
+                <div className="box">
+                  {ICONS.CLOCK_ICON()}
+                  <p className="date">{postCreatedDate}</p>
+                </div>
               </div>
             </div>
 

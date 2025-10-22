@@ -1,18 +1,18 @@
 .container {
-	width: var(--container-width);
-	height: fit-content;
+  width: var(--container-width);
+  height: fit-content;
 }
 
 .container-title {
-	width: 100%;
+  width: 100%;
 
-	font-size: 3rem;
-	font-weight: bold;
+  font-size: var(--huge-text);
+  font-weight: bold;
 }
 
 .container-desc {
-	font-size: 1rem;
-	color: var(--light);
+  font-size: var(--md-text);
+  color: var(--light);
 
-	margin-bottom: 1em;
+  margin-bottom: var(--normal-gap);
 }
