@@ -53,4 +53,17 @@ export const DateFunctions = {
   getThisMonthAsText() {
     return moment().format("MMMM");
   },
+
+  isBeforeDateTime(first, second) {
+    const momentA = moment(first).milliseconds(0);
+    const momentB = moment(second).milliseconds(0);
+
+    if (momentA.isBefore(momentB)) {
+      return 1; // A is earlier
+    } else if (momentA.isAfter(momentB)) {
+      return -1; // A is later
+    } else {
+      return 0; // Equal
+    }
+  },
 };

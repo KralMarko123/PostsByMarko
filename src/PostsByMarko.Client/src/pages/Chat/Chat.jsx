@@ -12,6 +12,7 @@ import { HelperFunctions } from "../../util/helperFunctions";
 import AppContext from "../../context/AppContext";
 import "../Page.css";
 import "./Chat.css";
+import { DateFunctions } from "../../util/dateFunctions";
 
 const Chat = () => {
   const appContext = useContext(AppContext);
@@ -42,7 +43,15 @@ const Chat = () => {
           (c) => c.id === chat.id && c.id !== openChat?.id
         );
 
-        if (existingChat && existingChat.updatedAt > chat.updatedAt) {
+        if (
+          existingChat &&
+          DateFunctions.isBeforeDateTime(
+            chat.updatedAt,
+            existingChat.updatedAt
+          ) === 1
+        ) {
+          console.log(existingChat.updatedAt, chat.updatedAt);
+
           let userIdWithNewMessage = existingChat.participantIds.filter(
             (id) => id !== user.id
           )[0];
