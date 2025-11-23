@@ -1,82 +1,64 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Decorators;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Services;
 
-namespace PostsByMarko.Host.Controllers;
-
-[Authorize]
-public class PostsController : BaseController
+namespace PostsByMarko.Host.Controllers
 {
-    private readonly IPostsService postsService;
-    public PostsController(IPostsService postsService) : base()
+    [ApiController]
+    [Route("api/post")]
+    [Authorize]
+    public class PostsController : ControllerBase
     {
-        this.postsService = postsService;
-    }
+        private readonly IPostsService postsService;
 
-    [HttpGet]
-    [Route("/getAllPosts")]
-    [Tags("Posts Endpoints")]
-    public async Task<RequestResult> GetAllPostsAsync()
-    {
-        LoadRequestClaims();
-        return await postsService.GetAllPostsAsync(user);
-    }
+        public PostsController(IPostsService postsService)
+        {
+            this.postsService = postsService;
+        }
 
-    [HttpGet]
-    [Route("/getPost/{postId}")]
-    [Tags("Posts Endpoint")]
-    public async Task<RequestResult> GetPostAsync(string postId)
-    {
-        LoadRequestClaims();
-        return await postsService.GetPostByIdAsync(postId, user);
-    }
+        [HttpGet]
+        [Route("all")]
+        public async Task<ActionResult<List<PostDto>>> GetPosts(CancellationToken cancellationToken = default)
+        {
+            var result = await postsService.GetAllPostsAsync(cancellationToken);
 
-    [HttpPost]
-    [Route("/createPost")]
-    [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
-    public async Task<RequestResult> CreatePostAsync([FromBody] Post postToCreate)
-    {
-        LoadRequestClaims();
-        return await postsService.CreatePostAsync(postToCreate, user);
-    }
+            return Ok(result);
+        }
 
-    [HttpPut]
-    [Route("/updatePost")]
-    [Tags("Posts Endpoint")]
-    [LimitRequest(MaxRequests = 1, TimeWindow = 3)]
-    public async Task<RequestResult> UpdatePostAsync([FromBody] Post updatedPost)
-    {
-        LoadRequestClaims();
-        return await postsService.UpdatePostAsync(updatedPost, user);
-    }
+        [HttpGet]
+        [Route("{id::guid}")]
+        public async Task<ActionResult<PostDto>> GetPost(Guid id, CancellationToken cancellationToken = default)
+        {
+            var post = await postsService.GetPostByIdAsync(id, cancellationToken);
 
-    [HttpDelete]
-    [Route("/deletePost/{postId}")]
-    [Tags("Posts Endpoint")]
-    public async Task<RequestResult> DeletePostAsync(string postId)
-    {
-        LoadRequestClaims();
-        return await postsService.DeletePostByIdAsync(postId, user);
-    }
+            return Ok(post);        
+        }
 
-    [HttpPost]
-    [Route("/togglePostVisibility/{postId}")]
-    [Tags("Posts Endpoint")]
-    public async Task<RequestResult> TogglePostVisibilityAsync(string postId)
-    {
-        LoadRequestClaims();
-        return await postsService.TogglePostVisibilityAsync(postId, user);
-    }
+        [HttpPost]
+        [Route("create")]
+        public async Task<ActionResult<PostDto>> CreatePost([FromBody] PostDto postToCreate, CancellationToken cancellationToken = default)
+        {
+            var post = await postsService.CreatePostAsync(postToCreate, cancellationToken);
+            
+            return Ok(post);
+        }
 
-    [HttpGet]
-    [Route("/getPostAuthor/{postId}")]
-    [Tags("Posts Endpoint")]
-    public async Task<RequestResult> GetPostAuthor(string postId)
-    {
-        LoadRequestClaims();
-        return await postsService.GetPostAuthorDetails(postId);
+        [HttpPut]
+        [Route("update/{id::guid}")]
+        public async Task<ActionResult<PostDto>> UpdatePost(Guid id, [FromBody] UpdatePostRequest request, CancellationToken cancellationToken = default)
+        {
+            return await postsService.UpdatePostAsync(id, request, cancellationToken);
+        }
+
+        [HttpDelete]
+        [Route("delete/{id::guid}")]
+        public async Task<IActionResult> DeletePost(Guid id, CancellationToken cancellationToken = default)
+        {
+            await postsService.DeletePostByIdAsync(id, cancellationToken);
+
+            return NoContent();
+        }
     }
 }

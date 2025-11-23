@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Helper;
-using PostsByMarko.Host.Repos.Messaging;
-using PostsByMarko.Host.Repos.Posts;
-using PostsByMarko.Host.Repos.Users;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repos.Messaging;
+using PostsByMarko.Host.Data.Repositories.Posts;
+using PostsByMarko.Host.Data.Repositories.Users;
+using PostsByMarko.Host.Middlewares;
 using System.Text;
 
 namespace PostsByMarko.Host.Extensions
@@ -136,9 +137,9 @@ namespace PostsByMarko.Host.Extensions
             });
         }
 
-        public static void WithServices(this WebApplicationBuilder builder)
+        public static void WithAppServices(this WebApplicationBuilder builder)
         {
-            // Repos
+            // Repositories
             builder.Services.AddScoped<IPostsRepository, PostsRepository>();
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
             builder.Services.AddScoped<IMessagingRepository, MessagingRepository>();
@@ -147,10 +148,15 @@ namespace PostsByMarko.Host.Extensions
             builder.Services.AddScoped<IPostsService, PostsService>();
             builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IMessagingService, MessagingService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<ICurrentRequestAccessor, CurrentRequestAccessor>();
 
             // Helpers
             builder.Services.AddScoped<IJwtHelper, JwtHelper>();
             builder.Services.AddScoped<IEmailHelper, EmailHelper>();
+
+            // Middlewares
+            builder.Services.AddTransient<ExceptionHandlingMiddleware, ExceptionHandlingMiddleware>();
         }
     }
 }

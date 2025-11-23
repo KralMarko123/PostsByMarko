@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using Moq;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Data.Models.Responses;
-using PostsByMarko.Host.Helper;
-using PostsByMarko.Host.Repos.Users;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Data.Repositories.Users;
 using System.Net;
 
 namespace PostsByMarko.UnitTests
@@ -26,7 +26,7 @@ namespace PostsByMarko.UnitTests
         public async Task map_and_create_user_should_return_created_with_appropriate_message_when_user_is_registered()
         {
             // Arrange
-            var userToRegister = new UserRegistrationDto
+            var userToRegister = new RegistrationDto
             {
                 Email = "some_user@test.com",
                 Password = "test_password"
@@ -46,7 +46,7 @@ namespace PostsByMarko.UnitTests
         public async Task map_and_create_user_should_return_bad_request_with_appropriate_message_when_user_is_not_registered()
         {
             // Arrange
-            var userToRegister = new UserRegistrationDto
+            var userToRegister = new RegistrationDto
             {
                 Email = "test_user@test.com",
                 Password = "test_password",
@@ -68,7 +68,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var user = new User("test_user@test.com", "Test", "User");
-            var userLogin = new UserLoginDto { Email = user.Email, Password = "test_password" };
+            var userLogin = new LoginDto { Email = user.Email, Password = "test_password" };
             var jwtToken = "some_jwt_token";
             var userRoles = new List<string> { "User" };
             var loginResponse = new LoginResponse { Token = jwtToken, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, Id = user.Id, Roles = userRoles };
@@ -93,7 +93,7 @@ namespace PostsByMarko.UnitTests
         public async Task validate_user_should_return_bad_request_with_appropriate_message_when_user_does_not_exist()
         {
             // Arrange
-            var userLogin = new UserLoginDto { Email = "test_user", Password = "test_password" };
+            var userLogin = new LoginDto { Email = "test_user", Password = "test_password" };
 
             usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(It.IsAny<string>())).ReturnsAsync(() => null);
 
@@ -110,7 +110,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var user = new User("test_user@test.com");
-            var userLogin = new UserLoginDto { Email = "test_user@test.com", Password = "test_password" };
+            var userLogin = new LoginDto { Email = "test_user@test.com", Password = "test_password" };
 
             usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => false);
@@ -128,7 +128,7 @@ namespace PostsByMarko.UnitTests
         {
             // Arrange
             var user = new User("test_user@test.com");
-            var userLogin = new UserLoginDto { Email = "test_user@test.com", Password = "test_password" };
+            var userLogin = new LoginDto { Email = "test_user@test.com", Password = "test_password" };
 
             usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, userLogin.Password)).ReturnsAsync(() => true);

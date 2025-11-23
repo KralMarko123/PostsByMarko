@@ -1,106 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Decorators;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Services;
 
 namespace PostsByMarko.Host.Controllers
 {
-
+    [ApiController]
+    [Route("api/user")]
     [Authorize]
-    public class UsersController : BaseController
+    public class UsersController : ControllerBase
     {
         private readonly IUsersService usersService;
-        public UsersController(IUsersService usersService) : base()
+
+        public UsersController(IUsersService usersService)
         {
             this.usersService = usersService;
         }
 
         [HttpGet]
-        [Route("/getAllUsers")]
-        [Tags("Users Endpoints")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<RequestResult> GetAllUsersAsync()
+        [Route("all")]
+        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] Guid exceptId, CancellationToken cancellationToken = default)
         {
-            LoadRequestClaims();
-            return await usersService.GetAllUsersAsync();
+            var users = await usersService.GetUsersAsync(exceptId, cancellationToken);
+
+            return Ok(users);
         }
 
         [HttpGet]
-        [Route("/getOtherUsers")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<RequestResult> GetOtherUsersAsync()
+        [Route("{id::guid}")]
+        public async Task<ActionResult<UserDto>> GetUser(Guid id)
         {
-            LoadRequestClaims();
-            return await usersService.GetOtherUsersAsync(user.Id);
-        }
-
-        [HttpGet]
-        [Route("/getUser/{id}")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        public async Task<RequestResult> GetUserAsync(string id)
-        {
-            LoadRequestClaims();
-            return await usersService.GetUserByIdAsync(id);
-        }
-
-        [HttpGet]
-        [Route("/getEmailRoles/{email}")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> GetEmailRolesAsync(string email)
-        {
-            LoadRequestClaims();
-            return await usersService.GetRolesForEmailAsync(email);
-        }
-
-        [HttpGet]
-        [Route("/getAdminDashboard")]
-        [Tags("Users Endpoint")]
-        [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> GetAdminDashboardAsync()
-        {
-            LoadRequestClaims();
-            
-            var admin = await usersService.GetUserByEmailAsync(user.Email);
-
-            return await usersService.GetAdminDashboard(admin);
-        }
-
-        [HttpDelete]
-        [Route("/deleteUser/{userId}")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> DeleteUserAsync(string userId)
-        {
-            LoadRequestClaims();
-            return await usersService.DeleteUser(userId);
-        }
-
-        [HttpPost]
-        [Route("/addRoleToUser/{userId}/{role}")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> AddRoleToUserAsync(string userId, string role)
-        {
-            LoadRequestClaims();
-            return await usersService.AddRoleToUserAsync(userId, role);
-        }
-
-        [HttpPost]
-        [Route("/removeRoleFromUser/{userId}/{role}")]
-        [Tags("Users Endpoint")]
-        [LimitRequest(MaxRequests = 5, TimeWindow = 10)]
-        [Authorize(Roles = "Admin")]
-        public async Task<RequestResult> RemoveRoleFromUserAsync(string userId, string role)
-        {
-            LoadRequestClaims();
-            return await usersService.RemoveRoleFromUserAsync(userId, role);
+            var user = await usersService.GetUserByIdAsync(id);
+         
+            return Ok(user);
         }
     }
 }

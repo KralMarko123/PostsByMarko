@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using PostsByMarko.Host.Extensions;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Data
 {

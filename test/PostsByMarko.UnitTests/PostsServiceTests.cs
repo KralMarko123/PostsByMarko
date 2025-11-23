@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Moq;
+using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Responses;
-using PostsByMarko.Host.Repos.Posts;
-using PostsByMarko.Host.Repos.Users;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Data.Repositories.Posts;
+using PostsByMarko.Host.Data.Repositories.Users;
 using System.Net;
 
 namespace PostsByMarko.UnitTests

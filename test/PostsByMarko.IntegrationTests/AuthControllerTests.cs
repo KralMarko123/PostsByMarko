@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Newtonsoft.Json;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Test.Shared.Constants;
 using System.Net;
 using System.Net.Http;
@@ -28,7 +28,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_register()
         {
             // Arrange
-            var registrationDto = new UserRegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
+            var registrationDto = new RegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
 
             // Act
             var response = await client.PostAsJsonAsync("/register", registrationDto);
@@ -43,7 +43,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_login()
         {
             // Arrange
-            var loginDto = new UserLoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD };
+            var loginDto = new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD };
 
             // Act
             var response = await client.PostAsJsonAsync("/login", loginDto);

@@ -1,57 +1,55 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Helper;
-using PostsByMarko.Host.Services;
-using System.Net;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Application.Services;
 
 namespace PostsByMarko.Host.Controllers;
 
+[ApiController]
+[Route("api/auth")]
 [AllowAnonymous]
-public class AuthController : BaseController
+public class AuthController : ControllerBase
 {
     private readonly IUsersService usersService;
-    private readonly IEmailHelper emailHelper;
+    private readonly IEmailService emailService;
+    private readonly IConfiguration configuration;  
 
-    public AuthController(IUsersService usersService, IEmailHelper emailHelper) : base()
+    public AuthController(IUsersService usersService, IEmailService emailService, IConfiguration configuration)
     {
         this.usersService = usersService;
-        this.emailHelper = emailHelper;
+        this.emailService = emailService;
+        this.configuration = configuration;
     }
 
     [HttpPost]
-    [Route("/register")]
-    [Tags("Auth Endpoints")]
-    public async Task<RequestResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
+    [Route("register")]
+    public async Task<ActionResult> Register([FromBody] RegistrationDto registrationDto)
     {
-        var result = await usersService.MapAndCreateUserAsync(userRegistration);
+        await usersService.CreateUserAsync(registrationDto);
 
-        if (result.StatusCode.Equals(HttpStatusCode.Created)) await SendEmailConfirmationLinkToUser(userRegistration.Email!);
-
-        return result;
+        return Ok("Successfully registered, please check your email and confirm your account before logging in");
     }
 
     [HttpPost]
-    [Route("/login")]
-    [Tags("Auth Endpoint")]
-    public async Task<RequestResult> AuthenticateUser([FromBody] UserLoginDto userLogin)
+    [Route("login")]
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto)
     {
-        var result = await usersService.ValidateUserAsync(userLogin);
+        var result = await usersService.ValidateUserAsync(loginDto);
 
-        if (result.StatusCode.Equals(HttpStatusCode.Forbidden)) await SendEmailConfirmationLinkToUser(userLogin.Email!);
-
-        return result;
+        return Ok(result);
     }
 
-    private async Task SendEmailConfirmationLinkToUser(string username)
+    [HttpPost]
+    [Route("confirmEmail")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
     {
-        var user = await usersService.GetUserByEmailAsync(username);
-        var token = await usersService.GenerateEmailConfirmationTokenForUserAsync(user);
-        var confirmationLink = Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
-        var subject = $"Please confirm the registration for {user.Email}";
-        var body = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
+        await emailService.ConfirmEmailAsync(confirmEmailDto);
+        
+        var jwtConfiguration = configuration.GetSection("Jwt");
+        var urlToRedirectTo = $"{jwtConfiguration.GetSection("validAudiences").Get<List<string>>()!.FirstOrDefault()}/login";
 
-        await emailHelper.SendEmail(user.FirstName!, user.LastName!, user.Email, subject, body);
+        return Redirect(urlToRedirectTo);
     }
 }

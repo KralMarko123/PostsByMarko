@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Services;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Services;
 
 namespace PostsByMarko.Host.Controllers
 {
+    [ApiController]
+    [Route("api/message")]
     [Authorize]
-    public class MessageController : BaseController
+    public class MessageController : ControllerBase
     {
         private readonly IMessagingService messagingService;
 
-        public MessageController(IMessagingService messagingService) : base()
+        public MessageController(IMessagingService messagingService)
         {
             this.messagingService = messagingService;
         }
 
         [HttpGet]
         [Route("/getChats")]
-        [Tags("Messaging Endpoints")]
         public async Task<RequestResult> GetChatsAsync()
         {
             LoadRequestClaims();
@@ -27,7 +27,6 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpPost]
         [Route("/startChat")]
-        [Tags("Messaging Endpoints")]
         public async Task<RequestResult> StartChatAsync([FromBody] string[] participantIds)
         {
             LoadRequestClaims();
@@ -36,7 +35,6 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpPost]
         [Route("/sendMessage")]
-        [Tags("Messaging Endpoints")]
         public async Task<RequestResult> SendMessageAsync([FromBody] MessageDto messageDto)
         {
             LoadRequestClaims();

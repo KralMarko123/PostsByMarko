@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;

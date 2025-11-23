@@ -1,6 +1,7 @@
 ﻿using Azure;
 using FluentAssertions;
 using Newtonsoft.Json;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Models;
 using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Test.Shared.Constants;

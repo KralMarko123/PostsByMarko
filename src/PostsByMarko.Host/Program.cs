@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PostsByMarko.Host.Constants;
+using PostsByMarko.Host.Application.Constants;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Mapping.Profiles;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Extensions;
-using PostsByMarko.Host.Hubs;
 using Serilog;
 using System.Text.Json.Serialization;
 
@@ -35,7 +36,14 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(connectionString!)
 );
-builder.WithServices();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<RegistrationPofile>();
+    cfg.AddProfile<UserProfile>();
+    cfg.AddProfile<PostProfile>();   
+});
+builder.Services.AddHttpContextAccessor();
+builder.WithAppServices();
 builder.WithIdentity();
 builder.Services.AddEndpointsApiExplorer();
 builder.WithSwagger();
@@ -61,7 +69,6 @@ app.UseCors(MiscConstants.CORS_POLICY_NAME);
 if (!isInLocalDevelopment && !isInTest.GetValueOrDefault(false))
 {
     app.UseHttpsRedirection();
-    app.UseRateLimiting();
 }
 
 app.UseAuthentication();

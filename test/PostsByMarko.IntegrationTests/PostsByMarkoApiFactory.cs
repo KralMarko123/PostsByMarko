@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Data.Models.Responses;
 using PostsByMarko.Test.Shared.Constants;
 using System;
 using System.Net.Http;
@@ -53,7 +53,7 @@ namespace PostsByMarko.IntegrationTests
             {
                 try
                 {
-                    var result = await client!.PostAsJsonAsync("/login", new UserLoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
+                    var result = await client!.PostAsJsonAsync("/login", new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
 
                     if (result.IsSuccessStatusCode)
                     {

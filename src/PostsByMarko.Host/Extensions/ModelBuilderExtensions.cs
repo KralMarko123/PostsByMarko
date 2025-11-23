@@ -1,7 +1,8 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PostsByMarko.Host.Constants;
+using PostsByMarko.Host.Application.Constants;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Models;
 
 namespace PostsByMarko.Host.Extensions

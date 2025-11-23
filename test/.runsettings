@@ -2,7 +2,7 @@
 <RunSettings>
   <RunConfiguration>
     <EnvironmentVariables>
-      <IsLocalDevelopment>False</IsLocalDevelopment>
+      <IsLocalDevelopment>True</IsLocalDevelopment>
     </EnvironmentVariables>
   </RunConfiguration>
 </RunSettings>

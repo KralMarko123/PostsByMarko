@@ -1,8 +1,8 @@
 using Bogus;
 using FluentAssertions;
 using Newtonsoft.Json;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Responses;
+using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Test.Shared.Constants;
 using System;
 using System.Collections.Generic;

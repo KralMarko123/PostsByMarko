@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using FluentAssertions;
 using Microsoft.Playwright;
-using PostsByMarko.Host.Data.Models;
+using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Test.Shared.Constants;
 using PostsTesting.UI_Models.Pages;
 using Xunit;
