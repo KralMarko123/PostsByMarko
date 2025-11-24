@@ -10,19 +10,14 @@ namespace PostsByMarko.Host.Data.Entities
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation properties
         public ICollection<Message> Messages { get; set; } = new List<Message>();
-        public List<Guid> ParticipantIds { get; set; } = new List<Guid>();
+        public ICollection<ChatUser> ChatUsers { get; set; } = new List<ChatUser>();
 
         public Chat()
         {
 
-        }
-
-        public Chat(List<string> participantIds)
-        {
-            ParticipantIds = participantIds;
-            CreatedAt = DateTime.UtcNow;
-            UpdatedAt = DateTime.UtcNow;
         }
     }
 }

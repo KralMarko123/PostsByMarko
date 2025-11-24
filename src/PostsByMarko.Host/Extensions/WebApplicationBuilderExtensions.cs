@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Entities;
-using PostsByMarko.Host.Data.Repos.Messaging;
+using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Host.Data.Repositories.Users;
 using PostsByMarko.Host.Middlewares;
@@ -25,7 +26,7 @@ namespace PostsByMarko.Host.Extensions
                     policy =>
                     {
                         policy
-                         .WithOrigins(allowedOrigins.ToArray())
+                         .WithOrigins([.. allowedOrigins])
                          .AllowAnyHeader()
                          .AllowAnyMethod()
                          .AllowCredentials();
@@ -35,7 +36,7 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithIdentity(this WebApplicationBuilder builder)
         {
-            builder.Services.AddIdentity<User, IdentityRole>(user =>
+            builder.Services.AddIdentity<User, Role>(user =>
             {
                 user.Password.RequiredLength = 6;
                 user.Password.RequireDigit = true;
@@ -142,7 +143,8 @@ namespace PostsByMarko.Host.Extensions
             // Repositories
             builder.Services.AddScoped<IPostsRepository, PostsRepository>();
             builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-            builder.Services.AddScoped<IMessagingRepository, MessagingRepository>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
+            builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             // Services
             builder.Services.AddScoped<IPostsService, PostsService>();

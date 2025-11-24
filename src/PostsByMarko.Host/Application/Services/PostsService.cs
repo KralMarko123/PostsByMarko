@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Posts;

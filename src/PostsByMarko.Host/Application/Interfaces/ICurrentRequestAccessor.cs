@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Services
+﻿namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface ICurrentRequestAccessor
     {

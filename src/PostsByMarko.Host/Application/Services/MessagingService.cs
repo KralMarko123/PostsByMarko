@@ -1,97 +1,84 @@
-﻿using PostsByMarko.Host.Application.DTOs;
-using PostsByMarko.Host.Builders;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Data.Repos.Messaging;
+﻿using AutoMapper;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Interfaces;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Messaging;
 
 namespace PostsByMarko.Host.Application.Services
 {
     public class MessagingService : IMessagingService
     {
-        private readonly IMessagingRepository messagingRepository;
-        
-        public MessagingService(IMessagingRepository messagingRepository)
+        private readonly IChatRepository chatRepository;
+        private readonly IMessageRepository messageRepository;
+        private readonly IUsersService usersService;
+        private readonly IMapper mapper;
+
+        public MessagingService(IChatRepository chatRepository, IMessageRepository messageRepository, IUsersService usersService, IMapper mapper)
         {
-            this.messagingRepository = messagingRepository;
+            this.chatRepository = chatRepository;
+            this.messageRepository = messageRepository;
+            this.usersService = usersService;
+            this.mapper = mapper;
         }
 
-        public async Task<RequestResult> StartChatAsync(string[] participantIds)
+        public async Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken = default)
         {
-            var existingChat = await messagingRepository.GetChatByParticipantIdsAsync(participantIds);
+            var currentUser = await usersService.GetCurrentUserAsync();
+            var chats = await chatRepository.GetChatsForUserAsync(currentUser, cancellationToken);
+            var result = mapper.Map<List<ChatDto>>(chats);
 
-            if (existingChat != null)
+            return result;
+        }
+
+        public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
+        {
+            var currentUser = await usersService.GetCurrentUserAsync();
+
+            try
             {
-                existingChat.Messages = await messagingRepository.GetChatMessagesAsync(existingChat);
-                
-                return new RequestResultBuilder()
-                    .Ok()
-                    .WithPayload(existingChat)
-                    .Build();
+                var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
+
+                return mapper.Map<ChatDto>(existingChat);
             }
-            
-            var createdChat = await messagingRepository.CreateChatAsync(new Chat([.. participantIds]));
-
-            return new RequestResultBuilder()
-                .Ok()
-                .WithPayload(createdChat)
-                .Build();
-        }
-
-        public async Task<RequestResult> SendMessageAsync(MessageDto messageDto)
-        {
-            var forbiddenRequest = new RequestResultBuilder()
-                .Forbidden()
-                .WithMessage("You are not a participant of this chat")
-                .Build();
-            var notFoundRequest = new RequestResultBuilder()
-                .NotFound()
-                .WithMessage($"Chat with Id: {messageDto.ChatId} was not found")
-                .Build();
-            var badRequest = new RequestResultBuilder()
-                .BadRequest()
-                .WithMessage("Error during chat update")
-                .Build();
-
-            var chat = await messagingRepository.GetChatByIdAsync(messageDto.ChatId);
-
-            if (chat == null)
-                return notFoundRequest;
-
-            if (!chat.ParticipantIds.Contains(messageDto.SenderId))
-                return forbiddenRequest;
-
-            var createdMessage = await messagingRepository.CreateMessageAsync(new Message(messageDto));
-
-            chat.Messages.Add(createdMessage);
-            chat.UpdatedAt = DateTime.UtcNow;
-
-            var chatUpdatedSuccessfully = await messagingRepository.UpdateChatAsync(chat);
-
-            if (!chatUpdatedSuccessfully)
-                return badRequest;
-
-            return new RequestResultBuilder()
-                .Ok()
-                .WithPayload(createdMessage)
-                .Build();
-        }
-
-        public async Task<RequestResult> GetUserChatsAsync(string userId)
-        {
-            var chats = await messagingRepository.GetUserChatsAsync(userId);
-
-            if(chats != null)
+            catch (KeyNotFoundException)
             {
-                foreach (var chat in chats)
+                var newChat = new Chat
                 {
-                    chat.Messages = await messagingRepository.GetChatMessagesAsync(chat);
-                }
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Messages = new List<Message>(),
+                    ChatUsers = new List<ChatUser>
+                    {
+                        new ChatUser { UserId = currentUser.Id },
+                        new ChatUser { UserId = otherUserId }
+                    }
+                };
+
+                var createdChat = await chatRepository.AddChatAsync(newChat, cancellationToken);
+
+                await chatRepository.SaveChangesAsync(cancellationToken);
+
+                return mapper.Map<ChatDto>(createdChat);
+            }
+        }
+
+        public async Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default)
+        {
+            var sender = await usersService.GetUserByIdAsync(messageDto.SenderId);
+            var chat = await chatRepository.GetChatByIdAsync(messageDto.ChatId, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {messageDto.ChatId} was not found");
+
+            if (!chat.ChatUsers.Select(c => c.UserId).Contains(messageDto.SenderId))
+            {
+                throw new AuthException("Sender is not a member of the chat.");
             }
 
-            return new RequestResultBuilder()
-                .Ok()
-                .WithPayload(chats)
-                .Build();
+            var newMessage = mapper.Map<Message>(messageDto);
+            var createdMessage = await messageRepository.AddMessageAsync(newMessage, cancellationToken);
+
+            await messageRepository.SaveChangesAsync(cancellationToken);
+            
+            return mapper.Map<MessageDto>(createdMessage);
         }
     }
 }

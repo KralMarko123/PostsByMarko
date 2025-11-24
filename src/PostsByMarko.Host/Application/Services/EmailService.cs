@@ -1,6 +1,7 @@
 ﻿using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Interfaces;
 
 namespace PostsByMarko.Host.Application.Services
 {

@@ -41,6 +41,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<RegistrationPofile>();
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<PostProfile>();   
+    cfg.AddProfile<MessagingProfile>();
 });
 builder.Services.AddHttpContextAccessor();
 builder.WithAppServices();

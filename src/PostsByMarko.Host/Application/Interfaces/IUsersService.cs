@@ -4,10 +4,11 @@ using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 
-namespace PostsByMarko.Host.Application.Services
+namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IUsersService
     {
+        Task<User> GetCurrentUserAsync();
         Task CreateUserAsync(RegistrationDto userRegistration);
         Task<UserDto> GetUserByIdAsync(Guid id);
         Task<User> GetUserByEmailAsync(string email);

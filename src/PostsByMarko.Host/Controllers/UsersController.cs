@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
-using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Application.Interfaces;
 
 namespace PostsByMarko.Host.Controllers
 {

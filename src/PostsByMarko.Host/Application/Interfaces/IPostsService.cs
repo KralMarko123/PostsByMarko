@@ -1,7 +1,7 @@
 ﻿using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Requests;
 
-namespace PostsByMarko.Host.Application.Services
+namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IPostsService
     {

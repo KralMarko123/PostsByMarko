@@ -4,6 +4,7 @@ using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Enums;
 using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
@@ -26,6 +27,14 @@ namespace PostsByMarko.Host.Application.Services
             this.jwtHelper = jwtHelper;
             this.mapper = mapper;
             this.currentRequestAccessor = currentRequestAccessor;
+        }
+
+        public async Task<User> GetCurrentUserAsync()
+        {
+            var userId = Guid.Parse(currentRequestAccessor.Id);
+            var user = await usersRepository.GetUserByIdAsync(userId) ?? throw new KeyNotFoundException($"User with Id: '{userId}' was not found");
+
+            return user;
         }
 
         public async Task CreateUserAsync(RegistrationDto registrationDto)
@@ -83,7 +92,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<List<string>> GetRolesForEmailAsync(string email)
         {
-            var user = await usersRepository.GetUserByEmailAsync(email) ?? throw new KeyNotFoundException($"User with email: '{email}' was not found");
+            var user = await GetUserByEmailAsync(email);
             var roles = await usersRepository.GetRolesForUserAsync(user);
 
             return [.. roles];

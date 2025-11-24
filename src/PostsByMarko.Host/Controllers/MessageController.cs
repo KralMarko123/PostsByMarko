@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
-using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Application.Interfaces;
 
 namespace PostsByMarko.Host.Controllers
 {
     [ApiController]
-    [Route("api/message")]
+    [Route("api/messaging")]
     [Authorize]
     public class MessageController : ControllerBase
     {
@@ -18,27 +18,30 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("/getChats")]
-        public async Task<RequestResult> GetChatsAsync()
+        [Route("chats")]
+        public async Task<ActionResult<List<ChatDto>>> GetChats(CancellationToken cancellationToken = default)
         {
-            LoadRequestClaims();
-            return await messagingService.GetUserChatsAsync(user.Id);
+            var result = await messagingService.GetUserChatsAsync(cancellationToken);
+            
+            return Ok(result);
         }
 
         [HttpPost]
-        [Route("/startChat")]
-        public async Task<RequestResult> StartChatAsync([FromBody] string[] participantIds)
+        [Route("chats/{id::guid}")]
+        public async Task<ActionResult<ChatDto>> StartChat(Guid otherUserId, CancellationToken cancellationToken = default)
         {
-            LoadRequestClaims();
-            return await messagingService.StartChatAsync(participantIds);
+            var result = await messagingService.StartChatAsync(otherUserId, cancellationToken);
+
+            return Ok(result);
         }
 
         [HttpPost]
-        [Route("/sendMessage")]
-        public async Task<RequestResult> SendMessageAsync([FromBody] MessageDto messageDto)
+        [Route("send")]
+        public async Task<ActionResult<MessageDto>> SendMessageAsync([FromBody] MessageDto messageDto, CancellationToken cancellationToken = default)
         {
-            LoadRequestClaims();
-            return await messagingService.SendMessageAsync(messageDto);
+            var result = await messagingService.SendMessageAsync(messageDto, cancellationToken);
+            
+            return Ok(result);
         }
     }
 }
