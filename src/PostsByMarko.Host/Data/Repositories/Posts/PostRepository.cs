@@ -3,11 +3,11 @@ using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Data.Repositories.Posts
 {
-    public class PostsRepository : IPostsRepository
+    public class PostRepository : IPostRepository
     {
         private readonly AppDbContext appDbContext;
 
-        public PostsRepository(AppDbContext appDbContext)
+        public PostRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }

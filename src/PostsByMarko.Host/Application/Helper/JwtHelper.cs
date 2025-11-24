@@ -9,10 +9,10 @@ namespace PostsByMarko.Host.Application.Helper
 {
     public class JwtHelper : IJwtHelper
     {
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository usersRepository;
         private readonly IConfiguration configuration;
 
-        public JwtHelper(IUsersRepository usersRepository, IConfiguration configuration)
+        public JwtHelper(IUserRepository usersRepository, IConfiguration configuration)
         {
             this.usersRepository = usersRepository;
             this.configuration = configuration;

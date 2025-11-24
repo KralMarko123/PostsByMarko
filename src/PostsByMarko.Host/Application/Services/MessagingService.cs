@@ -11,10 +11,10 @@ namespace PostsByMarko.Host.Application.Services
     {
         private readonly IChatRepository chatRepository;
         private readonly IMessageRepository messageRepository;
-        private readonly IUsersService usersService;
+        private readonly IUserService usersService;
         private readonly IMapper mapper;
 
-        public MessagingService(IChatRepository chatRepository, IMessageRepository messageRepository, IUsersService usersService, IMapper mapper)
+        public MessagingService(IChatRepository chatRepository, IMessageRepository messageRepository, IUserService usersService, IMapper mapper)
         {
             this.chatRepository = chatRepository;
             this.messageRepository = messageRepository;
@@ -34,33 +34,30 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
         {
             var currentUser = await usersService.GetCurrentUserAsync();
+            var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
-            try
+            if(existingChat != null)
             {
-                var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
-
                 return mapper.Map<ChatDto>(existingChat);
             }
-            catch (KeyNotFoundException)
+
+            var newChat = new Chat
             {
-                var newChat = new Chat
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Messages = new List<Message>(),
+                ChatUsers = new List<ChatUser>
                 {
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    Messages = new List<Message>(),
-                    ChatUsers = new List<ChatUser>
-                    {
-                        new ChatUser { UserId = currentUser.Id },
-                        new ChatUser { UserId = otherUserId }
-                    }
-                };
+                    new ChatUser { UserId = currentUser.Id },
+                    new ChatUser { UserId = otherUserId }
+                }
+            };
 
-                var createdChat = await chatRepository.AddChatAsync(newChat, cancellationToken);
+            var createdChat = await chatRepository.AddChatAsync(newChat, cancellationToken);
 
-                await chatRepository.SaveChangesAsync(cancellationToken);
+            await chatRepository.SaveChangesAsync(cancellationToken);
 
-                return mapper.Map<ChatDto>(createdChat);
-            }
+            return mapper.Map<ChatDto>(createdChat);
         }
 
         public async Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default)

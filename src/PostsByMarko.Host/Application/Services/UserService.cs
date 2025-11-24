@@ -12,15 +12,15 @@ using PostsByMarko.Host.Data.Repositories.Users;
 
 namespace PostsByMarko.Host.Application.Services
 {
-    public class UsersService : IUsersService
+    public class UserService : IUserService
     {
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository usersRepository;
         private readonly IEmailService emailService;
         private readonly IJwtHelper jwtHelper;
         private readonly IMapper mapper;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
 
-        public UsersService(IUsersRepository usersRepository, IEmailService emailService, IJwtHelper jwtHelper, IMapper mapper, ICurrentRequestAccessor currentRequestAccessor)
+        public UserService(IUserRepository usersRepository, IEmailService emailService, IJwtHelper jwtHelper, IMapper mapper, ICurrentRequestAccessor currentRequestAccessor)
         {
             this.usersRepository = usersRepository;
             this.emailService = emailService;
@@ -48,7 +48,7 @@ namespace PostsByMarko.Host.Application.Services
             }
             else
             {
-                throw new AuthException("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                throw new ArgumentException("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
 

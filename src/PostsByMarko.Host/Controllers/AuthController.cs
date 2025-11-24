@@ -11,11 +11,11 @@ namespace PostsByMarko.Host.Controllers;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
-    private readonly IUsersService usersService;
+    private readonly IUserService usersService;
     private readonly IEmailService emailService;
     private readonly IConfiguration configuration;  
 
-    public AuthController(IUsersService usersService, IEmailService emailService, IConfiguration configuration)
+    public AuthController(IUserService usersService, IEmailService emailService, IConfiguration configuration)
     {
         this.usersService = usersService;
         this.emailService = emailService;
@@ -40,12 +40,11 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
-    [Route("confirmEmail")]
-    [AllowAnonymous]
-    public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
+    [HttpPost(Name = "ConfirmEmail")]
+    [Route("confirm")]
+    public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token )
     {
-        await emailService.ConfirmEmailAsync(confirmEmailDto);
+        await emailService.ConfirmEmailAsync(email, token);
         
         var jwtConfiguration = configuration.GetSection("Jwt");
         var urlToRedirectTo = $"{jwtConfiguration.GetSection("validAudiences").Get<List<string>>()!.FirstOrDefault()}/login";

@@ -11,9 +11,9 @@ namespace PostsByMarko.Host.Controllers
     [Authorize]
     public class PostsController : ControllerBase
     {
-        private readonly IPostsService postsService;
+        private readonly IPostService postsService;
 
-        public PostsController(IPostsService postsService)
+        public PostsController(IPostService postsService)
         {
             this.postsService = postsService;
         }

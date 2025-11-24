@@ -3,7 +3,7 @@ using PostsByMarko.Host.Application.Requests;
 
 namespace PostsByMarko.Host.Application.Interfaces
 {
-    public interface IPostsService
+    public interface IPostService
     {
         Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken);
         Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken);

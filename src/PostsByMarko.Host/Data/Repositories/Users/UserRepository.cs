@@ -5,12 +5,12 @@ using System.Security.Claims;
 
 namespace PostsByMarko.Host.Data.Repositories.Users
 {
-    public class UsersRepository : IUsersRepository
+    public class UserRepository : IUserRepository
     {
         private readonly AppDbContext appDbContext;
         private readonly UserManager<User> userManager;
 
-        public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager)
+        public UserRepository(AppDbContext appDbContext, UserManager<User> userManager)
         {
             this.appDbContext = appDbContext;
             this.userManager = userManager;

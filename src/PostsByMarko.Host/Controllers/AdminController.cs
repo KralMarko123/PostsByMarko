@@ -11,9 +11,9 @@ namespace PostsByMarko.Host.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly IUsersService usersService;
+        private readonly IUserService usersService;
 
-        public AdminController(IUsersService usersService)
+        public AdminController(IUserService usersService)
         {
             this.usersService = usersService;
         }

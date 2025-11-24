@@ -8,14 +8,14 @@ using PostsByMarko.Host.Data.Repositories.Posts;
 
 namespace PostsByMarko.Host.Application.Services
 {
-    public class PostsService : IPostsService
+    public class PostService : IPostService
     {
-        private readonly IPostsRepository postsRepository;
-        private readonly IUsersService usersService;
+        private readonly IPostRepository postsRepository;
+        private readonly IUserService usersService;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly IMapper mapper;
         
-        public PostsService(IPostsRepository postsRepository, IUsersService usersService,
+        public PostService(IPostRepository postsRepository, IUserService usersService,
             ICurrentRequestAccessor currentRequestAccessor, IMapper mapper)
         {
             this.postsRepository = postsRepository;

@@ -2,7 +2,7 @@
 
 namespace PostsByMarko.Host.Data.Repositories.Posts
 {
-    public interface IPostsRepository
+    public interface IPostRepository
     {
         Task<List<Post>> GetPostsAsync(CancellationToken cancellationToken);
         Task<Post?> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken);

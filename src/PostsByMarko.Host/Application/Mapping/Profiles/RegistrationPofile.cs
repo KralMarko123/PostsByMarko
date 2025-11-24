@@ -8,7 +8,7 @@ namespace PostsByMarko.Host.Application.Mapping.Profiles
     {
         public RegistrationPofile()
         {
-            CreateMap<RegistrationDto, User>()
+            CreateMap<RegistrationDto, User>(MemberList.None)
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))

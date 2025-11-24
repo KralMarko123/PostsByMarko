@@ -6,7 +6,7 @@ using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Application.Interfaces
 {
-    public interface IUsersService
+    public interface IUserService
     {
         Task<User> GetCurrentUserAsync();
         Task CreateUserAsync(RegistrationDto userRegistration);

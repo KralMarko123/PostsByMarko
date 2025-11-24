@@ -141,14 +141,14 @@ namespace PostsByMarko.Host.Extensions
         public static void WithAppServices(this WebApplicationBuilder builder)
         {
             // Repositories
-            builder.Services.AddScoped<IPostsRepository, PostsRepository>();
-            builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IChatRepository, ChatRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             // Services
-            builder.Services.AddScoped<IPostsService, PostsService>();
-            builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IMessagingService, MessagingService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ICurrentRequestAccessor, CurrentRequestAccessor>();

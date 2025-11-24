@@ -10,9 +10,9 @@ namespace PostsByMarko.Host.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly IUsersService usersService;
+        private readonly IUserService usersService;
 
-        public UsersController(IUsersService usersService)
+        public UsersController(IUserService usersService)
         {
             this.usersService = usersService;
         }
