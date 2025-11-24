@@ -1,209 +1,196 @@
-﻿using FluentAssertions;
+﻿using AutoMapper;
+using FluentAssertions;
 using Moq;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
-using PostsByMarko.Host.Data.Models;
-using PostsByMarko.Host.Data.Models.Dtos;
-using PostsByMarko.Host.Data.Repos.Messaging;
-using System.Net;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Messaging;
 
 namespace PostsByMarko.UnitTests
 {
     public class MessagingServiceTests
     {
-        private readonly MessagingService service;
-        private readonly Mock<IMessagingRepository> messagingRepositoryMock = new Mock<IMessagingRepository>();
+        private readonly MessagingService messagingService;
+        private readonly Mock<IChatRepository> chatRepositoryMock = new();
+        private readonly Mock<IMessageRepository> messageRepositoryMock = new();
+        private readonly Mock<IUserService> userServiceMock = new();
+        private readonly Mock<IMapper> mapperMock = new();
 
         public MessagingServiceTests()
         {
-            service = new MessagingService(messagingRepositoryMock.Object);
+            messagingService = new MessagingService(chatRepositoryMock.Object, messageRepositoryMock.Object, userServiceMock.Object, mapperMock.Object);
         }
 
         [Fact]
-        public async Task start_chat_should_return_a_new_chat_for_participants_if_no_previous_chat_existed()
+        public async Task get_user_chats_should_return_chats_of_user()
         {
             // Arrange
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-
-            messagingRepositoryMock.Setup(r => r.GetChatByParticipantIdsAsync(participantIds)).ReturnsAsync(() => null);
-            messagingRepositoryMock.Setup(r => r.CreateChatAsync(It.IsAny<Chat>())).ReturnsAsync(() => new Chat([ .. participantIds]));
-
-            // Act
-            var result = await service.StartChatAsync(participantIds);
-            var newChat = result.Payload as Chat;
-
-            // Assert
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            newChat.Should().NotBeNull();
-            newChat.ParticipantIds.Should().Equal(participantIds);
-            newChat.Messages.Should().BeEmpty();
-        }
-
-        [Fact]
-        public async Task start_chat_should_return_an_existing_chat_for_participants()
-        {
-            // Arrange
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var existingChat = new Chat([.. participantIds]);
-            var existingMessages = new List<Message>()
+            var user = new User { Id = Guid.NewGuid(), Email = "test@test.com" };
+            var chats = new List<Chat>
             {
-                new Message(existingChat.Id, firstParticipantId, "First"),
-                new Message(existingChat.Id, firstParticipantId, "First")
+                new Chat { Id = Guid.NewGuid() },
+                new Chat { Id = Guid.NewGuid() }
+            };
+            var chatDtos = new List<ChatDto>
+            {
+                new ChatDto { Id = chats[0].Id },
+                new ChatDto { Id = chats[1].Id }
             };
 
-            messagingRepositoryMock.Setup(r => r.GetChatByParticipantIdsAsync(participantIds)).ReturnsAsync(() => existingChat);
-            messagingRepositoryMock.Setup(r => r.GetChatMessagesAsync(existingChat)).ReturnsAsync(() => existingMessages);
+            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatsForUserAsync(user, It.IsAny<CancellationToken>())).ReturnsAsync(chats);
+            mapperMock.Setup(m => m.Map<List<ChatDto>>(chats)).Returns(chatDtos);
 
             // Act
-            var result = await service.StartChatAsync(participantIds);
-            var chat = result.Payload as Chat;
+            var result = await messagingService.GetUserChatsAsync(CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            chat.Should().NotBeNull();
-            chat.ParticipantIds.Should().Equal(participantIds);
-            chat.Messages.Should().BeEquivalentTo(existingMessages);
+            result.Should().BeEquivalentTo(chatDtos);
         }
 
         [Fact]
-        public async Task send_message_should_return_message_if_successfully_sent()
+        public async Task start_chat_should_return_existing_chat()
         {
             // Arrange
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var existingChat = new Chat([.. participantIds]);
-            var existingChatUpdatedAt = existingChat.UpdatedAt;
-            var messageDto = new MessageDto(existingChat.Id, firstParticipantId, "Test");
-            var expectedMessage = new Message(messageDto);
-            
+            var user = new User { Id = Guid.NewGuid() };
+            var otherUser = new User { Id = Guid.NewGuid() };
+            Guid[] userIds = [user.Id, otherUser.Id];
+            var existingChat = new Chat { Id = Guid.NewGuid() };
+            var chatDto = new ChatDto { Id = existingChat.Id };
 
-            messagingRepositoryMock.Setup(r => r.GetChatByIdAsync(messageDto.ChatId)).ReturnsAsync(() => existingChat);
-            messagingRepositoryMock.Setup(r => r.CreateMessageAsync(It.IsAny<Message>())).ReturnsAsync(() => expectedMessage);
-            messagingRepositoryMock.Setup(r => r.UpdateChatAsync(existingChat)).ReturnsAsync(() => true);
+            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatByUserIdsAsync(userIds, It.IsAny<CancellationToken>())).ReturnsAsync(existingChat);
+            mapperMock.Setup(m => m.Map<ChatDto>(existingChat)).Returns(chatDto);
 
             // Act
-            var result = await service.SendMessageAsync(messageDto);
-            var message = result.Payload as Message;
+            var result = await messagingService.StartChatAsync(otherUser.Id, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            message.Should().NotBeNull();
-            message.ChatId.Should().Be(existingChat.Id);
-            message.SenderId.Should().Be(firstParticipantId);
-            message.Content.Should().Be("Test");
-
-            existingChat.Messages.Should().NotBeNull();
-            existingChat.Messages.Should().Contain(message);
-            existingChat.UpdatedAt.Should().BeAfter(existingChatUpdatedAt);
+            result.Should().BeEquivalentTo(chatDto);
         }
 
         [Fact]
-        public async Task send_message_should_return_not_found_if_chat_does_not_exist()
+        public async Task start_chat_should_create_a_new_chat()
         {
             // Arrange
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var messageDto = new MessageDto(1, firstParticipantId, "Test");
+            var user = new User { Id = Guid.NewGuid() };
+            var otherUser = new User { Id = Guid.NewGuid() };
+            Guid[] userIds = [user.Id, otherUser.Id];
+            var newChat = new Chat
+            {
+                Id = Guid.NewGuid(),    
+                ChatUsers = new List<ChatUser>
+                {
+                    new ChatUser { UserId = user.Id },
+                    new ChatUser { UserId = otherUser.Id }
+                }
+            };
+            var chatDto = new ChatDto
+            { 
+                Id = newChat.Id, Users = new List<UserDto>
+                {
+                    new UserDto { Id = user.Id },
+                    new UserDto { Id = otherUser.Id }
+                }
+            };
 
-            messagingRepositoryMock.Setup(r => r.GetChatByIdAsync(messageDto.ChatId)).ReturnsAsync(() => null);
-            
+            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.AddChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
+            mapperMock.Setup(m => m.Map<ChatDto>(newChat)).Returns(chatDto);
+
             // Act
-            var result = await service.SendMessageAsync(messageDto);
+            var result = await messagingService.StartChatAsync(otherUser.Id, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-            result.Message.Should().Be($"Chat with Id: {messageDto.ChatId} was not found");
-            result.Payload.Should().BeNull();
+            result.Should().BeEquivalentTo(chatDto);
+            chatRepositoryMock.Verify(cr => cr.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
-        public async Task send_message_should_return_forbidden_if_sender_is_not_a_participant()
+        public async Task send_message_should_create_and_return_message()
         {
             // Arrange
-            var forbiddenParticipantId = Guid.NewGuid().ToString();
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var existingChat = new Chat([.. participantIds]);
-            var messageDto = new MessageDto(existingChat.Id, forbiddenParticipantId, "Test");
+            var user = new UserDto { Id = Guid.NewGuid() };
+            var chat = new Chat
+            {
+                Id = Guid.NewGuid(),
+                ChatUsers = new List<ChatUser>
+                {
+                    new ChatUser { UserId = user.Id }
+                }
+            };
+            var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = user.Id };
+            var messageDto = new MessageDto
+            {
+                Id = message.Id,
+                SenderId = message.SenderId,
+                ChatId = message.ChatId,
+            };
 
-            messagingRepositoryMock.Setup(r => r.GetChatByIdAsync(messageDto.ChatId)).ReturnsAsync(() => existingChat);
+            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
+            messageRepositoryMock.Setup(mr => mr.AddMessageAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>())).ReturnsAsync(message);
+            mapperMock.Setup(m => m.Map<Message>(messageDto)).Returns(message);
+            mapperMock.Setup(m => m.Map<MessageDto>(message)).Returns(messageDto);
 
             // Act
-            var result = await service.SendMessageAsync(messageDto);
+            var result = await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            result.Message.Should().Be("You are not a participant of this chat");
-            result.Payload.Should().BeNull();
+            result.Should().BeEquivalentTo(messageDto);
+            messageRepositoryMock.Verify(mr => mr.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
-        public async Task send_message_should_return_bad_request_if_chat_does_not_update()
+        public async Task send_message_should_throw_if_chat_does_not_exist()
         {
             // Arrange
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var existingChat = new Chat([.. participantIds]);
-            var messageDto = new MessageDto(existingChat.Id, firstParticipantId, "Test");
-            var expectedMessage = new Message(messageDto);
+            var user = new UserDto { Id = Guid.NewGuid() };
+            var message = new Message { Id = Guid.NewGuid(), ChatId = Guid.NewGuid(), SenderId = user.Id };
+            var messageDto = new MessageDto
+            {
+                Id = message.Id,
+                SenderId = message.SenderId,
+                ChatId = message.ChatId,
+            };
 
-            messagingRepositoryMock.Setup(r => r.GetChatByIdAsync(messageDto.ChatId)).ReturnsAsync(() => existingChat);
-            messagingRepositoryMock.Setup(r => r.CreateMessageAsync(It.IsAny<Message>())).ReturnsAsync(() => expectedMessage);
-            messagingRepositoryMock.Setup(r => r.UpdateChatAsync(existingChat)).ReturnsAsync(() => false);
+            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
 
             // Act
-            var result = await service.SendMessageAsync(messageDto);
+            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
 
             // Assert
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            result.Message.Should().Be("Error during chat update");
-            result.Payload.Should().BeNull();
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"Chat with Id: {messageDto.ChatId} was not found");
         }
 
         [Fact]
-        public async Task get_user_chats_should_return_chats_with_loaded_messages_for_a_user()
+        public async Task send_message_should_throw_if_chat_does_not_container_sender_id()
         {
             // Arrange
-            var userId = Guid.NewGuid().ToString();
-            var firstParticipantId = Guid.NewGuid().ToString();
-            var secondParticipantId = Guid.NewGuid().ToString();
-            var participantIds = new string[] { firstParticipantId, secondParticipantId };
-            var existingChats = new List<Chat>() { new Chat([userId, firstParticipantId]), new Chat([userId, secondParticipantId]) };
-            var expectedMessages = new List<Message>() { new Message(existingChats[0].Id, userId, "Test"), new Message(existingChats[1].Id, userId, "Test") };
-       
+            var user = new UserDto { Id = Guid.NewGuid() };
+            var chat = new Chat { Id = Guid.NewGuid() };
+            var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = user.Id };
+            var messageDto = new MessageDto
+            {
+                Id = message.Id,
+                SenderId = message.SenderId,
+                ChatId = message.ChatId,
+            };
 
-            messagingRepositoryMock.Setup(r => r.GetUserChatsAsync(userId)).ReturnsAsync(() => existingChats);
-            messagingRepositoryMock.Setup(r => r.GetChatMessagesAsync(It.IsAny<Chat>())).ReturnsAsync(() => expectedMessages);
+            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
 
             // Act
-            var result = await service.GetUserChatsAsync(userId);
-            var chats = result.Payload as List<Chat>;
+            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
 
             // Assert
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            chats.Should().NotBeNull();
-            chats.Count.Should().Be(existingChats.Count);
-            chats.Select(c => c.Id).Should().BeEquivalentTo(existingChats.Select(c => c.Id));
-            chats[0].Messages.Should().BeEquivalentTo(expectedMessages);
-            chats[1].Messages.Should().BeEquivalentTo(expectedMessages);
+            await result.Should().ThrowAsync<AuthException>().WithMessage("Sender is not a member of the chat.");
         }
     }
 }
