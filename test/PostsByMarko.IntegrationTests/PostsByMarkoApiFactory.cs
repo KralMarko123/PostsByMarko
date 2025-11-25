@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
@@ -16,15 +19,18 @@ namespace PostsByMarko.IntegrationTests
 {
     public class PostsByMarkoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        public HttpClient? client;
-
-        public User testAdmin = TestingConstants.TEST_ADMIN;
-
+        public HttpClient? authenticatedClient;
+        public HttpClient? unauthenticatedClient;
+        public UserManager<User>? userManager;
+        public IMapper mapper;
         public async Task InitializeAsync()
         {
-            client = CreateClient();
+            unauthenticatedClient = CreateClient( new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+            authenticatedClient = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+            userManager = Services.GetRequiredService<UserManager<User>>();
+            mapper = Services.GetRequiredService<IMapper>();
 
-            await ConfigureClientAuthentication();
+            await ConfigureAuthenticatedClient();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -40,12 +46,13 @@ namespace PostsByMarko.IntegrationTests
 
         public new Task DisposeAsync()
         {
-            client?.Dispose();
+            unauthenticatedClient?.Dispose();
+            authenticatedClient?.Dispose();
 
             return Task.CompletedTask;
         }
 
-        private async Task ConfigureClientAuthentication()
+        private async Task ConfigureAuthenticatedClient()
         {
             const int maxRetries = 5;
 
@@ -53,14 +60,14 @@ namespace PostsByMarko.IntegrationTests
             {
                 try
                 {
-                    var result = await client!.PostAsJsonAsync("api/auth/login", new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
+                    var result = await authenticatedClient!.PostAsJsonAsync("api/auth/login", new LoginDto { Email = TestingConstants.TEST_ADMIN.Email, Password = TestingConstants.TEST_PASSWORD });
 
                     if (result.IsSuccessStatusCode)
                     {
                         var response = await result.Content.ReadFromJsonAsync<LoginResponse>();
                         var token = response!.Token;
-                        
-                        client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                        authenticatedClient!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
                         
                         return;
                     }

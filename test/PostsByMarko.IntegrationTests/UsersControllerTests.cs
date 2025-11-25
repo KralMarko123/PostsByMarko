@@ -1,213 +1,99 @@
-//using FluentAssertions;
-//using Newtonsoft.Json;
-//using PostsByMarko.Host.Application.Responses;
-//using PostsByMarko.Host.Data.Entities;
-//using PostsByMarko.Test.Shared.Constants;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Net;
-//using System.Net.Http;
-//using System.Net.Http.Json;
-//using System.Threading.Tasks;
-//using Xunit;
+using AutoMapper;
+using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Test.Shared.Constants;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
 
-//namespace PostsByMarko.IntegrationTests
-//{
-//    [Collection("Integration Collection")]
-//    public class UsersControllerTests
-//    {
-//        private readonly HttpClient client;
-//        private readonly User testUser = TestingConstants.TEST_USER;
-//        private readonly User randomUser = TestingConstants.RANDOM_USER;
+namespace PostsByMarko.IntegrationTests
+{
+    [Collection("Integration Collection")]
+    public class UsersControllerTests
+    {
+        private readonly HttpClient client;
+        private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly User randomUser = TestingConstants.RANDOM_USER;
+        private readonly string controllerPrefix = "/api/user";
+        private readonly IMapper mapper;
+        private readonly UserManager<User> userManager;
 
-//        public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
-//        {
-//            client = postsByMarkoApiFactory.client!;
-//        }
+        public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        {
+            client = postsByMarkoApiFactory.authenticatedClient!;
+            mapper = postsByMarkoApiFactory.mapper!;
+            userManager = postsByMarkoApiFactory.userManager!;
+        }
 
-//        [Fact]
-//        public async Task should_return_a_list_of_all_users()
-//        {
-//            // Arrange
+        [Fact]
+        public async Task should_return_all_users()
+        {
+            // Arrange
+            var allUsers = await userManager.Users.ToListAsync();
+            var userDtos = mapper.Map<List<UserDto>>(allUsers);
 
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>("/getAllUsers");
-//            var users = JsonConvert.DeserializeObject<List<User>>(response!.Payload!.ToString()!);
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/all");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var users = JsonConvert.DeserializeObject<List<UserDto>>(responseContent);
 
-//            // Assert
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//            users.Should().NotBeNullOrEmpty();
-//            users.Select(u => u.Email).Should().Contain(testUser.Email);
-//        }
+            users.Should().NotBeNullOrEmpty();
+            users.Count.Should().Be(userDtos.Count);
 
-//        [Fact]
-//        public async Task should_return_a_list_of_other_users()
-//        {
-//            // Arrange
+            foreach (var userDto in userDtos)
+            {
+                users.Should().ContainEquivalentOf(userDto);
+            }
+        }
 
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>("/getOtherUsers");
-//            var users = JsonConvert.DeserializeObject<List<AuthorDetailsResponse>>(response!.Payload!.ToString()!);
+        [Fact]
+        public async Task should_return_filtered_users()
+        {
+            // Arrange
+            var allUsers = await userManager.Users.ToListAsync();
+            var userDtos = mapper.Map<List<UserDto>>(allUsers);
+            var filteredUserDto = userDtos.First(u => u.Id == testUser.Id);
 
-//            // Assert
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/all?exceptId={testUser.Id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var filteredUsers = JsonConvert.DeserializeObject<List<UserDto>>(responseContent);
 
-//            users.Should().NotBeNullOrEmpty();
-//            users.Should().NotContain(new AuthorDetailsResponse(testUser));
-//        }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//        [Fact]
-//        public async Task should_return_a_user()
-//        {
-//            // Arrange
+            filteredUsers.Should().NotBeNullOrEmpty();
+            filteredUsers.Count.Should().Be(userDtos.Count - 1);
+            filteredUsers.Should().NotContainEquivalentOf(filteredUserDto);
+        }
 
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getUser/{testUser.Id}");
-//            var user = JsonConvert.DeserializeObject<User>(response!.Payload!.ToString()!);
 
-//            // Assert
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        [Fact]
+        public async Task should_return_user()
+        {
+            // Arrange
+            var userToReturn = mapper.Map<UserDto>(testUser);
 
-//            user.Should().NotBeNull();
-//            user.Id.Should().Be(testUser.Id);
-//        }
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/{testUser.Id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var user = JsonConvert.DeserializeObject<UserDto>(responseContent);
 
-//        [Fact]
-//        public async Task should_return_not_found_if_a_user_does_not_exist()
-//        {
-//            // Arrange
-//            var randomId = Guid.NewGuid().ToString();
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getUser/{randomId}");
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-//            response.Message.Should().Be($"User with Id: {randomId} was not found");
-//            response.Payload.Should().BeNull();
-//        }
-
-//        [Fact]
-//        public async Task should_return_list_of_roles_for_a_given_email()
-//        {
-//            // Arrange
-
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getEmailRoles/{testUser.Email}");
-//            var roles = JsonConvert.DeserializeObject<List<string>>(response!.Payload!.ToString()!);
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-//            roles.Should().Contain(["User"]);
-//        }
-
-//        [Fact]
-//        public async Task should_return_an_appropriate_message_if_no_roles_exist_for_an_email()
-//        {
-//            // Arrange
-//            var randomEmail = "random@random.com";
-
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getEmailRoles/{randomEmail}");
-//            var roles = JsonConvert.DeserializeObject<List<string>>(response!.Payload!.ToString()!);
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
-//            response.Message.Should().Be("Email has no roles associated with it");
-
-//            roles.Should().BeEmpty();
-//        }
-
-//        [Fact]
-//        public async Task should_return_admin_dashboard_data()
-//        {
-//            // Arrange
-
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getAdminDashboard");
-//            var data = JsonConvert.DeserializeObject<List<AdminDashboardResponse>>(response!.Payload!.ToString()!);
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-//            data.Should().NotBeNullOrEmpty();
-//        }
-
-//        [Fact]
-//        public async Task should_delete_a_user()
-//        {
-//            // Arrange
-
-//            // Act
-//            var response = await client.DeleteFromJsonAsync<RequestResult>($"/deleteUser/{randomUser.Id}");
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
-//            response.Message.Should().Be($"User with Id: {randomUser.Id} removed successfully");
-//        }
-
-//        [Fact]
-//        public async Task should_return_not_found_when_deleting_an_unknown_user()
-//        {
-//            // Arrange
-//            var randomId = Guid.NewGuid().ToString();
-
-//            // Act
-//            var response = await client.DeleteFromJsonAsync<RequestResult>($"/deleteUser/{randomId}");
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-//            response.Message.Should().Be($"User with Id: {randomId} was not found");
-//        }
-
-//        [Fact]
-//        public async Task should_add_a_role_to_a_user()
-//        {
-//            // Arrange
-
-//            // Act
-//            var response = await client.PostAsync($"/addRoleToUser/{testUser.Id}/Admin", null);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-
-//            var rolesResponse = await client.GetFromJsonAsync<RequestResult>($"/getEmailRoles/{testUser.Email}");
-//            var roles = JsonConvert.DeserializeObject<List<string>>(rolesResponse!.Payload!.ToString()!);
-
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-//            requestResult.Message.Should().Be("Role successfully added to user");
-
-//            roles.Should().Contain("Admin");
-//        }
-
-//        [Fact]
-//        public async Task should_remove_a_role_from_a_user()
-//        {
-//            // Arrange
-
-//            // Act
-//            var response = await client.PostAsync($"/removeRoleFromUser/{testUser.Id}/USER", null);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-
-//            var rolesResponse = await client.GetFromJsonAsync<RequestResult>($"/getEmailRoles/{testUser.Email}");
-//            var roles = JsonConvert.DeserializeObject<List<string>>(rolesResponse!.Payload!.ToString()!);
-
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-//            requestResult.Message.Should().Be("Role successfully removed from user");
-
-//            roles.Should().NotContain("USER");
-//            roles.Should().BeEmpty();
-//        }
-//    }
-//}
+            user.Should().NotBeNull();
+            user.Should().BeEquivalentTo(userToReturn);
+        }
+    }
+}

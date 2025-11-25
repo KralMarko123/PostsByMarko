@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
@@ -16,11 +17,15 @@ namespace PostsByMarko.IntegrationTests
     public class AuthControllerTests
     {
         private readonly HttpClient client;
+        private readonly UserManager<User> userManager;
         private readonly User testAdmin = TestingConstants.TEST_ADMIN;
+        private readonly User unconfirmedUser = TestingConstants.RANDOM_USER;
+        private readonly string controllerPrefix = "api/auth";
 
         public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.client!;
+            client = postsByMarkoApiFactory.unauthenticatedClient!;
+            userManager = postsByMarkoApiFactory.userManager!;
         }
 
         [Fact]
@@ -30,7 +35,7 @@ namespace PostsByMarko.IntegrationTests
             var registrationDto = new RegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
 
             // Act
-            var response = await client.PostAsJsonAsync("api/auth/register", registrationDto);
+            var response = await client.PostAsJsonAsync($"{controllerPrefix}/register", registrationDto);
             var responseContent = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -45,7 +50,7 @@ namespace PostsByMarko.IntegrationTests
             var loginDto = new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD };
 
             // Act
-            var response = await client.PostAsJsonAsync("/login", loginDto);
+            var response = await client.PostAsJsonAsync($"{controllerPrefix}/login", loginDto);
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<LoginResponse>(content);
             
@@ -57,22 +62,23 @@ namespace PostsByMarko.IntegrationTests
             result.Email.Should().Be(testAdmin.Email);
             result.FirstName.Should().Be(testAdmin.FirstName);
             result.LastName.Should().Be(testAdmin.LastName);
+            result.Roles.Should().Contain("Admin");
         }
 
         [Fact]
         public async Task should_confirm_email()
         {
             // Arrange
-            var email = testAdmin.Email;
-            var token = "some_token";
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(unconfirmedUser);
+            token = WebUtility.UrlEncode(token);
 
             // Act
-            var response = await client.PostAsync($"/confirm?email={email}&token={token}", default);
-            var content = await response.Content.ReadAsStringAsync();
+            var response = await client.PostAsync($"{controllerPrefix}/confirm?email={unconfirmedUser.Email}&token={token}", null);
+            var redirect = response.Headers.Location!.ToString();
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-            content.Should().Be("http://localhost:3000");
+            redirect.Should().Be("http://localhost:3000/login");
         }
     }
 }
