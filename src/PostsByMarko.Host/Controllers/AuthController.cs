@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost(Name = "ConfirmEmail")]
+    [HttpPost]
     [Route("confirm")]
     public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token )
     {

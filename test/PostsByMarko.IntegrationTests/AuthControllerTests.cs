@@ -58,5 +58,21 @@ namespace PostsByMarko.IntegrationTests
             result.FirstName.Should().Be(testAdmin.FirstName);
             result.LastName.Should().Be(testAdmin.LastName);
         }
+
+        [Fact]
+        public async Task should_confirm_email()
+        {
+            // Arrange
+            var email = testAdmin.Email;
+            var token = "some_token";
+
+            // Act
+            var response = await client.PostAsync($"/confirm?email={email}&token={token}", default);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+            content.Should().Be("http://localhost:3000");
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("roles/{email::string}")]
+        [Route("roles/{email}")]
         public async Task<ActionResult<List<string>>> GetRolesForEmail(string email)
         {
             var roles = await usersService.GetRolesForEmailAsync(email);
