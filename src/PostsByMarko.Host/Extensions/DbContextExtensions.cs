@@ -12,25 +12,26 @@ namespace PostsByMarko.Host.Extensions
         public static async Task Seed(this AppDbContext appDbContext)
         {
             var passwordHasher = new PasswordHasher<User>();
-            var appRoles = AppConstants.APP_ROLES;
-            var admins = AppConstants.ADMINS;
-            var users = AppConstants.USERS;
+            var appRoles = AppConstants.appRoles;
+            var admins = AppConstants.admins;
+            var users = AppConstants.appUsers;
             var allUsers = admins.Concat(users);
 
             // seed roles
-            appDbContext.Roles.AddRange(appRoles);
+            await appDbContext.Roles.AddRangeAsync(appRoles);
 
             // seed users
-            appDbContext.Users.AddRange(allUsers);
+            await appDbContext.Users.AddRangeAsync(allUsers);
 
             // set password hashes
             foreach (var user in allUsers)
             {
+                user.Id = Guid.NewGuid();
                 user.PasswordHash = passwordHasher.HashPassword(user, "@Marko123");
             }
 
             // seed userRoles
-            List<IdentityUserRole<Guid>> userRoles = new();
+            List<IdentityUserRole<Guid>> userRoles = [];
 
             foreach (var user in allUsers)
             {
@@ -42,17 +43,19 @@ namespace PostsByMarko.Host.Extensions
                 userRoles.Add(new IdentityUserRole<Guid> {UserId = user.Id, RoleId = appRoles[1].Id });
             }
 
-            appDbContext.UserRoles.AddRange(userRoles);
+            await appDbContext.UserRoles.AddRangeAsync(userRoles);
+            await appDbContext.SaveChangesAsync();
 
             // generate random data for local development & tests
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
             if (environment == "Development" || environment == "Test")
             {
-                GenerateRandomData(appDbContext, passwordHasher, 5);
+                await GenerateRandomData(appDbContext, passwordHasher, 5);
             }
         }
 
-        public static void GenerateRandomData(AppDbContext appDbContext, PasswordHasher<User> hasher, int numberOfUsers)
+        public static async Task GenerateRandomData(AppDbContext appDbContext, PasswordHasher<User> hasher, int numberOfUsers)
         {
             var halfOfMonthHasGoneBy = DateTime.UtcNow.Day >= 15;
 
@@ -82,18 +85,25 @@ namespace PostsByMarko.Host.Extensions
 
             fakeUsers.ForEach(u =>
             {
+                u.Id = Guid.NewGuid();
                 u.PasswordHash = hasher.HashPassword(u, "@Marko123");
-                userRoles.Add(new IdentityUserRole<Guid> { UserId = u.Id, RoleId = AppConstants.APP_ROLES[1].Id });
+                userRoles.Add(new IdentityUserRole<Guid> { UserId = u.Id, RoleId = AppConstants.appRoles[1].Id });
 
                 var postsToAdd = postFaker.Generate(new Random().Next(1, 3));
 
-                postsToAdd.ForEach(p => p.AuthorId = u.Id);
+                postsToAdd.ForEach(p =>
+                {
+                    p.Author = u;
+                    p.AuthorId = u.Id;
+                });
+                u.Posts = postsToAdd;
                 fakePosts.AddRange(postsToAdd);
             });
 
-            appDbContext.Users.AddRange(fakeUsers);
-            appDbContext.UserRoles.AddRange(userRoles);
-            appDbContext.Posts.AddRange(fakePosts);
+            await appDbContext.Users.AddRangeAsync(fakeUsers);
+            await appDbContext.UserRoles.AddRangeAsync(userRoles);
+            await appDbContext.Posts.AddRangeAsync(fakePosts);
+            await appDbContext.SaveChangesAsync();
         }
     }
 }

@@ -46,8 +46,9 @@ public class AuthController : ControllerBase
     {
         await emailService.ConfirmEmailAsync(email, token);
         
-        var jwtConfiguration = configuration.GetSection("Jwt");
-        var urlToRedirectTo = $"{jwtConfiguration.GetSection("validAudiences").Get<List<string>>()!.FirstOrDefault()}/login";
+        var jwtConfiguration = configuration.GetSection("JwtConfig");
+        var audiences = jwtConfiguration.GetSection("validAudiences").Get<List<string>>();
+        var urlToRedirectTo = $"{audiences[0]}/login";
 
         return Redirect(urlToRedirectTo);
     }

@@ -24,10 +24,7 @@ namespace PostsByMarko.Host.Extensions
                 appDbContext.Database.EnsureDeleted();
                 appDbContext.Database.EnsureCreated();
 
-                if (app.Environment.IsDevelopment())
-                {
-                    await appDbContext.Seed();
-                }
+                await appDbContext.Seed();
             }
         }
     }

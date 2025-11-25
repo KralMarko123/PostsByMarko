@@ -15,35 +15,5 @@ namespace PostsByMarko.Host.Data.Entities
         public ICollection<Message> Messages { get; set; } = new List<Message>();
 
         public User() { }
-
-        public User(string email)
-        {
-            Email = email;
-            NormalizedEmail = email.ToUpper();
-            UserName = email;
-            NormalizedUserName = email.ToUpper();
-        }
-
-        public User(string email, string firstName, string lastName)
-        {
-            Email = email;
-            NormalizedEmail = email.ToUpper();
-            UserName = email;
-            NormalizedUserName = email.ToUpper();
-            FirstName = firstName;
-            LastName = lastName;
-            EmailConfirmed = false;
-        }
-
-        public User(string email, string firstName, string lastName, bool emailConfirmed)
-        {
-            Email = email;
-            NormalizedEmail = email.ToUpper();
-            UserName = email;
-            NormalizedUserName = email.ToUpper();
-            FirstName = firstName;
-            LastName = lastName;
-            EmailConfirmed = emailConfirmed;
-        }
     }
 }
