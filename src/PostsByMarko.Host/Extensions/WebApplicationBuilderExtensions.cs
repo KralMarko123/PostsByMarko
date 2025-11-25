@@ -36,7 +36,7 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithIdentity(this WebApplicationBuilder builder)
         {
-            builder.Services.AddIdentity<User, Role>(user =>
+            builder.Services.AddIdentity<User, IdentityRole<Guid>>(user =>
             {
                 user.Password.RequiredLength = 6;
                 user.Password.RequireDigit = true;
@@ -147,8 +147,8 @@ namespace PostsByMarko.Host.Extensions
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             // Services
-            builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IMessagingService, MessagingService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ICurrentRequestAccessor, CurrentRequestAccessor>();

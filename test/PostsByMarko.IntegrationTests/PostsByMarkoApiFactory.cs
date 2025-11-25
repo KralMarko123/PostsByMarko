@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
+using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
-using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Test.Shared.Constants;
 using System;
 using System.Net.Http;
@@ -15,7 +14,7 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    public class PostsByMarkoApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
+    public class PostsByMarkoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         public HttpClient? client;
 
@@ -24,6 +23,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task InitializeAsync()
         {
             client = CreateClient();
+
             await ConfigureClientAuthentication();
         }
 
@@ -53,19 +53,16 @@ namespace PostsByMarko.IntegrationTests
             {
                 try
                 {
-                    var result = await client!.PostAsJsonAsync("/login", new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
+                    var result = await client!.PostAsJsonAsync("api/auth/login", new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD });
 
                     if (result.IsSuccessStatusCode)
                     {
-                        var requestResult = await result.Content.ReadFromJsonAsync<RequestResult>();
-
-                        if (requestResult?.Payload != null)
-                        {
-                            var payload = JsonConvert.DeserializeObject<LoginResponse>(requestResult.Payload.ToString()!);
-                            var token = payload!.Token;
-                            client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                            return;
-                        }
+                        var response = await result.Content.ReadFromJsonAsync<LoginResponse>();
+                        var token = response!.Token;
+                        
+                        client!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                        
+                        return;
                     }
                 }
                 catch { /* ignore and retry */ }

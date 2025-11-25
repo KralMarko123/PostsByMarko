@@ -62,7 +62,8 @@ var app = builder.Build();
 if (isInLocalDevelopment || isInTest.GetValueOrDefault(false))
 {
     app.WithSwaggerEnabled();
-    app.WithDatabaseReset();
+    
+    await app.WithDatabaseReset();
 }
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
@@ -85,4 +86,3 @@ if (isInLocalDevelopment) Console.WriteLine("App is running locally!");
 app.Run();
 
 public partial class Program { }
-public interface IApiMarker { }

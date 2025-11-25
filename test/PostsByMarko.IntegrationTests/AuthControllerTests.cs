@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Newtonsoft.Json;
+using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
-using PostsByMarko.Host.Data.Models.Dtos;
 using PostsByMarko.Test.Shared.Constants;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +16,6 @@ namespace PostsByMarko.IntegrationTests
     public class AuthControllerTests
     {
         private readonly HttpClient client;
-        private readonly User testUser = TestingConstants.TEST_USER;
         private readonly User testAdmin = TestingConstants.TEST_ADMIN;
 
         public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
@@ -31,12 +30,12 @@ namespace PostsByMarko.IntegrationTests
             var registrationDto = new RegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
 
             // Act
-            var response = await client.PostAsJsonAsync("/register", registrationDto);
-            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
+            var response = await client.PostAsJsonAsync("api/auth/register", registrationDto);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
             // Assert
-            requestResult!.StatusCode.Should().Be(HttpStatusCode.Created);
-            requestResult!.Message.Should().Be("Successfully Registered");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            responseContent.Should().Be("Successfully registered, please check your email and confirm your account before logging in");
         }
 
         [Fact]
@@ -47,18 +46,17 @@ namespace PostsByMarko.IntegrationTests
 
             // Act
             var response = await client.PostAsJsonAsync("/login", loginDto);
-            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-            var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(requestResult.Payload.ToString()!);
-
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<LoginResponse>(content);
+            
             // Assert
-            requestResult.Should().NotBeNull();
-            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-            requestResult.Message.Should().Be("Successfully Logged In");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            loginResponse.Should().NotBeNull();
-            loginResponse.Email.Should().Be(testAdmin.Email);
-            loginResponse.Token.Should().NotBeNullOrEmpty();
-            loginResponse.Roles.Should().Contain("User", "Admin");
+            result!.Token.Should().NotBeNullOrEmpty();
+            result.Id.Should().Be(testAdmin.Id);
+            result.Email.Should().Be(testAdmin.Email);
+            result.FirstName.Should().Be(testAdmin.FirstName);
+            result.LastName.Should().Be(testAdmin.LastName);
         }
     }
 }
