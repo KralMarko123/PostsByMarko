@@ -7,6 +7,7 @@ using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
+using PostsByMarko.Host.Data.Repositories.Users;
 
 namespace PostsByMarko.UnitTests
 {
@@ -15,12 +16,14 @@ namespace PostsByMarko.UnitTests
         private readonly MessagingService messagingService;
         private readonly Mock<IChatRepository> chatRepositoryMock = new();
         private readonly Mock<IMessageRepository> messageRepositoryMock = new();
-        private readonly Mock<IUserService> userServiceMock = new();
+        private readonly Mock<IUserRepository> userRepositoryMock = new();
+        private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
         private readonly Mock<IMapper> mapperMock = new();
 
         public MessagingServiceTests()
         {
-            messagingService = new MessagingService(chatRepositoryMock.Object, messageRepositoryMock.Object, userServiceMock.Object, mapperMock.Object);
+            messagingService = new MessagingService(chatRepositoryMock.Object, messageRepositoryMock.Object,
+                userRepositoryMock.Object, currentRequestAccessorMock.Object, mapperMock.Object);
         }
 
         [Fact]
@@ -39,7 +42,8 @@ namespace PostsByMarko.UnitTests
                 new ChatDto { Id = chats[1].Id }
             };
 
-            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
             chatRepositoryMock.Setup(cr => cr.GetChatsForUserAsync(user, It.IsAny<CancellationToken>())).ReturnsAsync(chats);
             mapperMock.Setup(m => m.Map<List<ChatDto>>(chats)).Returns(chatDtos);
 
@@ -52,6 +56,21 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task get_user_chats_should_throw_if_user_was_not_found()
+        {
+            // Arrange
+            var randomId = Guid.NewGuid();
+
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(randomId.ToString());
+
+            // Act
+            var result = async () => await messagingService.GetUserChatsAsync(CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
+        }
+
+        [Fact]
         public async Task start_chat_should_return_existing_chat()
         {
             // Arrange
@@ -61,7 +80,8 @@ namespace PostsByMarko.UnitTests
             var existingChat = new Chat { Id = Guid.NewGuid() };
             var chatDto = new ChatDto { Id = existingChat.Id };
 
-            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
             chatRepositoryMock.Setup(cr => cr.GetChatByUserIdsAsync(userIds, It.IsAny<CancellationToken>())).ReturnsAsync(existingChat);
             mapperMock.Setup(m => m.Map<ChatDto>(existingChat)).Returns(chatDto);
 
@@ -98,7 +118,8 @@ namespace PostsByMarko.UnitTests
                 }
             };
 
-            userServiceMock.Setup(us => us.GetCurrentUserAsync()).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user); 
             chatRepositoryMock.Setup(cr => cr.AddChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
             mapperMock.Setup(m => m.Map<ChatDto>(newChat)).Returns(chatDto);
 
@@ -112,10 +133,25 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task start_chat_should_throw_if_user_was_not_found()
+        {
+            // Arrange
+            var randomId = Guid.NewGuid();
+
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(randomId.ToString());
+
+            // Act
+            var result = async () => await messagingService.StartChatAsync(randomId, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
+        }
+
+        [Fact]
         public async Task send_message_should_create_and_return_message()
         {
             // Arrange
-            var user = new UserDto { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid() };
             var chat = new Chat
             {
                 Id = Guid.NewGuid(),
@@ -132,7 +168,7 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
             chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
             messageRepositoryMock.Setup(mr => mr.AddMessageAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>())).ReturnsAsync(message);
             mapperMock.Setup(m => m.Map<Message>(messageDto)).Returns(message);
@@ -148,10 +184,30 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task send_message_should_throw_if_user_does_not_exist()
+        {
+            // Arrange
+            var message = new Message { Id = Guid.NewGuid(), ChatId = Guid.NewGuid(), SenderId = Guid.NewGuid() };
+            var messageDto = new MessageDto
+            {
+                Id = message.Id,
+                SenderId = message.SenderId,
+                ChatId = message.ChatId,
+            };
+
+
+            // Act
+            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"Sender with Id: {messageDto.SenderId} was not found");
+        }
+
+        [Fact]
         public async Task send_message_should_throw_if_chat_does_not_exist()
         {
             // Arrange
-            var user = new UserDto { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid() };
             var message = new Message { Id = Guid.NewGuid(), ChatId = Guid.NewGuid(), SenderId = user.Id };
             var messageDto = new MessageDto
             {
@@ -160,7 +216,7 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
 
             // Act
             var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
@@ -173,7 +229,7 @@ namespace PostsByMarko.UnitTests
         public async Task send_message_should_throw_if_chat_does_not_container_sender_id()
         {
             // Arrange
-            var user = new UserDto { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid() };
             var chat = new Chat { Id = Guid.NewGuid() };
             var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = user.Id };
             var messageDto = new MessageDto
@@ -183,7 +239,7 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userServiceMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId)).ReturnsAsync(user);
             chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
 
             // Act

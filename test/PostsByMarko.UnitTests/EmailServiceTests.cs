@@ -8,6 +8,7 @@ using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Users;
 
 namespace PostsByMarko.UnitTests
 {
@@ -15,13 +16,13 @@ namespace PostsByMarko.UnitTests
     {
         private readonly EmailService emailService;
         private readonly Mock<IEmailHelper> emailHelperMock = new();
-        private readonly Mock<IUserService> userServiceMock = new();
+        private readonly Mock<IUserRepository> userRepositoryMock = new();
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
         private readonly Mock<LinkGenerator> linkGeneratorMock = new();
 
         public EmailServiceTests()
         {
-            emailService = new EmailService(emailHelperMock.Object, userServiceMock.Object, linkGeneratorMock.Object, currentRequestAccessorMock.Object);
+            emailService = new EmailService(emailHelperMock.Object, userRepositoryMock.Object, linkGeneratorMock.Object, currentRequestAccessorMock.Object);
         }
 
         [Fact]
@@ -41,8 +42,8 @@ namespace PostsByMarko.UnitTests
             var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 
             currentRequestAccessorMock.Setup(c => c.requestContext).Returns(defaultHttpContext);
-            userServiceMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
-            userServiceMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
+            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
             linkGeneratorMock
                 .Setup(lg => lg.GetUriByAddress(
                     defaultHttpContext,
@@ -60,7 +61,20 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task confirm_email_throws_if_account_was_not_found_for_email()
+        public async Task send_email_confirmation_link_should_throw_if_email_was_not_found()
+        {
+            // Arrange
+            var randomEmail = "test@test.com";
+
+            // Act
+            var result = async () => await emailService.SendEmailConfimationLinkAsync(randomEmail);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with email '{randomEmail}' was not found");
+        }
+
+        [Fact]
+        public async Task confirm_email_should_throw_if_email_was_not_found()
         {
             // Arrange
             var randomEmail = "test@test.com";
@@ -74,15 +88,15 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task confirm_email_throws_if_confirmation_failed()
+        public async Task confirm_email_should_throw_if_confirmation_failed()
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid(), Email = "test@test.com" };
             var failed = IdentityResult.Failed(new IdentityError());
             var token = "some_token";
 
-            userServiceMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
-            userServiceMock.Setup(u => u.ConfirmEmailForUserAsync(user, token)).ReturnsAsync(failed);
+            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            userRepositoryMock.Setup(u => u.ConfirmEmailForUserAsync(user, token)).ReturnsAsync(failed);
             
             // Act
             var result = async () => await emailService.ConfirmEmailAsync(user.Email, token);
