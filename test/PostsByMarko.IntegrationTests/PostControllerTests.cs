@@ -17,13 +17,13 @@ using Xunit;
 namespace PostsByMarko.IntegrationTests
 {
     [Collection("IntegrationCollection")]
-    public class PostsControllerTests : IAsyncLifetime
+    public class PostControllerTests : IAsyncLifetime
     {
         private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
         private readonly HttpClient client;
         private readonly string controllerPrefix = "/api/post";
 
-        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        public PostControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
             this.postsByMarkoApiFactory = postsByMarkoApiFactory;
 
@@ -130,7 +130,7 @@ namespace PostsByMarko.IntegrationTests
             };
 
             // Act
-            var response = await client.PutAsJsonAsync($"{controllerPrefix}/update/{postToUpdate.Id}", updateRequest);
+            var response = await client.PutAsJsonAsync($"{controllerPrefix}/{postToUpdate.Id}", updateRequest);
             var responseContent = await response.Content.ReadAsStringAsync();
             var updatedPost = JsonConvert.DeserializeObject<PostDto>(responseContent);
 
@@ -153,7 +153,7 @@ namespace PostsByMarko.IntegrationTests
             var postToDelete = allPosts.First();
 
             // Act
-            var response = await client.DeleteAsync($"{controllerPrefix}/delete/{postToDelete.Id}");
+            var response = await client.DeleteAsync($"{controllerPrefix}/{postToDelete.Id}");
             var responseContent = await response.Content.ReadAsStringAsync();
 
             // Assert

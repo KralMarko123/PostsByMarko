@@ -16,13 +16,13 @@ using Xunit;
 namespace PostsByMarko.IntegrationTests
 {
     [Collection("IntegrationCollection")]
-    public class UsersControllerTests : IAsyncLifetime
+    public class UserControllerTests : IAsyncLifetime
     {
         private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
         private readonly HttpClient client;
         private readonly string controllerPrefix = "/api/user";
 
-        public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        public UserControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
             this.postsByMarkoApiFactory = postsByMarkoApiFactory;
 
