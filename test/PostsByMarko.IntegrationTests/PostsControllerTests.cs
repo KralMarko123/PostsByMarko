@@ -3,7 +3,6 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Requests;
-using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Test.Shared.Constants;
 using System.Collections.Generic;
@@ -17,26 +16,35 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    [Collection("Sequential Collection")]
-    public class PostsControllerTests
+    [Collection("IntegrationCollection")]
+    public class PostsControllerTests : IAsyncLifetime
     {
+        private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
         private readonly HttpClient client;
-        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
-        private readonly IPostRepository postRepository;
-        private readonly IMapper mapper;
         private readonly string controllerPrefix = "/api/post";
 
         public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.authenticatedClient!;
-            postRepository = postsByMarkoApiFactory.postRepository!;
-            mapper = postsByMarkoApiFactory.mapper!;
+            this.postsByMarkoApiFactory = postsByMarkoApiFactory;
+
+            client = postsByMarkoApiFactory.client!;
         }
+
+        public async Task InitializeAsync()
+        {
+            await postsByMarkoApiFactory.RecreateAndSeedDatabaseAsync();
+            await postsByMarkoApiFactory.AuthenticateClientAsync(client);
+        }
+
+        public Task DisposeAsync() => Task.CompletedTask;
 
         [Fact]
         public async Task should_return_all_posts()
         {
             // Arrange
+            var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
+            var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
+
             var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
             var allPostsDtos = mapper.Map<List<PostDto>>(allPosts);
 
@@ -59,6 +67,9 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_return_a_post()
         {
             // Arrange
+            var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
+            var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
+
             var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
             var postDto = mapper.Map<PostDto>(allPosts.First());
 
@@ -78,6 +89,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_create_a_post()
         {
             // Arrange
+            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
             var newPost = new PostDto
             {
                 AuthorId = testAdmin.Id,
@@ -106,8 +118,10 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_update_a_post()
         {
             // Arrange
+            var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
             var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
-            var postToUpdate = allPosts.First();
+
+            var postToUpdate = allPosts.First(); 
             var updateRequest = new UpdatePostRequest
             {
                 Title = "Updated Title",
@@ -134,6 +148,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_delete_a_post()
         {
             // Arrange
+            var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
             var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
             var postToDelete = allPosts.First();
 
@@ -148,6 +163,5 @@ namespace PostsByMarko.IntegrationTests
 
             deletedPost.Should().BeNull();
         }
-
     }
 }

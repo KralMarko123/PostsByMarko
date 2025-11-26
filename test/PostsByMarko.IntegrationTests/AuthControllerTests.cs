@@ -13,19 +13,18 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    [Collection("Sequential Collection")]
+    [Collection("IntegrationCollection")]
     public class AuthControllerTests
     {
+        private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
         private readonly HttpClient client;
-        private readonly UserManager<User> userManager;
-        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
-        private readonly User unconfirmedUser = TestingConstants.RANDOM_USER;
         private readonly string controllerPrefix = "api/auth";
 
         public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.unauthenticatedClient!;
-            userManager = postsByMarkoApiFactory.userManager!;
+            this.postsByMarkoApiFactory = postsByMarkoApiFactory;
+            
+            client = postsByMarkoApiFactory.client!;
         }
 
         [Fact]
@@ -47,6 +46,7 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_login()
         {
             // Arrange
+            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
             var loginDto = new LoginDto { Email = testAdmin.Email, Password = TestingConstants.TEST_PASSWORD };
 
             // Act
@@ -69,7 +69,10 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_confirm_email()
         {
             // Arrange
+            var userManager = postsByMarkoApiFactory.Resolve<UserManager<User>>();
+            var unconfirmedUser = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.UNCONFIRMED_USER_EMAIL);
             var token = await userManager.GenerateEmailConfirmationTokenAsync(unconfirmedUser);
+
             token = WebUtility.UrlEncode(token);
 
             // Act

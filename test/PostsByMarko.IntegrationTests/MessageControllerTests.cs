@@ -1,117 +1,104 @@
-﻿//using Azure;
-//using FluentAssertions;
-//using Newtonsoft.Json;
-//using PostsByMarko.Host.Data.Entities;
-//using PostsByMarko.Test.Shared.Constants;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Net;
-//using System.Net.Http;
-//using System.Net.Http.Json;
-//using System.Threading.Tasks;
-//using Xunit;
+﻿using FluentAssertions;
+using Newtonsoft.Json;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Test.Shared.Constants;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Xunit;
 
-//namespace PostsByMarko.IntegrationTests
-//{
-//    [Collection("Integration Collection")]
-//    public class MessageControllerTests
-//    {
-//        private readonly HttpClient client;
-//        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
-//        private readonly User testUser = TestingConstants.TEST_USER;
-//        private readonly User randomUser = TestingConstants.RANDOM_USER;
+namespace PostsByMarko.IntegrationTests
+{
+    [Collection("IntegrationCollection")]
+    public class MessageControllerTests : IAsyncLifetime
+    {
+        private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
+        private readonly HttpClient client;
+        private readonly string controllerPrefix = "/api/messaging";
 
-//        public MessageControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
-//        {
-//            client = postsByMarkoApiFactory.client!;
-//        }
+        public MessageControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        {
+            this.postsByMarkoApiFactory = postsByMarkoApiFactory;
 
-//        [Fact]
-//        public async Task should_create_chat()
-//        {
-//            // Arrange
-//            var participantIds = new string[] { testAdmin.Id, testUser.Id };
+            client = postsByMarkoApiFactory.client!;
+        }
 
-//            // Act
-//            var response = await client.PostAsJsonAsync("/startChat", participantIds);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-//            var chat = JsonConvert.DeserializeObject<Chat>(requestResult.Payload.ToString());
+        public async Task InitializeAsync()
+        {
+            await postsByMarkoApiFactory.RecreateAndSeedDatabaseAsync();
+            await postsByMarkoApiFactory.AuthenticateClientAsync(client);
+        }
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+        public Task DisposeAsync() => Task.CompletedTask;
 
-//            chat.Should().NotBeNull();
-//            chat.ParticipantIds.Should().BeEquivalentTo(participantIds);
-//        }
+        [Fact]
+        public async Task should_get_chats()
+        {
+            // Arrange
 
-//        [Fact]
-//        public async Task should_send_a_message()
-//        {
-//            // Arrange
-//            var participantIds = new string[] { testAdmin.Id, testUser.Id };
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/chats");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var chats = JsonConvert.DeserializeObject<List<ChatDto>>(responseContent);
 
-//            var response = await client.PostAsJsonAsync("/startChat", participantIds);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-//            var chat = JsonConvert.DeserializeObject<Chat>(requestResult.Payload.ToString());
-//            var messageToSend = new MessageDto(chat.Id, testAdmin.Id, "Test");
+            // Assert
+            chats.Should().NotBeNull();
+            chats.Should().BeOfType<List<ChatDto>>();
+        }
 
-//            // Act
-//            response = await client.PostAsJsonAsync("/sendMessage", messageToSend);
-//            requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-//            var message = JsonConvert.DeserializeObject<Message>(requestResult.Payload.ToString());
+        [Fact]
+        public async Task should_start_a_chat()
+        {
+            // Arrange
+            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
+            var testUser = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_USER_EMAIL);
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            // Act
+            var chat = await StartChatAsync(testUser.Id);
 
-//            message.Should().NotBeNull();
-//            message.SenderId.Should().Be(testAdmin.Id);
-//            message.Content.Should().Be(messageToSend.Content);
-//            message.ChatId.Should().Be(messageToSend.ChatId);
-//        }
+            // Assert
+            chat.Should().NotBeNull();
+            chat.Users.Should().Contain(u => u.Id == testAdmin.Id);
+            chat.Users.Should().Contain(u => u.Id == testUser.Id);
+            chat.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        }
 
-//        [Fact]
-//        public async Task should_get_chats_for_user()
-//        {
-//            // Arrange
-//            var firstChatParticipants = new string[] { testAdmin.Id, testUser.Id };
-//            var secondChatParticipants = new string[] { testAdmin.Id, randomUser.Id };
+        [Fact]
+        public async Task should_send_a_message()
+        {
+            // Arrange
+            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
+            var testUser = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_USER_EMAIL);
+            var chat = await StartChatAsync(testUser.Id);
+            var newMessage = new MessageDto
+            {
+                ChatId = chat.Id,
+                SenderId = testAdmin.Id,
+                Content = "Hello, this is a test message!"
+            };
 
-//            var firstChat = await GetChatForParticipants(firstChatParticipants);
-//            var secondChat = await GetChatForParticipants(secondChatParticipants);
+            // Act
+            var response = await client.PostAsJsonAsync($"{controllerPrefix}/send", newMessage);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<MessageDto>(responseContent);
 
-//            await client.PostAsJsonAsync("/sendMessage", new MessageDto(firstChat.Id, testAdmin.Id, "First Message"));
-//            await client.PostAsJsonAsync("/sendMessage", new MessageDto(secondChat.Id, testAdmin.Id, "Second Message"));
+            // Assert
+            message.Should().NotBeNull();
+            message.Content.Should().Be(newMessage.Content);
+            message.ChatId.Should().Be(chat.Id);
+            message.SenderId.Should().Be(testAdmin.Id);
+            message.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        }
 
-//            // Act
-//            var requestResult = await client.GetFromJsonAsync<RequestResult>("/getChats");
-//            var chats = JsonConvert.DeserializeObject<List<Chat>>(requestResult.Payload.ToString());
+        private async Task<ChatDto> StartChatAsync(Guid otherUserId)
+        {
+            var response = await client.PostAsync($"{controllerPrefix}/chats/user/{otherUserId}", null);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var chat = JsonConvert.DeserializeObject<ChatDto>(responseContent);
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-
-//            chats.Should().NotBeNull();
-//            chats.Count.Should().Be(2);
-
-//            chats[0].ParticipantIds.Should().BeEquivalentTo(firstChatParticipants);
-//            chats[0].Id.Should().Be(firstChat.Id);
-//            chats[0].Messages.First().Content.Should().Be("First Message");
-
-
-//            chats[1].ParticipantIds.Should().BeEquivalentTo(secondChatParticipants);
-//            chats[1].Id.Should().Be(secondChat.Id);
-//            chats[1].Messages.First().Content.Should().Be("Second Message");
-//        }
-
-//        private async Task<Chat> GetChatForParticipants(string[] participants)
-//        {
-//            var response = await client.PostAsJsonAsync("/startChat", participants);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-//            var chat = JsonConvert.DeserializeObject<Chat>(requestResult.Payload.ToString());
-
-//            return chat;
-//        }
-//    }
-//}
+            return chat!;
+        }
+    }
+}

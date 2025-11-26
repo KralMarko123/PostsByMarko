@@ -7,8 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Entities;
-using PostsByMarko.Host.Data.Repositories.Posts;
+using PostsByMarko.Host.Extensions;
 using PostsByMarko.Test.Shared.Constants;
 using System;
 using System.Net.Http;
@@ -20,20 +21,13 @@ namespace PostsByMarko.IntegrationTests
 {
     public class PostsByMarkoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        public HttpClient? authenticatedClient;
-        public HttpClient? unauthenticatedClient;
-        public UserManager<User>? userManager;
-        public IMapper? mapper;
-        public IPostRepository? postRepository;
+        public HttpClient? client;
+
         public async Task InitializeAsync()
         {
-            unauthenticatedClient = CreateClient( new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-            authenticatedClient = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-            userManager = Services.GetRequiredService<UserManager<User>>();
-            mapper = Services.GetRequiredService<IMapper>();
-            postRepository = Services.GetRequiredService<IPostRepository>();
+            client = CreateClient( new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
-            await ConfigureAuthenticatedClient();
+            await RecreateAndSeedDatabaseAsync();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -49,38 +43,50 @@ namespace PostsByMarko.IntegrationTests
 
         public new Task DisposeAsync()
         {
-            unauthenticatedClient?.Dispose();
-            authenticatedClient?.Dispose();
+            client?.Dispose();
 
             return Task.CompletedTask;
         }
 
-        private async Task ConfigureAuthenticatedClient()
+        public T Resolve<T>()
         {
-            const int maxRetries = 5;
+            var scope = Services.CreateScope();
 
-            for (int i = 0; i < maxRetries; i++)
-            {
-                try
+            return scope.ServiceProvider.GetRequiredService<T>();
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            var userManager = Resolve<UserManager<User>>();
+            var user = await userManager.FindByEmailAsync(email);
+
+            return user ?? throw new Exception("User for testing was not found.");
+        }
+
+        public async Task RecreateAndSeedDatabaseAsync()
+        {
+            using var scope = Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            await db.Database.EnsureDeletedAsync();
+            await db.Database.EnsureCreatedAsync();
+            await db.Seed();
+        }
+
+        public async Task AuthenticateClientAsync(HttpClient client)
+        {
+            var result = await client.PostAsJsonAsync("api/auth/login",
+                new LoginDto
                 {
-                    var result = await authenticatedClient!.PostAsJsonAsync("api/auth/login", new LoginDto { Email = TestingConstants.TEST_ADMIN.Email, Password = TestingConstants.TEST_PASSWORD });
+                    Email = TestingConstants.TEST_ADMIN_EMAIL,
+                    Password = TestingConstants.TEST_PASSWORD
+                });
 
-                    if (result.IsSuccessStatusCode)
-                    {
-                        var response = await result.Content.ReadFromJsonAsync<LoginResponse>();
-                        var token = response!.Token;
+            var response = await result.Content.ReadFromJsonAsync<LoginResponse>();
+            var token = response!.Token;
 
-                        authenticatedClient!.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                        
-                        return;
-                    }
-                }
-                catch { /* ignore and retry */ }
-
-                await Task.Delay(3000); // wait 3 seconds before next try
-            }
-
-            throw new Exception("Failed to authenticate test client after multiple retries.");
+            client.DefaultRequestHeaders.Remove("Authorization");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
     }
 }

@@ -1,14 +1,10 @@
-﻿using PostsByMarko.Host.Application.Constants;
-using PostsByMarko.Host.Data.Entities;
-
-namespace PostsByMarko.Test.Shared.Constants
+﻿namespace PostsByMarko.Test.Shared.Constants
 {
     public static class TestingConstants
     {
-        public static readonly User MARKO = AppConstants.admins[0];
-        public static readonly User TEST_ADMIN = AppConstants.admins[1];
-        public static readonly User TEST_USER = AppConstants.appUsers[0];
-        public static readonly User RANDOM_USER = AppConstants.appUsers[1];
+        public static readonly string TEST_ADMIN_EMAIL = "testAdmin@test.com";
+        public static readonly string TEST_USER_EMAIL = "test@test.com";
+        public static readonly string UNCONFIRMED_USER_EMAIL = "user@userson.com";
         public const string TEST_PASSWORD = "@Marko123";
         public const string DEVELOPMENT_HOST_ENDPOINT = "http://localhost:7171";
         public const string DEV_CLIENT_ENDPOINT = "http://localhost:3000";

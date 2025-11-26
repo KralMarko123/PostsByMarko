@@ -15,26 +15,35 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    [Collection("Sequential Collection")]
-    public class UsersControllerTests
+    [Collection("IntegrationCollection")]
+    public class UsersControllerTests : IAsyncLifetime
     {
+        private readonly PostsByMarkoApiFactory postsByMarkoApiFactory;
         private readonly HttpClient client;
-        private readonly IMapper mapper;
-        private readonly UserManager<User> userManager;
-        private readonly User testUser = TestingConstants.TEST_USER;
         private readonly string controllerPrefix = "/api/user";
 
         public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
-            client = postsByMarkoApiFactory.authenticatedClient!;
-            mapper = postsByMarkoApiFactory.mapper!;
-            userManager = postsByMarkoApiFactory.userManager!;
+            this.postsByMarkoApiFactory = postsByMarkoApiFactory;
+
+            client = postsByMarkoApiFactory.client!;
         }
+
+        public async Task InitializeAsync()
+        {
+            await postsByMarkoApiFactory.AuthenticateClientAsync(client);
+        }
+
+        public Task DisposeAsync() => Task.CompletedTask;
+
 
         [Fact]
         public async Task should_return_all_users()
         {
             // Arrange
+            var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
+            var userManager = postsByMarkoApiFactory.Resolve<UserManager<User>>();
+
             var allUsers = await userManager.Users.ToListAsync();
             var userDtos = mapper.Map<List<UserDto>>(allUsers);
 
@@ -59,7 +68,11 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_return_filtered_users()
         {
             // Arrange
+            var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
+            var userManager = postsByMarkoApiFactory.Resolve<UserManager<User>>();
+
             var allUsers = await userManager.Users.ToListAsync();
+            var testUser = allUsers.Find(u => u.Email == TestingConstants.TEST_USER_EMAIL);
             var userDtos = mapper.Map<List<UserDto>>(allUsers);
             var filteredUserDto = userDtos.First(u => u.Id == testUser.Id);
 
@@ -81,6 +94,8 @@ namespace PostsByMarko.IntegrationTests
         public async Task should_return_user()
         {
             // Arrange
+            var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
+            var testUser = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_USER_EMAIL);
             var userToReturn = mapper.Map<UserDto>(testUser);
 
             // Act

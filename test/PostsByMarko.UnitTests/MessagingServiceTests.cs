@@ -82,6 +82,7 @@ namespace PostsByMarko.UnitTests
 
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(otherUser.Id)).ReturnsAsync(otherUser);
             chatRepositoryMock.Setup(cr => cr.GetChatByUserIdsAsync(userIds, It.IsAny<CancellationToken>())).ReturnsAsync(existingChat);
             mapperMock.Setup(m => m.Map<ChatDto>(existingChat)).Returns(chatDto);
 
@@ -119,7 +120,8 @@ namespace PostsByMarko.UnitTests
             };
 
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user); 
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(otherUser.Id)).ReturnsAsync(otherUser);
             chatRepositoryMock.Setup(cr => cr.AddChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
             mapperMock.Setup(m => m.Map<ChatDto>(newChat)).Returns(chatDto);
 
@@ -139,6 +141,23 @@ namespace PostsByMarko.UnitTests
             var randomId = Guid.NewGuid();
 
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(randomId.ToString());
+
+            // Act
+            var result = async () => await messagingService.StartChatAsync(randomId, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
+        }
+
+        [Fact]
+        public async Task start_chat_should_throw_if_other_user_was_not_found()
+        {
+            // Arrange
+            var user = new User { Id = Guid.NewGuid() };
+            var randomId = Guid.NewGuid();
+
+            currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id.ToString());
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
 
             // Act
             var result = async () => await messagingService.StartChatAsync(randomId, CancellationToken.None);
