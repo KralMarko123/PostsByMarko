@@ -42,7 +42,7 @@ namespace PostsByMarko.UnitTests
             var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 
             currentRequestAccessorMock.Setup(c => c.requestContext).Returns(defaultHttpContext);
-            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
             linkGeneratorMock
                 .Setup(lg => lg.GetUriByAddress(
@@ -95,7 +95,7 @@ namespace PostsByMarko.UnitTests
             var failed = IdentityResult.Failed(new IdentityError());
             var token = "some_token";
 
-            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+            userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.ConfirmEmailForUserAsync(user, token)).ReturnsAsync(failed);
             
             // Act

@@ -1,27 +1,36 @@
-﻿using Moq;
+﻿using AutoMapper;
 using FluentAssertions;
-using PostsByMarko.Host.Application.Services;
-using PostsByMarko.Host.Data.Repositories.Posts;
-using PostsByMarko.Host.Application.Interfaces;
-using AutoMapper;
-using PostsByMarko.Host.Data.Entities;
+using Microsoft.AspNetCore.SignalR;
+using Moq;
 using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs.Client;
+using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Host.Data.Repositories.Users;
 
 namespace PostsByMarko.UnitTests
 {
-    public class PostsServiceTests
+    public class PostServiceTests
     {
         private readonly PostService postService;
         private readonly Mock<IPostRepository> postsRepositoryMock = new();
         private readonly Mock<IUserRepository> userRepositoryMock = new();
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
         private readonly Mock<IMapper> mapperMock = new();
+        private readonly Mock<IHubContext<PostHub, IPostClient>> postHubMock = new();
+        private readonly Mock<IPostClient> postClientMock = new();
 
-        public PostsServiceTests()
+        public PostServiceTests()
         {
-            postService = new PostService(postsRepositoryMock.Object, userRepositoryMock.Object, currentRequestAccessorMock.Object, mapperMock.Object);
+            postService = new PostService(postsRepositoryMock.Object, 
+                userRepositoryMock.Object, 
+                currentRequestAccessorMock.Object,
+                mapperMock.Object,
+                postHubMock.Object);
         }
 
         [Fact]
@@ -41,8 +50,8 @@ namespace PostsByMarko.UnitTests
                 new PostDto { Title = "Other Title" }
             };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(posts);
             mapperMock.Setup(m => m.Map<List<PostDto>>(posts)).Returns(postDtos);
@@ -73,8 +82,8 @@ namespace PostsByMarko.UnitTests
                 new PostDto { Hidden = true }
             };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(posts);
             mapperMock.Setup(m => m.Map<List<PostDto>>(posts)).Returns(postDtos.Where(p => !p.Hidden).ToList());
@@ -94,7 +103,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var randomId = Guid.NewGuid();
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId.ToString());
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
 
             // Act
             var result = async () => await postService.GetAllPostsAsync(CancellationToken.None);
@@ -112,8 +121,8 @@ namespace PostsByMarko.UnitTests
             var post = new Post { Id = Guid.NewGuid(), Title = "Some Title" };
             var postDto = new PostDto { Id = post.Id, Title = post.Title };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
@@ -133,7 +142,7 @@ namespace PostsByMarko.UnitTests
             var randomId = Guid.NewGuid();
             var post = new Post { Id = Guid.NewGuid() };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId.ToString());
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
 
             // Act
             var result = async () => await postService.GetPostByIdAsync(post.Id, CancellationToken.None);
@@ -151,8 +160,8 @@ namespace PostsByMarko.UnitTests
             var userRoles = new List<string> { "Admin" };
             var randomId = Guid.NewGuid();
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
 
             // Act
@@ -171,8 +180,8 @@ namespace PostsByMarko.UnitTests
             var userRoles = new List<string> { "User" };
             var post = new Post { Id = Guid.NewGuid(), Title = "Some Title", Hidden = true };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
 
@@ -193,7 +202,9 @@ namespace PostsByMarko.UnitTests
             mapperMock.Setup(m => m.Map<Post>(postDto)).Returns(post);
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
             postsRepositoryMock.Setup(r => r.AddPostAsync(post, It.IsAny<CancellationToken>())).ReturnsAsync(post);
-            
+            postHubMock.Setup(p => p.Clients.All).Returns(postClientMock.Object);
+            postClientMock.Setup(p => p.PostCreated(postDto)).Returns(Task.CompletedTask);
+
             // Act
             var result = await postService.CreatePostAsync(postDto, CancellationToken.None);
 
@@ -203,6 +214,7 @@ namespace PostsByMarko.UnitTests
             result.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
             result.LastUpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            postClientMock.Verify(p => p.PostCreated(postDto), Times.Once);
         }
 
         [Fact]
@@ -235,11 +247,13 @@ namespace PostsByMarko.UnitTests
             var postDto = new PostDto { Id = post.Id, Title = updateRequest.Title, Content = updateRequest.Content,
                 Hidden = updateRequest.Hidden, LastUpdatedDate = DateTime.UtcNow };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
+            postHubMock.Setup(p => p.Clients.All).Returns(postClientMock.Object);
+            postClientMock.Setup(p => p.PostUpdated(postDto)).Returns(Task.CompletedTask);
 
             // Act
             var result = await postService.UpdatePostAsync(post.Id, updateRequest, CancellationToken.None);
@@ -255,6 +269,7 @@ namespace PostsByMarko.UnitTests
 
             postsRepositoryMock.Verify(r => r.UpdatePostAsync(post), Times.Once);
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            postClientMock.Verify(p => p.PostUpdated(postDto), Times.Once);
         }
 
         [Fact]
@@ -271,7 +286,7 @@ namespace PostsByMarko.UnitTests
                 Hidden = false
             };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId.ToString());
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
 
             // Act
             var result = async () => await postService.UpdatePostAsync(post.Id, updateRequest, CancellationToken.None);
@@ -294,8 +309,8 @@ namespace PostsByMarko.UnitTests
                 Hidden = false
             };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
 
             // Act
@@ -319,8 +334,8 @@ namespace PostsByMarko.UnitTests
                 Hidden = false
             };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
 
@@ -339,10 +354,12 @@ namespace PostsByMarko.UnitTests
             var userRoles = new List<string> { "Admin" };
             var post = new Post { Id = Guid.NewGuid() };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
+            postHubMock.Setup(p => p.Clients.All).Returns(postClientMock.Object);
+            postClientMock.Setup(p => p.PostDeleted(post.Id)).Returns(Task.CompletedTask);
 
             // Act
             await postService.DeletePostByIdAsync(post.Id, CancellationToken.None);
@@ -350,6 +367,7 @@ namespace PostsByMarko.UnitTests
             // Assert
             postsRepositoryMock.Verify(r => r.DeletePostAsync(post), Times.Once);
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            postClientMock.Verify(p => p.PostDeleted(post.Id), Times.Once);
         }
 
         [Fact]
@@ -359,7 +377,7 @@ namespace PostsByMarko.UnitTests
             var post = new Post { Id = Guid.NewGuid() };
             var randomId = Guid.NewGuid();
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId.ToString());
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
 
             // Act
             var result = async () => await postService.DeletePostByIdAsync(post.Id, CancellationToken.None);
@@ -376,8 +394,8 @@ namespace PostsByMarko.UnitTests
             var userRoles = new List<string> { "Admin" };
             var randomId = Guid.NewGuid();
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
 
             // Act
@@ -395,8 +413,8 @@ namespace PostsByMarko.UnitTests
             var userRoles = new List<string> { "User" };
             var post = new Post { Id = Guid.NewGuid() };
 
-            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id.ToString());
-            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
 

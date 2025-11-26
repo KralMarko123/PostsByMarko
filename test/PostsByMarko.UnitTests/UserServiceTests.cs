@@ -35,8 +35,8 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new User() { Id = Guid.NewGuid() };
 
-            currentRequestAccessorMock.Setup(a => a.Id).Returns(user.Id.ToString());
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id)).ReturnsAsync(() => user);
+            currentRequestAccessorMock.Setup(a => a.Id).Returns(user.Id);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
             var result = await userService.GetCurrentUserAsync();
@@ -52,7 +52,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var randomId = Guid.NewGuid();
 
-            currentRequestAccessorMock.Setup(a => a.Id).Returns(randomId.ToString());
+            currentRequestAccessorMock.Setup(a => a.Id).Returns(randomId);
 
             // Act
             var result = async () => await userService.GetCurrentUserAsync();
@@ -115,7 +115,7 @@ namespace PostsByMarko.UnitTests
 
             var user = new User() { Id = Guid.NewGuid(), Email = loginDto.Email, FirstName = "Test", LastName = "Test" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => true);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, loginDto.Password)).ReturnsAsync(() => true);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(["Some Role"]);
@@ -163,7 +163,7 @@ namespace PostsByMarko.UnitTests
 
             var user = new User() { Id = Guid.NewGuid(), Email = loginDto.Email, FirstName = "Test", LastName = "Test" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => false);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, loginDto.Password)).ReturnsAsync(() => true);
 
@@ -187,7 +187,7 @@ namespace PostsByMarko.UnitTests
 
             var user = new User() { Id = Guid.NewGuid(), Email = loginDto.Email, FirstName = "Test", LastName = "Test" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(loginDto.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(() => true);
             usersRepositoryMock.Setup(r => r.CheckPasswordForUserAsync(user, loginDto.Password)).ReturnsAsync(() => false);
 
@@ -204,7 +204,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new User() { Id = Guid.NewGuid(), Email = "test@test.com" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
             var result = await userService.GetUserByEmailAsync(user.Email);
@@ -234,7 +234,7 @@ namespace PostsByMarko.UnitTests
             var user = new User() { Id = Guid.NewGuid(), Email = "test@test.com" };
             var roles = new List<string> { "Role1", "Role2" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
 
             // Act
@@ -344,7 +344,7 @@ namespace PostsByMarko.UnitTests
             var userDto = new UserDto { Id = user.Id };
 
             mapperMock.Setup(m => m.Map<UserDto>(user)).Returns(userDto);
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userDto.Id)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userDto.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
             var result = await userService.GetUserByIdAsync(user.Id);
@@ -397,7 +397,7 @@ namespace PostsByMarko.UnitTests
             };
             var roles = new List<string> { "Some role" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
 
             // Act
@@ -421,7 +421,7 @@ namespace PostsByMarko.UnitTests
             };
             var roles = new List<string> { "Some role", request.Role };
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
 
             // Act
@@ -454,7 +454,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new User() { Id = Guid.NewGuid() };
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id)).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
             await userService.DeleteUserAsync(user.Id, CancellationToken.None);
@@ -498,7 +498,7 @@ namespace PostsByMarko.UnitTests
             };
             var userRoles = new List<string> { "Some role" };
 
-            currentRequestAccessorMock.Setup(a => a.Id).Returns(admin.Id.ToString());
+            currentRequestAccessorMock.Setup(a => a.Id).Returns(admin.Id);
             usersRepositoryMock.Setup(r => r.GetUsersAsync(admin.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => users);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(It.IsAny<User>())).ReturnsAsync(() => userRoles);
 
