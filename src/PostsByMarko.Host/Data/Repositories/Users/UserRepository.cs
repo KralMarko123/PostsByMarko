@@ -42,7 +42,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await userManager.FindByEmailAsync(email);
+            var user = await userManager.Users
+                .Include(u => u.Posts)
+                .Include(u => u.Messages)
+                .Include(u => u.ChatUsers)
+                    .ThenInclude(cu => cu.Chat)
+                .SingleOrDefaultAsync(u => u.Email == email);
+
+            return user;
         }
 
         public async Task<List<string>> GetRolesForUser(User user)
@@ -65,7 +72,7 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         {
             var user = await GetUserByEmailAsync(email);
 
-            user.Posts!.Remove(post);
+            user!.Posts!.Remove(post);
 
             var result = await userManager.UpdateAsync(user);
 
@@ -74,7 +81,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await userManager.FindByIdAsync(id.ToString());
+            var user = await userManager.Users
+                .Include(u => u.Posts)
+                .Include(u => u.Messages)
+                .Include(u => u.ChatUsers)
+                    .ThenInclude(cu => cu.Chat)
+                .SingleOrDefaultAsync(u => u.Id == id);
+
+            return user;
         }
 
         public async Task<bool> CheckPasswordForUserAsync(User user, string password)
@@ -107,13 +121,18 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             return await userManager.AddToRoleAsync(user, role);
         }
 
-        public Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
+        public async Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
-            var result = appDbContext.Users.ToListAsync(cancellationToken);
+            var result = await userManager.Users
+                .Include(u => u.Posts)
+                .Include(u => u.Messages)
+                .Include(u => u.ChatUsers)
+                    .ThenInclude(cu => cu.Chat)
+                .ToListAsync(cancellationToken);
 
             if(exceptId.HasValue)
             {
-                result = appDbContext.Users.Where(u => u.Id != exceptId.Value).ToListAsync(cancellationToken);
+                result = [.. result.Where(u => u.Id != exceptId.Value)];
             }
 
             return result;

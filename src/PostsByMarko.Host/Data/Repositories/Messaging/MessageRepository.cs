@@ -14,12 +14,17 @@ namespace PostsByMarko.Host.Data.Repositories.Messaging
 
         public async Task<Message?> GetMessageByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await appDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            return await appDbContext.Messages
+                .Include(m => m.Chat)
+                .Include(m => m.Sender)
+                .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         }
 
         public async Task<List<Message>> GetMessagesByChatIdAsync(Guid chatId, CancellationToken cancellationToken)
         {
             return await appDbContext.Messages
+                .Include(m => m.Chat)
+                .Include(m => m.Sender)
                 .Where(m => m.ChatId == chatId)
                 .OrderBy(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);

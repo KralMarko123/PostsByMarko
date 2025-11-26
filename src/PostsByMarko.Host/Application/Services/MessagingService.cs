@@ -37,7 +37,8 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
         {
             var currentUserId = Guid.Parse(currentRequestAccessor.Id);
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found"); 
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var otherUser = await userRepository.GetUserByIdAsync(otherUserId) ?? throw new KeyNotFoundException($"User with Id: {otherUserId} was not found");
             var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
             if(existingChat != null)
@@ -52,8 +53,8 @@ namespace PostsByMarko.Host.Application.Services
                 Messages = new List<Message>(),
                 ChatUsers = new List<ChatUser>
                 {
-                    new ChatUser { UserId = currentUser.Id },
-                    new ChatUser { UserId = otherUserId }
+                    new ChatUser { UserId = currentUser.Id, User = currentUser },
+                    new ChatUser { UserId = otherUser.Id, User = otherUser }
                 }
             };
 

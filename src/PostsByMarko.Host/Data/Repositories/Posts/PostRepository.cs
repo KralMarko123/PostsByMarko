@@ -14,14 +14,18 @@ namespace PostsByMarko.Host.Data.Repositories.Posts
 
         public async Task<List<Post>> GetPostsAsync(CancellationToken cancellationToken = default)
         {
-            var result = await appDbContext.Posts.ToListAsync(cancellationToken);
+            var result = await appDbContext.Posts
+                .Include(p => p.Author)
+                .ToListAsync(cancellationToken);
 
             return result;
         }
 
         public async Task<Post?> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
-            return await appDbContext.Posts.FirstOrDefaultAsync(p => p.Id == Id, cancellationToken);
+            return await appDbContext.Posts
+                .Include(p => p.Author)
+                .FirstOrDefaultAsync(p => p.Id == Id, cancellationToken);
         }
 
         public async Task<Post> AddPostAsync(Post postToCreate, CancellationToken cancellationToken = default)
