@@ -6,8 +6,8 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 {
     public interface IUserRepository
     {
-        Task<User?> GetUserByIdAsync(Guid id);
-        Task<User?> GetUserByEmailAsync(string email);
+        Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<List<User>> GetUsersAsync(Guid? exceptId, CancellationToken cancellationToken);
         Task<IdentityResult> MapAndCreateUserAsync(User userToCreate, string passwordForUser);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);

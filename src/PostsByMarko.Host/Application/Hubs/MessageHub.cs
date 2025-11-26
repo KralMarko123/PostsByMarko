@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Hubs.Client;
 
 namespace PostsByMarko.Host.Application.Hubs
 {
+    [Authorize]
     public class MessageHub : Hub<IMessageClient>
     {
-        public async Task NotifyUsersAboutNewMessage(string[] userIds)
-        {
-            await Clients.Users(userIds).ReceiveMessage($"New message for users: '{string.Join(", ", userIds)}' at {DateTime.UtcNow}");
-        }
+        // Later we can override OnConnectedAsync and join user groups if needed
     }
 }

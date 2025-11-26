@@ -3,7 +3,7 @@
     public interface ICurrentRequestAccessor
     {
         public HttpContext requestContext { get; }
-        public string Id { get; }
+        public Guid Id { get; }
         public string Email { get; }
         public IEnumerable<string> Roles { get; }
     }

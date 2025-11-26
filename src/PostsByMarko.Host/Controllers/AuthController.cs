@@ -33,9 +33,9 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto, CancellationToken cancellationToken = default)
     {
-        var result = await usersService.ValidateUserAsync(loginDto);
+        var result = await usersService.ValidateUserAsync(loginDto, cancellationToken);
 
         return Ok(result);
     }
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
         
         var jwtConfiguration = configuration.GetSection("JwtConfig");
         var audiences = jwtConfiguration.GetSection("validAudiences").Get<List<string>>();
-        var urlToRedirectTo = $"{audiences[0]}/login";
+        var urlToRedirectTo = $"{audiences![0]}/login";
 
         return Redirect(urlToRedirectTo);
     }

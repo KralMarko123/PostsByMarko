@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using PostsByMarko.Host.Application.Exceptions;
+using System.Net;
 using System.Text.Json;
 
 namespace PostsByMarko.Host.Middlewares
@@ -32,7 +33,9 @@ namespace PostsByMarko.Host.Middlewares
             {
                 KeyNotFoundException => HttpStatusCode.NotFound,
                 InvalidOperationException => HttpStatusCode.BadRequest,
+                ArgumentException => HttpStatusCode.BadRequest,
                 UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+                AuthException => HttpStatusCode.Forbidden,
                 _ => HttpStatusCode.InternalServerError
             };
 

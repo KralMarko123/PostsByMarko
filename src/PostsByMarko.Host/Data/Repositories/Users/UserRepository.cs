@@ -40,14 +40,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             return claims;
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             var user = await userManager.Users
                 .Include(u => u.Posts)
                 .Include(u => u.Messages)
                 .Include(u => u.ChatUsers)
                     .ThenInclude(cu => cu.Chat)
-                .SingleOrDefaultAsync(u => u.Email == email);
+                .SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
 
             return user;
         }
@@ -79,14 +79,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             return result.Succeeded;
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var user = await userManager.Users
                 .Include(u => u.Posts)
                 .Include(u => u.Messages)
                 .Include(u => u.ChatUsers)
                     .ThenInclude(cu => cu.Chat)
-                .SingleOrDefaultAsync(u => u.Id == id);
+                .SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
 
             return user;
         }

@@ -20,9 +20,9 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("roles")]
-        public async Task<ActionResult<List<string>>> GetRolesForEmail([FromQuery] string email)
+        public async Task<ActionResult<List<string>>> GetRolesForEmail([FromQuery] string email, CancellationToken cancellationToken = default)
         {
-            var roles = await usersService.GetRolesForEmailAsync(email);
+            var roles = await usersService.GetRolesForEmailAsync(email, cancellationToken);
 
             return Ok(roles);
         }

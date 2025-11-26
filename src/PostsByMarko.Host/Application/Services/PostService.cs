@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
@@ -15,19 +18,21 @@ namespace PostsByMarko.Host.Application.Services
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly IMapper mapper;
-        
+        private readonly IHubContext<PostHub, IPostClient> postHub;
+
         public PostService(IPostRepository postRepository, IUserRepository userRepository,
-            ICurrentRequestAccessor currentRequestAccessor, IMapper mapper)
+            ICurrentRequestAccessor currentRequestAccessor, IMapper mapper, IHubContext<PostHub, IPostClient> postHub)
         {
             this.postRepository = postRepository;
             this.userRepository = userRepository;
             this.currentRequestAccessor = currentRequestAccessor;
             this.mapper = mapper;
+            this.postHub = postHub;
         }
 
         public async Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken = default)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
+            var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var allPosts = await postRepository.GetPostsAsync(cancellationToken);
@@ -42,7 +47,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<PostDto> GetPostByIdAsync(Guid postId, CancellationToken cancellationToken = default)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
+            var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
@@ -70,12 +75,16 @@ namespace PostsByMarko.Host.Application.Services
 
             await postRepository.SaveChangesAsync(cancellationToken);
 
-            return mapper.Map<PostDto>(post);
+            var postDto = mapper.Map<PostDto>(post);
+
+            await postHub.Clients.All.PostCreated(postDto);
+
+            return postDto;
         }
 
         public async Task<PostDto> UpdatePostAsync(Guid postId, UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
+            var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
@@ -95,12 +104,14 @@ namespace PostsByMarko.Host.Application.Services
 
             var result = mapper.Map<PostDto>(post);
 
+            await postHub.Clients.All.PostUpdated(result);
+
             return result;
         }
 
         public async Task DeletePostByIdAsync(Guid postId, CancellationToken cancellationToken)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
+            var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
@@ -112,6 +123,7 @@ namespace PostsByMarko.Host.Application.Services
             
             await postRepository.DeletePostAsync(post);
             await postRepository.SaveChangesAsync(cancellationToken);
+            await postHub.Clients.All.PostDeleted(postId);
         }
     }
 }

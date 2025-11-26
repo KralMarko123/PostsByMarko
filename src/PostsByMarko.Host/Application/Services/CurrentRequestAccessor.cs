@@ -14,7 +14,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public HttpContext requestContext => contextAccessor.HttpContext!;
 
-        public string Id => requestContext.User.FindFirstValue(ClaimTypes.PrimarySid) ?? string.Empty;
+        public Guid Id => Guid.TryParse(requestContext.User.FindFirstValue(ClaimTypes.PrimarySid), out var guid) ? guid : Guid.Empty;
 
         public string Email => requestContext.User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
 

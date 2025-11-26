@@ -31,7 +31,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<User> GetCurrentUserAsync()
         {
-            var userId = Guid.Parse(currentRequestAccessor.Id);
+            var userId = currentRequestAccessor.Id;
             var user = await userRepository.GetUserByIdAsync(userId) ?? throw new KeyNotFoundException($"User with Id: '{userId}' was not found");
 
             return user;
@@ -52,9 +52,9 @@ namespace PostsByMarko.Host.Application.Services
             }
         }
 
-        public async Task<LoginResponse> ValidateUserAsync(LoginDto userLogin)
+        public async Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(userLogin.Email) ?? throw new AuthException($"No account for '{userLogin.Email}', please check your credentials and try again");
+            var user = await userRepository.GetUserByEmailAsync(userLogin.Email, cancellationToken) ?? throw new AuthException($"No account for '{userLogin.Email}', please check your credentials and try again");
             var emailConfirmed = await userRepository.CheckIsEmailConfirmedForUserAsync(user);
             var validPassword = await userRepository.CheckPasswordForUserAsync(user, userLogin.Password!);
 
@@ -83,16 +83,16 @@ namespace PostsByMarko.Host.Application.Services
             return response;
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(email) ?? throw new KeyNotFoundException($"User with email: '{email}' was not found");
+            var user = await userRepository.GetUserByEmailAsync(email, cancellationToken) ?? throw new KeyNotFoundException($"User with email: '{email}' was not found");
 
             return user;
         }
 
-        public async Task<List<string>> GetRolesForEmailAsync(string email)
+        public async Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await GetUserByEmailAsync(email);
+            var user = await GetUserByEmailAsync(email, cancellationToken);
             var roles = await userRepository.GetRolesForUserAsync(user);
 
             return [.. roles];
@@ -116,9 +116,9 @@ namespace PostsByMarko.Host.Application.Services
             return await userRepository.ConfirmEmailForUserAsync(user, token);
         }
 
-        public async Task<UserDto> GetUserByIdAsync(Guid id)
+        public async Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(id) ?? throw new KeyNotFoundException($"User with Id: {id} was not found");
+            var user = await userRepository.GetUserByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {id} was not found");
 
             return mapper.Map<UserDto>(user);
         }
@@ -132,7 +132,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(request.UserId) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
+            var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
             var currentRoles = await userRepository.GetRolesForUserAsync(user);
 
             if(request.ActionType == ActionType.Create)
@@ -155,7 +155,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
         {
-            var adminId = Guid.Parse(currentRequestAccessor.Id);            
+            var adminId = currentRequestAccessor.Id;            
             var users = await userRepository.GetUsersAsync(adminId, cancellationToken);
             var result = new List<AdminDashboardResponse>();
 
@@ -178,7 +178,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task DeleteUserAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(id) ?? throw new KeyNotFoundException($"User with Id: {id} was not found");
+            var user = await userRepository.GetUserByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {id} was not found");
             
             await userRepository.DeleteUserAsync(user);
         }

@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
+using System;
 
 namespace PostsByMarko.Host.Application.Services
 {
@@ -15,20 +19,23 @@ namespace PostsByMarko.Host.Application.Services
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly IMapper mapper;
+        private readonly IHubContext<MessageHub, IMessageClient> messageHub;
 
-        public MessagingService(IChatRepository chatRepository, IMessageRepository messageRepository, IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor, IMapper mapper)
+        public MessagingService(IChatRepository chatRepository, IMessageRepository messageRepository,
+            IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor, IMapper mapper, IHubContext<MessageHub, IMessageClient> messageHub)
         {
             this.chatRepository = chatRepository;
             this.messageRepository = messageRepository;
             this.userRepository = userRepository;
             this.currentRequestAccessor = currentRequestAccessor;
             this.mapper = mapper;
+            this.messageHub = messageHub;
         }
 
         public async Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken = default)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUserId = currentRequestAccessor.Id;
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var chats = await chatRepository.GetChatsForUserAsync(currentUser, cancellationToken);
 
             return mapper.Map<List<ChatDto>>(chats);
@@ -36,9 +43,9 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
         {
-            var currentUserId = Guid.Parse(currentRequestAccessor.Id);
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
-            var otherUser = await userRepository.GetUserByIdAsync(otherUserId) ?? throw new KeyNotFoundException($"User with Id: {otherUserId} was not found");
+            var currentUserId = currentRequestAccessor.Id;
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var otherUser = await userRepository.GetUserByIdAsync(otherUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {otherUserId} was not found");
             var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
             if(existingChat != null)
@@ -62,7 +69,11 @@ namespace PostsByMarko.Host.Application.Services
 
             await chatRepository.SaveChangesAsync(cancellationToken);
 
-            return mapper.Map<ChatDto>(createdChat);
+            var chatDto = mapper.Map<ChatDto>(createdChat);
+
+            await messageHub.Clients.Users(chatDto.Users.Select(u => u.Id.ToString())).ChatCreated(chatDto);
+
+            return chatDto;
         }
 
         public async Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default)
@@ -80,7 +91,11 @@ namespace PostsByMarko.Host.Application.Services
 
             await messageRepository.SaveChangesAsync(cancellationToken);
             
-            return mapper.Map<MessageDto>(createdMessage);
+            var result = mapper.Map<MessageDto>(createdMessage);
+
+            await messageHub.Clients.Users(chat.ChatUsers.Select(c => c.UserId.ToString())).MessageSent(result);
+
+            return result;
         }
     }
 }

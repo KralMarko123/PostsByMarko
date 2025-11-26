@@ -10,12 +10,12 @@ namespace PostsByMarko.Host.Application.Interfaces
     {
         Task<User> GetCurrentUserAsync();
         Task CreateUserAsync(RegistrationDto userRegistration);
-        Task<UserDto> GetUserByIdAsync(Guid id);
-        Task<User> GetUserByEmailAsync(string email);
+        Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);
-        Task<LoginResponse> ValidateUserAsync(LoginDto userLogin);
+        Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken);
         Task<List<UserDto>> GetUsersAsync(Guid? exceptId, CancellationToken cancellationToken);
-        Task<List<string>> GetRolesForEmailAsync(string email);
+        Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken);
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<List<string>> GetRolesForUserAsync(User user);
         Task DeleteUserAsync(Guid id, CancellationToken cancellationToken);
