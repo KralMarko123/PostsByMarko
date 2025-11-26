@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Test.Shared.Constants;
 using System;
 using System.Net.Http;
@@ -22,13 +23,15 @@ namespace PostsByMarko.IntegrationTests
         public HttpClient? authenticatedClient;
         public HttpClient? unauthenticatedClient;
         public UserManager<User>? userManager;
-        public IMapper mapper;
+        public IMapper? mapper;
+        public IPostRepository? postRepository;
         public async Task InitializeAsync()
         {
             unauthenticatedClient = CreateClient( new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
             authenticatedClient = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
             userManager = Services.GetRequiredService<UserManager<User>>();
             mapper = Services.GetRequiredService<IMapper>();
+            postRepository = Services.GetRequiredService<IPostRepository>();
 
             await ConfigureAuthenticatedClient();
         }

@@ -1,188 +1,153 @@
-//using Bogus;
-//using FluentAssertions;
-//using Newtonsoft.Json;
-//using PostsByMarko.Host.Data.Entities;
-//using PostsByMarko.Test.Shared.Constants;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Net;
-//using System.Net.Http;
-//using System.Net.Http.Json;
-//using System.Threading.Tasks;
-//using Xunit;
+using AutoMapper;
+using FluentAssertions;
+using Newtonsoft.Json;
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Repositories.Posts;
+using PostsByMarko.Test.Shared.Constants;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
-//namespace PostsByMarko.IntegrationTests
-//{
-//    [Collection("Integration Collection")]
-//    public class PostsControllerTests
-//    {
-//        private readonly HttpClient client;
-//        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
+namespace PostsByMarko.IntegrationTests
+{
+    [Collection("Sequential Collection")]
+    public class PostsControllerTests
+    {
+        private readonly HttpClient client;
+        private readonly User testAdmin = TestingConstants.TEST_ADMIN;
+        private readonly IPostRepository postRepository;
+        private readonly IMapper mapper;
+        private readonly string controllerPrefix = "/api/post";
 
-//        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
-//        {
-//            client = postsByMarkoApiFactory.client!;
-//        }
+        public PostsControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
+        {
+            client = postsByMarkoApiFactory.authenticatedClient!;
+            postRepository = postsByMarkoApiFactory.postRepository!;
+            mapper = postsByMarkoApiFactory.mapper!;
+        }
 
-//        [Fact]
-//        public async Task should_return_all_posts()
-//        {
-//            // Arrange
-//            var randomTitle = new Faker().Commerce.ProductName();
-//            var posts = new List<Post>() { new Post(randomTitle, "Content"), new Post(randomTitle, "Materials") };
+        [Fact]
+        public async Task should_return_all_posts()
+        {
+            // Arrange
+            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPostsDtos = mapper.Map<List<PostDto>>(allPosts);
 
-//            foreach (var post in posts)
-//            {
-//                await client.PostAsJsonAsync("/createPost", post);
-//            }
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/all");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var posts = JsonConvert.DeserializeObject<List<PostDto>>(responseContent);
 
-//            // Act
-//            var requestResult = await client.GetFromJsonAsync<RequestResult>("/getAllPosts");
-//            var allPosts = JsonConvert.DeserializeObject<List<Post>>(requestResult.Payload.ToString());
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            posts.Should().NotBeNullOrEmpty();
+            allPostsDtos.ForEach(postDto =>
+            {
+                posts.Should().ContainEquivalentOf(postDto);
+            });
+        }
 
-//            allPosts.Should().NotBeNullOrEmpty();
-//            allPosts.Select(p => p.Title).Should().Contain(randomTitle);
-//        }
+        [Fact]
+        public async Task should_return_a_post()
+        {
+            // Arrange
+            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var postDto = mapper.Map<PostDto>(allPosts.First());
 
-//        [Fact]
-//        public async Task should_create_a_post()
-//        {
-//            // Arrange
-//            var post = new Post("Title", "Content");
+            // Act
+            var response = await client.GetAsync($"{controllerPrefix}/{postDto.Id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var post = JsonConvert.DeserializeObject<PostDto>(responseContent);
 
-//            // Act
-//            var response = await client.PostAsJsonAsync("/createPost", post);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-//            var createdPost = JsonConvert.DeserializeObject<Post>(requestResult.Payload.ToString());
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            
+            post.Should().NotBeNull();
+            post.Should().BeEquivalentTo(postDto);
+        }
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.Created);
-//            requestResult.Message.Should().Be("Post was created successfully");
+        [Fact]
+        public async Task should_create_a_post()
+        {
+            // Arrange
+            var newPost = new PostDto
+            {
+                AuthorId = testAdmin.Id,
+                Title = "Integration Test Post",
+                Content = "This is a post created during an integration test.",
+                Hidden = false
+            };
 
-//            createdPost.Should().NotBeNull();
-//            createdPost.Title.Should().Be(post.Title);
-//            createdPost.Content.Should().Be(post.Content);
-//            createdPost.AuthorId.Should().Be(testAdmin.Id);
-//        }
+            // Act
+            var response = await client.PostAsJsonAsync($"{controllerPrefix}/create", newPost);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var post = JsonConvert.DeserializeObject<PostDto>(responseContent);
 
-//        [Fact]
-//        public async Task should_update_a_post()
-//        {
-//            // Arrange
-//            var post = new Post("Title", "Content");
-//            await client.PostAsJsonAsync("/createPost", post);
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//            post.Title = "Updated title";
-//            post.Content = "Updated content";
+            post.Should().NotBeNull();
+            post.Id.Should().NotBeEmpty();
+            post.Title.Should().Be(newPost.Title);
+            post.Content.Should().Be(newPost.Content);
+            post.AuthorId.Should().Be(newPost.AuthorId);
+            post.Hidden.Should().Be(newPost.Hidden);
+        }
 
-//            // Act
-//            var response = await client.PutAsJsonAsync("/updatePost", post);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
+        [Fact]
+        public async Task should_update_a_post()
+        {
+            // Arrange
+            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var postToUpdate = allPosts.First();
+            var updateRequest = new UpdatePostRequest
+            {
+                Title = "Updated Title",
+                Content = "Updated Content",
+                Hidden = true
+            };
 
-//            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
-//            var updatedPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
+            // Act
+            var response = await client.PutAsJsonAsync($"{controllerPrefix}/update/{postToUpdate.Id}", updateRequest);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var updatedPost = JsonConvert.DeserializeObject<PostDto>(responseContent);
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-//            requestResult.Message.Should().Be("Post was updated successfully");
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-//            updatedPost.Should().NotBeNull();
-//            updatedPost.Title.Should().Be(post.Title);
-//            updatedPost.Content.Should().Be(post.Content);
-//        }
+            updatedPost.Should().NotBeNull();
+            updatedPost.Title.Should().Be(updateRequest.Title);
+            updatedPost.Content.Should().Be(updateRequest.Content);
+            updatedPost.Hidden.Should().Be(updateRequest.Hidden);
+            updatedPost.LastUpdatedDate.Should().BeAfter(postToUpdate.LastUpdatedDate);
+        }
 
-//        [Fact]
-//        public async Task should_hide_a_post()
-//        {
-//            // Arrange
-//            var post = new Post("Title", "Content");
-//            await client.PostAsJsonAsync("/createPost", post);
+        [Fact]
+        public async Task should_delete_a_post()
+        {
+            // Arrange
+            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var postToDelete = allPosts.First();
 
-//            // Act
-//            var response = await client.PostAsync($"/togglePostVisibility/{post.Id}", null);
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
+            // Act
+            var response = await client.DeleteAsync($"{controllerPrefix}/delete/{postToDelete.Id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
 
-//            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
-//            var hiddenPost = JsonConvert.DeserializeObject<Post>(postResponse!.Payload!.ToString()!);
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-//            requestResult.Message.Should().Be("Post visibility was toggled successfully");
+            var deletedPost = await postRepository.GetPostByIdAsync(postToDelete.Id, CancellationToken.None);
 
-//            hiddenPost.Should().NotBeNull();
-//            hiddenPost.IsHidden.Should().BeTrue();
-//        }
+            deletedPost.Should().BeNull();
+        }
 
-//        [Fact]
-//        public async Task should_delete_a_post()
-//        {
-//            // Arrange
-//            var post = new Post("Title", "Content");
-//            await client.PostAsJsonAsync("/createPost", post);
-
-//            // Act
-//            var response = await client.DeleteAsync($"/deletePost/{post.Id}");
-//            var requestResult = await response.Content.ReadFromJsonAsync<RequestResult>();
-
-//            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{post.Id}");
-
-//            // Assert
-//            requestResult.Should().NotBeNull();
-//            requestResult.StatusCode.Should().Be(HttpStatusCode.OK);
-//            requestResult.Message.Should().Be("Post was deleted successfully");
-
-//            postResponse.Should().NotBeNull();
-//            postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-//            postResponse.Message.Should().Be($"Post with Id: {post.Id} was not found");
-//        }
-
-//        [Fact]
-//        public async Task should_return_post_author()
-//        {
-//            // Arrange
-//            var post = new Post("Title", "Content");
-//            await client.PostAsJsonAsync("/createPost", post);
-
-//            // Act
-//            var response = await client.GetFromJsonAsync<RequestResult>($"/getPostAuthor/{post.Id}");
-//            var postAuthor = JsonConvert.DeserializeObject<AuthorDetailsResponse>(response!.Payload!.ToString()!);
-
-//            // Assert
-//            response.Should().NotBeNull();
-//            response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-//            postAuthor.Should().NotBeNull();
-//            postAuthor.Should().BeEquivalentTo(new AuthorDetailsResponse(testAdmin));
-//        }
-
-//        [Fact]
-//        public async Task should_return_not_found_if_post_does_not_exist()
-//        {
-//            // Arrange
-//            var randomId = Guid.NewGuid().ToString();
-
-//            // Act
-//            var postResponse = await client.GetFromJsonAsync<RequestResult>($"/getPost/{randomId}");
-//            var authorResponse = await client.GetFromJsonAsync<RequestResult>($"/getPostAuthor/{randomId}");
-
-//            // Assert
-//            postResponse.Should().NotBeNull();
-//            postResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-//            postResponse.Message.Should().Be($"Post with Id: {randomId} was not found");
-//            postResponse.Payload.Should().BeNull();
-
-//            authorResponse.Should().NotBeNull();
-//            authorResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-//            authorResponse.Message.Should().Be($"Post with Id: {randomId} was not found");
-//            authorResponse.Payload.Should().BeNull();
-//        }
-//    }
-//}
+    }
+}

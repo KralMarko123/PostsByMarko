@@ -49,7 +49,9 @@ namespace PostsByMarko.Host.Controllers
         [Route("update/{id::guid}")]
         public async Task<ActionResult<PostDto>> UpdatePost(Guid id, [FromBody] UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
-            return await postsService.UpdatePostAsync(id, request, cancellationToken);
+            var updatedPost = await postsService.UpdatePostAsync(id, request, cancellationToken);
+            
+            return Ok(updatedPost);
         }
 
         [HttpDelete]

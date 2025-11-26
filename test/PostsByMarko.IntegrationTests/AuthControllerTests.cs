@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    [Collection("Integration Collection")]
+    [Collection("Sequential Collection")]
     public class AuthControllerTests
     {
         private readonly HttpClient client;

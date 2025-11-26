@@ -15,15 +15,14 @@ using Xunit;
 
 namespace PostsByMarko.IntegrationTests
 {
-    [Collection("Integration Collection")]
+    [Collection("Sequential Collection")]
     public class UsersControllerTests
     {
         private readonly HttpClient client;
-        private readonly User testUser = TestingConstants.TEST_USER;
-        private readonly User randomUser = TestingConstants.RANDOM_USER;
-        private readonly string controllerPrefix = "/api/user";
         private readonly IMapper mapper;
         private readonly UserManager<User> userManager;
+        private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly string controllerPrefix = "/api/user";
 
         public UsersControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
