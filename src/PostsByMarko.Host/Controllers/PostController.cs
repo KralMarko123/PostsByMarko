@@ -28,7 +28,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("{id::guid}")]
+        [Route("{id:guid}")]
         public async Task<ActionResult<PostDto>> GetPost(Guid id, CancellationToken cancellationToken = default)
         {
             var post = await postsService.GetPostByIdAsync(id, cancellationToken);
@@ -46,7 +46,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpPut]
-        [Route("{id::guid}")]
+        [Route("{id:guid}")]
         public async Task<ActionResult<PostDto>> UpdatePost(Guid id, [FromBody] UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
             var updatedPost = await postsService.UpdatePostAsync(id, request, cancellationToken);
@@ -55,7 +55,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpDelete]
-        [Route("{id::guid}")]
+        [Route("{id:guid}")]
         public async Task<IActionResult> DeletePost(Guid id, CancellationToken cancellationToken = default)
         {
             await postsService.DeletePostByIdAsync(id, cancellationToken);

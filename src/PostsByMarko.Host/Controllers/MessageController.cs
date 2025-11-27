@@ -27,7 +27,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpPost]
-        [Route("chats/user/{otherUserId::guid}")]
+        [Route("chats/user/{otherUserId:guid}")]
         public async Task<ActionResult<ChatDto>> StartChat(Guid otherUserId, CancellationToken cancellationToken = default)
         {
             var result = await messagingService.StartChatAsync(otherUserId, cancellationToken);

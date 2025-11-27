@@ -19,7 +19,7 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("all")]
-        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] Guid exceptId, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
             var users = await usersService.GetUsersAsync(exceptId, cancellationToken);
 
@@ -27,7 +27,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpGet]
-        [Route("{id::guid}")]
+        [Route("{id:guid}")]
         public async Task<ActionResult<UserDto>> GetUser(Guid id, CancellationToken cancellationToken = default)
         {
             var user = await usersService.GetUserByIdAsync(id, cancellationToken);

@@ -1,5 +1,7 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Hubs;
@@ -9,14 +11,37 @@ using PostsByMarko.Host.Extensions;
 using Serilog;
 using System.Text.Json.Serialization;
 
+
 var builder = WebApplication.CreateBuilder(args);
-var isInLocalDevelopment = builder.Environment.IsDevelopment();
-var isInTest = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Test");
+var environment = builder.Environment;
+var isInLocalDevelopment = environment.IsDevelopment();
+var isInTest = environment.IsEnvironment("Test");
+
+if (isInLocalDevelopment || isInTest)
+{
+    var projectRoot = Directory.GetCurrentDirectory();
+    var envPath = isInTest ? 
+        Path.GetFullPath(Path.Combine(projectRoot, "../../../../../", ".env"))
+        : Path.GetFullPath(Path.Combine(projectRoot, "../../", ".env"));
+
+    Console.WriteLine($"Loading .env from: {envPath}");
+
+    if (File.Exists(envPath))
+    {
+        Env.Load(envPath);
+    }
+    else
+    {
+        throw new ArgumentException("Missing '.env' file for configuration!");
+    }
+}
+
+builder.Configuration.AddEnvironmentVariables();
+
+// Define configurations here
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
 
 #region ServicesConfiguration
 
@@ -62,7 +87,7 @@ var app = builder.Build();
 
 
 
-if (isInLocalDevelopment || isInTest.GetValueOrDefault(false))
+if (isInLocalDevelopment || isInTest)
 {
     app.WithSwaggerEnabled();
     
@@ -71,7 +96,7 @@ if (isInLocalDevelopment || isInTest.GetValueOrDefault(false))
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
-if (!isInLocalDevelopment && !isInTest.GetValueOrDefault(false))
+if (!isInLocalDevelopment && !isInTest)
 {
     app.UseHttpsRedirection();
 }
