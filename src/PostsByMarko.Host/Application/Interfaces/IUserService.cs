@@ -14,7 +14,7 @@ namespace PostsByMarko.Host.Application.Interfaces
         Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);
         Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken = default);
-        Task<List<UserDto>> GetUsersAsync(Guid? exceptId, CancellationToken cancellationToken = default);
+        Task<List<UserDto>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default);
         Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<List<string>> GetRolesForUserAsync(User user);

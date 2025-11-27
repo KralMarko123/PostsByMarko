@@ -114,10 +114,10 @@ namespace PostsByMarko.Host.Application.Services
             return result;
         }
 
-        public async Task DeletePostByIdAsync(Guid Id, CancellationToken cancellationToken)
+        public async Task DeletePostByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
 

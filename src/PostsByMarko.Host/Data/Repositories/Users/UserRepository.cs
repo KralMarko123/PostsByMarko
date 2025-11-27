@@ -52,14 +52,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             return user;
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<User?> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var user = await userManager.Users
                 .Include(u => u.Posts)
                 .Include(u => u.Messages)
                 .Include(u => u.ChatUsers)
                     .ThenInclude(cu => cu.Chat)
-                .SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
+                .SingleOrDefaultAsync(u => u.Id == Id, cancellationToken);
 
             return user;
         }

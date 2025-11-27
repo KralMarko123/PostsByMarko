@@ -20,6 +20,6 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         Task<IdentityResult> AddRoleToUserAsync(User user, string role);
         Task<IdentityResult> RemoveRoleFromUserAsync(User user, string role);
         Task<IdentityResult> UpdateUserAsync(User user);
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
