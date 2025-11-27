@@ -86,6 +86,6 @@ app.MapControllers();
 
 if (isInLocalDevelopment) Console.WriteLine("App is running locally!");
 
-app.Run();
+await app.RunAsync();
 
 public partial class Program { }

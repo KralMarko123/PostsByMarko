@@ -131,13 +131,11 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithAuthorization(this WebApplicationBuilder builder)
         {
-            builder.Services.AddAuthorization(options =>
-            {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            builder.Services.AddAuthorizationBuilder()
+                .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                 .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
-                .Build();
-            });
+                .Build());
         }
 
         public static void WithAppServices(this WebApplicationBuilder builder)

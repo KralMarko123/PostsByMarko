@@ -199,8 +199,8 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
-            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
             messageRepositoryMock.Setup(mr => mr.AddMessageAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>())).ReturnsAsync(message);
             mapperMock.Setup(m => m.Map<Message>(messageDto)).Returns(message);
             mapperMock.Setup(m => m.Map<MessageDto>(message)).Returns(messageDto);
@@ -218,26 +218,6 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task send_message_should_throw_if_user_does_not_exist()
-        {
-            // Arrange
-            var message = new Message { Id = Guid.NewGuid(), ChatId = Guid.NewGuid(), SenderId = Guid.NewGuid() };
-            var messageDto = new MessageDto
-            {
-                Id = message.Id,
-                SenderId = message.SenderId,
-                ChatId = message.ChatId,
-            };
-
-
-            // Act
-            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
-
-            // Assert
-            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"Sender with Id: {messageDto.SenderId} was not found");
-        }
-
-        [Fact]
         public async Task send_message_should_throw_if_chat_does_not_exist()
         {
             // Arrange
@@ -250,7 +230,7 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
             // Act
             var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
@@ -273,8 +253,8 @@ namespace PostsByMarko.UnitTests
                 ChatId = message.ChatId,
             };
 
-            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
-            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
+            userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
 
             // Act
             var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);

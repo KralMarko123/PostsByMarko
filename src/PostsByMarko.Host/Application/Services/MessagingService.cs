@@ -8,7 +8,6 @@ using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
-using System;
 
 namespace PostsByMarko.Host.Application.Services
 {
@@ -70,18 +69,19 @@ namespace PostsByMarko.Host.Application.Services
             await chatRepository.SaveChangesAsync(cancellationToken);
 
             var chatDto = mapper.Map<ChatDto>(createdChat);
+            var chatUserIds = chatDto.Users.Select(u => u.Id.ToString());
 
-            await messageHub.Clients.Users(chatDto.Users.Select(u => u.Id.ToString())).ChatCreated(chatDto);
+            await messageHub.Clients.Users(chatUserIds!).ChatCreated(chatDto);
 
             return chatDto;
         }
 
         public async Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default)
         {
-            var sender = await userRepository.GetUserByIdAsync(messageDto.SenderId) ?? throw new KeyNotFoundException($"Sender with Id: {messageDto.SenderId} was not found");
-            var chat = await chatRepository.GetChatByIdAsync(messageDto.ChatId, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {messageDto.ChatId} was not found");
+            var chat = await chatRepository.GetChatByIdAsync(messageDto.ChatId!.Value, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {messageDto.ChatId} was not found");
+            var chatUserIds = chat.ChatUsers.Select(c => c.UserId);
 
-            if (!chat.ChatUsers.Select(c => c.UserId).Contains(messageDto.SenderId))
+            if (!chatUserIds.Contains(messageDto.SenderId!.Value))
             {
                 throw new AuthException("Sender is not a member of the chat.");
             }

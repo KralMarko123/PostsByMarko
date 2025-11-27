@@ -10,16 +10,16 @@ namespace PostsByMarko.Host.Application.Interfaces
     {
         Task<User> GetCurrentUserAsync();
         Task CreateUserAsync(RegistrationDto userRegistration);
-        Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
+        Task<UserDto> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default);
+        Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);
-        Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken);
-        Task<List<UserDto>> GetUsersAsync(Guid? exceptId, CancellationToken cancellationToken);
-        Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken);
+        Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken = default);
+        Task<List<UserDto>> GetUsersAsync(Guid? exceptId, CancellationToken cancellationToken = default);
+        Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<List<string>> GetRolesForUserAsync(User user);
-        Task DeleteUserAsync(Guid id, CancellationToken cancellationToken);
-        Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken);
-        Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken);
+        Task DeleteUserByIdAsync(Guid Id, CancellationToken cancellationToken = default);
+        Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default);
+        Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default);
     }
 }

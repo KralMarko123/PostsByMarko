@@ -16,35 +16,37 @@ namespace PostsByMarko.Host.Data
 
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            SetupKeyGenerationStrategy(modelBuilder);
-            SetupRelationshipStrategies(modelBuilder);
-            SetupIndexes(modelBuilder);
+            SetupKeyGenerationStrategy(builder);
+            SetupRelationshipStrategies(builder);
+            SetupIndexes(builder);
 
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
         }
 
-        private void SetupKeyGenerationStrategy(ModelBuilder modelBuilder)
+        private static void SetupKeyGenerationStrategy(ModelBuilder modelBuilder)
         {
+            const string pgGuidGenerationFunctionName = "gen_random_uuid()";
+
             modelBuilder.Entity<User>()
                 .Property(u => u.Id)
-                .HasDefaultValueSql("gen_random_uuid()");
+                .HasDefaultValueSql(pgGuidGenerationFunctionName);
 
             modelBuilder.Entity<Post>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql("gen_random_uuid()");
+                .HasDefaultValueSql(pgGuidGenerationFunctionName);
 
             modelBuilder.Entity<Chat>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql("gen_random_uuid()");
+                .HasDefaultValueSql(pgGuidGenerationFunctionName);
 
             modelBuilder.Entity<Message>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql("gen_random_uuid()");
+                .HasDefaultValueSql(pgGuidGenerationFunctionName);
         }
 
-        private void SetupRelationshipStrategies(ModelBuilder modelBuilder)
+        private static void SetupRelationshipStrategies(ModelBuilder modelBuilder)
         {
             // Post → User (1:N)
             modelBuilder.Entity<Post>()
@@ -81,7 +83,7 @@ namespace PostsByMarko.Host.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
-        private void SetupIndexes(ModelBuilder modelBuilder)
+        private static void SetupIndexes(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Post>()
                 .HasIndex(p => new { p.AuthorId });

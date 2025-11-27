@@ -17,15 +17,12 @@ namespace PostsByMarko.Host.Extensions
 
         public static async Task WithDatabaseReset(this WebApplication app)
         {
-            using (var scope = app.Services.CreateScope())
-            {
-                var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            using var scope = app.Services.CreateScope();
+            var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                appDbContext.Database.EnsureDeleted();
-                appDbContext.Database.EnsureCreated();
-
-                await appDbContext.Seed();
-            }
+            await appDbContext.Database.EnsureDeletedAsync();
+            await appDbContext.Database.EnsureCreatedAsync();
+            await appDbContext.Seed();
         }
     }
 }

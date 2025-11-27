@@ -12,22 +12,22 @@ namespace PostsByMarko.Host.Data.Repositories.Messaging
             this.appDbContext = appDbContext;
         }
 
-        public async Task<Chat?> GetChatByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Chat?> GetChatByIdAsync(Guid Id, CancellationToken cancellationToken)
         {
             return await appDbContext.Chats
                 .Include(c => c.Messages)
                 .Include(c => c.ChatUsers)
                     .ThenInclude(cu => cu.User)
-                .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+                .FirstOrDefaultAsync(c => c.Id == Id, cancellationToken);
         }
 
-        public async Task<Chat?> GetChatByUserIdsAsync(Guid[] userIds, CancellationToken cancellationToken)
+        public async Task<Chat?> GetChatByUserIdsAsync(Guid[] Ids, CancellationToken cancellationToken)
         {
             return await appDbContext.Chats
                 .Include(c => c.Messages)
                 .Include(c => c.ChatUsers)
                     .ThenInclude(cu => cu.User)
-                .FirstOrDefaultAsync(c => c.ChatUsers.Count == userIds.Length && c.ChatUsers.All(cu => userIds.Contains(cu.UserId)), cancellationToken);
+                .FirstOrDefaultAsync(c => c.ChatUsers.Count == Ids.Length && c.ChatUsers.All(cu => Ids.Contains(cu.UserId)), cancellationToken);
         }
 
         public async Task<List<Chat>> GetChatsForUserAsync(User user, CancellationToken cancellationToken)

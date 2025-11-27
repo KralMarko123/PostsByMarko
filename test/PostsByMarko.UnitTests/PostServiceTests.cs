@@ -196,9 +196,18 @@ namespace PostsByMarko.UnitTests
         public async Task create_post_should_return_added_post()
         {
             // Arrange
-            var post = new Post { Id = Guid.NewGuid(), Title = "Some Title", Content = "Some Content", Hidden = true };
-            var postDto = new PostDto { Id = post.Id, Title = post.Title, Content = post.Content, Hidden = post.Hidden };
+            var user = new User { Id = Guid.NewGuid() };
+            var createRequest = new CreatePostRequest
+            {
+                Title = "Post created during unit test",
+                Content = "Content created during unit test"
+            };
+            var post = new Post { Id = Guid.NewGuid(), Title = createRequest.Title, Content = createRequest.Content };
+            var postDto = new PostDto { Id = post.Id, Title = post.Title, Content = post.Content, Hidden = post.Hidden};
 
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            mapperMock.Setup(m => m.Map<Post>(createRequest)).Returns(post);
             mapperMock.Setup(m => m.Map<Post>(postDto)).Returns(post);
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
             postsRepositoryMock.Setup(r => r.AddPostAsync(post, It.IsAny<CancellationToken>())).ReturnsAsync(post);
@@ -206,7 +215,7 @@ namespace PostsByMarko.UnitTests
             postClientMock.Setup(p => p.PostCreated(postDto)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await postService.CreatePostAsync(postDto, CancellationToken.None);
+            var result = await postService.CreatePostAsync(createRequest, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
@@ -218,14 +227,33 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task create_post_should_throw_if_user_was_not_found()
+        {
+            // Arrange
+            var randomId = Guid.NewGuid();
+            var createRequest = new CreatePostRequest { Title = "Some title", Content = "Some content" };
+
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
+
+            // Act
+            var result = async () => await postService.CreatePostAsync(createRequest, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
+        }
+
+        [Fact]
         public async Task create_post_should_throw_if_post_has_no_title_or_content()
         {
             // Arrange
-            var post = new Post { Id = Guid.NewGuid() };
-            var postDto = new PostDto { Id = post.Id };
+            var user = new User { Id = Guid.NewGuid() };
+            var createRequest = new CreatePostRequest { Title = "", Content = "" };
+
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
             // Act
-            var result = async () => await postService.CreatePostAsync(postDto, CancellationToken.None);
+            var result = async () => await postService.CreatePostAsync(createRequest, CancellationToken.None);
 
             // Assert
             await result.Should().ThrowAsync<ArgumentException>().WithMessage("Post title and content cannot be empty");

@@ -4,8 +4,8 @@ namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IMessagingService
     {
-        Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken);
-        Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken);
-        Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken);
+        Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken = default);
+        Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default);
+        Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default);
     }
 }

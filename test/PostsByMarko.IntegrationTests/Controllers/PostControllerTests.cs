@@ -90,16 +90,14 @@ namespace PostsByMarko.IntegrationTests.Controllers
         {
             // Arrange
             var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
-            var newPost = new PostDto
+            var createRequest = new CreatePostRequest
             {
-                AuthorId = testAdmin.Id,
-                Title = "Integration Test Post",
-                Content = "This is a post created during an integration test.",
-                Hidden = false
+                Title = "Post created during integration test",
+                Content = "Content for integration test"
             };
 
             // Act
-            var response = await client.PostAsJsonAsync($"{controllerPrefix}/create", newPost);
+            var response = await client.PostAsJsonAsync($"{controllerPrefix}", createRequest);
             var responseContent = await response.Content.ReadAsStringAsync();
             var post = JsonConvert.DeserializeObject<PostDto>(responseContent);
 
@@ -108,10 +106,10 @@ namespace PostsByMarko.IntegrationTests.Controllers
 
             post.Should().NotBeNull();
             post.Id.Should().NotBeEmpty();
-            post.Title.Should().Be(newPost.Title);
-            post.Content.Should().Be(newPost.Content);
-            post.AuthorId.Should().Be(newPost.AuthorId);
-            post.Hidden.Should().Be(newPost.Hidden);
+            post.Title.Should().Be(createRequest.Title);
+            post.Content.Should().Be(createRequest.Content);
+            post.AuthorId.Should().Be(testAdmin.Id);
+            post.Hidden.Should().BeFalse();
         }
 
         [Fact]

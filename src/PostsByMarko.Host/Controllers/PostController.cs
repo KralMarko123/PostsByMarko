@@ -37,10 +37,10 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpPost]
-        [Route("create")]
-        public async Task<ActionResult<PostDto>> CreatePost([FromBody] PostDto postToCreate, CancellationToken cancellationToken = default)
+        [Route("")]
+        public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostRequest createRequest, CancellationToken cancellationToken = default)
         {
-            var post = await postsService.CreatePostAsync(postToCreate, cancellationToken);
+            var post = await postsService.CreatePostAsync(createRequest, cancellationToken);
             
             return Ok(post);
         }

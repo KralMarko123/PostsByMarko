@@ -29,8 +29,7 @@ reportgenerator `
     -reports:"$coverageOutputDir/Unit/**/coverage.cobertura.xml;$coverageOutputDir/Integration/**/coverage.cobertura.xml" `
     -targetdir:"$reportOutputDir" `
     -reporttypes:"Html;Cobertura" `
-    -assemblyfilters:"-PostsByMarko.Host.Builders*;-PostsByMarko.Host.Constants*;-PostsByMarko.Host.Data*;-PostsByMarko.Host.Extensions*;-PostsByMarko.Host.Hubs*;-PostsByMarko.Host.Middlewares*;-PostsByMarko.Test.Shared*" `
-    -classfilters:"-*.Builders.*;-*.Constants.*;-*.Data.*;-*.Extensions.*;-*.Hubs.*;-*.Middlewares.*;-*.Helper.*"
+    -classfilters:"-*.Builders.*;-*.Constants.*;-*.Migrations.*;-*.Extensions.*;-*.Exceptions.*;-*.Hubs.*;-*.Middlewares.*;-*.Helper.*"
 
 Write-Host "`n✅ Coverage report generated under: $reportOutputDir"
 

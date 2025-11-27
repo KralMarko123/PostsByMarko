@@ -4,7 +4,7 @@ namespace PostsByMarko.Host.Data.Entities
 {
     public class User : IdentityUser<Guid>
     {
-        public override string Email { get; set; } = string.Empty;
+        public override string? Email { get; set; }
         public override bool EmailConfirmed { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }

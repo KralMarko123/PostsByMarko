@@ -4,18 +4,74 @@ using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Data.Entities;
+using System.Collections.Immutable;
 
 namespace PostsByMarko.Host.Extensions
 {
     public static class DbContextExtensions
     {
+        private static readonly ImmutableList<IdentityRole<Guid>> appRoles =
+        [
+                new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = RoleConstants.ADMIN, NormalizedName = RoleConstants.ADMIN.ToUpper() },
+                new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = RoleConstants.USER, NormalizedName = RoleConstants.USER.ToUpper() }
+        ];
+
+        private static readonly ImmutableList<User> admins =
+        [
+                new User
+                {
+                    Email = "kralmarko123@gmail.com",
+                    NormalizedEmail = "KRALMARKO123@gmail.com",
+                    UserName = "kralmarko123@gmail.com",
+                    NormalizedUserName = "KRALMARKO123@gmail.com",
+                    FirstName = "Marko",
+                    LastName = "Markovikj",
+                    EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                },
+                new User
+                {
+                    Email = "testAdmin@test.com",
+                    NormalizedEmail = "TESTADMIN@TEST.COM",
+                    UserName = "testAdmin@test.com",
+                    NormalizedUserName = "TESTADMIN@TEST.COM",
+                    FirstName = "Test",
+                    LastName = "Admin",
+                    EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                }
+        ];
+
+        private static readonly ImmutableList<User> appUsers =
+        [
+                new User
+                {
+                    Email = "test@test.com",
+                    NormalizedEmail = "TEST@TEST.COM",
+                    UserName = "test@test.com",
+                    NormalizedUserName = "TEST@TEST.COM",
+                    FirstName = "Test",
+                    LastName = "User",
+                    EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                },
+                new User
+                {
+                    Email = "user@userson.com",
+                    NormalizedEmail = "USER@USERSON.COM",
+                    UserName = "user@userson.com",
+                    NormalizedUserName = "USER@USERSON.COM",
+                    FirstName = "User",
+                    LastName = "Userson",
+                    EmailConfirmed = false,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                }
+        ];
+
         public static async Task Seed(this AppDbContext appDbContext)
         {
             var passwordHasher = new PasswordHasher<User>();
-            var appRoles = AppConstants.appRoles;
-            var admins = AppConstants.admins;
-            var users = AppConstants.appUsers;
-            var allUsers = admins.Concat(users);
+            var allUsers = admins.Concat(appUsers);
 
             // seed roles
             await appDbContext.Roles.AddRangeAsync(appRoles);
@@ -87,7 +143,7 @@ namespace PostsByMarko.Host.Extensions
             {
                 u.Id = Guid.NewGuid();
                 u.PasswordHash = hasher.HashPassword(u, "@Marko123");
-                userRoles.Add(new IdentityUserRole<Guid> { UserId = u.Id, RoleId = AppConstants.appRoles[1].Id });
+                userRoles.Add(new IdentityUserRole<Guid> { UserId = u.Id, RoleId = appRoles[1].Id });
 
                 var postsToAdd = postFaker.Generate(new Random().Next(1, 3));
 

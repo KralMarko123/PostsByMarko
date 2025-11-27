@@ -5,10 +5,10 @@ namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IPostService
     {
-        Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken);
-        Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken);
-        Task<PostDto> CreatePostAsync(PostDto post, CancellationToken cancellationToken);
-        Task<PostDto> UpdatePostAsync(Guid Id, UpdatePostRequest request, CancellationToken cancellationToken);
-        Task DeletePostByIdAsync(Guid postId, CancellationToken cancellationToken);
+        Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken = default);
+        Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default);
+        Task<PostDto> CreatePostAsync(CreatePostRequest request, CancellationToken cancellationToken = default);
+        Task<PostDto> UpdatePostAsync(Guid Id, UpdatePostRequest request, CancellationToken cancellationToken = default);
+        Task DeletePostByIdAsync(Guid Id, CancellationToken cancellationToken = default);
     }
 }

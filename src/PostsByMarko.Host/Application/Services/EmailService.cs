@@ -25,11 +25,11 @@ namespace PostsByMarko.Host.Application.Services
         {
             var user = await userRepository.GetUserByEmailAsync(emailToSendTo) ?? throw new KeyNotFoundException($"User with email '{emailToSendTo}' was not found");
             var token = await userRepository.GenerateEmailConfirmationTokenForUserAsync(user);
-            var confirmationLink = GenerateEmailConfirmationLink(user.Email, token);
+            var confirmationLink = GenerateEmailConfirmationLink(user.Email!, token);
             var subject = $"Please confirm the registration for {user.Email}";
             var body = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 
-            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email, subject, body);
+            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, body);
         }
 
         public async Task ConfirmEmailAsync(string email, string token)
@@ -52,7 +52,7 @@ namespace PostsByMarko.Host.Application.Services
             };
 
             var confirmationLink = linkGenerator.GetUriByAddress(
-                httpContext: currentRequestAccessor.requestContext,
+                httpContext: currentRequestAccessor.Context,
                 address: CONFIRM_EMAIL_ENDPOINT_NAME, // the route name
                 values: dictionaryValues,
                 scheme: null,

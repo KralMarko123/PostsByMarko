@@ -33,7 +33,7 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var allPosts = await postRepository.GetPostsAsync(cancellationToken);
 
@@ -45,12 +45,12 @@ namespace PostsByMarko.Host.Application.Services
             return mapper.Map<List<PostDto>>(allPosts);
         }
 
-        public async Task<PostDto> GetPostByIdAsync(Guid postId, CancellationToken cancellationToken = default)
+        public async Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
             
             if (post.Hidden && !userRoles.Contains(RoleConstants.ADMIN) && post.AuthorId != currentUser.Id)
             {
@@ -60,17 +60,22 @@ namespace PostsByMarko.Host.Application.Services
             return mapper.Map<PostDto>(post);
         }
 
-        public async Task<PostDto> CreatePostAsync(PostDto postToCreate, CancellationToken cancellationToken = default)
+        public async Task<PostDto> CreatePostAsync(CreatePostRequest request, CancellationToken cancellationToken = default)
         {
-            if(postToCreate.Title.Length == 0 || postToCreate.Content.Length == 0)
+            var currentUserId = currentRequestAccessor.Id;
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+
+            if (request.Title.Length == 0 || request.Content.Length == 0)
             {
                 throw new ArgumentException("Post title and content cannot be empty");
             }
            
-            postToCreate.CreatedDate = DateTime.UtcNow;
-            postToCreate.LastUpdatedDate = postToCreate.CreatedDate;
+            var post = mapper.Map<Post>(request);
 
-            var post = mapper.Map<Post>(postToCreate);
+            post.CreatedDate = DateTime.UtcNow;
+            post.AuthorId = currentUser.Id;
+            post.Author = currentUser;
+
             post = await postRepository.AddPostAsync(post, cancellationToken);
 
             await postRepository.SaveChangesAsync(cancellationToken);
@@ -82,12 +87,12 @@ namespace PostsByMarko.Host.Application.Services
             return postDto;
         }
 
-        public async Task<PostDto> UpdatePostAsync(Guid postId, UpdatePostRequest request, CancellationToken cancellationToken = default)
+        public async Task<PostDto> UpdatePostAsync(Guid Id, UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
 
             if (currentUser.Id != post.AuthorId && !userRoles.Contains(RoleConstants.ADMIN))
             {
@@ -109,12 +114,12 @@ namespace PostsByMarko.Host.Application.Services
             return result;
         }
 
-        public async Task DeletePostByIdAsync(Guid postId, CancellationToken cancellationToken)
+        public async Task DeletePostByIdAsync(Guid Id, CancellationToken cancellationToken)
         {
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(postId, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {postId} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
 
             if (currentUser.Id != post.AuthorId && !userRoles.Contains(RoleConstants.ADMIN))
             {
@@ -123,7 +128,7 @@ namespace PostsByMarko.Host.Application.Services
             
             await postRepository.DeletePostAsync(post);
             await postRepository.SaveChangesAsync(cancellationToken);
-            await postHub.Clients.All.PostDeleted(postId);
+            await postHub.Clients.All.PostDeleted(Id);
         }
     }
 }

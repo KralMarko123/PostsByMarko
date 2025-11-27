@@ -26,7 +26,7 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.PrimarySid, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
@@ -50,33 +50,6 @@ namespace PostsByMarko.Host.Data.Repositories.Users
                 .SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
 
             return user;
-        }
-
-        public async Task<List<string>> GetRolesForUser(User user)
-        {
-            var result = await userManager.GetRolesAsync(user);
-
-            return [.. result];
-        }
-
-        public async Task<bool> AddPostToUserAsync(User user, Post post)
-        {
-            user.Posts.Add(post);
-
-            var result = await userManager.UpdateAsync(user);
-
-            return result.Succeeded;
-        }
-
-        public async Task<bool> RemovePostFromUserAsync(string email, Post post)
-        {
-            var user = await GetUserByEmailAsync(email);
-
-            user!.Posts!.Remove(post);
-
-            var result = await userManager.UpdateAsync(user);
-
-            return result.Succeeded;
         }
 
         public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default)

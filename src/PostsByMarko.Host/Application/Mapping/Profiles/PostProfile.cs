@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Application.Mapping.Profiles
@@ -9,6 +10,7 @@ namespace PostsByMarko.Host.Application.Mapping.Profiles
         public PostProfile() 
         {
             CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<CreatePostRequest, Post>(MemberList.None);
         }
     }
 }

@@ -344,7 +344,7 @@ namespace PostsByMarko.UnitTests
             var userDto = new UserDto { Id = user.Id };
 
             mapperMock.Setup(m => m.Map<UserDto>(user)).Returns(userDto);
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userDto.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(userDto.Id.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
             var result = await userService.GetUserByIdAsync(user.Id);
@@ -397,7 +397,7 @@ namespace PostsByMarko.UnitTests
             };
             var roles = new List<string> { "Some role" };
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
 
             // Act
@@ -421,7 +421,7 @@ namespace PostsByMarko.UnitTests
             };
             var roles = new List<string> { "Some role", request.Role };
 
-            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
             usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
 
             // Act
@@ -457,7 +457,7 @@ namespace PostsByMarko.UnitTests
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
 
             // Act
-            await userService.DeleteUserAsync(user.Id, CancellationToken.None);
+            await userService.DeleteUserByIdAsync(user.Id, CancellationToken.None);
 
             // Assert
             usersRepositoryMock.Verify(r => r.DeleteUserAsync(user), Times.Once);
@@ -470,7 +470,7 @@ namespace PostsByMarko.UnitTests
             var randomId = Guid.NewGuid();
 
             // Act
-            var result = async () => await userService.DeleteUserAsync(randomId, CancellationToken.None);
+            var result = async () => await userService.DeleteUserByIdAsync(randomId, CancellationToken.None);
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");

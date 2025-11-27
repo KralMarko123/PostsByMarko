@@ -18,17 +18,17 @@ namespace PostsByMarko.Host.Application.Helper
             try
             {
                 using var client = new SmtpClient();
-                client.Connect("mail.markomarkovikj.com", 465, true);
+                await client.ConnectAsync("mail.markomarkovikj.com", 465, true);
 
                 // Note: since we don't have an OAuth2 token, disable
                 // the XOAUTH2 authentication mechanism.
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
                 // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(MiscConstants.SERVER_EMAIL, "@Ilovemotorcycles123");
+                await client.AuthenticateAsync(MiscConstants.SERVER_EMAIL, "@Ilovemotorcycles123");
 
                 await client.SendAsync(message);
-                client.Disconnect(true);
+                await client.DisconnectAsync(true);
             }
             catch (Exception ex)
             {

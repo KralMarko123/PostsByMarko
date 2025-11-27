@@ -41,7 +41,7 @@ namespace PostsByMarko.UnitTests
             var expectedSubject = $"Please confirm the registration for {user.Email}";
             var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 
-            currentRequestAccessorMock.Setup(c => c.requestContext).Returns(defaultHttpContext);
+            currentRequestAccessorMock.Setup(c => c.Context).Returns(defaultHttpContext);
             userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
             linkGeneratorMock

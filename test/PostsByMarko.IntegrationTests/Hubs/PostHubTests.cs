@@ -50,27 +50,25 @@ namespace PostsByMarko.IntegrationTests.Hubs
         {
             // Arrange
             var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
-            var newPost = new PostDto
+            var createRequest = new CreatePostRequest
             {
-                AuthorId = testAdmin.Id,
-                Title = "Integration Test Post",
-                Content = "This is a post created during a SignalR test.",
-                Hidden = false
+                Title = "Post created during SignalR test",
+                Content = "Content for SignalR test"
             };
 
             PostDto? postCreated = null;
             hubConnection!.On<PostDto>("PostCreated", post => postCreated = post);
 
             // Act
-            await client.PostAsJsonAsync($"{controllerPrefix}/create", newPost);
+            await client.PostAsJsonAsync($"{controllerPrefix}", createRequest);
             await postsByMarkoApiFactory.WaitForSignalRPropagation();
 
             // Assert
             postCreated.Should().NotBeNull();
-            postCreated.AuthorId.Should().Be(newPost.AuthorId);
-            postCreated.Title.Should().Be(newPost.Title);
-            postCreated.Content.Should().Be(newPost.Content);
-            postCreated.Hidden.Should().Be(newPost.Hidden);
+            postCreated.Title.Should().Be(createRequest.Title);
+            postCreated.Content.Should().Be(createRequest.Content);
+            postCreated.AuthorId.Should().Be(testAdmin.Id);
+            postCreated.Hidden.Should().BeFalse();
         }
 
         [Fact]
