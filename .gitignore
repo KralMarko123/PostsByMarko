@@ -371,3 +371,4 @@ aspnetserver/Data/AppDB.db
 .env
 CoverageHistory
 coveragereport
+.sonarqube
