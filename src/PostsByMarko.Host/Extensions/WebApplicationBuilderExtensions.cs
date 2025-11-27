@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
@@ -88,7 +89,7 @@ namespace PostsByMarko.Host.Extensions
             });
         }
 
-        public static void WithAuthentication(this WebApplicationBuilder builder, IConfigurationSection jwtConfig)
+        public static void WithAuthentication(this WebApplicationBuilder builder, JwtConfig jwtConfig)
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -103,11 +104,11 @@ namespace PostsByMarko.Host.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuers = jwtConfig.GetSection("validIssuers").Get<List<string>>(),
-                    ValidAudiences = jwtConfig.GetSection("validAudiences").Get<List<string>>(),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["secret"])),
+                    ValidIssuers = jwtConfig.ValidIssuers,
+                    ValidAudiences = jwtConfig.ValidAudiences,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
                 };
-                options.Authority = jwtConfig["authority"];
+
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
@@ -116,6 +117,7 @@ namespace PostsByMarko.Host.Extensions
 
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
+
                         if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/postHub") || path.StartsWithSegments("/messageHub")))
                         {
                             // Read the token out of the query string

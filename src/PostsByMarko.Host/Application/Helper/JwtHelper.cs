@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Users;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,12 +12,12 @@ namespace PostsByMarko.Host.Application.Helper
     public class JwtHelper : IJwtHelper
     {
         private readonly IUserRepository usersRepository;
-        private readonly IConfiguration configuration;
+        private readonly JwtConfig jwtConfig;
 
-        public JwtHelper(IUserRepository usersRepository, IConfiguration configuration)
+        public JwtHelper(IUserRepository usersRepository, IOptions<JwtConfig> jwtConfig)
         {
             this.usersRepository = usersRepository;
-            this.configuration = configuration;
+            this.jwtConfig = jwtConfig.Value;
         }
 
         public async Task<string> CreateTokenAsync(User user)
@@ -27,8 +29,7 @@ namespace PostsByMarko.Host.Application.Helper
 
         private SigningCredentials GetSigningCredentials()
         {
-            var jwtConfig = configuration.GetSection("JwtConfig");
-            var key = Encoding.UTF8.GetBytes(jwtConfig["secret"]!);
+            var key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
             var secret = new SymmetricSecurityKey(key);
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -36,13 +37,12 @@ namespace PostsByMarko.Host.Application.Helper
 
         private string GenerateToken(List<Claim> claims)
         {
-            var jwtConfig = configuration.GetSection("JwtConfig");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig["expiresIn"])),
-                Issuer = jwtConfig.GetSection("validIssuers")!.Get<List<string>>()!.FirstOrDefault(),
-                Audience = jwtConfig.GetSection("validAudiences")!.Get<List<string>>()!.FirstOrDefault(),
+                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig.ExpiresIn)),
+                Issuer = jwtConfig.ValidIssuers.FirstOrDefault(),
+                Audience = jwtConfig.ValidAudiences.FirstOrDefault(),
                 SigningCredentials = GetSigningCredentials()
 
             };

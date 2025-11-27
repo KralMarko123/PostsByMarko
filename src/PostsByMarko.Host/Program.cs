@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Mapping.Profiles;
@@ -11,16 +12,18 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var isInLocalDevelopment = builder.Environment.IsDevelopment();
 var isInTest = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Test");
-var allowedOrigins = builder.Configuration.GetSection("JwtConfig").GetSection("validAudiences").Get<List<string>>();
-var jwtConfig = builder.Configuration.GetSection("JwtConfig");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
 #region ServicesConfiguration
 
 builder.Host.UseSerilog();
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
-builder.WithCors(MiscConstants.CORS_POLICY_NAME, allowedOrigins!);
+builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig!.ValidAudiences!);
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSignalR(options =>
 {
