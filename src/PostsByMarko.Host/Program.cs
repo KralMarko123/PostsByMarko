@@ -41,7 +41,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddProfile<RegistrationPofile>();
+    cfg.AddProfile<RegistrationProfile>();
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<PostProfile>();   
     cfg.AddProfile<MessagingProfile>();

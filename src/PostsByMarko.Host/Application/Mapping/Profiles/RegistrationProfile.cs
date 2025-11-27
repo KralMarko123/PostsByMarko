@@ -4,9 +4,9 @@ using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Application.Mapping.Profiles
 {
-    public class RegistrationPofile : Profile
+    public class RegistrationProfile : Profile
     {
-        public RegistrationPofile()
+        public RegistrationProfile()
         {
             CreateMap<RegistrationDto, User>(MemberList.None)
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
