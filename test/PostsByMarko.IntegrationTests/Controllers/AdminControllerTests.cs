@@ -13,7 +13,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace PostsByMarko.IntegrationTests
+namespace PostsByMarko.IntegrationTests.Controllers
 {
     [Collection("IntegrationCollection")]
     public class AdminControllerTests : IAsyncLifetime

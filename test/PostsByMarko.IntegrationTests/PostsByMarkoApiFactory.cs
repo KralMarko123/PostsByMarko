@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +22,7 @@ namespace PostsByMarko.IntegrationTests
     public class PostsByMarkoApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         public HttpClient? client;
+        public string jwtToken = string.Empty;
 
         public async Task InitializeAsync()
         {
@@ -87,6 +88,21 @@ namespace PostsByMarko.IntegrationTests
 
             client.DefaultRequestHeaders.Remove("Authorization");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            jwtToken = token!;
         }
+
+        public HubConnection CreateHubConnection(string hubPath)
+        {
+            return new HubConnectionBuilder()
+                .WithUrl($"{Server.BaseAddress}{hubPath}", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(jwtToken)!;
+                    options.HttpMessageHandlerFactory = _ => Server.CreateHandler();
+                })
+                .WithAutomaticReconnect()
+                .Build();
+        }
+        
+        public Task WaitForSignalRPropagation() => Task.Delay(150); // Small wait for SignalR messages to propagate
     }
 }

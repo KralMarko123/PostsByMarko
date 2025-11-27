@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace PostsByMarko.IntegrationTests
+namespace PostsByMarko.IntegrationTests.Controllers
 {
     [Collection("IntegrationCollection")]
     public class PostControllerTests : IAsyncLifetime
