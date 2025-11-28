@@ -2,7 +2,7 @@ import { React, useContext, useState, useEffect } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
 import { useSignalR } from "../../../custom/useSignalR";
-import PostsService from "../../../api/PostsService";
+import PostService from "../../../api/PostService";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
@@ -54,7 +54,7 @@ const UpdatePostForm = () => {
     if (noEmptyFields() && notSameData()) {
       setErrorMessage("");
       setIsLoading(true);
-      await PostsService.updatePost(updatedPostData, user.token)
+      await PostService.updatePost(updatedPostData, user.token)
         .then((requestResult) => {
           if (requestResult.statusCode === 200) {
             appContext.dispatch({

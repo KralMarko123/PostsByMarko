@@ -73,6 +73,7 @@
   flex-direction: column;
   gap: var(--small-gap);
 
+  box-shadow: var(--simple-shadow);
   z-index: 100;
 }
 

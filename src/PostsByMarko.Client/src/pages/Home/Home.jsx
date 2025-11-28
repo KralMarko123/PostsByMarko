@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
-import PostsService from "../../api/PostsService";
+import PostService from "../../api/PostService";
 import Post from "../../components/Post/Post";
 import Nav from "../../components/Layout/Nav/Nav";
 import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
@@ -21,8 +21,7 @@ const Home = () => {
   const [posts, setPosts] = useState([]);
 
   const getPosts = async () => {
-    await PostsService.getAllPosts(user.token).then((requestResult) => {
-      let posts = requestResult.payload;
+    await PostService.getPosts(user.token).then((posts) => {
       HelperFunctions.sortPostsByCreatedDate(posts);
 
       setPosts(posts);

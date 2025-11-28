@@ -1,7 +1,7 @@
 import { React, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import PostsService from "../../api/PostsService";
+import PostService from "../../api/PostService";
 import Nav from "../../components/Layout/Nav/Nav";
 import AppContext from "../../context/AppContext";
 import Container from "../../components/Layout/Container/Container";
@@ -40,7 +40,7 @@ const Details = () => {
   const getPost = async () => {
     let authorId;
 
-    await PostsService.getPostById(postId, user.token).then((requestResult) => {
+    await PostService.getPostById(postId, user.token).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setErrorMessage(null);
         setPost(requestResult.payload);

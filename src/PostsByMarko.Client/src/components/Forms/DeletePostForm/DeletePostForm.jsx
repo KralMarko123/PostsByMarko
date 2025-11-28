@@ -1,7 +1,7 @@
 import { React, useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { useSignalR } from "../../../custom/useSignalR";
-import PostsService from "../../../api/PostsService";
+import PostService from "../../../api/PostService";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
@@ -18,17 +18,14 @@ const DeletePostForm = () => {
 
   const onDelete = async () => {
     setIsLoading(true);
-    await PostsService.deletePostById(
+    await PostService.deletePostById(
       appContext.postBeingModified.id,
       user.token
     )
-      .then((requestResult) => {
+      .then((response) => {
         if (requestResult.statusCode === 200) {
           setErrorMessage("");
-          setConfirmationalMessage(requestResult.message);
-          sendMessage({
-            message: `Deleted post with Id: ${appContext.postBeingModified.id}`,
-          });
+          setConfirmationalMessage("Post deleted successfully");
           appContext.dispatch({
             type: "DELETED_POST",
             id: appContext.postBeingModified.id,

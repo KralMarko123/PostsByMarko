@@ -1,44 +1,40 @@
-import ENDPOINT__URLS from "../constants/endpoints";
+import ENDPOINT_URLS from "../constants/endpoints";
 
 const MessagingService = {
   async getChats(userToken) {
-    return await fetch(ENDPOINT__URLS.GET_CHATS, {
+    return await fetch(ENDPOINT_URLS.GET_CHATS, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
     })
-      .then((response) => response.json())
-      .then((requestResult) => requestResult)
-      .catch((error) => console.log(error));
+      .then(async (response) => await response.json())
+      .catch((error) => console.error(error));
   },
 
-  async getChatByParticipantIds(participantIds, userToken) {
-    return await fetch(ENDPOINT__URLS.START_CHAT, {
+  async startChat(otherUserId, userToken) {
+    return await fetch(ENDPOINT_URLS.START_CHAT(otherUserId), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${userToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(participantIds),
     })
-      .then((response) => response.json())
-      .then((requestResult) => requestResult)
-      .catch((error) => console.log(error));
+      .then(async (response) => await response.json())
+      .catch((error) => console.error(error));
   },
 
-  async sendMessage(message, userToken) {
-    return await fetch(ENDPOINT__URLS.SEND_MESSAGE, {
+  async sendMessage(messageToSend, userToken) {
+    return await fetch(ENDPOINT_URLS.SEND_MESSAGE, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${userToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(message),
+      body: JSON.stringify(messageToSend),
     })
-      .then((response) => response.json())
-      .then((requestResult) => requestResult)
-      .catch((error) => console.log(error));
+      .then(async (response) => await response.json())
+      .catch((error) => console.error(error));
   },
 };
 

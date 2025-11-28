@@ -3,7 +3,7 @@ import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
-import UsersService from "../../api/UsersService";
+import UserService from "../../api/UserService";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
@@ -29,7 +29,7 @@ const Chat = () => {
   const [messageIsSending, setMessageIsSending] = useState(false);
 
   const getUsers = async () => {
-    await UsersService.getOtherUsers(user.token).then((requestResult) => {
+    await UserService.getOtherUsers(user.token).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setUsers(requestResult.payload);
       }

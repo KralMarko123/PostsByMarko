@@ -33,9 +33,11 @@ const LoginForm = () => {
       setIsLoading(true);
 
       await AuthService.login(loginData)
-        .then((requestResult) => {
-          if (requestResult.statusCode === 200) login(requestResult.payload);
-          else setErrorMessage(requestResult.message);
+        .then((loginPayload) => {
+          login(loginPayload);
+        })
+        .catch((error) => {
+          console.log(error);
         })
         .finally(() => setIsLoading(false));
     }

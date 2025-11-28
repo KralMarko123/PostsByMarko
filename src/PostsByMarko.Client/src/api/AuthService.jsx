@@ -1,31 +1,29 @@
-import ENDPOINT__URLS from "../constants/endpoints";
+import ENDPOINT_URLS from "../constants/endpoints";
 
 const AuthService = {
-	async login(userToLogin) {
-		return await fetch(ENDPOINT__URLS.LOGIN, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(userToLogin),
-		}).then(async (response) => {
-			const requestResult = await response.json();
-			return requestResult;
-		});
-	},
+  async login(loginRequest) {
+    return await fetch(ENDPOINT_URLS.LOGIN, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginRequest),
+    })
+      .then(async (response) => await response.json())
+      .catch((error) => console.error(error));
+  },
 
-	async register(userToRegister) {
-		return await fetch(ENDPOINT__URLS.REGISTER, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(userToRegister),
-		}).then(async (response) => {
-			const requestResult = await response.json();
-			return requestResult;
-		});
-	},
+  async register(registerRequest) {
+    return await fetch(ENDPOINT_URLS.REGISTER, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(registerRequest),
+    })
+      .then(async (response) => await response.json())
+      .catch((error) => console.error(error));
+  },
 };
 
 export default AuthService;

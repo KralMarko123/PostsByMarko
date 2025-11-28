@@ -2,7 +2,7 @@ import { React, useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
 import { useSignalR } from "../../../custom/useSignalR";
-import PostsService from "../../../api/PostsService";
+import PostService from "../../../api/PostService";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
@@ -19,13 +19,6 @@ const CreatePostForm = () => {
   const { user } = useAuth();
   const { sendMessage } = useSignalR();
   const [newPostData, setNewPostData] = useState({
-    authorId: user.id,
-    author: {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    },
     title: "",
     content: "",
   });
@@ -49,7 +42,7 @@ const CreatePostForm = () => {
       setErrorMessage("");
       setIsLoading(true);
 
-      await PostsService.createPost(newPostData, user.token)
+      await PostService.createPost(newPostData, user.token)
         .then((requestResult) => {
           if (requestResult.statusCode === 201) {
             sendMessage({
@@ -67,7 +60,7 @@ const CreatePostForm = () => {
             }, 1000);
           } else setErrorMessage(requestResult.message);
         })
-        .finally(setIsLoading(false));
+        .finally(() => setIsLoading(false));
     }
   };
 
@@ -90,10 +83,10 @@ const CreatePostForm = () => {
                 id={group.id}
                 className="input input-text"
                 onChange={(e) =>
-                  setNewPostData({
-                    ...newPostData,
+                  setNewPostData((prev) => ({
+                    ...prev,
                     [`${group.id}`]: e.currentTarget.value,
-                  })
+                  }))
                 }
                 placeholder={`What do you want to share, ${user.firstName}?`}
               />

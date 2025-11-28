@@ -131,7 +131,7 @@ export const appReducer = (state, action) => {
       return { ...state, chats: chats };
 
     default:
-      return defaultAppState;
+      return state;
   }
 };
 

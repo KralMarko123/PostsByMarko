@@ -5,7 +5,7 @@ import { ICONS } from "../../constants/icons";
 import { useSignalR } from "../../custom/useSignalR";
 import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
-import PostsService from "../../api/PostsService";
+import PostService from "../../api/PostService";
 import Card from "../Helper/Card/Card";
 import { DateFunctions } from "../../util/dateFunctions";
 import "./Post.css";
@@ -42,7 +42,7 @@ const Post = ({
   const handleHiddenToggle = async (e) => {
     e.stopPropagation();
 
-    await PostsService.togglePostVisibility(id, user.token).then(
+    await PostService.togglePostVisibility(id, user.token).then(
       (requestResult) => {
         if (requestResult.statusCode === 200) {
           appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });

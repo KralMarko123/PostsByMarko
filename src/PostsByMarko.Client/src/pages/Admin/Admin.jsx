@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import Container from "../../components/Layout/Container/Container";
 import Nav from "../../components/Layout/Nav/Nav";
-import UsersService from "../../api/UsersService";
-import PostsService from "../../api/PostsService";
+import UserService from "../../api/UserService";
+import PostService from "../../api/PostService";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import AppContext from "../../context/AppContext";
@@ -45,7 +45,7 @@ const Admin = () => {
   );
 
   const getAdminDashboard = async () => {
-    await UsersService.GetAdminDashboard(user.token).then((requestResult) => {
+    await UserService.getAdminDashboard(user.token).then((requestResult) => {
       if (requestResult.statusCode === 200) {
         setErrorMessage(null);
         setUsers(requestResult.payload);
@@ -56,7 +56,7 @@ const Admin = () => {
   };
 
   const getPosts = async () => {
-    await PostsService.getAllPosts(user.token).then((requestResult) => {
+    await PostService.getPosts(user.token).then((requestResult) => {
       setPosts(requestResult.payload);
       appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
     });
