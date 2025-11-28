@@ -1,7 +1,6 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Hubs;
@@ -39,9 +38,11 @@ if (isInLocalDevelopment || isInTest)
 builder.Configuration.AddEnvironmentVariables();
 
 // Define configurations here
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
-builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
 
 #region ServicesConfiguration
 

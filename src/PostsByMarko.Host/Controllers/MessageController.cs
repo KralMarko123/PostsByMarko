@@ -37,7 +37,7 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpPost]
         [Route("send")]
-        public async Task<ActionResult<MessageDto>> SendMessageAsync([FromBody] MessageDto messageDto, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<MessageDto>> SendMessage([FromBody] MessageDto messageDto, CancellationToken cancellationToken = default)
         {
             var result = await messagingService.SendMessageAsync(messageDto, cancellationToken);
             
