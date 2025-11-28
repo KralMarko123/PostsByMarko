@@ -11,9 +11,11 @@ namespace PostsByMarko.Host.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Message> Messages { get; set; }
 
-        public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
-        {
+        public readonly IHostEnvironment hostEnvironment;
 
+        public AppDbContext(DbContextOptions dbContextOptions, IHostEnvironment hostEnvironment) : base(dbContextOptions)
+        {
+            this.hostEnvironment = hostEnvironment;
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

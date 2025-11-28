@@ -16,25 +16,6 @@ var environment = builder.Environment;
 var isInLocalDevelopment = environment.IsDevelopment();
 var isInTest = environment.IsEnvironment("Test");
 
-if (isInLocalDevelopment || isInTest)
-{
-    var projectRoot = Directory.GetCurrentDirectory();
-    var envPath = isInTest ? 
-        Path.GetFullPath(Path.Combine(projectRoot, "../../../../../", ".env"))
-        : Path.GetFullPath(Path.Combine(projectRoot, "../../", ".env"));
-
-    Console.WriteLine($"Loading .env from: {envPath}");
-
-    if (File.Exists(envPath))
-    {
-        Env.Load(envPath);
-    }
-    else
-    {
-        throw new ArgumentException("Missing '.env' file for configuration!");
-    }
-}
-
 builder.Configuration.AddEnvironmentVariables();
 
 // Define configurations here

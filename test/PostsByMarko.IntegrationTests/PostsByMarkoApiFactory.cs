@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data;
@@ -35,11 +33,6 @@ namespace PostsByMarko.IntegrationTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Test");
-            builder.ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddEnvironmentVariables();
-            });
-            SetupEnvironmentConfigurations(builder);
         }
 
         public new Task DisposeAsync()
@@ -104,48 +97,5 @@ namespace PostsByMarko.IntegrationTests
         }
         
         public Task WaitForSignalRPropagation() => Task.Delay(150); // Small wait for SignalR messages to propagate
-
-        private static void SetupEnvironmentConfigurations(IWebHostBuilder builder)
-        {
-            builder.ConfigureServices(services =>
-            {
-                // REPLACE JwtConfig from appsettings with environment-loaded version
-                var jwtConfig = new JwtConfig
-                {
-                    Secret = Environment.GetEnvironmentVariable("JwtConfig__Secret")!,
-                    ValidIssuers = [ Environment.GetEnvironmentVariable("JwtConfig__ValidIssuers__0") ],
-                    ValidAudiences = [ Environment.GetEnvironmentVariable("JwtConfig__ValidAudiences__0") ],
-                    ExpiresIn = int.Parse(Environment.GetEnvironmentVariable("JwtConfig__ExpiresIn") ?? "100")
-                };
-
-                var emailConfig = new EmailConfig
-                {
-                    Host = Environment.GetEnvironmentVariable("EmailConfig__Host")!,
-                    Port = int.Parse(Environment.GetEnvironmentVariable("JwtConfig__ExpiresIn") ?? "100"),
-                    Username = Environment.GetEnvironmentVariable("EmailConfig__Username")!,
-                    Password = Environment.GetEnvironmentVariable("EmailConfig__Password")!,
-                    UseSsl = bool.TryParse(Environment.GetEnvironmentVariable("EmailConfig__UseSsl"), out bool result) ? result : true,
-                    SenderName = Environment.GetEnvironmentVariable("EmailConfig__SenderName")!
-                };
-
-                services.Configure<JwtConfig>(options =>
-                {
-                    options.Secret = jwtConfig.Secret!;
-                    options.ValidIssuers = jwtConfig.ValidIssuers;
-                    options.ValidAudiences = jwtConfig.ValidAudiences;
-                    options.ExpiresIn = jwtConfig.ExpiresIn;
-                });
-
-                services.Configure<EmailConfig>(options =>
-                {
-                    options.Port = emailConfig.Port;
-                    options.Host = emailConfig.Host;
-                    options.Username = emailConfig.Username;
-                    options.Password = emailConfig.Password;
-                    options.UseSsl = emailConfig.UseSsl;
-                    options.SenderName = emailConfig.SenderName;
-                });
-            });
-        }
     }
 }

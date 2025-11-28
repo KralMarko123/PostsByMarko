@@ -103,9 +103,7 @@ namespace PostsByMarko.Host.Extensions
             await appDbContext.SaveChangesAsync();
 
             // generate random data for local development & tests
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            if (environment == "Development" || environment == "Test")
+            if (appDbContext.hostEnvironment.IsDevelopment() || appDbContext.hostEnvironment.EnvironmentName == "Test")
             {
                 await GenerateRandomData(appDbContext, passwordHasher, 5);
             }
