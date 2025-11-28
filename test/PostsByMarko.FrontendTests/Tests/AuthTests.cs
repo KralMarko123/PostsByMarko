@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
 using PostsTesting.UI_Models.Pages;
@@ -16,7 +15,7 @@ namespace PostsByMarko.FrontendTests.Tests
         private HomePage homePage;
         private LoginPage loginPage;
         private RegisterPage registerPage;
-        private readonly User testUser = TestingConstants.TEST_USER;
+        private readonly string testUserEmail = TestingConstants.TEST_USER_EMAIL;
 
         public AuthTests(PostsByMarkoFactory postsByMarkoFactory)
         {
@@ -42,7 +41,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_login()
         {
-            await LoginWithUser(testUser);
+            await LoginWithEmail(testUserEmail);
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
 
@@ -63,17 +62,17 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_logout()
         {
-            await LoginWithUser(testUser);
+            await LoginWithEmail(testUserEmail);
 
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.logout.ClickAsync();
             await loginPage.loginButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
 
-        private async Task LoginWithUser(User user)
+        private async Task LoginWithEmail(string email)
         {
             await loginPage.Visit();
-            await loginPage.Login(user.Email, TestingConstants.TEST_PASSWORD);
+            await loginPage.Login(email, TestingConstants.TEST_PASSWORD);
             await homePage.username.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
     }

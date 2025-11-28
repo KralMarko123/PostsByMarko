@@ -2,6 +2,7 @@
 {
     public static class TestingConstants
     {
+        public static readonly string OWNER_EMAIL = "kralmarko123@gmail.com";
         public static readonly string TEST_ADMIN_EMAIL = "testAdmin@test.com";
         public static readonly string TEST_USER_EMAIL = "test@test.com";
         public static readonly string UNCONFIRMED_USER_EMAIL = "user@userson.com";
