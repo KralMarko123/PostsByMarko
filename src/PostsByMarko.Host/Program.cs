@@ -83,6 +83,7 @@ if (!isInLocalDevelopment && !isInTest)
     app.UseHttpsRedirection();
 }
 
+app.WithMiddlewares();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<PostHub>("/postHub");

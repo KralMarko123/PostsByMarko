@@ -1,4 +1,5 @@
 ﻿using PostsByMarko.Host.Data;
+using PostsByMarko.Host.Middlewares;
 
 namespace PostsByMarko.Host.Extensions
 {
@@ -23,6 +24,11 @@ namespace PostsByMarko.Host.Extensions
             await appDbContext.Database.EnsureDeletedAsync();
             await appDbContext.Database.EnsureCreatedAsync();
             await appDbContext.Seed();
+        }
+
+        public static void WithMiddlewares(this WebApplication app)
+        {
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
         }
     }
 }

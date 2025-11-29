@@ -83,6 +83,26 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task create_user_should_throw_if_user_already_exists()
+        {
+            // Arrange
+            var user = new User() { Id = Guid.NewGuid(), Email = "test@test.com" };
+            var registrationDto = new RegistrationDto
+            {
+                Email = user.Email,
+                Password = "Password"
+            };
+
+            usersRepositoryMock.Setup(r => r.GetUserByEmailAsync(registrationDto.Email, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+
+            // Act
+            var result = async () => await userService.CreateUserAsync(registrationDto);
+
+            // Assert
+            await result.Should().ThrowAsync<ArgumentException>().WithMessage($"User with email '{registrationDto.Email}' already exists");
+        }
+
+        [Fact]
         public async Task create_user_should_throw_if_user_failed_to_create()
         {
             // Arrange

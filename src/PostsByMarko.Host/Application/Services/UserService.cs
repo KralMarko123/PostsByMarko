@@ -39,6 +39,13 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task CreateUserAsync(RegistrationDto userRegistration)
         {
+            var existingUser = await userRepository.GetUserByEmailAsync(userRegistration.Email);
+
+            if(existingUser != null)
+            {
+                throw new ArgumentException(message: $"User with email '{existingUser.Email}' already exists");
+            }
+
             var newUser = mapper.Map<User>(userRegistration);
             var result = await userRepository.MapAndCreateUserAsync(newUser, userRegistration.Password);
 
