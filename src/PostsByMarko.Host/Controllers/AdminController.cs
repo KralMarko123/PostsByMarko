@@ -47,7 +47,7 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpPut]
         [Route("roles")]
-        public async Task<ActionResult<List<string>>> UpdateUserRoles(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<string>>> UpdateUserRoles([FromBody] UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
             var result = await adminService.UpdateUserRolesAsync(request, cancellationToken);
             
