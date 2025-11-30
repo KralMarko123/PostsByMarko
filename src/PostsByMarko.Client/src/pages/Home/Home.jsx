@@ -1,8 +1,8 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
-import { useSignalR } from "../../custom/useSignalR";
 import { PostService } from "../../api/PostService";
 import { HelperFunctions } from "../../util/helperFunctions";
+import { usePostHub } from "../../custom/usePostHub";
 import Post from "../../components/Post/Post";
 import Nav from "../../components/Layout/Nav/Nav";
 import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
@@ -17,7 +17,7 @@ import "./Home.css";
 const Home = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
-  const { lastMessageRegistered } = useSignalR(true);
+  const { lastMessageRegistered } = usePostHub();
   const [posts, setPosts] = useState([]);
 
   const getPosts = async () => {

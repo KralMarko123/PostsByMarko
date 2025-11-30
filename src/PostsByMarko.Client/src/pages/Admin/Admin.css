@@ -93,7 +93,7 @@
 }
 
 .admin .chart {
-  width: calc(50% - var(--normal-gap));
+  width: 100%;
 }
 
 /**TABLET*/

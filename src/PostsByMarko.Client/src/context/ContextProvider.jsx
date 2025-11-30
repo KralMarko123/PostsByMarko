@@ -25,7 +25,6 @@ export const appReducer = (state, action) => {
 
   switch (action.type) {
     // MODAL EVENTS
-
     case "SHOW_MODAL":
       return {
         ...state,
@@ -39,7 +38,6 @@ export const appReducer = (state, action) => {
       };
 
     // POST EVENTS
-
     case "LOAD_POSTS":
       return { ...state, posts: action.posts };
 
@@ -57,12 +55,7 @@ export const appReducer = (state, action) => {
         (p) => p.id === action.post.id
       );
       posts = [...state.posts];
-
-      posts[postBeingModifiedIndex].title = action.post.title;
-      posts[postBeingModifiedIndex].content = action.post.content;
-      posts[postBeingModifiedIndex].lastUpdatedDate =
-        action.post.lastUpdatedDate;
-      posts[postBeingModifiedIndex].hidden = action.post.hidden;
+      posts[postBeingModifiedIndex] = { ...action.post };
 
       return { ...state, posts: posts };
 
@@ -70,33 +63,6 @@ export const appReducer = (state, action) => {
       posts = [...state.posts];
 
       posts.push(action.post);
-
-      return { ...state, posts: posts };
-
-    case "TOGGLE_POST_HIDDEN":
-      postBeingModifiedIndex = [...state.posts].findIndex(
-        (p) => p.id === action.id
-      );
-      posts = [...state.posts];
-
-      posts[postBeingModifiedIndex].isHidden =
-        !posts[postBeingModifiedIndex].isHidden;
-      posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
-
-      return { ...state, posts: posts };
-
-    case "TOGGLED_USER":
-      postBeingModifiedIndex = [...state.posts].findIndex(
-        (p) => p.id == action.id
-      );
-      posts = [...state.posts];
-
-      if (action.isAdded)
-        posts[postBeingModifiedIndex].allowedUsers.push(action.username);
-      else
-        posts[postBeingModifiedIndex].allowedUsers = posts[
-          postBeingModifiedIndex
-        ].allowedUsers.filter((u) => u !== action.username);
 
       return { ...state, posts: posts };
 

@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useAuth } from "../../custom/useAuth";
+import { ICONS } from "../../constants/icons";
+import { HelperFunctions } from "../../util/helperFunctions";
+import { DateFunctions } from "../../util/dateFunctions";
+import { useMessageHub } from "../../custom/useMessageHub";
 import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
 import UserService from "../../api/UserService";
-import { useAuth } from "../../custom/useAuth";
-import { useSignalR } from "../../custom/useSignalR";
 import MessagingService from "../../api/MessagingService";
-import { ICONS } from "../../constants/icons";
-import { HelperFunctions } from "../../util/helperFunctions";
 import AppContext from "../../context/AppContext";
 import "../Page.css";
 import "./Chat.css";
-import { DateFunctions } from "../../util/dateFunctions";
 
 const Chat = () => {
   const appContext = useContext(AppContext);
@@ -21,7 +21,7 @@ const Chat = () => {
   const [unreadChats, setUnreadChats] = useState([]);
   const [openChat, setOpenChat] = useState(null);
   const { user } = useAuth();
-  const { sendMessage, lastMessageRegistered } = useSignalR(false);
+  const { lastMessageRegistered } = useMessageHub;
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
   const messageInputRef = useRef(null);
@@ -121,8 +121,6 @@ const Chat = () => {
             ...openChat,
             messages: [...openChat.messages, newMessage],
           });
-
-          sendMessage({ userIds: openChat.participantIds });
 
           appContext.dispatch({
             type: "SENT_MESSAGE",

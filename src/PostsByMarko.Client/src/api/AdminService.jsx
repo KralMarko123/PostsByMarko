@@ -1,56 +1,36 @@
 import ENDPOINT_URLS from "../constants/endpoints";
+import ApiClient from "./ApiClient";
 
-const AdminService = {
-  async getDashboard(userToken) {
-    return await fetch(ENDPOINT_URLS.GET_DASHBOARD, {
+export const AdminService = {
+  getDashboard: async (userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.GET_DASHBOARD, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async deleteUser(userId, userToken) {
-    return await fetch(ENDPOINT_URLS.DELETE_USER(userId), {
+  deleteUser: async (userId, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.DELETE_USER(userId), {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async updateUserRoles(updateRolesRequest, userToken) {
-    return await fetch(`${ENDPOINT_URLS.UPDATE_USER_ROLES}`, {
+  updateUserRoles: async (updateRolesRequest, userToken) =>
+    await ApiClient.apiRequest(`${ENDPOINT_URLS.UPDATE_USER_ROLES}`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: JSON.stringify(updateRolesRequest),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.log(error));
-  },
+      body: updateRolesRequest,
+      token: userToken,
+    }),
 
-  async getRolesForEmail(email, userToken) {
+  getRolesForEmail: async (email, userToken) => {
     const params = { email: email };
     const queryParams = new URLSearchParams(params);
     const constructedEndpoint = `${
       ENDPOINT_URLS.GET_ROLES_FOR_EMAIL
     }?${queryParams.toString()}`;
 
-    return await fetch(constructedEndpoint, {
+    return await ApiClient.apiRequest(constructedEndpoint, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
+      token: userToken,
+    });
   },
 };
-
-export default AdminService;

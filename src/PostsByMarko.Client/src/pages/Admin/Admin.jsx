@@ -1,30 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
-import Container from "../../components/Layout/Container/Container";
-import Nav from "../../components/Layout/Nav/Nav";
-import UserService from "../../api/UserService";
+import { AdminService } from "../../api/AdminService";
 import { PostService } from "../../api/PostService";
 import { useAuth } from "../../custom/useAuth";
-import { useSignalR } from "../../custom/useSignalR";
+import { DateFunctions } from "../../util/dateFunctions";
+import { ActionType } from "../../constants/enums";
+import { usePostHub } from "../../custom/usePostHub";
+import Nav from "../../components/Layout/Nav/Nav";
+import Container from "../../components/Layout/Container/Container";
 import AppContext from "../../context/AppContext";
 import Card from "../../components/Helper/Card/Card";
-import { useNavigate } from "react-router";
 import BarChart from "../../components/Charts/BarChart";
-import LineChart from "../../components/Charts/LineChart";
 import Footer from "../../components/Layout/Footer/Footer";
-import { DateFunctions } from "../../util/dateFunctions";
 import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Admin.css";
 
 const Admin = () => {
   const appContext = useContext(AppContext);
-  const { user } = useAuth();
-  const { sendMessage, lastMessageRegistered } = useSignalR();
-  const [users, setUsers] = useState([]);
+  const { user, checkToken } = useAuth();
+  const { lastMessageRegistered } = usePostHub();
+  const [dashboardData, setDashboardData] = useState([]);
   const [posts, setPosts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
-  const navigate = useNavigate();
 
   const barChartLabels = [
     ...Array(DateFunctions.getCurrentMonthDayNumber()).keys(),
@@ -36,76 +34,60 @@ const Admin = () => {
           DateFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
       ).length
   );
-  const lineChartLabels = DateFunctions.getThisMonthsDates();
-  const lineChartData = lineChartLabels.map(
-    (l) =>
-      users.filter(
-        (u) => DateFunctions.getDateTimeInFormat(u.createdAt, "D/M/YYYY") === l
-      ).length
-  );
 
   const getAdminDashboard = async () => {
-    await UserService.getAdminDashboard(user.token).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
+    await AdminService.getDashboard(user.token)
+      .then((data) => {
         setErrorMessage(null);
-        setUsers(requestResult.payload);
-      } else if (requestResult.statusCode === 204) {
-        setUsers([]);
-      } else setErrorMessage(requestResult.message);
-    });
+        setDashboardData(data);
+      })
+      .catch((error) => setErrorMessage(error.message));
   };
 
   const getPosts = async () => {
-    await PostService.getPosts(user.token).then((requestResult) => {
-      setPosts(requestResult.payload);
-      appContext.dispatch({ type: "LOAD_POSTS", posts: requestResult.payload });
-    });
+    await PostService.getPosts(user.token)
+      .then((posts) => {
+        setPosts(posts);
+        appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
+      })
+      .catch(async (error) => {
+        await checkToken();
+
+        // TODO: Setup some global notification modal showing error
+        console.log(error);
+      });
   };
 
   const handleUserDelete = async (userId, userEmail) => {
-    await UsersService.DeleteUser(userId, user.token).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
-        sendMessage("Deleted User");
+    await AdminService.deleteUser(userId, user.token)
+      .then((response) => {
         setConfirmationalMessage(`User ${userEmail} removed successfully`);
         setErrorMessage(null);
         setTimeout(() => setConfirmationalMessage(null), 3000);
-      } else {
-        setErrorMessage(`Error while removing user ${userEmail}`);
+      })
+      .catch((error) => {
         setConfirmationalMessage(null);
-      }
-    });
+        setErrorMessage(error.message);
+      });
   };
 
-  const handleUserMadeAdmin = async (userId) => {
-    await UsersService.addRoleToUser(userId, "Admin", user.token).then(
-      (requestResult) => {
-        if (requestResult.statusCode === 200) {
-          sendMessage("Updated User");
-          setConfirmationalMessage(requestResult.message);
-          setErrorMessage(null);
-          setTimeout(() => setConfirmationalMessage(null), 3000);
-        } else {
-          setErrorMessage(requestResult.message);
-          setConfirmationalMessage(null);
-        }
-      }
-    );
-  };
+  const handleUserRoleUpdate = async (userId, addRole = true) => {
+    let updateRolesRequest = {
+      userId: userId,
+      actionType: addRole ? ActionType.CREATE : ActionType.DELETE,
+      role: "Admin",
+    };
 
-  const handleUserRemovedAdmin = async (userId) => {
-    await UsersService.removeRoleFromUser(userId, "Admin", user.token).then(
-      (requestResult) => {
-        if (requestResult.statusCode === 200) {
-          sendMessage("Updated User");
-          setConfirmationalMessage(requestResult.message);
-          setErrorMessage(null);
-          setTimeout(() => setConfirmationalMessage(null), 3000);
-        } else {
-          setErrorMessage(requestResult.message);
-          setConfirmationalMessage(null);
-        }
-      }
-    );
+    await AdminService.updateUserRoles(updateRolesRequest, user.token)
+      .then((newRoles) => {
+        setConfirmationalMessage("User roles updated successfully!");
+        setErrorMessage(null);
+        setTimeout(() => setConfirmationalMessage(null), 3000);
+      })
+      .catch((error) => {
+        setErrorMessage(requestResult.message);
+        setConfirmationalMessage(null);
+      });
   };
 
   useEffect(() => {
@@ -122,7 +104,7 @@ const Admin = () => {
         title="Admin Dashboard"
         desc="Manage users and view statistics"
       >
-        {users.length > 0 ? (
+        {dashboardData.length > 0 ? (
           <Card buttonRadius>
             <table className="table">
               <thead>
@@ -136,48 +118,50 @@ const Admin = () => {
               </thead>
 
               <tbody>
-                {users.map((user, index) => (
+                {dashboardData.map((row, index) => (
                   <tr
-                    key={user.id}
+                    key={row.userId}
                     className={index % 2 != 0 ? "odd" : ""}
-                    data-email={user.email}
+                    data-email={row.email}
                   >
-                    <td>{user.email}</td>
-                    <td>{user.numberOfPosts}</td>
+                    <td>{row.email}</td>
+                    <td>{row.numberOfPosts}</td>
                     <td>
-                      {user.lastPostedAt
-                        ? DateFunctions.getReadableDateTime(user.lastPostedAt)
+                      {row.lastPostedAt
+                        ? DateFunctions.getReadableDateTime(row.lastPostedAt)
                         : ""}
                     </td>
                     <td>
-                      {user.roles.map((r) => (
+                      {row.roles.map((r) => (
                         <span className="table-badge" key={r}>
                           {r}
                         </span>
                       ))}
                     </td>
                     <td>
-                      <span
-                        className="table-button error"
-                        onClick={() => handleUserDelete(user.id, user.email)}
-                      >
-                        Delete
-                      </span>
-                      {user.roles.includes("Admin") ? (
+                      {row.roles.includes("Admin") ? (
                         <span
                           className="table-button warning"
-                          onClick={() => handleUserRemovedAdmin(user.id)}
+                          onClick={() =>
+                            handleUserRoleUpdate(row.userId, false)
+                          }
                         >
                           Remove Admin
                         </span>
                       ) : (
                         <span
                           className="table-button success"
-                          onClick={() => handleUserMadeAdmin(user.id)}
+                          onClick={() => handleUserRoleUpdate(row.userId, true)}
                         >
                           Make Admin
                         </span>
                       )}
+                      <span
+                        className="table-button error"
+                        onClick={() => handleUserDelete(row.userId, row.email)}
+                      >
+                        Delete
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -201,14 +185,6 @@ const Admin = () => {
               title={"Posts this month"}
               labels={barChartLabels}
               data={barChartData}
-            />
-          </div>
-
-          <div className="chart">
-            <LineChart
-              title={"Registered users this month"}
-              labels={lineChartLabels}
-              data={lineChartData}
             />
           </div>
         </div>

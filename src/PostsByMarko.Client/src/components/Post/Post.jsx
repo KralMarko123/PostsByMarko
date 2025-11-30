@@ -2,7 +2,6 @@ import { React, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
-import { useSignalR } from "../../custom/useSignalR";
 import { DateFunctions } from "../../util/dateFunctions";
 import { PostService } from "../../api/PostService";
 import * as ROUTES from "../../constants/routes";
@@ -27,7 +26,6 @@ const Post = ({
   const isAuthor = authorId === user.id;
   const isHidden = hidden;
   const readableCreatedDate = DateFunctions.getReadableDateTime(createdDate);
-  const {} = useSignalR(true);
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
