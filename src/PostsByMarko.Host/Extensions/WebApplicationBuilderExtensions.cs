@@ -147,6 +147,7 @@ namespace PostsByMarko.Host.Extensions
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             // Services
+            builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IMessagingService, MessagingService>();

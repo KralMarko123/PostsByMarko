@@ -11,18 +11,18 @@ namespace PostsByMarko.Host.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly IUserService usersService;
+        private readonly IAdminService adminService;
 
-        public AdminController(IUserService usersService)
+        public AdminController(IAdminService adminService)
         {
-            this.usersService = usersService;
+            this.adminService = adminService;
         }
 
         [HttpGet]
         [Route("roles")]
         public async Task<ActionResult<List<string>>> GetRolesForEmail([FromQuery] string email, CancellationToken cancellationToken = default)
         {
-            var roles = await usersService.GetRolesForEmailAsync(email, cancellationToken);
+            var roles = await adminService.GetRolesForEmailAsync(email, cancellationToken);
 
             return Ok(roles);
         }
@@ -31,7 +31,7 @@ namespace PostsByMarko.Host.Controllers
         [Route("dashboard")]
         public async Task<ActionResult<List<AdminDashboardResponse>>> GetAdminDashboard(CancellationToken cancellationToken = default)
         {
-            var result = await usersService.GetAdminDashboardAsync(cancellationToken);
+            var result = await adminService.GetAdminDashboardAsync(cancellationToken);
 
             return Ok(result);
         }
@@ -40,7 +40,7 @@ namespace PostsByMarko.Host.Controllers
         [Route("users/{id::guid}")]
         public async Task<IActionResult> DeleteUser(Guid Id, CancellationToken cancellationToken = default)
         {
-            await usersService.DeleteUserByIdAsync(Id, cancellationToken);
+            await adminService.DeleteUserByIdAsync(Id, cancellationToken);
 
             return NoContent();
         }
@@ -49,7 +49,7 @@ namespace PostsByMarko.Host.Controllers
         [Route("roles")]
         public async Task<ActionResult<List<string>>> UpdateUserRoles(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
-            var result = await usersService.UpdateUserRolesAsync(request, cancellationToken);
+            var result = await adminService.UpdateUserRolesAsync(request, cancellationToken);
             
             return Ok(result);
         }

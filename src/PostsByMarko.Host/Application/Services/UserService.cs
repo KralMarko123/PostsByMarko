@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using PostsByMarko.Host.Application.DTOs;
-using PostsByMarko.Host.Application.Enums;
 using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
-using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -97,14 +95,6 @@ namespace PostsByMarko.Host.Application.Services
             return user;
         }
 
-        public async Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken = default)
-        {
-            var user = await GetUserByEmailAsync(email, cancellationToken);
-            var roles = await userRepository.GetRolesForUserAsync(user);
-
-            return [.. roles];
-        }
-
         public async Task<List<UserDto>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
             var users = await userRepository.GetUsersAsync(exceptId, cancellationToken);
@@ -130,64 +120,19 @@ namespace PostsByMarko.Host.Application.Services
             return mapper.Map<UserDto>(user);
         }
 
-        public async Task<List<string>> GetRolesForUserAsync(User user)
+        public async Task<bool> ValidateUserWithTokenExistsAsync(CancellationToken cancellationToken = default)
         {
-            var userRoles = await userRepository.GetRolesForUserAsync(user);
+            var userId = currentRequestAccessor.Id;
+            var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
 
-            return [.. userRoles];
-        }
-
-        public async Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
-        {
-            var user = await userRepository.GetUserByIdAsync(request.UserId!.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
-            var currentRoles = await userRepository.GetRolesForUserAsync(user);
-
-            if(request.ActionType == ActionType.Create)
+            if (user == null)
             {
-                if (currentRoles.Contains(request.Role)) return [.. currentRoles];
-
-                await userRepository.AddRoleToUserAsync(user, request.Role);
+                throw new AuthException($"User with Id: {userId} no longer exists!");
             }
-            else if(request.ActionType == ActionType.Delete)
+            else
             {
-                if (!currentRoles.Contains(request.Role)) return [.. currentRoles];
-                
-                await userRepository.RemoveRoleFromUserAsync(user, request.Role);
+                return true;
             }
-            
-            var updatedRoles = await userRepository.GetRolesForUserAsync(user);
-            
-            return [.. updatedRoles];
-        }
-
-        public async Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
-        {
-            var adminId = currentRequestAccessor.Id;            
-            var users = await userRepository.GetUsersAsync(adminId, cancellationToken);
-            var result = new List<AdminDashboardResponse>();
-
-            foreach (var user in users)
-            {
-                var roles = await userRepository.GetRolesForUserAsync(user);
-                
-                result.Add(new AdminDashboardResponse
-                {
-                    UserId = user.Id,
-                    Email = user.Email!,
-                    NumberOfPosts = user.Posts.Count,
-                    LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedDate)?.LastUpdatedDate,
-                    Roles = [.. roles]
-                });
-            }
-
-            return result;
-        }
-
-        public async Task DeleteUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
-        {
-            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
-            
-            await userRepository.DeleteUserAsync(user);
         }
     }
 }

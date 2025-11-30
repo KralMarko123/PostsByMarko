@@ -16,6 +16,7 @@ namespace PostsByMarko.Host.Data.Repositories.Posts
         {
             var result = await appDbContext.Posts
                 .Include(p => p.Author)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             return result;

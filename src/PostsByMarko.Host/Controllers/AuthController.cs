@@ -8,7 +8,6 @@ namespace PostsByMarko.Host.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly IUserService usersService;
@@ -21,7 +20,8 @@ public class AuthController : ControllerBase
         this.emailService = emailService;
         this.configuration = configuration;
     }
-
+    
+    [AllowAnonymous]
     [HttpPost]
     [Route("register")]
     public async Task<ActionResult> Register([FromBody] RegistrationDto registrationDto)
@@ -31,6 +31,7 @@ public class AuthController : ControllerBase
         return Ok("Successfully registered, please check your email and confirm your account before logging in");
     }
 
+    [AllowAnonymous]
     [HttpPost]
     [Route("login")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto, CancellationToken cancellationToken = default)
@@ -40,6 +41,7 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [AllowAnonymous]
     [HttpPost]
     [Route("confirm")]
     public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token )
@@ -51,5 +53,15 @@ public class AuthController : ControllerBase
         var urlToRedirectTo = $"{audiences![0]}/login";
 
         return Redirect(urlToRedirectTo);
+    }
+
+    [Authorize]
+    [HttpGet]
+    [Route("validate")]
+    public async Task<ActionResult<LoginResponse>> ValidateToken(CancellationToken cancellationToken = default)
+    {
+        var result = await usersService.ValidateUserWithTokenExistsAsync(cancellationToken);
+
+        return Ok(result);
     }
 }
