@@ -1,8 +1,7 @@
 import { React, useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
-import { useSignalR } from "../../../custom/useSignalR";
-import PostService from "../../../api/PostService";
+import { PostService } from "../../../api/PostService";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
@@ -17,8 +16,7 @@ const CreatePostForm = () => {
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { sendMessage } = useSignalR();
-  const [newPostData, setNewPostData] = useState({
+  const [newPost, setNewPost] = useState({
     title: "",
     content: "",
   });
@@ -27,11 +25,11 @@ const CreatePostForm = () => {
     appContext.dispatch({ type: "CLOSE_MODAL", modal: "createPost" });
     setErrorMessage("");
     setConfirmationalMessage("");
-    setNewPostData({ title: "", content: "" });
+    setNewPost({ title: "", content: "" });
   };
 
   const noEmptyFields = () => {
-    if (!HelperFunctions.noEmptyFields(newPostData)) {
+    if (!HelperFunctions.noEmptyFields(newPost)) {
       setErrorMessage("Fields can't be empty");
       return false;
     } else return true;
@@ -42,24 +40,19 @@ const CreatePostForm = () => {
       setErrorMessage("");
       setIsLoading(true);
 
-      await PostService.createPost(newPostData, user.token)
-        .then((requestResult) => {
-          if (requestResult.statusCode === 201) {
-            sendMessage({
-              message: `Created Post with Id: ${requestResult.payload.id}`,
-              toAll: true,
-            });
-            setConfirmationalMessage(requestResult.message);
-            appContext.dispatch({
-              type: "CREATED_POST",
-              post: requestResult.payload,
-            });
+      await PostService.createPost(newPost, user.token)
+        .then((postResponse) => {
+          appContext.dispatch({
+            type: "CREATED_POST",
+            post: postResponse,
+          });
+          setConfirmationalMessage("Successfully created Post!");
 
-            setTimeout(() => {
-              onClose();
-            }, 1000);
-          } else setErrorMessage(requestResult.message);
+          setTimeout(() => {
+            onClose();
+          }, 1000);
         })
+        .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
   };
@@ -83,10 +76,10 @@ const CreatePostForm = () => {
                 id={group.id}
                 className="input input-text"
                 onChange={(e) =>
-                  setNewPostData((prev) => ({
-                    ...prev,
+                  setNewPost({
+                    ...newPost,
                     [`${group.id}`]: e.currentTarget.value,
-                  }))
+                  })
                 }
                 placeholder={`What do you want to share, ${user.firstName}?`}
               />
@@ -96,8 +89,8 @@ const CreatePostForm = () => {
                 type={group.type}
                 className="input"
                 onChange={(e) =>
-                  setNewPostData({
-                    ...newPostData,
+                  setNewPost({
+                    ...newPost,
                     [`${group.id}`]: e.currentTarget.value,
                   })
                 }

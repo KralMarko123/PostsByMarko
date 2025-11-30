@@ -1,7 +1,8 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
-import PostService from "../../api/PostService";
+import { PostService } from "../../api/PostService";
+import { HelperFunctions } from "../../util/helperFunctions";
 import Post from "../../components/Post/Post";
 import Nav from "../../components/Layout/Nav/Nav";
 import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
@@ -12,21 +13,23 @@ import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Home.css";
-import { HelperFunctions } from "../../util/helperFunctions";
 
 const Home = () => {
   const appContext = useContext(AppContext);
-  const { user } = useAuth();
+  const { user, checkToken } = useAuth();
   const { lastMessageRegistered } = useSignalR(true);
   const [posts, setPosts] = useState([]);
 
   const getPosts = async () => {
-    await PostService.getPosts(user.token).then((posts) => {
-      HelperFunctions.sortPostsByCreatedDate(posts);
-
-      setPosts(posts);
-      appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
-    });
+    await PostService.getPosts(user.token)
+      .then((posts) => {
+        HelperFunctions.sortPostsByCreatedDate(posts);
+        setPosts(posts);
+        appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
+      })
+      .catch(async (error) => {
+        await checkToken();
+      });
   };
 
   useEffect(() => {
@@ -48,10 +51,10 @@ const Home = () => {
               key={p.id}
               id={p.id}
               authorId={p.authorId}
+              author={p.author}
               title={p.title}
               content={p.content}
-              isHidden={p.isHidden}
-              allowedUsers={p.allowedUsers}
+              hidden={p.hidden}
               createdDate={p.createdDate}
               lastUpdatedDate={p.lastUpdatedDate}
               index={i}

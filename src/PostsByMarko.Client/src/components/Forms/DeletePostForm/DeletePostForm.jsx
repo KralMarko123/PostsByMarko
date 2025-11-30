@@ -1,7 +1,6 @@
 import { React, useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
-import { useSignalR } from "../../../custom/useSignalR";
-import PostService from "../../../api/PostService";
+import { PostService } from "../../../api/PostService";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
@@ -14,7 +13,6 @@ const DeletePostForm = () => {
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { sendMessage } = useSignalR();
 
   const onDelete = async () => {
     setIsLoading(true);
@@ -23,22 +21,20 @@ const DeletePostForm = () => {
       user.token
     )
       .then((response) => {
-        if (requestResult.statusCode === 200) {
-          setErrorMessage("");
-          setConfirmationalMessage("Post deleted successfully");
-          appContext.dispatch({
-            type: "DELETED_POST",
-            id: appContext.postBeingModified.id,
-          });
-
-          setTimeout(() => {
-            appContext.dispatch({ type: "CLOSE_MODAL", modal: "deletePost" });
-            setConfirmationalMessage("");
-          }, 1000);
-        } else {
+        setErrorMessage("");
+        setConfirmationalMessage("Post deleted successfully");
+        appContext.dispatch({
+          type: "DELETED_POST",
+          id: appContext.postBeingModified.id,
+        });
+        setTimeout(() => {
+          appContext.dispatch({ type: "CLOSE_MODAL", modal: "deletePost" });
           setConfirmationalMessage("");
-          setErrorMessage(requestResult.message);
-        }
+        }, 1000);
+      })
+      .catch((error) => {
+        setConfirmationalMessage("");
+        setErrorMessage(error.message);
       })
       .finally(() => setIsLoading(false));
   };

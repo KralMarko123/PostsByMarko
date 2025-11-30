@@ -1,12 +1,11 @@
 import { React, useContext, useState, useEffect } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
-import { useSignalR } from "../../../custom/useSignalR";
-import PostService from "../../../api/PostService";
+import { PostService } from "../../../api/PostService";
+import { HelperFunctions } from "../../../util/helperFunctions";
 import Button from "../../Helper/Button/Button";
 import Modal from "../../Helper/Modal/Modal";
 import AppContext from "../../../context/AppContext";
-import { HelperFunctions } from "../../../util/helperFunctions";
 import "./UpdatePostForm.css";
 import "../Form.css";
 
@@ -17,26 +16,25 @@ const UpdatePostForm = () => {
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { sendMessage } = useSignalR();
-  const [updatedPostData, setUpdatedPostData] = useState({
+  const [updatedPost, setUpdatedPost] = useState({
     ...appContext.postBeingModified,
   });
 
   useEffect(() => {
-    setUpdatedPostData({ ...appContext.postBeingModified });
+    setUpdatedPost({ ...appContext.postBeingModified });
   }, [appContext.postBeingModified]);
 
   const onClose = () => {
     appContext.dispatch({ type: "CLOSE_MODAL", modal: "updatePost" });
     setErrorMessage("");
     setConfirmationalMessage("");
-    setUpdatedPostData({});
+    setUpdatedPost({});
   };
 
   const notSameData = () => {
     if (
-      updatedPostData.title === appContext.postBeingModified.title &&
-      updatedPostData.content === appContext.postBeingModified.content
+      updatedPost.title === appContext.postBeingModified.title &&
+      updatedPost.content === appContext.postBeingModified.content
     ) {
       setErrorMessage("You haven't made any changes");
       return false;
@@ -44,7 +42,7 @@ const UpdatePostForm = () => {
   };
 
   const noEmptyFields = () => {
-    if (!HelperFunctions.noEmptyFields(updatedPostData)) {
+    if (!HelperFunctions.noEmptyFields(updatedPost)) {
       setErrorMessage("Fields can't be empty");
       return false;
     } else return true;
@@ -54,23 +52,20 @@ const UpdatePostForm = () => {
     if (noEmptyFields() && notSameData()) {
       setErrorMessage("");
       setIsLoading(true);
-      await PostService.updatePost(updatedPostData, user.token)
-        .then((requestResult) => {
-          if (requestResult.statusCode === 200) {
-            appContext.dispatch({
-              type: "UPDATED_POST",
-              post: updatedPostData,
-            });
-            sendMessage({
-              message: `Updated post with Id: ${appContext.postBeingModified.id}`,
-            });
-            setConfirmationalMessage(requestResult.message);
 
-            setTimeout(() => {
-              onClose();
-            }, 1000);
-          } else setErrorMessage(requestResult.message);
+      await PostService.updatePost(updatedPost.id, updatedPost, user.token)
+        .then((updatedPostResponse) => {
+          appContext.dispatch({
+            type: "UPDATED_POST",
+            post: updatedPostResponse,
+          });
+          setConfirmationalMessage("Successfully updated Post!");
+
+          setTimeout(() => {
+            onClose();
+          }, 1000);
         })
+        .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
   };
@@ -94,8 +89,8 @@ const UpdatePostForm = () => {
                 id={group.id}
                 className="input input-text"
                 onChange={(e) =>
-                  setUpdatedPostData({
-                    ...updatedPostData,
+                  setUpdatedPost({
+                    ...updatedPost,
                     [`${group.id}`]: e.currentTarget.value,
                   })
                 }
@@ -108,8 +103,8 @@ const UpdatePostForm = () => {
                 type={group.type}
                 className="input"
                 onChange={(e) =>
-                  setUpdatedPostData({
-                    ...updatedPostData,
+                  setUpdatedPost({
+                    ...updatedPost,
                     [`${group.id}`]: e.currentTarget.value,
                   })
                 }

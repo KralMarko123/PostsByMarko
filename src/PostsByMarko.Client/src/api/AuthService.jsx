@@ -1,29 +1,22 @@
 import ENDPOINT_URLS from "../constants/endpoints";
+import ApiClient from "./ApiClient";
 
-const AuthService = {
-  async login(loginRequest) {
-    return await fetch(ENDPOINT_URLS.LOGIN, {
+export const AuthService = {
+  login: async (loginRequest) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.LOGIN, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginRequest),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      body: loginRequest,
+    }),
 
-  async register(registerRequest) {
-    return await fetch(ENDPOINT_URLS.REGISTER, {
+  register: async (registerRequest) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.REGISTER, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(registerRequest),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      body: registerRequest,
+    }),
+
+  validate: async (userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.VALIDATE, {
+      method: "GET",
+      token: userToken,
+    }),
 };
-
-export default AuthService;

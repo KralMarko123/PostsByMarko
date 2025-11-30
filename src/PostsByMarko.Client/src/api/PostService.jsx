@@ -1,64 +1,36 @@
 import ENDPOINT_URLS from "../constants/endpoints";
+import ApiClient from "./ApiClient";
 
-const PostService = {
-  async getPosts(userToken) {
-    return await fetch(ENDPOINT_URLS.GET_POSTS, {
+export const PostService = {
+  getPosts: async (userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.GET_POSTS, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async getPostById(postId, userToken) {
-    return await fetch(ENDPOINT_URLS.GET_POST_BY_ID(postId), {
+  getPostById: async (postId, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.GET_POST_BY_ID(postId), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async createPost(createPostRequest, userToken) {
-    return await fetch(ENDPOINT_URLS.CREATE_POST, {
+  createPost: async (createPostRequest, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.CREATE_POST, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: JSON.stringify(createPostRequest),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      body: createPostRequest,
+      token: userToken,
+    }),
 
-  async updatePost(postId, updatePostRequest, userToken) {
-    return await fetch(ENDPOINT_URLS.UPDATE_POST(postId), {
+  updatePost: async (postId, updatePostRequest, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.UPDATE_POST(postId), {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: JSON.stringify(updatePostRequest),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      body: updatePostRequest,
+      token: userToken,
+    }),
 
-  async deletePostById(postId, userToken) {
-    return await fetch(ENDPOINT_URLS.DELETE_POST(postId), {
+  deletePostById: async (postId, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.DELETE_POST(postId), {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 };
-
-export default PostService;

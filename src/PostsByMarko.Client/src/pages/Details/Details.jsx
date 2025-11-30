@@ -1,16 +1,14 @@
 import { React, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import PostService from "../../api/PostService";
-import Nav from "../../components/Layout/Nav/Nav";
-import AppContext from "../../context/AppContext";
-import Container from "../../components/Layout/Container/Container";
+import { PostService } from "../../api/PostService";
 import { ICONS } from "../../constants/icons";
-import Button from "../../components/Helper/Button/Button";
-import TextareaAutosize from "react-textarea-autosize";
-import { useSignalR } from "../../custom/useSignalR";
 import { ROUTES } from "../../constants/routes";
 import { DateFunctions } from "../../util/dateFunctions";
+import Nav from "../../components/Layout/Nav/Nav";
+import Container from "../../components/Layout/Container/Container";
+import Button from "../../components/Helper/Button/Button";
+import TextareaAutosize from "react-textarea-autosize";
 import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
@@ -20,54 +18,41 @@ const Details = () => {
   const params = useParams();
   const postId = params.id;
   const { user, isAdmin } = useAuth();
-  const appContext = useContext(AppContext);
   const [post, setPost] = useState({});
-  const [author, setAuthor] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [confirmationalMessage, setConfirmationalMessage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedContent, setUpdatedContent] = useState("");
   const textAreaRef = useRef();
-  const { sendMessage } = useSignalR(true);
   const navigate = useNavigate();
   const postCreatedDate = DateFunctions.getLocalDateInFormat(
     post?.createdDate,
     "DD MMMM YYYY"
   );
+  const [author, setAuthor] = useState({});
   const isAuthor = author.id === user.id;
 
   const getPost = async () => {
-    let authorId;
-
-    await PostService.getPostById(postId, user.token).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
+    await PostService.getPostById(postId, user.token)
+      .then((postResponse) => {
         setErrorMessage(null);
-        setPost(requestResult.payload);
-        setUpdatedContent(requestResult.payload.content);
-        authorId = requestResult.payload.authorId;
-      } else setErrorMessage(requestResult.message);
-    });
-
-    await PostsService.getPostAuthor(postId, user.token).then(
-      (requestResult) => {
-        if (requestResult.statusCode === 200) {
-          setErrorMessage(null);
-          setAuthor(requestResult.payload);
-        } else setErrorMessage(requestResult.message);
-      }
-    );
+        setPost(postResponse);
+        setAuthor(postResponse.author);
+        setUpdatedContent((prev) => postResponse.content);
+      })
+      .catch((error) => setErrorMessage(error.message));
   };
 
   const toggleEdit = (flag) => {
-    setIsEditing(flag);
     textAreaRef.current.style.display = flag ? "block" : "none";
 
-    if (!flag) {
+    if (flag) {
       textAreaRef.current.value = post.content;
-      setUpdatedContent(post.content);
-      setErrorMessage(null);
     }
+
+    setIsEditing(flag);
+    setErrorMessage(null);
   };
 
   const handleUpdatedPostContent = async () => {
@@ -81,38 +66,39 @@ const Details = () => {
       return;
     }
 
-    updatePostContent();
+    await updatePostContent();
   };
 
   const updatePostContent = async () => {
-    let updatedPost = post;
-    updatedPost.content = updatedContent;
+    let updatePostRequest = {
+      title: post.title,
+      hidden: post.hidden,
+      content: updatedContent,
+    };
 
     setErrorMessage(null);
     setIsLoading(true);
 
-    await PostsService.updatePost(updatedPost, user.token)
-      .then((requestResult) => {
-        if (requestResult.statusCode === 200) {
-          sendMessage("Updated Post");
-          setConfirmationalMessage(requestResult.message);
-          toggleEdit(false);
+    await PostService.updatePost(post.id, updatePostRequest, user.token)
+      .then((updatedPostResponse) => {
+        setPost(updatedPostResponse);
+        setAuthor(updatedPostResponse.author);
+        setUpdatedContent(updatedPostResponse.content);
+        setConfirmationalMessage("Successfully updated Post!");
 
-          setTimeout(() => {
-            setConfirmationalMessage(null);
-          }, 3000);
-        } else setErrorMessage(requestResult.message);
+        textAreaRef.current.value = updatedPostResponse.content;
+        toggleEdit(false);
+
+        setTimeout(() => {
+          setConfirmationalMessage(null);
+        }, 3000);
       })
+      .catch((error) => setErrorMessage(error.message))
       .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
     getPost();
-
-    appContext.dispatch({
-      type: "MODIFYING_POST",
-      post: { postId: postId },
-    });
   }, []);
 
   return (

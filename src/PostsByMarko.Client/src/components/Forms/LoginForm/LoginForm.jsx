@@ -5,9 +5,9 @@ import { ROUTES } from "../../../constants/routes";
 import { FORMS } from "../../../constants/forms";
 import { HelperFunctions } from "../../../util/helperFunctions";
 import Button from "../../Helper/Button/Button";
-import AuthService from "../../../api/AuthService";
 import "../Form.css";
 import "./LoginForm.css";
+import { AuthService } from "../../../api/AuthService";
 
 const LoginForm = () => {
   const loginForm = FORMS.LOGIN_FORM;
@@ -33,12 +33,8 @@ const LoginForm = () => {
       setIsLoading(true);
 
       await AuthService.login(loginData)
-        .then((loginPayload) => {
-          login(loginPayload);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
+        .then((loginPayload) => login(loginPayload))
+        .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
   };

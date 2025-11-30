@@ -3,28 +3,31 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
 import { useSignalR } from "../../custom/useSignalR";
+import { DateFunctions } from "../../util/dateFunctions";
+import { PostService } from "../../api/PostService";
 import * as ROUTES from "../../constants/routes";
 import AppContext from "../../context/AppContext";
-import PostService from "../../api/PostService";
 import Card from "../Helper/Card/Card";
-import { DateFunctions } from "../../util/dateFunctions";
 import "./Post.css";
 
 const Post = ({
   id,
   authorId,
+  author,
   title,
   content,
-  isHidden,
+  hidden,
   createdDate,
+  lastUpdatedDate,
   index,
 }) => {
   let navigate = useNavigate();
   const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
   const isAuthor = authorId === user.id;
+  const isHidden = hidden;
   const readableCreatedDate = DateFunctions.getReadableDateTime(createdDate);
-  const { sendMessage } = useSignalR(true);
+  const {} = useSignalR(true);
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
@@ -32,6 +35,7 @@ const Post = ({
 
   const handleModalToggle = (e, modalToToggle) => {
     e.stopPropagation();
+
     appContext.dispatch({
       type: "MODIFYING_POST",
       post: { id: id, title: title, content: content },
@@ -42,17 +46,19 @@ const Post = ({
   const handleHiddenToggle = async (e) => {
     e.stopPropagation();
 
-    await PostService.togglePostVisibility(id, user.token).then(
-      (requestResult) => {
-        if (requestResult.statusCode === 200) {
-          appContext.dispatch({ type: "TOGGLE_POST_HIDDEN", id: id });
-          sendMessage({
-            message: `Modified visibility for post with Id: ${id}`,
-            toAll: true,
-          });
-        }
-      }
-    );
+    let updateRequest = { title, content, hidden: !hidden };
+
+    await PostService.updatePost(id, updateRequest, user.token)
+      .then((updatedPost) => {
+        appContext.dispatch({
+          type: "UPDATED_POST",
+          post: updatedPost,
+        });
+      })
+      .catch((error) => {
+        // TODO: Create modal notification that something went wrong
+        console.log(error);
+      });
   };
 
   return (

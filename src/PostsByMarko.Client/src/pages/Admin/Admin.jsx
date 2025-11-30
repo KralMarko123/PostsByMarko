@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Container from "../../components/Layout/Container/Container";
 import Nav from "../../components/Layout/Nav/Nav";
 import UserService from "../../api/UserService";
-import PostService from "../../api/PostService";
+import { PostService } from "../../api/PostService";
 import { useAuth } from "../../custom/useAuth";
 import { useSignalR } from "../../custom/useSignalR";
 import AppContext from "../../context/AppContext";

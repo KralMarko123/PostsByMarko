@@ -4,7 +4,7 @@ import { ROUTES } from "../../../constants/routes";
 import { FORMS } from "../../../constants/forms";
 import { HelperFunctions } from "../../../util/helperFunctions";
 import Button from "../../Helper/Button/Button";
-import AuthService from "../../../api/AuthService";
+import { AuthService } from "../../../api/AuthService";
 import "./RegisterForm.css";
 import "../Form.css";
 
@@ -65,10 +65,8 @@ const RegisterForm = () => {
       setIsLoading(true);
 
       await AuthService.register(registerData)
-        .then((requestResult) => {
-          if (requestResult.statusCode === 201) setIsRegistered(true);
-          else setErrorMessage(requestResult.message);
-        })
+        .then((response) => setIsRegistered(true))
+        .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
   };

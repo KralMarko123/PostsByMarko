@@ -60,7 +60,9 @@ export const appReducer = (state, action) => {
 
       posts[postBeingModifiedIndex].title = action.post.title;
       posts[postBeingModifiedIndex].content = action.post.content;
-      posts[postBeingModifiedIndex].lastUpdatedDate = new Date().toISOString();
+      posts[postBeingModifiedIndex].lastUpdatedDate =
+        action.post.lastUpdatedDate;
+      posts[postBeingModifiedIndex].hidden = action.post.hidden;
 
       return { ...state, posts: posts };
 
