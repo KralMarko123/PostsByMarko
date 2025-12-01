@@ -4,12 +4,12 @@ import { ICONS } from "../../constants/icons";
 import { HelperFunctions } from "../../util/helperFunctions";
 import { DateFunctions } from "../../util/dateFunctions";
 import { useMessageHub } from "../../custom/useMessageHub";
+import { UserService } from "../../api/UserService";
+import { MessagingService } from "../../api/MessagingService";
 import Nav from "../../components/Layout/Nav/Nav";
 import Container from "../../components/Layout/Container/Container";
 import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
-import UserService from "../../api/UserService";
-import MessagingService from "../../api/MessagingService";
 import AppContext from "../../context/AppContext";
 import "../Page.css";
 import "./Chat.css";
@@ -20,8 +20,8 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [unreadChats, setUnreadChats] = useState([]);
   const [openChat, setOpenChat] = useState(null);
-  const { user } = useAuth();
-  const { lastMessageRegistered } = useMessageHub;
+  const { user, checkToken } = useAuth();
+  const { lastMessageRegistered } = useMessageHub();
   const [newMessage, setNewMessage] = useState("");
   const [isMessageEmpty, setIsMessageEmpty] = useState(false);
   const messageInputRef = useRef(null);
@@ -29,57 +29,65 @@ const Chat = () => {
   const [messageIsSending, setMessageIsSending] = useState(false);
 
   const getUsers = async () => {
-    await UserService.getOtherUsers(user.token).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
-        setUsers(requestResult.payload);
-      }
-    });
+    await UserService.getUsers(user.token, user.id)
+      .then((users) => {
+        setUsers(users);
+      })
+      .catch(async (error) => {
+        await checkToken();
+
+        // TODO: Create global notification modal
+        console.log(error);
+      });
   };
 
   const getChats = async () => {
-    await MessagingService.getChats(user.token).then((requestResult) => {
-      appContext.chats.forEach((chat) => {
-        let existingChat = requestResult.payload.find(
-          (c) => c.id === chat.id && c.id !== openChat?.id
-        );
+    await MessagingService.getChats(user.token)
+      .then((chats) => {
+        appContext.chats.forEach((chat) => {
+          let existingChat = chats.find(
+            (c) => c.id === chat.id && c.id !== openChat?.id
+          );
 
-        if (
-          existingChat &&
-          DateFunctions.isBeforeDateTime(
-            chat.updatedAt,
-            existingChat.updatedAt
-          ) === 1
-        ) {
-          console.log(existingChat.updatedAt, chat.updatedAt);
+          if (
+            existingChat &&
+            DateFunctions.isBeforeDateTime(
+              chat.updatedAt,
+              existingChat.updatedAt
+            ) === 1
+          ) {
+            let userIdWithNewMessage = existingChat.users.filter(
+              (u) => u.id !== user.id
+            ).id;
 
-          let userIdWithNewMessage = existingChat.participantIds.filter(
-            (id) => id !== user.id
-          )[0];
+            setUnreadChats([...unreadChats, userIdWithNewMessage]);
+          }
+        });
 
-          setUnreadChats([...unreadChats, userIdWithNewMessage]);
-        }
+        appContext.dispatch({ type: "LOAD_CHATS", chats: chats });
+      })
+      .catch(async (error) => {
+        await checkToken();
+
+        // TODO: Create global notification modal
+        console.log(error);
       });
-
-      appContext.dispatch({ type: "LOAD_CHATS", chats: requestResult.payload });
-    });
   };
 
-  const getChat = async (recipientId) => {
-    let participantIds = [user.id, recipientId];
-
-    await MessagingService.getChatByParticipantIds(
-      participantIds,
-      user.token
-    ).then((requestResult) => {
-      if (requestResult.statusCode === 200) {
-        setOpenChat(requestResult.payload);
+  const startChat = async (recipientId) => {
+    await MessagingService.startChat(recipientId, user.token)
+      .then((chat) => {
+        setOpenChat(chat);
 
         appContext.dispatch({
           type: "STARTED_CHAT",
-          chat: requestResult.payload,
+          chat: chat,
         });
-      }
-    });
+      })
+      .catch((error) => {
+        // TODO: Create global notification modal
+        console.log(error);
+      });
   };
 
   const handleUserClick = (u) => {
@@ -89,7 +97,7 @@ const Chat = () => {
     }
 
     setSelectedUser(u);
-    getChat(u.id);
+    startChat(u.id);
     setUnreadChats(unreadChats.filter((id) => id !== u.id));
   };
 
@@ -110,23 +118,23 @@ const Chat = () => {
     };
 
     await MessagingService.sendMessage(messageToSend, user.token)
-      .then((requestResult) => {
-        if (requestResult.statusCode === 200) {
-          const newMessage = requestResult.payload;
+      .then((newMessage) => {
+        messageInputRef.current.value = "";
+        setNewMessage("");
 
-          messageInputRef.current.value = "";
-          setNewMessage("");
+        setOpenChat({
+          ...openChat,
+          messages: [...openChat.messages, newMessage],
+        });
 
-          setOpenChat({
-            ...openChat,
-            messages: [...openChat.messages, newMessage],
-          });
-
-          appContext.dispatch({
-            type: "SENT_MESSAGE",
-            message: newMessage,
-          });
-        }
+        appContext.dispatch({
+          type: "SENT_MESSAGE",
+          message: newMessage,
+        });
+      })
+      .catch((error) => {
+        // TODO: Create global notification modal
+        console.log(error);
       })
       .finally(() => {
         setTimeout(() => {
@@ -153,7 +161,7 @@ const Chat = () => {
     else return false;
   };
 
-  const getMessagesGroupedByDayToMap = () => {
+  const getMessagesGroupedByDay = () => {
     return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
   };
 
@@ -170,7 +178,7 @@ const Chat = () => {
     getChats();
 
     if (selectedUser) {
-      getChat(selectedUser.id);
+      startChat(selectedUser.id);
     }
   }, [lastMessageRegistered]);
 
@@ -187,7 +195,9 @@ const Chat = () => {
         <div className="chat-container">
           <div className="user-list">
             {users?.map((u) => {
-              let isActiveChat = openChat?.participantIds?.includes(u.id);
+              let isActiveChat = openChat?.users
+                ?.map((cu) => cu.id)
+                ?.includes(u.id);
               let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
               let numberOfUnreadMessages = unreadChats?.filter(
                 (id) => id == u.id
@@ -230,8 +240,13 @@ const Chat = () => {
                 </div>
 
                 <div className="message-list" ref={messageListRef}>
-                  {getMessagesGroupedByDayToMap().map((ml) =>
-                    ml.map((m, index) => {
+                  {getMessagesGroupedByDay().map((messageList) => {
+                    DateFunctions.sortItemsByDateTimeAttribute(
+                      messageList,
+                      "createdAt"
+                    );
+
+                    return messageList.map((m, index) => {
                       let isMessageAuthor = m.senderId == user.id;
 
                       return (
@@ -263,8 +278,8 @@ const Chat = () => {
                           </div>
                         </div>
                       );
-                    })
-                  )}
+                    });
+                  })}
                 </div>
 
                 <div className="message-area">

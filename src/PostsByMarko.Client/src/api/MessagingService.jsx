@@ -1,41 +1,23 @@
 import ENDPOINT_URLS from "../constants/endpoints";
+import ApiClient from "./ApiClient";
 
-const MessagingService = {
-  async getChats(userToken) {
-    return await fetch(ENDPOINT_URLS.GET_CHATS, {
+export const MessagingService = {
+  getChats: async (userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.GET_CHATS, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async startChat(otherUserId, userToken) {
-    return await fetch(ENDPOINT_URLS.START_CHAT(otherUserId), {
+  startChat: async (otherUserId, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.START_CHAT(otherUserId), {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 
-  async sendMessage(messageToSend, userToken) {
-    return await fetch(ENDPOINT_URLS.SEND_MESSAGE, {
+  sendMessage: async (messageToSend, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.SEND_MESSAGE, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(messageToSend),
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+      body: messageToSend,
+    }),
 };
-
-export default MessagingService;

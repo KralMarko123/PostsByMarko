@@ -14,11 +14,13 @@ import Footer from "../../components/Layout/Footer/Footer";
 import Logo from "../../components/Layout/Logo/Logo";
 import "../Page.css";
 import "./Admin.css";
+import { useAdminHub } from "../../custom/useAdminHub";
 
 const Admin = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
   const { lastMessageRegistered } = usePostHub();
+  const { lastAdminAction } = useAdminHub();
   const [dashboardData, setDashboardData] = useState([]);
   const [posts, setPosts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -30,8 +32,7 @@ const Admin = () => {
   const barChartData = barChartLabels.map(
     (l) =>
       posts.filter(
-        (p) =>
-          DateFunctions.getDayOfMonthFromDate(p.createdDate) === l.toString()
+        (p) => DateFunctions.getDayOfMonthFromDate(p.createdAt) === l.toString()
       ).length
   );
 
@@ -85,7 +86,7 @@ const Admin = () => {
         setTimeout(() => setConfirmationalMessage(null), 3000);
       })
       .catch((error) => {
-        setErrorMessage(requestResult.message);
+        setErrorMessage(error.message);
         setConfirmationalMessage(null);
       });
   };
@@ -93,7 +94,7 @@ const Admin = () => {
   useEffect(() => {
     getAdminDashboard();
     getPosts();
-  }, [lastMessageRegistered, appContext.posts.length]);
+  }, [lastAdminAction, lastMessageRegistered, appContext.posts.length]);
 
   return (
     <div className="admin page">
@@ -142,8 +143,8 @@ const Admin = () => {
                       {row.roles.includes("Admin") ? (
                         <span
                           className="table-button warning"
-                          onClick={() =>
-                            handleUserRoleUpdate(row.userId, false)
+                          onClick={async () =>
+                            await handleUserRoleUpdate(row.userId, false)
                           }
                         >
                           Remove Admin
@@ -151,14 +152,18 @@ const Admin = () => {
                       ) : (
                         <span
                           className="table-button success"
-                          onClick={() => handleUserRoleUpdate(row.userId, true)}
+                          onClick={async () =>
+                            await handleUserRoleUpdate(row.userId, true)
+                          }
                         >
                           Make Admin
                         </span>
                       )}
                       <span
                         className="table-button error"
-                        onClick={() => handleUserDelete(row.userId, row.email)}
+                        onClick={async () =>
+                          await handleUserDelete(row.userId, row.email)
+                        }
                       >
                         Delete
                       </span>

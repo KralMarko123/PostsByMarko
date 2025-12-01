@@ -81,19 +81,25 @@
 }
 
 .admin .messages {
+  width: 100%;
+
+  padding: var(--normal-padding);
   margin: var(--normal-gap) 0;
+
+  font-size: var(--md-text);
 }
 
 .admin .charts-container {
   width: 100%;
+
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1em;
-  justify-content: space-between;
 }
 
 .admin .chart {
-  width: 100%;
+  width: 80%;
 }
 
 /**TABLET*/
@@ -123,10 +129,6 @@
 
   .admin .messages {
     margin: var(--normal-gap) 0;
-  }
-
-  .admin .charts-container {
-    flex-direction: column;
   }
 
   .admin .chart {

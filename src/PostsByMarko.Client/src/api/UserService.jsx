@@ -1,27 +1,27 @@
 import ENDPOINT_URLS from "../constants/endpoints";
+import ApiClient from "./ApiClient";
 
-const UserService = {
-  async getUsers(userToken) {
-    return await fetch(ENDPOINT_URLS.GET_USERS, {
+export const UserService = {
+  getUsers: async (userToken, exceptId = null) => {
+    let constructedEndpoint = ENDPOINT_URLS.GET_USERS;
+
+    if (exceptId !== null) {
+      const params = { exceptId: exceptId };
+      const queryParams = new URLSearchParams(params);
+      constructedEndpoint = `${
+        ENDPOINT_URLS.GET_USERS
+      }?${queryParams.toString()}`;
+    }
+
+    return await ApiClient.apiRequest(constructedEndpoint, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
+      token: userToken,
+    });
   },
 
-  async getUserById(userId, userToken) {
-    return await fetch(ENDPOINT_URLS.GET_USER(userId), {
+  getUserById: async (userId, userToken) =>
+    await ApiClient.apiRequest(ENDPOINT_URLS.GET_USER(userId), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => console.error(error));
-  },
+      token: userToken,
+    }),
 };
-
-export default UserService;

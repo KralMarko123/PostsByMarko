@@ -10,8 +10,13 @@ const AppContext = createContext({
   },
   postBeingModified: {
     id: null,
+    authorId: null,
+    author: null,
     title: "",
     content: "",
+    createdAt: null,
+    lastUpdatedAt: null,
+    hidden: false,
     index: null,
   },
   chats: [],

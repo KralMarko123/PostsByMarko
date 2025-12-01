@@ -42,7 +42,8 @@ export const appReducer = (state, action) => {
       return { ...state, posts: action.posts };
 
     case "MODIFYING_POST":
-      return { ...state, postBeingModified: action.post };
+      console.log(action.post);
+      return { ...state, postBeingModified: { ...action.post } };
 
     case "DELETED_POST":
       return {

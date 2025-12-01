@@ -66,4 +66,12 @@ export const DateFunctions = {
       return 0; // Equal
     }
   },
+
+  sortItemsByDateTimeAttribute(items, attributeName = "") {
+    items.sort(
+      (a, b) =>
+        moment(a[`${attributeName}`]).valueOf() -
+        moment(b[`${attributeName}`]).valueOf()
+    );
+  },
 };

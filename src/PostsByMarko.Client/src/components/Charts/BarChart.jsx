@@ -46,7 +46,7 @@ export const options = {
       labels: {
         padding: 20,
         font: {
-          size: 16,
+          size: 18,
           weight: "bold",
         },
       },

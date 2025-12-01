@@ -3,30 +3,30 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import ENDPOINT_URLS from "../constants/endpoints";
 import { useAuth } from "./useAuth";
 
-export const useMessageHub = () => {
+export const useAdminHub = () => {
   const { user } = useAuth();
   const [signalR, setSignalR] = useState({
     connection: new HubConnectionBuilder()
-      .withUrl(ENDPOINT_URLS.MESSAGE_HUB, {
+      .withUrl(ENDPOINT_URLS.ADMIN_HUB, {
         accessTokenFactory: () => user.token,
       })
       .configureLogging(LogLevel.Information)
       .withAutomaticReconnect([0, 2, 4, 6, 8, 10, 15, 20, 30])
       .build(),
 
-    lastMessageRegistered: "",
+    lastAdminAction: "",
   });
 
-  const MessagingEvents = {
-    onMessageSent: (message) =>
+  const AdminEvents = {
+    onUpdatedUserRoles: (userId, updatedAt) =>
       setSignalR({
         ...signalR,
-        lastMessageRegistered: `New Message sent at ${message.createdAt}`,
+        lastAdminAction: `Updated roles for user with Id '${userId}' at ${updatedAt}`,
       }),
-    onChatCreated: (chat) =>
+    onDeletedUser: (userId, deletedAt) =>
       setSignalR({
         ...signalR,
-        lastMessageRegistered: `Chat started at ${chat.createdAt}`,
+        lastAdminAction: `Deleted user with Id '${userId}' at ${deletedAt}`,
       }),
   };
 
@@ -35,13 +35,13 @@ export const useMessageHub = () => {
       signalR.connection
         .start()
         .then(() => {
-          signalR.connection.on("MessageSent", (message) =>
-            MessagingEvents.onMessageSent(message)
+          signalR.connection.on("UpdatedUserRoles", (userId, updatedAt) =>
+            AdminEvents.onUpdatedUserRoles(userId, updatedAt)
           );
 
-          signalR.connection.on("ChatCreated", (chat) => {
-            MessagingEvents.onChatCreated(chat);
-          });
+          signalR.connection.on("DeletedUser", (userId, deletedAt) =>
+            AdminEvents.onDeletedUser(userId, deletedAt)
+          );
         })
         .catch((error) =>
           console.error(`SignalR connection	failed with error: ${error}`)

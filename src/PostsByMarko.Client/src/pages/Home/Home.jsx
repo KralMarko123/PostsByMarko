@@ -1,8 +1,8 @@
 import { React, useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { PostService } from "../../api/PostService";
-import { HelperFunctions } from "../../util/helperFunctions";
 import { usePostHub } from "../../custom/usePostHub";
+import { DateFunctions } from "../../util/dateFunctions";
 import Post from "../../components/Post/Post";
 import Nav from "../../components/Layout/Nav/Nav";
 import DeletePostForm from "../../components/Forms/DeletePostForm/DeletePostForm";
@@ -23,7 +23,7 @@ const Home = () => {
   const getPosts = async () => {
     await PostService.getPosts(user.token)
       .then((posts) => {
-        HelperFunctions.sortPostsByCreatedDate(posts);
+        DateFunctions.sortItemsByDateTimeAttribute(posts, "createdAt");
         setPosts(posts);
         appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
       })
@@ -55,8 +55,8 @@ const Home = () => {
               title={p.title}
               content={p.content}
               hidden={p.hidden}
-              createdDate={p.createdDate}
-              lastUpdatedDate={p.lastUpdatedDate}
+              createdAt={p.createdAt}
+              lastUpdatedAt={p.lastUpdatedAt}
               index={i}
             />
           ))}

@@ -5,7 +5,7 @@ import { DateFunctions } from "./dateFunctions";
 export const HelperFunctions = {
   noEmptyFields(data) {
     return Object.values(data).every(
-      (field) => field.length > 0 || typeof field === "object"
+      (field) => field.length > 0 || typeof field !== "string"
     );
   },
 
@@ -36,22 +36,22 @@ export const HelperFunctions = {
     }
   },
 
-  sortPostsByCreatedDate(posts) {
-    posts.length > 0
-      ? posts.sort((p1, p2) => {
-          const date1 = Date.parse(p1.createdDate);
-          const date2 = Date.parse(p2.createdDate);
+  sortItemsByCreatedAt(items) {
+    items.length > 0
+      ? items.sort((item1, item2) => {
+          const date1 = Date.parse(item1.createdAt);
+          const date2 = Date.parse(item2.createdAt);
 
           return date1 > date2 ? -1 : 1;
         })
       : null;
   },
 
-  sortPostsByLastUpdatedDate(posts) {
-    posts.length > 0
-      ? posts.sort((p1, p2) => {
-          const date1 = Date.parse(p1.lastUpdatedDate);
-          const date2 = Date.parse(p2.lastUpdatedDate);
+  sortPostsByLastUpdatedAt(items) {
+    items.length > 0
+      ? items.sort((item1, item2) => {
+          const date1 = Date.parse(item1.lastUpdatedAt);
+          const date2 = Date.parse(item2.lastUpdatedAt);
 
           return date1 > date2 ? -1 : 1;
         })
@@ -66,7 +66,7 @@ export const HelperFunctions = {
     const messagesByDay = {};
 
     messages.forEach((m) => {
-      const date = moment(m.createdDate);
+      const date = moment(m.createdAt);
       const dayKey = date.startOf("day").format("YYYY-MM-DD"); // Format to get a consistent key for each day
 
       if (!messagesByDay[dayKey]) {

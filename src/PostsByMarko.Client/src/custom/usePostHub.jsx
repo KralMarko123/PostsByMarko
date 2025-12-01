@@ -28,10 +28,10 @@ export const usePostHub = () => {
         ...signalR,
         lastMessageRegistered: `Post updated at ${post.lastUpdatedAt}`,
       }),
-    onPostDeleted: (id) =>
+    onPostDeleted: (postId) =>
       setSignalR({
         ...signalR,
-        lastMessageRegistered: `Post with Id '${id}' was deleted`,
+        lastMessageRegistered: `Post with Id '${postId}' was deleted`,
       }),
   };
 

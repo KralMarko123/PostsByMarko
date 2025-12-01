@@ -1,4 +1,4 @@
-import { React, useContext } from "react";
+import { React, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
@@ -16,16 +16,25 @@ const Post = ({
   title,
   content,
   hidden,
-  createdDate,
-  lastUpdatedDate,
+  createdAt,
+  lastUpdatedAt,
   index,
 }) => {
   let navigate = useNavigate();
   const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
-  const isAuthor = authorId === user.id;
-  const isHidden = hidden;
-  const readableCreatedDate = DateFunctions.getReadableDateTime(createdDate);
+  const [post, setPost] = useState({
+    id: id,
+    authorId: authorId,
+    author: author,
+    title: title,
+    content: content,
+    hidden: hidden,
+    createdAt: createdAt,
+    lastUpdatedAt: lastUpdatedAt,
+  });
+  const isAuthor = post.authorId === user.id;
+  const readableCreatedDate = DateFunctions.getReadableDateTime(post.createdAt);
 
   const handlePostClick = () => {
     navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
@@ -36,7 +45,7 @@ const Post = ({
 
     appContext.dispatch({
       type: "MODIFYING_POST",
-      post: { id: id, title: title, content: content },
+      post: post,
     });
     appContext.dispatch({ type: "SHOW_MODAL", modal: modalToToggle });
   };
@@ -44,10 +53,16 @@ const Post = ({
   const handleHiddenToggle = async (e) => {
     e.stopPropagation();
 
+    appContext.dispatch({
+      type: "MODIFYING_POST",
+      post: post,
+    });
+
     let updateRequest = { title, content, hidden: !hidden };
 
     await PostService.updatePost(id, updateRequest, user.token)
       .then((updatedPost) => {
+        setPost(updatedPost);
         appContext.dispatch({
           type: "UPDATED_POST",
           post: updatedPost,
@@ -59,11 +74,24 @@ const Post = ({
       });
   };
 
+  useEffect(() => {
+    setPost({
+      id: id,
+      authorId: authorId,
+      author: author,
+      title: title,
+      content: content,
+      hidden: hidden,
+      createdAt: createdAt,
+      lastUpdatedAt: lastUpdatedAt,
+    });
+  }, [title, content, hidden, lastUpdatedAt]);
+
   return (
     <Card>
       <div
         id={`post-${id}`}
-        className={`post ${isHidden ? "hidden" : ""}`}
+        className={`post ${post.hidden ? "hidden" : ""}`}
         onClick={() => handlePostClick()}
         style={{ animationDelay: `${index * 0.15}s` }}
       >
@@ -72,7 +100,7 @@ const Post = ({
             className="post-icon hide"
             onClick={(e) => handleHiddenToggle(e)}
           >
-            {ICONS.EYE_ICON(isHidden)}
+            {ICONS.EYE_ICON(post.hidden)}
           </span>
         )}
         {(isAuthor || isAdmin) && (

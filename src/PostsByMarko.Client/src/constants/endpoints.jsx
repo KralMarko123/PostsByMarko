@@ -8,6 +8,7 @@ const POST_CONTROLLER_PREFIX = "api/post";
 const MESSAGING_CONTROLLER_PREFIX = "api/messaging";
 const POST_HUB = "postHub";
 const MESSAGE_HUB = "messageHub";
+const ADMIN_HUB = "adminHub";
 
 const ENDPOINTS = {
   // Admin
@@ -34,12 +35,13 @@ const ENDPOINTS = {
 
   // Messaging
   GET_CHATS: `${MESSAGING_CONTROLLER_PREFIX}/chats`,
-  START_CHAT: (id) => `${MESSAGING_CONTROLLER_PREFIX}/chats/user${id}`,
+  START_CHAT: (id) => `${MESSAGING_CONTROLLER_PREFIX}/chats/user/${id}`,
   SEND_MESSAGE: `${MESSAGING_CONTROLLER_PREFIX}/send`,
 
   // Hubs
   POST_HUB: POST_HUB,
   MESSAGE_HUB: MESSAGE_HUB,
+  ADMIN_HUB: ADMIN_HUB,
 };
 
 const developmentEndpoints = {
@@ -74,6 +76,7 @@ const developmentEndpoints = {
   // Hubs
   POST_HUB: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.POST_HUB}`,
   MESSAGE_HUB: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.MESSAGE_HUB}`,
+  ADMIN_HUB: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.ADMIN_HUB}`,
 };
 
 const dockerEndpoints = {
@@ -107,6 +110,7 @@ const dockerEndpoints = {
   // Hubs
   POST_HUB: `${BASE_URL_DOCKER}/${ENDPOINTS.POST_HUB}`,
   MESSAGE_HUB: `${BASE_URL_DOCKER}/${ENDPOINTS.MESSAGE_HUB}`,
+  ADMIN_HUB: `${BASE_URL_DOCKER}/${ENDPOINTS.ADMIN_HUB}`,
 };
 
 let ENDPOINT_URLS;

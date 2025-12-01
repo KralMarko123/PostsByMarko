@@ -1,5 +1,5 @@
 export const ActionType = {
-  CREATE: "Create",
-  UPDATE: "Update",
-  DELETE: "Delete",
+  CREATE: 1,
+  UPDATE: 2,
+  DELETE: 3,
 };
