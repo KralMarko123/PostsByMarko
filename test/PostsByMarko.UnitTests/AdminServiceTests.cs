@@ -101,7 +101,8 @@ namespace PostsByMarko.UnitTests
             var updatedRoles = new List<string> { currentRoles[0], request.Role };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
-            usersRepositoryMock.SetupSequence(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => currentRoles).ReturnsAsync(() => updatedRoles);
+            usersRepositoryMock.Setup(r => r.AddRoleToUserAsync(user, request.Role)).ReturnsAsync(IdentityResult.Success);
+            usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => updatedRoles);
             adminHubMock.Setup(a => a.Clients.All).Returns(adminClientMock.Object);
             adminClientMock.Setup(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>())).Returns(Task.CompletedTask);
 
@@ -130,7 +131,8 @@ namespace PostsByMarko.UnitTests
             var updatedRoles = new List<string> { currentRoles[0] };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
-            usersRepositoryMock.SetupSequence(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => currentRoles).ReturnsAsync(() => updatedRoles);
+            usersRepositoryMock.Setup(r => r.RemoveRoleFromUserAsync(user, request.Role)).ReturnsAsync(IdentityResult.Success);
+            usersRepositoryMock.SetupSequence(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => updatedRoles);
             adminHubMock.Setup(a => a.Clients.All).Returns(adminClientMock.Object);
             adminClientMock.Setup(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>())).Returns(Task.CompletedTask);
 
@@ -148,6 +150,28 @@ namespace PostsByMarko.UnitTests
         public async Task update_user_roles_should_throw_if_user_was_not_found()
         {
             // Arrange
+            var user = new User { Id = Guid.NewGuid() };
+            var request = new UpdateUserRolesRequest
+            {
+                UserId = user.Id,
+                ActionType = ActionType.Create,
+                Role = "Added role"
+            };
+
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.AddRoleToUserAsync(user, request.Role)).ReturnsAsync(IdentityResult.Failed());
+
+            // Act
+            var result = async () => await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<InvalidOperationException>().WithMessage($"Error while updating roles for user with Id: {user.Id}");
+        }
+
+        [Fact]
+        public async Task update_user_roles_should_throw_if_role_update_was_unsuccessful()
+        {
+            // Arrange
             var request = new UpdateUserRolesRequest
             {
                 UserId = Guid.NewGuid(),
@@ -159,6 +183,7 @@ namespace PostsByMarko.UnitTests
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {request.UserId} was not found");
         }
+
 
         [Fact]
         public async Task delete_user_should_call_delete_method_in_repository()

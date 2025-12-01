@@ -117,6 +117,7 @@ namespace PostsByMarko.Host.Extensions
                 .CustomInstantiator(f => new User
                 {
                     Email = f.Internet.Email(),
+                    UserName = f.Internet.Email(),
                     FirstName = f.Name.FirstName(),
                     LastName = f.Name.LastName(),
                     EmailConfirmed = true,

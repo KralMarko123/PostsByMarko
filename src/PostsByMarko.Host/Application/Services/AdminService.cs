@@ -48,19 +48,13 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
             var user = await userRepository.GetUserByIdAsync(request.UserId!.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
-            var currentRoles = await userRepository.GetRolesForUserAsync(user);
+            var result = request.ActionType == ActionType.Create 
+                ? await userRepository.AddRoleToUserAsync(user, request.Role)
+                : await userRepository.RemoveRoleFromUserAsync(user, request.Role);
 
-            if (request.ActionType == ActionType.Create)
+            if (!result.Succeeded)
             {
-                if (currentRoles.Contains(request.Role)) return [.. currentRoles];
-
-                await userRepository.AddRoleToUserAsync(user, request.Role);
-            }
-            else if (request.ActionType == ActionType.Delete)
-            {
-                if (!currentRoles.Contains(request.Role)) return [.. currentRoles];
-
-                await userRepository.RemoveRoleFromUserAsync(user, request.Role);
+                throw new InvalidOperationException($"Error while updating roles for user with Id: {request.UserId}");
             }
 
             var updatedRoles = await userRepository.GetRolesForUserAsync(user);
