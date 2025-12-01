@@ -220,8 +220,8 @@ namespace PostsByMarko.UnitTests
             // Assert
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(postDto);
-            result.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-            result.LastUpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.LastUpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             postClientMock.Verify(p => p.PostCreated(postDto), Times.Once);
         }
@@ -273,7 +273,7 @@ namespace PostsByMarko.UnitTests
                 Hidden = false
             };
             var postDto = new PostDto { Id = post.Id, Title = updateRequest.Title, Content = updateRequest.Content,
-                Hidden = updateRequest.Hidden, LastUpdatedDate = DateTime.UtcNow };
+                Hidden = updateRequest.Hidden, LastUpdatedAt = DateTime.UtcNow };
 
             currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
@@ -290,7 +290,7 @@ namespace PostsByMarko.UnitTests
             post.Title.Should().Be(updateRequest.Title);
             post.Content.Should().Be(updateRequest.Content);
             post.Hidden.Should().Be(updateRequest.Hidden);
-            post.LastUpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            post.LastUpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(postDto);

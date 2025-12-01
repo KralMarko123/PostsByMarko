@@ -1,4 +1,5 @@
-﻿using PostsByMarko.Host.Data;
+﻿using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Middlewares;
 
 namespace PostsByMarko.Host.Extensions
@@ -29,6 +30,13 @@ namespace PostsByMarko.Host.Extensions
         public static void WithMiddlewares(this WebApplication app)
         {
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+        }
+
+        public static void WithHubs(this WebApplication app)
+        {
+            app.MapHub<AdminHub>("/adminHub");
+            app.MapHub<PostHub>("/postHub");
+            app.MapHub<MessageHub>("/messageHub");
         }
     }
 }

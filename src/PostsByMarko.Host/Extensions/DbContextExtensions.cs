@@ -120,6 +120,7 @@ namespace PostsByMarko.Host.Extensions
                     FirstName = f.Name.FirstName(),
                     LastName = f.Name.LastName(),
                     EmailConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString()
                 });
 
             var postFaker = new Faker<Post>()
@@ -127,8 +128,8 @@ namespace PostsByMarko.Host.Extensions
                 {
                     Title = f.Commerce.ProductName(),
                     Content = f.Rant.Review(f.Commerce.ProductName()),
-                    CreatedDate = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
-                    LastUpdatedDate = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
+                    CreatedAt = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
+                    LastUpdatedAt = halfOfMonthHasGoneBy ? f.Date.Recent(30, DateTime.UtcNow) : f.Date.Soon(30, DateTime.UtcNow),
                     Hidden = f.Random.Bool(0.25f)
                 });
 

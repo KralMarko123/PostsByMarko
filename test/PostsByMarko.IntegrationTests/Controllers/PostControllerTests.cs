@@ -5,6 +5,7 @@ using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Test.Shared.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -139,7 +140,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             updatedPost.Title.Should().Be(updateRequest.Title);
             updatedPost.Content.Should().Be(updateRequest.Content);
             updatedPost.Hidden.Should().Be(updateRequest.Hidden);
-            updatedPost.LastUpdatedDate.Should().BeAfter(postToUpdate.LastUpdatedDate);
+            updatedPost.LastUpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 
         [Fact]

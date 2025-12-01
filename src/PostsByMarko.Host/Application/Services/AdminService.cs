@@ -1,4 +1,7 @@
-﻿using PostsByMarko.Host.Application.Enums;
+﻿using Microsoft.AspNetCore.SignalR;
+using PostsByMarko.Host.Application.Enums;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
@@ -10,11 +13,13 @@ namespace PostsByMarko.Host.Application.Services
     {
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
+        private readonly IHubContext<AdminHub, IAdminClient> adminHub;
 
-        public AdminService(IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor)
+        public AdminService(IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor, IHubContext<AdminHub, IAdminClient> adminHub)
         {
             this.userRepository = userRepository;
             this.currentRequestAccessor = currentRequestAccessor;
+            this.adminHub = adminHub;
         }
 
         public async Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
@@ -32,7 +37,7 @@ namespace PostsByMarko.Host.Application.Services
                     UserId = user.Id,
                     Email = user.Email!,
                     NumberOfPosts = user.Posts.Count,
-                    LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedDate)?.LastUpdatedDate,
+                    LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedAt)?.LastUpdatedAt,
                     Roles = [.. roles]
                 });
             }
@@ -60,6 +65,8 @@ namespace PostsByMarko.Host.Application.Services
 
             var updatedRoles = await userRepository.GetRolesForUserAsync(user);
 
+            await adminHub.Clients.All.UpdatedUserRoles(user.Id, DateTime.UtcNow);
+
             return [.. updatedRoles];
         }
 
@@ -74,8 +81,16 @@ namespace PostsByMarko.Host.Application.Services
         public async Task DeleteUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
+            var result = await userRepository.DeleteUserAsync(user);
 
-            await userRepository.DeleteUserAsync(user);
+            if (result.Succeeded) 
+            {
+                await adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow);    
+            }
+            else
+            {
+                throw new InvalidOperationException($"Failed to delete user with Id: {user.Id}");
+            }
         }
     }
 }

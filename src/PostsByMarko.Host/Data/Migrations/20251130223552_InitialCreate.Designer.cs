@@ -12,8 +12,8 @@ using PostsByMarko.Host.Data;
 namespace PostsByMarko.Host.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251125111710_Initial")]
-    partial class Initial
+    [Migration("20251130223552_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -231,13 +231,13 @@ namespace PostsByMarko.Host.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("Hidden")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("LastUpdatedDate")
+                    b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
@@ -266,7 +266,6 @@ namespace PostsByMarko.Host.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 

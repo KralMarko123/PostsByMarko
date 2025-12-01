@@ -118,7 +118,10 @@ namespace PostsByMarko.Host.Extensions
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
 
-                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/postHub") || path.StartsWithSegments("/messageHub")))
+                        if (!string.IsNullOrEmpty(accessToken) && 
+                        (path.StartsWithSegments("/postHub") 
+                        || path.StartsWithSegments("/messageHub")
+                        || path.StartsWithSegments("/adminHub")))
                         {
                             // Read the token out of the query string
                             context.Token = accessToken;

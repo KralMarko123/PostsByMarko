@@ -1,6 +1,10 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Moq;
 using PostsByMarko.Host.Application.Enums;
+using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Services;
@@ -14,10 +18,12 @@ namespace PostsByMarko.UnitTests
         private readonly AdminService adminService;
         private readonly Mock<IUserRepository> usersRepositoryMock = new();
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
+        private readonly Mock<IHubContext<AdminHub, IAdminClient>> adminHubMock = new();
+        private readonly Mock<IAdminClient> adminClientMock = new();
 
         public AdminServiceTests()
         {
-            adminService = new AdminService(usersRepositoryMock.Object, currentRequestAccessorMock.Object);
+            adminService = new AdminService(usersRepositoryMock.Object, currentRequestAccessorMock.Object, adminHubMock.Object);
         }
 
         [Fact]
@@ -35,7 +41,7 @@ namespace PostsByMarko.UnitTests
                     Email = "test@test.com",
                     Posts = new List<Post>
                     {
-                        new Post { Id = Guid.NewGuid(), LastUpdatedDate = today },
+                        new Post { Id = Guid.NewGuid(), LastUpdatedAt = today },
                         new Post { Id = Guid.NewGuid() }
                     }
                 }
@@ -91,17 +97,22 @@ namespace PostsByMarko.UnitTests
                 ActionType = ActionType.Create,
                 Role = "New role"
             };
-            var roles = new List<string> { "Some role" };
+            var currentRoles = new List<string> { "Some role" };
+            var updatedRoles = new List<string> { currentRoles[0], request.Role };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
-            usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
+            usersRepositoryMock.SetupSequence(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => currentRoles).ReturnsAsync(() => updatedRoles);
+            adminHubMock.Setup(a => a.Clients.All).Returns(adminClientMock.Object);
+            adminClientMock.Setup(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(updatedRoles);
             usersRepositoryMock.Verify(r => r.AddRoleToUserAsync(user, request.Role), Times.Once);
+            adminClientMock.Verify(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
         [Fact]
@@ -115,17 +126,22 @@ namespace PostsByMarko.UnitTests
                 ActionType = ActionType.Delete,
                 Role = "Removed role"
             };
-            var roles = new List<string> { "Some role", request.Role };
+            var currentRoles = new List<string> { "Some role", request.Role };
+            var updatedRoles = new List<string> { currentRoles[0] };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(request.UserId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
-            usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => roles);
+            usersRepositoryMock.SetupSequence(r => r.GetRolesForUserAsync(user)).ReturnsAsync(() => currentRoles).ReturnsAsync(() => updatedRoles);
+            adminHubMock.Setup(a => a.Clients.All).Returns(adminClientMock.Object);
+            adminClientMock.Setup(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(updatedRoles);
             usersRepositoryMock.Verify(r => r.RemoveRoleFromUserAsync(user, request.Role), Times.Once);
+            adminClientMock.Verify(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
         [Fact]
@@ -151,12 +167,16 @@ namespace PostsByMarko.UnitTests
             var user = new User() { Id = Guid.NewGuid() };
 
             usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.DeleteUserAsync(user)).ReturnsAsync(IdentityResult.Success);
+            adminHubMock.Setup(a => a.Clients.All).Returns(adminClientMock.Object);
+            adminClientMock.Setup(a => a.DeletedUser(user.Id, It.IsAny<DateTime>())).Returns(Task.CompletedTask);
 
             // Act
             await adminService.DeleteUserByIdAsync(user.Id, CancellationToken.None);
 
             // Assert
             usersRepositoryMock.Verify(r => r.DeleteUserAsync(user), Times.Once);
+            adminClientMock.Verify(a => a.DeletedUser(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
         [Fact]
@@ -170,6 +190,23 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
+        }
+
+        [Fact]
+        public async Task delete_user_should_throw_if_user_was_not_deleted()
+        {
+            // Arrange
+            var user = new User() { Id = Guid.NewGuid() };
+            var failedResult = IdentityResult.Failed();
+
+            usersRepositoryMock.Setup(r => r.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => user);
+            usersRepositoryMock.Setup(r => r.DeleteUserAsync(user)).ReturnsAsync(() => failedResult);
+
+            // Act
+            var result = async () => await adminService.DeleteUserByIdAsync(user.Id, CancellationToken.None);
+
+            // Assert
+            await result.Should().ThrowAsync<InvalidOperationException>().WithMessage($"Failed to delete user with Id: {user.Id}");
         }
     }
 }

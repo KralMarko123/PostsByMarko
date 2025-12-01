@@ -72,7 +72,7 @@ namespace PostsByMarko.Host.Application.Services
            
             var post = mapper.Map<Post>(request);
 
-            post.CreatedDate = DateTime.UtcNow;
+            post.CreatedAt = DateTime.UtcNow;
             post.AuthorId = currentUser.Id;
             post.Author = currentUser;
 
@@ -102,7 +102,7 @@ namespace PostsByMarko.Host.Application.Services
             post.Title = request.Title;
             post.Content = request.Content;
             post.Hidden = request.Hidden;
-            post.LastUpdatedDate = DateTime.UtcNow;
+            post.LastUpdatedAt = DateTime.UtcNow;
 
             await postRepository.UpdatePostAsync(post);
             await postRepository.SaveChangesAsync(cancellationToken);

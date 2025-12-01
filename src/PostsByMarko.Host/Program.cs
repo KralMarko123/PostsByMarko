@@ -84,10 +84,9 @@ if (!isInLocalDevelopment && !isInTest)
 }
 
 app.WithMiddlewares();
+app.WithHubs();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapHub<PostHub>("/postHub");
-app.MapHub<MessageHub>("/messageHub");
 app.MapControllers();
 
 #endregion
