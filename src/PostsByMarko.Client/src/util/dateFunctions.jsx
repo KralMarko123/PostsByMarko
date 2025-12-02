@@ -54,9 +54,9 @@ export const DateFunctions = {
     return moment().format("MMMM");
   },
 
-  isBeforeDateTime(first, second) {
-    const momentA = moment(first).milliseconds(0);
-    const momentB = moment(second).milliseconds(0);
+  isBeforeDateTime(a, b) {
+    const momentA = moment(a).milliseconds(0);
+    const momentB = moment(b).milliseconds(0);
 
     if (momentA.isBefore(momentB)) {
       return 1; // A is earlier

@@ -43,28 +43,27 @@ const Chat = () => {
 
   const getChats = async () => {
     await MessagingService.getChats(user.token)
-      .then((chats) => {
-        appContext.chats.forEach((chat) => {
-          let existingChat = chats.find(
-            (c) => c.id === chat.id && c.id !== openChat?.id
+      .then((chatsResponse) => {
+        appContext.chats.forEach((localChat) => {
+          let existingUnopenedChat = chatsResponse.find(
+            (c) => c.id === localChat.id && c.id !== openChat?.id
           );
 
           if (
-            existingChat &&
-            DateFunctions.isBeforeDateTime(
-              chat.updatedAt,
-              existingChat.updatedAt
-            ) === 1
+            existingUnopenedChat &&
+            existingUnopenedChat.messages.length > localChat.messages.length
           ) {
-            let userIdWithNewMessage = existingChat.users.filter(
+            let userIdWithNewMessages = existingUnopenedChat.users.find(
               (u) => u.id !== user.id
             ).id;
 
-            setUnreadChats([...unreadChats, userIdWithNewMessage]);
+            console.log(userIdWithNewMessages);
+
+            setUnreadChats([...unreadChats, userIdWithNewMessages]);
           }
         });
 
-        appContext.dispatch({ type: "LOAD_CHATS", chats: chats });
+        appContext.dispatch({ type: "LOAD_CHATS", chats: chatsResponse });
       })
       .catch(async (error) => {
         await checkToken();
