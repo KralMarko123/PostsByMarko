@@ -1,47 +1,85 @@
-cd ..
-cd ./src/PostsByMarko.Host
+# From scripts/, go one level up to repo root
+$root = Split-Path -Path $PSScriptRoot -Parent
+Set-Location $root
 
-# Allowed file extensions (C# logic + project files)
-$includeExtensions = @(".cs", ".csproj", ".sln", ".json", ".razor")
+# Common settings
+$includeExtensions = @(
+    ".cs", ".csproj", ".sln", ".json",
+    ".razor", ".css", ".html",
+    ".js", ".jsx", ".ts", ".tsx"
+)
 
-# Folders to exclude (generated/noise)
-$excludeDirs = @("bin", "obj", "node_modules", ".vs")
+# Folders to exclude (.NET + frontend noise)
+$excludeDirs = @("bin", "obj", ".vs", "node_modules", ".sonarqube")
 
-# Patterns to exclude (generated C# files)
-$excludePatterns = @("*\.g.cs", "*\.g.i.cs", "*Designer.cs", "*AssemblyInfo.cs")
+# Patterns to exclude (generated / lock files)
+$excludePatterns = @(
+    "*.g.cs",
+    "*.g.i.cs",
+    "*Designer.cs",
+    "*AssemblyInfo.cs",
+    "package-lock.json"
+)
 
-# Delimiter for readability in output
 $delimiter = "`n`n===== FILE START =====`n`n"
 
-# StringBuilder is efficient for large concatenation
-$stringBuilder = New-Object System.Text.StringBuilder
+function IsUnderExcludedDir {
+    param(
+        [System.IO.FileInfo] $File,
+        [string[]] $DirsToExclude
+    )
 
-# Get all files recursively while excluding noise folders
-$files = Get-ChildItem -Recurse -File | Where-Object {
-    # Extension must match
-    $includeExtensions -contains $_.Extension.ToLower() -and
-    # Parent folder must not be excluded
-    ($excludeDirs -notcontains $_.Directory.Name) -and
-    # File must not match excluded patterns
-    ($excludePatterns -notcontains $_.Name)
+    $dir = $File.Directory
+    while ($dir) {
+        if ($DirsToExclude -contains $dir.Name) { return $true }
+        $dir = $dir.Parent
+    }
+    return $false
 }
 
-foreach ($file in $files) {
-    $content = Get-Content -Path $file.FullName -Raw
+function Write-ProjectContents {
+    param(
+        [string] $ProjectRoot,
+        [string] $OutputPath
+    )
 
-    $null = $stringBuilder.Append($delimiter)
-    $null = $stringBuilder.AppendLine("PATH: $($file.FullName)")
-    $null = $stringBuilder.AppendLine("CONTENT:")
-    $null = $stringBuilder.AppendLine($content)
+    $stringBuilder = New-Object System.Text.StringBuilder
+
+    $files = Get-ChildItem -Path $ProjectRoot -Recurse -File | Where-Object {
+        $file = $_
+
+        # Extension must be in the include list
+        ($includeExtensions -contains $file.Extension.ToLower()) -and
+
+        # Not inside excluded directories
+        -not (IsUnderExcludedDir -File $file -DirsToExclude $excludeDirs) -and
+
+        # Name doesn't match any excluded wildcard pattern
+        -not ($excludePatterns | Where-Object { $file.Name -like $_ })
+    }
+
+    foreach ($file in $files) {
+        $content = Get-Content -Path $file.FullName -Raw
+
+        $null = $stringBuilder.Append($delimiter)
+        $null = $stringBuilder.AppendLine("PATH: $($file.FullName)")
+        $null = $stringBuilder.AppendLine("CONTENT:")
+        $null = $stringBuilder.AppendLine($content)
+    }
+
+    # Overwrite the file each run
+    Set-Content -Path $OutputPath -Value $stringBuilder.ToString() -Encoding UTF8
 }
 
-# Determine output path (two levels above current directory)
-$basePath = (Get-Location).Path
-$twoLevelsUp = Split-Path (Split-Path $basePath)
-$outputPath = Join-Path $twoLevelsUp "contents.txt"
+# Backend: src/PostsByMarko.Host -> backend.txt
+$backendRoot = Join-Path $root "src/PostsByMarko.Host"
+$backendOut  = Join-Path $root "backend.txt"
+Write-ProjectContents -ProjectRoot $backendRoot -OutputPath $backendOut
 
-# Write the collected content
-Set-Content -Path $outputPath -Value $stringBuilder.ToString()
+# Frontend: src/PostsByMarko.Client -> frontend.txt
+$frontendRoot = Join-Path $root "src/PostsByMarko.Client"
+$frontendOut  = Join-Path $root "frontend.txt"
+Write-ProjectContents -ProjectRoot $frontendRoot -OutputPath $frontendOut
 
-cd ../..
-cd ./scripts
+# Return to scripts directory at the end
+Set-Location $PSScriptRoot
