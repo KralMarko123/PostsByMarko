@@ -52,7 +52,7 @@ namespace PostsByMarko.FrontendTests.Tests
         public async Task should_register()
         {
             await registerPage.Visit();
-            await registerPage.Register("Test", "User", $"test_{RandomHelper.GetRandomString(5)}@domain.com", "@Test123");
+            await registerPage.Register("Test", $"{RandomHelper.GetRandomString(8)}", $"test_{RandomHelper.GetRandomString(5)}@domain.com", "@Test123");
             await registerPage.confirmationalForm.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();

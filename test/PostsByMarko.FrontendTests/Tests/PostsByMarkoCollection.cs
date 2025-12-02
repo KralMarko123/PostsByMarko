@@ -3,7 +3,7 @@
 namespace PostsByMarko.FrontendTests.Tests
 {
 
-    [CollectionDefinition("Frontend Collection")]
+    [CollectionDefinition("Frontend Collection", DisableParallelization = true)]
     public class PostsByMarkoCollection : ICollectionFixture<PostsByMarkoFactory>
     {
         // This class has no code, and is never created. Its purpose is simply

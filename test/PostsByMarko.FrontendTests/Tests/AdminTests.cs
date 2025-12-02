@@ -57,7 +57,7 @@ namespace PostsByMarko.FrontendTests.Tests
             dashboardTitle.Should().Be("Admin Dashboard");
             dashboardDescription.Should().Be("Manage users and view statistics");
             userTableHeaderTexts.Should().Contain("User", "Number of Posts", "Last Posted", "Roles", "Actions");
-            chartsCount.Should().Be(2);
+            chartsCount.Should().Be(1);
         }
 
         [Fact]

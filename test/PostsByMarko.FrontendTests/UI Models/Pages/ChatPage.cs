@@ -26,6 +26,11 @@ namespace PostsByMarko.FrontendTests.UI_Models.Pages
             return userCard.Filter(new LocatorFilterOptions { HasText = withUsername });
         }
 
+        public async Task WaitForNumberOfMessagesToChange()
+        {
+            await PlaywrightHelpers.WaitForCountToChange(message);
+        }
+
         public async Task WaitForNotificationToRegister()
         {
             await PlaywrightHelpers.WaitForCountToChange(unreads);
