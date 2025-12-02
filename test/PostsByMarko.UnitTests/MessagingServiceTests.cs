@@ -213,6 +213,7 @@ namespace PostsByMarko.UnitTests
             // Assert
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(messageDto);
+            chat.UpdatedAt.Should().BeAfter(messageDto.CreatedAt);
             messageRepositoryMock.Verify(mr => mr.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             messageClientMock.Verify(m => m.MessageSent(messageDto), Times.Once);
         }

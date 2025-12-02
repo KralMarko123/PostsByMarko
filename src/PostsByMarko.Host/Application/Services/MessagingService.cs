@@ -90,7 +90,11 @@ namespace PostsByMarko.Host.Application.Services
             var createdMessage = await messageRepository.AddMessageAsync(newMessage, cancellationToken);
 
             await messageRepository.SaveChangesAsync(cancellationToken);
-            
+
+            chat.UpdatedAt = DateTime.UtcNow;
+
+            await chatRepository.SaveChangesAsync(cancellationToken);
+
             var result = mapper.Map<MessageDto>(createdMessage);
 
             await messageHub.Clients.Users(chat.ChatUsers.Select(c => c.UserId.ToString())).MessageSent(result);
