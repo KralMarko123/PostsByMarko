@@ -1,5 +1,9 @@
+
 # Go to repo root (relative to scripts folder)
 Set-Location "$PSScriptRoot/.."
+
+# Exit the script if anything fails
+$ErrorActionPreference = "Stop"
 
 # Ensure ReportGenerator is installed globally
 dotnet tool install -g dotnet-reportgenerator-globaltool | Out-Null
@@ -17,12 +21,20 @@ dotnet test $unitTestsProj `
     --settings coverage.runsettings `
     --collect "XPlat Code Coverage" `
     --results-directory "$coverageOutputDir/Unit"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Unit tests failed. Aborting coverage generation."
+    exit 1
+}
 
 Write-Host "=== Running Integration Tests with Coverage ==="
 dotnet test $integrationTestsProj `
     --settings coverage.runsettings `
     --collect "XPlat Code Coverage" `
     --results-directory "$coverageOutputDir/Integration"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Integration tests failed. Aborting coverage generation."
+    exit 1
+}
 
 Write-Host "=== Generating merged and filtered coverage report ==="
 reportgenerator `
