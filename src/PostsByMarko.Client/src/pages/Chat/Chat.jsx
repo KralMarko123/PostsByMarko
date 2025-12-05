@@ -149,14 +149,15 @@ const Chat = () => {
     }
   };
 
-  const isLastMessageFromRecipientInSeries = (message, index) => {
-    if (message.senderId == user.id) return false;
+  const isLastMessageFromRecipientInSeries = (message, messages) => {
+    if (messages.length === 0) return false;
 
-    let nextMessage = openChat.messages[index + 1];
+    let otherUserMessages = messages.filter((m) => m.senderId !== user.id);
 
-    if (!nextMessage) return true;
+    DateFunctions.sortItemsByDateTimeAttribute(otherUserMessages, "createdAt");
 
-    if (nextMessage.senderId == user.id) return true;
+    if (otherUserMessages[otherUserMessages.length - 1].id === message.id)
+      return true;
     else return false;
   };
 
@@ -267,7 +268,10 @@ const Chat = () => {
                             {!isMessageAuthor && (
                               <span
                                 className={`message-handle${
-                                  isLastMessageFromRecipientInSeries(m, index)
+                                  isLastMessageFromRecipientInSeries(
+                                    m,
+                                    messageList
+                                  )
                                     ? " show"
                                     : ""
                                 }`}
