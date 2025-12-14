@@ -81,8 +81,7 @@ namespace PostsByMarko.Host.Data
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany(u => u.Messages)
-                .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(m => m.SenderId);
         }
 
         private static void SetupIndexes(ModelBuilder modelBuilder)

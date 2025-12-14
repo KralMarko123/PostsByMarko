@@ -401,7 +401,7 @@ namespace PostsByMarko.Host.Data.Migrations
                     b.HasOne("PostsByMarko.Host.Data.Entities.User", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");

@@ -12,7 +12,7 @@ using PostsByMarko.Host.Data;
 namespace PostsByMarko.Host.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251130223552_InitialCreate")]
+    [Migration("20251214174448_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -404,7 +404,7 @@ namespace PostsByMarko.Host.Data.Migrations
                     b.HasOne("PostsByMarko.Host.Data.Entities.User", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");
