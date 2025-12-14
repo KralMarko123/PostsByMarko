@@ -4,8 +4,6 @@ import { PostService } from "../../api/PostService";
 import { useAuth } from "../../custom/useAuth";
 import { DateFunctions } from "../../util/dateFunctions";
 import { ActionType } from "../../constants/enums";
-import { usePostHub } from "../../custom/usePostHub";
-import { useAdminHub } from "../../custom/useAdminHub";
 import { Nav } from "../../components/Layout/Nav/Nav";
 import { Container } from "../../components/Layout/Container/Container";
 import { AppContext } from "../../context/AppContext";
@@ -21,8 +19,6 @@ import "../Page.css";
 export const Admin = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
-  const lastMessageRegistered = usePostHub();
-  const lastAdminAction = useAdminHub();
   const [dashboardData, setDashboardData] = useState<AdminDashboardResponse[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -54,7 +50,7 @@ export const Admin = () => {
         appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
       })
       .catch(async (error) => {
-        await checkToken();
+        checkToken();
 
         // TODO: Setup some global notification modal showing error
         console.log(error);
@@ -96,7 +92,11 @@ export const Admin = () => {
   useEffect(() => {
     getAdminDashboard();
     getPosts();
-  }, [lastAdminAction, lastMessageRegistered, appContext.posts.length]);
+  }, [
+    appContext.lastMessageRegistered,
+    appContext.lastAdminAction,
+    appContext.posts.length,
+  ]);
 
   return (
     <div className="admin page">

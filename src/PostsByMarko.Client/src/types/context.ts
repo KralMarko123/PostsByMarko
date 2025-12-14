@@ -13,6 +13,10 @@ export interface AppContextValue {
     index?: number | null;
   };
   chats: Chat[];
+
+  lastMessageRegistered: string;
+  lastAdminAction: string;
+
   dispatch: ActionDispatch<[action: AppAction]>;
 }
 
@@ -36,4 +40,8 @@ export type AppAction =
   // CHAT EVENTS
   | { type: "LOAD_CHATS"; chats: Chat[] }
   | { type: "SENT_MESSAGE"; message: Message }
-  | { type: "STARTED_CHAT"; chat: Chat };
+  | { type: "STARTED_CHAT"; chat: Chat }
+
+  // SIGNALR EVENTS
+  | { type: "MESSAGE_REGISTERED"; message: string }
+  | { type: "ADMIN_ACTION_REGISTERED"; message: string };

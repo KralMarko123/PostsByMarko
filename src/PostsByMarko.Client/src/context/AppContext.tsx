@@ -21,5 +21,9 @@ export const AppContext = createContext<AppContextValue>({
     index: null,
   },
   chats: [],
+
+  lastMessageRegistered: "",
+  lastAdminAction: "",
+
   dispatch: () => null,
 });

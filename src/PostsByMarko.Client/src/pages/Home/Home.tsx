@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { PostService } from "../../api/PostService";
-import { usePostHub } from "../../custom/usePostHub";
 import { DateFunctions } from "../../util/dateFunctions";
 import { PostCard } from "../../components/Post/PostCard";
 import { Nav } from "../../components/Layout/Nav/Nav";
@@ -18,7 +17,6 @@ import "./Home.css";
 export const Home = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
-  const lastMessageRegistered = usePostHub();
   const [posts, setPosts] = useState<Post[]>([]);
 
   const getPosts = async () => {
@@ -38,7 +36,7 @@ export const Home = () => {
 
   useEffect(() => {
     getPosts();
-  }, [lastMessageRegistered, appContext.posts.length]);
+  }, [appContext.lastMessageRegistered, appContext.posts.length]);
 
   return (
     <div className="home page">

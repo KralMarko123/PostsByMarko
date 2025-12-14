@@ -1,35 +1,60 @@
-import { useState, useEffect } from "react";
+import { useEffect, Dispatch, useRef } from "react";
 import { HubConnection } from "@microsoft/signalr";
 import { ENDPOINT_URLS } from "../constants/endpoints";
-import { useAuth } from "./useAuth";
 import { createHubConnection } from "./useSignalRConnection";
 import { MessageHubEvents } from "../types/signalr";
 import { Chat, Message } from "@typeConfigs/messaging";
+import { AppAction } from "@typeConfigs/context";
 
-export const useMessageHub = () => {
-  const { user } = useAuth();
-  const connection: HubConnection = createHubConnection(
-    ENDPOINT_URLS.POST_HUB,
-    user?.token!
-  );
-  const [lastMessageRegistered, setLastMessageRegistered] = useState<string>("");
+export const useMessageHub = (
+  token: string | null | undefined,
+  dispatch: Dispatch<AppAction>
+) => {
+  const connectionRef = useRef<HubConnection | null>(null);
 
   useEffect(() => {
+    if (!token) {
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        connectionRef.current = null;
+      }
+
+      return;
+    }
+
+    if (connectionRef.current) return;
+
+    const connection: HubConnection = createHubConnection(
+      ENDPOINT_URLS.MESSAGE_HUB,
+      token
+    );
+
+    connectionRef.current = connection;
+
     if (connection) {
       connection
         .start()
         .then(() => {
           connection.on(MessageHubEvents.MessageSent, (message: Message) =>
-            setLastMessageRegistered(`New Message sent at ${message.createdAt}`)
+            dispatch({
+              type: "MESSAGE_REGISTERED",
+              message: `New Message sent at ${message.createdAt}`,
+            })
           );
 
           connection.on(MessageHubEvents.ChatCreated, (chat: Chat) =>
-            setLastMessageRegistered(`Chat started at ${chat.createdAt}`)
+            dispatch({
+              type: "MESSAGE_REGISTERED",
+              message: `Chat started at ${chat.createdAt}`,
+            })
           );
         })
         .catch((error) => console.error(`SignalR connection	failed with error: ${error}`));
     }
-  }, [connection]);
 
-  return lastMessageRegistered;
+    return () => {
+      connection.stop();
+      connectionRef.current = null;
+    };
+  }, [token, dispatch]);
 };

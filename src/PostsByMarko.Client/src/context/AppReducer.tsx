@@ -78,6 +78,13 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
 
       return { ...state, chats: chats };
 
+    // SIGNALR EVENTS
+    case "MESSAGE_REGISTERED":
+      return { ...state, lastMessageRegistered: action.message };
+
+    case "ADMIN_ACTION_REGISTERED":
+      return { ...state, lastAdminAction: action.message };
+
     default:
       return state;
   }

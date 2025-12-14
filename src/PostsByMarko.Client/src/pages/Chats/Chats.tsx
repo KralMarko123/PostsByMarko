@@ -3,7 +3,6 @@ import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
 import { HelperFunctions } from "../../util/helperFunctions";
 import { DateFunctions } from "../../util/dateFunctions";
-import { useMessageHub } from "../../custom/useMessageHub";
 import { UserService } from "../../api/UserService";
 import { MessagingService } from "../../api/MessagingService";
 import { Nav } from "../../components/Layout/Nav/Nav";
@@ -19,7 +18,6 @@ import "./Chats.css";
 export const Chats = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
-  const lastMessageRegistered = useMessageHub();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
@@ -184,7 +182,7 @@ export const Chats = () => {
     if (selectedUser) {
       startChat(selectedUser!.id!);
     }
-  }, [lastMessageRegistered]);
+  }, [appContext.lastMessageRegistered]);
 
   useEffect(() => {
     scrollMessagesToBottom();

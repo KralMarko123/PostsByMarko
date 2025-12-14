@@ -5,7 +5,7 @@ import { Home } from "./pages/Home/Home";
 import { Details } from "./pages/Details/Details";
 import { Login } from "./pages/Login/Login";
 import { Register } from "./pages/Register/Register";
-import { AppProvider } from "./context/ContextProvider";
+import { AppProvider } from "./context/AppProvider";
 import { Admin } from "./pages/Admin/Admin";
 import { Chats } from "./pages/Chats/Chats";
 import { NotFound } from "./pages/NotFound/NotFound";
