@@ -6,7 +6,7 @@ export interface ApiRequestOptions<TBody = unknown> {
   token?: string | null;
 }
 
-export interface ApiError {
+export interface ApiError extends Error {
   message: string;
   status: number;
   traceId: string;

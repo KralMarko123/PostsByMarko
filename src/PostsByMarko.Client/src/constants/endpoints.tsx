@@ -1,3 +1,5 @@
+import { Endpoints } from "@typeConfigs/endpoints";
+
 const BASE_URL_DEVELOPMENT = "http://localhost:7171";
 const BASE_URL_DOCKER = "http://localhost:7171";
 
@@ -10,7 +12,7 @@ const POST_HUB = "postHub";
 const MESSAGE_HUB = "messageHub";
 const ADMIN_HUB = "adminHub";
 
-const ENDPOINTS = {
+const ENDPOINTS: Endpoints = {
   // Admin
   GET_ROLES_FOR_EMAIL: `${ADMIN_CONTROLLER_PREFIX}/roles`,
   GET_DASHBOARD: `${ADMIN_CONTROLLER_PREFIX}/dashboard`,
@@ -44,7 +46,7 @@ const ENDPOINTS = {
   ADMIN_HUB: ADMIN_HUB,
 };
 
-const developmentEndpoints = {
+const developmentEndpoints: Endpoints = {
   // Admin
   GET_ROLES_FOR_EMAIL: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.GET_ROLES_FOR_EMAIL}`,
   GET_DASHBOARD: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.GET_DASHBOARD}`,
@@ -62,7 +64,8 @@ const developmentEndpoints = {
 
   // Posts
   GET_POSTS: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.GET_POSTS}`,
-  GET_POST_BY_ID: (id: string) => `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.GET_POST_BY_ID(id)}`,
+  GET_POST_BY_ID: (id: string) =>
+    `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.GET_POST_BY_ID(id)}`,
   CREATE_POST: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.CREATE_POST}`,
   UPDATE_POST: (id: string) => `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.UPDATE_POST(id)}`,
   DELETE_POST: (id: string) => `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.DELETE_POST(id)}`,
@@ -78,7 +81,7 @@ const developmentEndpoints = {
   ADMIN_HUB: `${BASE_URL_DEVELOPMENT}/${ENDPOINTS.ADMIN_HUB}`,
 };
 
-const dockerEndpoints = {
+const dockerEndpoints: Endpoints = {
   // Admin
   GET_ROLES_FOR_EMAIL: `${BASE_URL_DOCKER}/${ENDPOINTS.GET_ROLES_FOR_EMAIL}`,
   GET_DASHBOARD: `${BASE_URL_DOCKER}/${ENDPOINTS.GET_DASHBOARD}`,
@@ -112,7 +115,7 @@ const dockerEndpoints = {
   ADMIN_HUB: `${BASE_URL_DOCKER}/${ENDPOINTS.ADMIN_HUB}`,
 };
 
-let endpoints;
+let endpoints: Endpoints;
 
 switch (process.env.NODE_ENV) {
   case "development":
@@ -128,4 +131,4 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-export const ENDPOINT_URLS: Record<string, any> = endpoints;
+export const ENDPOINT_URLS: Endpoints = endpoints;

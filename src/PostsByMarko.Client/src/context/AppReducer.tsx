@@ -1,12 +1,6 @@
 import { AppAction, AppContextValue } from "@typeConfigs/context";
-import { Chat } from "@typeConfigs/messaging";
-import { Post } from "@typeConfigs/post";
 
 export const AppReducer = (state: AppContextValue, action: AppAction) => {
-  let posts: Post[];
-  let postBeingModifiedIndex: number;
-  let chats: Chat[];
-
   switch (action.type) {
     // MODAL EVENTS
     case "SHOW_MODAL":
@@ -35,18 +29,15 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
       };
 
     case "UPDATED_POST":
-      postBeingModifiedIndex = [...state.posts].findIndex((p) => p.id === action.post.id);
-      posts = [...state.posts];
-      posts[postBeingModifiedIndex] = { ...action.post };
-
-      return { ...state, posts: posts };
+      return {
+        ...state,
+        posts: state.posts.map((p) =>
+          p.id === action.post.id ? { ...action.post } : { ...p }
+        ),
+      };
 
     case "CREATED_POST":
-      posts = [...state.posts];
-
-      posts.push(action.post);
-
-      return { ...state, posts: posts };
+      return { ...state, posts: [...state.posts, action.post] };
 
     // CHAT EVENTS
     case "LOAD_CHATS":
@@ -55,28 +46,23 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
     case "SENT_MESSAGE":
       let newMessage = action.message;
 
-      chats = [...state.chats];
-
-      let indexOfChatForMessage = chats.findIndex((c) => c.id === newMessage.chatId);
-
-      if (indexOfChatForMessage !== -1) {
-        chats[indexOfChatForMessage].messages.push(newMessage);
-      }
-
-      return { ...state, chats: chats };
+      return {
+        ...state,
+        chats: state.chats.map((c) =>
+          c.id === newMessage.chatId ? { ...c, messages: [...c.messages, newMessage] } : c
+        ),
+      };
 
     case "STARTED_CHAT":
-      chats = [...state.chats];
-      let updatedChat = action.chat;
-      let indexOfExistingChat = chats.findIndex((c) => c.id === updatedChat.id);
+      const newChat = action.chat;
+      const alreadyExists = state.chats.some((c) => c.id === newChat.id);
 
-      if (indexOfExistingChat === -1) {
-        chats.push(updatedChat);
-      } else {
-        chats[indexOfExistingChat] = updatedChat;
-      }
-
-      return { ...state, chats: chats };
+      return {
+        ...state,
+        chats: alreadyExists
+          ? state.chats.map((c) => (c.id === newChat.id ? newChat : c))
+          : [...state.chats, newChat],
+      };
 
     // SIGNALR EVENTS
     case "MESSAGE_REGISTERED":

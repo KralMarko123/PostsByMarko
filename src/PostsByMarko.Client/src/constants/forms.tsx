@@ -1,6 +1,10 @@
 import { ICONS } from "./icons";
 import { ReactNode } from "react";
 
+type FormKey = "REGISTER_FORM" | "LOGIN_FORM" | "CREATE_POST_FORM" | "UPDATE_POST_FORM";
+
+type FormConfig = { formGroups: FormGroup[] };
+
 interface FormGroup {
   id: string;
   label?: string | null;
@@ -9,7 +13,7 @@ interface FormGroup {
   icon?: ReactNode;
 }
 
-export const FORMS: Record<string, Record<string, FormGroup[]>> = {
+export const FORMS: Record<FormKey, FormConfig> = {
   REGISTER_FORM: {
     formGroups: [
       {

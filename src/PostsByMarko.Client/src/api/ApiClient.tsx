@@ -2,7 +2,10 @@ import { HttpMethod } from "constants/enums";
 import { ApiError, ApiRequestOptions } from "types/api";
 
 export const ApiClient = {
-  async apiRequest<TResponse>(path: string, { method = HttpMethod.GET, body, token }: ApiRequestOptions) {
+  async apiRequest<TResponse>(
+    path: string,
+    { method = HttpMethod.GET, body, token }: ApiRequestOptions
+  ) {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -18,7 +21,7 @@ export const ApiClient = {
     });
 
     if (!response.ok) {
-      const error: ApiError = await response.json().catch((error) => error);
+      const error: ApiError = await response.json().catch((error: ApiError) => error);
       throw new Error(error?.message || response.statusText);
     }
 
