@@ -41,7 +41,6 @@ namespace PostsByMarko.Host.Middlewares
 
             var problemDetails = new
             {
-                failed = true,
                 message = ex.Message,
                 status = (int)statusCode,
                 traceId = context.TraceIdentifier

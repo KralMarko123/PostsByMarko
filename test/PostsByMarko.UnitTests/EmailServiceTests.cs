@@ -36,8 +36,10 @@ namespace PostsByMarko.UnitTests
                 { "email", user.Email },
                 { "token", token }
             };
-            var confirmationLink = $"https://example.com/confirm?email={user.Email}&token={token}";
             var defaultHttpContext = new DefaultHttpContext();
+            defaultHttpContext.Request.Scheme = "https";
+            defaultHttpContext.Request.Host = new HostString("example.com");
+            var confirmationLink = $"https://example.com/api/auth/confirm?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
             var expectedSubject = $"Please confirm the registration for {user.Email}";
             var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
 

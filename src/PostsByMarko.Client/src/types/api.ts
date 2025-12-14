@@ -1,0 +1,13 @@
+import { HttpMethod } from "constants/enums";
+
+export interface ApiRequestOptions<TBody = unknown> {
+  method: HttpMethod;
+  body?: TBody | null;
+  token?: string | null;
+}
+
+export interface ApiError {
+  message: string;
+  status: number;
+  traceId: string;
+}

@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+
+    "module": "ESNext",
+    "moduleResolution": "node",
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Paths */
+    "baseUrl": "src",
+    "paths": {
+      "@api/*": ["api/*"],
+      "@auth/*": ["auth/*"],
+      "@components/*": ["components/*", "pages/*"],
+      "@hooks/*": ["custom/*"],
+      "@context/*": ["context/*"],
+      "@typeConfigs/*": ["types/*"],
+      "@assets/*": ["assets/*"]
+    }
+  },
+
+  "include": ["src"]
+}

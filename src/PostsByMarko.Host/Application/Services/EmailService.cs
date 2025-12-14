@@ -11,7 +11,6 @@ namespace PostsByMarko.Host.Application.Services
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly LinkGenerator linkGenerator;
-        private const string CONFIRM_EMAIL_ENDPOINT_NAME = "ConfirmEmail";
 
         public EmailService(IEmailHelper emailHelper, IUserRepository userRepository, LinkGenerator linkGenerator, ICurrentRequestAccessor currentRequestAccessor)
         {
@@ -45,24 +44,15 @@ namespace PostsByMarko.Host.Application.Services
 
         private string GenerateEmailConfirmationLink(string email, string token)
         {
-            var dictionaryValues = new RouteValueDictionary
-            {
-                { "email", email },
-                { "token", token }
-            };
+            var ctx = currentRequestAccessor.Context ?? throw new InvalidOperationException("HttpContext not available");
+            var scheme = ctx.Request.Scheme ?? "https";
+            var host = ctx.Request.Host.HasValue ? ctx.Request.Host.Value : throw new InvalidOperationException("Host not available");
+            var pathBase = ctx.Request.PathBase.HasValue ? ctx.Request.PathBase.Value : string.Empty;
+            var path = "/api/auth/confirm";
+            var query = $"?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+            var confirmationLink = $"{scheme}://{host}{pathBase}{path}{query}";
 
-            var confirmationLink = linkGenerator.GetUriByAddress(
-                httpContext: currentRequestAccessor.Context,
-                address: CONFIRM_EMAIL_ENDPOINT_NAME, // the route name
-                values: dictionaryValues,
-                scheme: null,
-                host: null,
-                pathBase: null,
-                fragment: default,
-                options: null
-            );
-
-            return confirmationLink!;
+            return confirmationLink;
         }
     }
 }
