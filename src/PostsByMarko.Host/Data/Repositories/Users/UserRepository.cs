@@ -98,9 +98,6 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         {
             var result = await userManager.Users
                 .Include(u => u.Posts)
-                .Include(u => u.Messages)
-                .Include(u => u.ChatUsers)
-                    .ThenInclude(cu => cu.Chat)
                 .ToListAsync(cancellationToken);
 
             if(exceptId.HasValue)
