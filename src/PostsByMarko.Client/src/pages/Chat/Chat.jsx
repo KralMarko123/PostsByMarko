@@ -44,25 +44,7 @@ const Chat = () => {
   const getChats = async () => {
     await MessagingService.getChats(user.token)
       .then((chatsResponse) => {
-        appContext.chats.forEach((localChat) => {
-          let existingUnopenedChat = chatsResponse.find(
-            (c) => c.id === localChat.id && c.id !== openChat?.id
-          );
-
-          if (
-            existingUnopenedChat &&
-            existingUnopenedChat.messages.length > localChat.messages.length
-          ) {
-            let userIdWithNewMessages = existingUnopenedChat.users.find(
-              (u) => u.id !== user.id
-            ).id;
-
-            console.log(userIdWithNewMessages);
-
-            setUnreadChats([...unreadChats, userIdWithNewMessages]);
-          }
-        });
-
+        checkForUnreadMessages(chatsResponse);
         appContext.dispatch({ type: "LOAD_CHATS", chats: chatsResponse });
       })
       .catch(async (error) => {
@@ -71,6 +53,25 @@ const Chat = () => {
         // TODO: Create global notification modal
         console.log(error);
       });
+  };
+
+  const checkForUnreadMessages = (newChats) => {
+    appContext.chats.forEach((localChat) => {
+      let existingUnopenedChat = newChats.find(
+        (c) => c.id === localChat.id && c.id !== openChat?.id
+      );
+
+      if (
+        existingUnopenedChat &&
+        existingUnopenedChat.messages.length > localChat.messages.length
+      ) {
+        let userIdWithNewMessages = existingUnopenedChat.users.find(
+          (u) => u.id !== user.id
+        ).id;
+
+        setUnreadChats([...unreadChats, userIdWithNewMessages]);
+      }
+    });
   };
 
   const startChat = async (recipientId) => {
