@@ -1,58 +1,57 @@
-import { React, useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { PostService } from "../../api/PostService";
 import { ICONS } from "../../constants/icons";
 import { ROUTES } from "../../constants/routes";
 import { DateFunctions } from "../../util/dateFunctions";
-import Nav from "../../components/Layout/Nav/Nav";
-import Container from "../../components/Layout/Container/Container";
-import Button from "../../components/Helper/Button/Button";
+import { Nav } from "../../components/Layout/Nav/Nav";
+import { Container } from "../../components/Layout/Container/Container";
+import { Button } from "../../components/Helper/Button/Button";
+import { Footer } from "../../components/Layout/Footer/Footer";
+import { Logo } from "../../components/Layout/Logo/Logo";
 import TextareaAutosize from "react-textarea-autosize";
-import Footer from "../../components/Layout/Footer/Footer";
-import Logo from "../../components/Layout/Logo/Logo";
+import { Post } from "@typeConfigs/post";
+import { User } from "@typeConfigs/user";
 import "../Page.css";
 import "./Details.css";
 
-const Details = () => {
+export const Details = () => {
+  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const params = useParams();
   const postId = params.id;
-  const { user, isAdmin } = useAuth();
-  const [post, setPost] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [confirmationalMessage, setConfirmationalMessage] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [updatedContent, setUpdatedContent] = useState("");
-  const textAreaRef = useRef();
-  const navigate = useNavigate();
-  const postCreatedDate = DateFunctions.getLocalDateInFormat(
-    post?.createdDate,
-    "DD MMMM YYYY"
-  );
-  const [author, setAuthor] = useState({});
-  const isAuthor = author.id === user.id;
+  const [post, setPost] = useState<Post>();
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [confirmationalMessage, setConfirmationalMessage] = useState<string>("");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [updatedContent, setUpdatedContent] = useState<string>("");
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const [author, setAuthor] = useState<User>();
+  const isAuthor = author?.id === user?.id;
 
   const getPost = async () => {
-    await PostService.getPostById(postId, user.token)
+    await PostService.getPostById(postId!, user!.token!)
       .then((postResponse) => {
-        setErrorMessage(null);
+        setErrorMessage("");
         setPost(postResponse);
-        setAuthor(postResponse.author);
-        setUpdatedContent((prev) => postResponse.content);
+        setAuthor(postResponse.author!);
+        setUpdatedContent(postResponse.content);
       })
       .catch((error) => setErrorMessage(error.message));
   };
 
-  const toggleEdit = (flag) => {
-    textAreaRef.current.style.display = flag ? "block" : "none";
+  const toggleEdit = (flag: boolean) => {
+    textAreaRef.current!.style.display = flag ? "block" : "none";
 
     if (flag) {
-      textAreaRef.current.value = post.content;
+      textAreaRef.current!.value = post!.content;
     }
 
     setIsEditing(flag);
-    setErrorMessage(null);
+    setErrorMessage("");
   };
 
   const handleUpdatedPostContent = async () => {
@@ -61,7 +60,7 @@ const Details = () => {
       return;
     }
 
-    if (updatedContent === post.content) {
+    if (updatedContent === post!.content) {
       setErrorMessage(`You haven't made any changes`);
       return;
     }
@@ -71,26 +70,26 @@ const Details = () => {
 
   const updatePostContent = async () => {
     let updatePostRequest = {
-      title: post.title,
-      hidden: post.hidden,
+      title: post!.title,
+      hidden: post!.hidden,
       content: updatedContent,
     };
 
-    setErrorMessage(null);
+    setErrorMessage("");
     setIsLoading(true);
 
-    await PostService.updatePost(post.id, updatePostRequest, user.token)
+    await PostService.updatePost(post!.id!, updatePostRequest, user!.token!)
       .then((updatedPostResponse) => {
         setPost(updatedPostResponse);
-        setAuthor(updatedPostResponse.author);
+        setAuthor(updatedPostResponse.author!);
         setUpdatedContent(updatedPostResponse.content);
         setConfirmationalMessage("Successfully updated Post!");
 
-        textAreaRef.current.value = updatedPostResponse.content;
+        textAreaRef.current!.value = updatedPostResponse.content;
         toggleEdit(false);
 
         setTimeout(() => {
-          setConfirmationalMessage(null);
+          setConfirmationalMessage("");
         }, 3000);
       })
       .catch((error) => setErrorMessage(error.message))
@@ -107,34 +106,34 @@ const Details = () => {
       <Nav />
 
       <Container>
-        {post.title && (
+        {post && (
           <>
             <div className="details-header">
               <h1 className="details-title">{post.title}</h1>
               <div className="author-container">
                 <div className="box">
-                  {ICONS.USER_CIRCLE_ICON()}
+                  {ICONS.USER_CIRCLE_ICON({})}
                   <p className="author">
-                    By {author.firstName} {author.lastName}
+                    By {author?.firstName} {author?.lastName}
                   </p>
                 </div>
                 <div className="box">
-                  {ICONS.CLOCK_ICON()}
-                  <p className="date">{postCreatedDate}</p>
+                  {ICONS.CLOCK_ICON({})}
+                  <p className="date">
+                    {DateFunctions.getLocalDateInFormat(post?.createdAt!, "DD MMMM YYYY")}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="details-container">
-              <p className={`content ${isEditing ? "disabled" : ""}`}>
-                {post.content}
-              </p>
+              <p className={`content ${isEditing ? "disabled" : ""}`}>{post.content}</p>
               <TextareaAutosize
                 defaultValue={post.content}
                 minRows={3}
                 maxRows={20}
                 ref={textAreaRef}
-                onChange={() => setUpdatedContent(textAreaRef.current.value)}
+                onChange={() => setUpdatedContent(textAreaRef.current!.value)}
               />
               <div className={`details-update-controls`}>
                 {isEditing ? (
@@ -181,5 +180,3 @@ const Details = () => {
     </div>
   );
 };
-
-export default Details;

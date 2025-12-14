@@ -1,27 +1,28 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";
 import { FORMS } from "../../../constants/forms";
 import { HelperFunctions } from "../../../util/helperFunctions";
-import Button from "../../Helper/Button/Button";
-import "../Form.css";
-import "./LoginForm.css";
+import { Button } from "../../Helper/Button/Button";
 import { AuthService } from "../../../api/AuthService";
+import { LoginRequest } from "@typeConfigs/auth";
+import "./LoginForm.css";
+import "../Form.css";
 
-const LoginForm = () => {
+export const LoginForm = () => {
+  const { login } = useAuth();
   const loginForm = FORMS.LOGIN_FORM;
-  const [loginData, setLoginData] = useState({
+  const navigate = useNavigate();
+  const [loginRequest, setLoginRequest] = useState<LoginRequest>({
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const noEmptyFields = () => {
-    if (!HelperFunctions.noEmptyFields(loginData)) {
+    if (!HelperFunctions.noEmptyFields(loginRequest)) {
       setErrorMessage("Fields can't be empty");
       return false;
     } else return true;
@@ -32,7 +33,7 @@ const LoginForm = () => {
       setErrorMessage("");
       setIsLoading(true);
 
-      await AuthService.login(loginData)
+      await AuthService.login(loginRequest)
         .then((loginPayload) => login(loginPayload))
         .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
@@ -51,22 +52,18 @@ const LoginForm = () => {
             className="input"
             placeholder={group.placeholder}
             onChange={(e) =>
-              setLoginData({
-                ...loginData,
+              setLoginRequest({
+                ...loginRequest,
                 [`${group.id}`]: e.currentTarget.value,
               })
             }
           />
-          {group.icon}
+          {group.icon!({})}
         </div>
       ))}
 
       <div className="form-actions">
-        <Button
-          onButtonClick={() => handleLogin()}
-          text="Sign In"
-          loading={isLoading}
-        />
+        <Button onButtonClick={handleLogin} text="Sign In" loading={isLoading} />
       </div>
 
       <p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
@@ -77,5 +74,3 @@ const LoginForm = () => {
     </form>
   );
 };
-
-export default LoginForm;

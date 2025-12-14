@@ -1,22 +1,23 @@
-import { React, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
 import { PostService } from "../../../api/PostService";
-import Button from "../../Helper/Button/Button";
-import Modal from "../../Helper/Modal/Modal";
-import AppContext from "../../../context/AppContext";
+import { Button } from "../../Helper/Button/Button";
+import { Modal } from "../../Helper/Modal/Modal";
+import { AppContext } from "../../../context/AppContext";
 import { HelperFunctions } from "../../../util/helperFunctions";
+import { CreatePostRequest } from "@typeConfigs/post";
 import "./CreatePostForm.css";
 import "../Form.css";
 
-const CreatePostForm = () => {
+export const CreatePostForm = () => {
   const appContext = useContext(AppContext);
   const createPostForm = FORMS.CREATE_POST_FORM;
-  const [errorMessage, setErrorMessage] = useState("");
-  const [confirmationalMessage, setConfirmationalMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [confirmationalMessage, setConfirmationalMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user } = useAuth();
-  const [newPost, setNewPost] = useState({
+  const [newPost, setNewPost] = useState<CreatePostRequest>({
     title: "",
     content: "",
   });
@@ -40,12 +41,13 @@ const CreatePostForm = () => {
       setErrorMessage("");
       setIsLoading(true);
 
-      await PostService.createPost(newPost, user.token)
+      await PostService.createPost(newPost, user!.token!)
         .then((postResponse) => {
           appContext.dispatch({
             type: "CREATED_POST",
             post: postResponse,
           });
+
           setConfirmationalMessage("Successfully created Post!");
 
           setTimeout(() => {
@@ -58,10 +60,7 @@ const CreatePostForm = () => {
   };
 
   return (
-    <Modal
-      isShown={appContext.modalVisibility.createPost}
-      onClose={() => onClose()}
-    >
+    <Modal isShown={appContext.modalVisibility.createPost} onClose={() => onClose()}>
       <form method="POST" className="form create-post">
         <h1 className="form-title">Create post</h1>
         <p className="form-desc">Build & share with your friends</p>
@@ -81,7 +80,7 @@ const CreatePostForm = () => {
                     [`${group.id}`]: e.currentTarget.value,
                   })
                 }
-                placeholder={`What do you want to share, ${user.firstName}?`}
+                placeholder={`What do you want to share, ${user!.firstName}?`}
               />
             ) : (
               <input
@@ -97,25 +96,18 @@ const CreatePostForm = () => {
                 placeholder="What should the title for this post be?"
               />
             )}
-            {group.icon}
+            {group.icon!({})}
           </div>
         ))}
 
         <div className="form-actions">
-          <Button
-            onButtonClick={() => onSubmit()}
-            text="Create"
-            loading={isLoading}
-          />
-          <Button onButtonClick={() => onClose()} text="Cancel" />
+          <Button onButtonClick={onSubmit} text="Create" loading={isLoading} />
+          <Button onButtonClick={onClose} text="Cancel" />
         </div>
 
         {errorMessage && <p className="error">{errorMessage}</p>}
-        {confirmationalMessage && (
-          <p className="success">{confirmationalMessage}</p>
-        )}
+        {confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
       </form>{" "}
     </Modal>
   );
 };
-export default CreatePostForm;

@@ -67,7 +67,7 @@ export const DateFunctions = {
     }
   },
 
-  sortItemsByDateTimeAttribute(items: [], attributeName = "") {
+  sortItemsByDateTimeAttribute(items: any[], attributeName = "") {
     items.sort(
       (a, b) =>
         moment(a[`${attributeName}`]).valueOf() - moment(b[`${attributeName}`]).valueOf()

@@ -6,9 +6,13 @@ export interface Post {
   author?: User | null;
   title: string;
   content: string;
-  createdAt?: Date | null;
-  lastUpdatedAt?: Date | null;
+  createdAt?: string | null;
+  lastUpdatedAt?: string | null;
   hidden: boolean;
+}
+
+export interface PostProps extends Post {
+  index: number;
 }
 
 export interface CreatePostRequest {

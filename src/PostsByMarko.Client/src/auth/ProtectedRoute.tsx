@@ -13,5 +13,5 @@ export const ProtectedRoute = (props: ProtectedRouteProps) => {
     return <Navigate to={ROUTES.LOGIN} />;
   }
 
-  return props.children;
+  return <>{props.children}</>;
 };

@@ -1,14 +1,14 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
-import AppContext from "../../../context/AppContext";
+import { AppContext } from "../../../context/AppContext";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";
 import "./MobileNav.css";
 
-const MobileNav = () => {
+export const MobileNav = () => {
   const appContext = useContext(AppContext);
   const { user, logout, isAdmin } = useAuth();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const navigate = useNavigate();
 
   return (
@@ -23,7 +23,7 @@ const MobileNav = () => {
         <p className="nav__username">
           Hello{" "}
           <span>
-            {user.firstName} {user.lastName}
+            {user?.firstName} {user?.lastName}
           </span>
         </p>
         <div className="mobile__actions">
@@ -64,5 +64,3 @@ const MobileNav = () => {
     </nav>
   );
 };
-
-export default MobileNav;

@@ -3,7 +3,7 @@ import { DateFunctions } from "./dateFunctions";
 import { Message } from "@typeConfigs/messaging";
 
 export const HelperFunctions = {
-  noEmptyFields(data: Record<string, string>) {
+  noEmptyFields(data: Object) {
     return Object.values(data).every(
       (field) => field.length > 0 || typeof field !== "string"
     );

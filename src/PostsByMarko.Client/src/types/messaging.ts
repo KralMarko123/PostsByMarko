@@ -5,13 +5,13 @@ export interface Message {
   chatId?: string | null;
   senderId?: string | null;
   content: string;
-  createdAt: Date;
+  createdAt?: string | null;
 }
 
 export interface Chat {
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string | null;
+  updatedAt: string;
   users: User[];
   messages: Message[];
 }

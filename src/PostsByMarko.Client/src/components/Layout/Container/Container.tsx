@@ -1,7 +1,13 @@
 import React from "react";
 import "./Container.css";
 
-const Container = (props) => {
+interface ContainerProps {
+  title?: string | null;
+  desc?: string | null;
+  children: React.ReactNode;
+}
+
+export const Container = (props: ContainerProps) => {
   return (
     <div className="container">
       {props.title && <h1 className="container-title">{props.title}</h1>}
@@ -10,5 +16,3 @@ const Container = (props) => {
     </div>
   );
 };
-
-export default Container;

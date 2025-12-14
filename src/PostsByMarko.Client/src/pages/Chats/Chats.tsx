@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
 import { HelperFunctions } from "../../util/helperFunctions";
@@ -6,35 +6,37 @@ import { DateFunctions } from "../../util/dateFunctions";
 import { useMessageHub } from "../../custom/useMessageHub";
 import { UserService } from "../../api/UserService";
 import { MessagingService } from "../../api/MessagingService";
-import Nav from "../../components/Layout/Nav/Nav";
-import Container from "../../components/Layout/Container/Container";
-import Footer from "../../components/Layout/Footer/Footer";
-import Logo from "../../components/Layout/Logo/Logo";
-import AppContext from "../../context/AppContext";
+import { Nav } from "../../components/Layout/Nav/Nav";
+import { Container } from "../../components/Layout/Container/Container";
+import { Footer } from "../../components/Layout/Footer/Footer";
+import { Logo } from "../../components/Layout/Logo/Logo";
+import { AppContext } from "../../context/AppContext";
+import { User } from "@typeConfigs/user";
+import { Chat, Message } from "@typeConfigs/messaging";
 import "../Page.css";
-import "./Chat.css";
+import "./Chats.css";
 
-const Chat = () => {
+export const Chats = () => {
   const appContext = useContext(AppContext);
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [unreadChats, setUnreadChats] = useState([]);
-  const [openChat, setOpenChat] = useState(null);
   const { user, checkToken } = useAuth();
-  const { lastMessageRegistered } = useMessageHub();
-  const [newMessage, setNewMessage] = useState("");
-  const [isMessageEmpty, setIsMessageEmpty] = useState(false);
-  const messageInputRef = useRef(null);
-  const messageListRef = useRef(null);
-  const [messageIsSending, setMessageIsSending] = useState(false);
+  const lastMessageRegistered = useMessageHub();
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
+  const [openChat, setOpenChat] = useState<Chat | null>(null);
+  const [newMessage, setNewMessage] = useState<string>("");
+  const [isMessageEmpty, setIsMessageEmpty] = useState<boolean>(false);
+  const [messageIsSending, setMessageIsSending] = useState<boolean>(false);
+  const messageInputRef = useRef<HTMLInputElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   const getUsers = async () => {
-    await UserService.getUsers(user.token, user.id)
+    await UserService.getUsers(user!.token!, user!.id)
       .then((users) => {
         setUsers(users);
       })
       .catch(async (error) => {
-        await checkToken();
+        checkToken();
 
         // TODO: Create global notification modal
         console.log(error);
@@ -42,20 +44,20 @@ const Chat = () => {
   };
 
   const getChats = async () => {
-    await MessagingService.getChats(user.token)
+    await MessagingService.getChats(user!.token!)
       .then((chatsResponse) => {
         checkForUnreadMessages(chatsResponse);
         appContext.dispatch({ type: "LOAD_CHATS", chats: chatsResponse });
       })
       .catch(async (error) => {
-        await checkToken();
+        checkToken();
 
         // TODO: Create global notification modal
         console.log(error);
       });
   };
 
-  const checkForUnreadMessages = (newChats) => {
+  const checkForUnreadMessages = (newChats: Chat[]) => {
     appContext.chats.forEach((localChat) => {
       let existingUnopenedChat = newChats.find(
         (c) => c.id === localChat.id && c.id !== openChat?.id
@@ -65,17 +67,19 @@ const Chat = () => {
         existingUnopenedChat &&
         existingUnopenedChat.messages.length > localChat.messages.length
       ) {
-        let userIdWithNewMessages = existingUnopenedChat.users.find(
-          (u) => u.id !== user.id
-        ).id;
+        let userIdWithNewMessages = existingUnopenedChat!.users.find(
+          (u) => u.id !== user?.id
+        )?.id;
 
-        setUnreadChats([...unreadChats, userIdWithNewMessages]);
+        if (userIdWithNewMessages) {
+          setUnreadUserIds([...unreadUserIds, userIdWithNewMessages]);
+        }
       }
     });
   };
 
-  const startChat = async (recipientId) => {
-    await MessagingService.startChat(recipientId, user.token)
+  const startChat = async (recipientId: string) => {
+    await MessagingService.startChat(recipientId, user!.token!)
       .then((chat) => {
         setOpenChat(chat);
 
@@ -90,15 +94,15 @@ const Chat = () => {
       });
   };
 
-  const handleUserClick = (u) => {
-    if (newMessage.length > 0 && selectedUser !== u) {
+  const handleUserClick = (user: User) => {
+    if (newMessage.length > 0 && selectedUser !== user) {
       setNewMessage("");
-      messageInputRef.current.value = "";
+      messageInputRef!.current!.value = "";
     }
 
-    setSelectedUser(u);
-    startChat(u.id);
-    setUnreadChats(unreadChats.filter((id) => id !== u.id));
+    setSelectedUser(user);
+    startChat(user.id!);
+    setUnreadUserIds(unreadUserIds.filter((id) => id !== user.id));
   };
 
   const handleMessageSend = async () => {
@@ -111,20 +115,20 @@ const Chat = () => {
 
     setMessageIsSending(true);
 
-    const messageToSend = {
-      chatId: openChat.id,
-      senderId: user.id,
+    const messageToSend: Message = {
+      chatId: openChat!.id,
+      senderId: user!.id,
       content: newMessage,
     };
 
-    await MessagingService.sendMessage(messageToSend, user.token)
+    await MessagingService.sendMessage(messageToSend, user!.token!)
       .then((newMessage) => {
-        messageInputRef.current.value = "";
+        messageInputRef.current!.value = "";
         setNewMessage("");
 
         setOpenChat({
-          ...openChat,
-          messages: [...openChat.messages, newMessage],
+          ...openChat!,
+          messages: [...openChat!.messages, newMessage],
         });
 
         appContext.dispatch({
@@ -143,27 +147,26 @@ const Chat = () => {
       });
   };
 
-  const handleKeyDown = async (event) => {
+  const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       await handleMessageSend();
     }
   };
 
-  const isLastMessageFromRecipientInSeries = (message, messages) => {
+  const isLastMessageFromRecipientInSeries = (message: Message, messages: Message[]) => {
     if (messages.length === 0) return false;
 
-    let otherUserMessages = messages.filter((m) => m.senderId !== user.id);
+    let otherUserMessages = messages.filter((m) => m.senderId !== user!.id);
 
     DateFunctions.sortItemsByDateTimeAttribute(otherUserMessages, "createdAt");
 
-    if (otherUserMessages[otherUserMessages.length - 1].id === message.id)
-      return true;
+    if (otherUserMessages[otherUserMessages.length - 1].id === message.id) return true;
     else return false;
   };
 
   const getMessagesGroupedByDay = () => {
-    return Object.values(HelperFunctions.groupMessagesByDay(openChat.messages));
+    return Object.values(HelperFunctions.groupMessagesByDay(openChat!.messages));
   };
 
   const scrollMessagesToBottom = () => {
@@ -179,7 +182,7 @@ const Chat = () => {
     getChats();
 
     if (selectedUser) {
-      startChat(selectedUser.id);
+      startChat(selectedUser!.id!);
     }
   }, [lastMessageRegistered]);
 
@@ -196,20 +199,14 @@ const Chat = () => {
         <div className="chat-container">
           <div className="user-list">
             {users?.map((u) => {
-              let isActiveChat = openChat?.users
-                ?.map((cu) => cu.id)
-                ?.includes(u.id);
-              let hasUnreadMessages = unreadChats?.some((id) => id == u.id);
-              let numberOfUnreadMessages = unreadChats?.filter(
+              let isActiveChat = openChat?.users?.map((cu) => cu.id)?.includes(u.id);
+              let hasUnreadMessages = unreadUserIds?.some((id) => id == u.id);
+              let numberOfUnreadMessages = unreadUserIds?.filter(
                 (id) => id == u.id
               ).length;
               let unknownName = !u.firstName || !u.lastName;
-              let userInitials = unknownName
-                ? "??"
-                : `${u.firstName[0]}${u.lastName[0]}`;
-              let userName = unknownName
-                ? u.email
-                : `${u.firstName} ${u.lastName}`;
+              let userInitials = unknownName ? "??" : `${u.firstName[0]}${u.lastName[0]}`;
+              let userName = unknownName ? u.email : `${u.firstName} ${u.lastName}`;
 
               return (
                 <div
@@ -223,9 +220,7 @@ const Chat = () => {
                   <span className="user-name">{userName}</span>
                   {hasUnreadMessages && (
                     <span className="user-unreads">
-                      {numberOfUnreadMessages > 4
-                        ? `+4`
-                        : numberOfUnreadMessages}
+                      {numberOfUnreadMessages > 4 ? `+4` : numberOfUnreadMessages}
                     </span>
                   )}
                 </div>
@@ -242,25 +237,20 @@ const Chat = () => {
 
                 <div className="message-list" ref={messageListRef}>
                   {getMessagesGroupedByDay().map((messageList) => {
-                    DateFunctions.sortItemsByDateTimeAttribute(
-                      messageList,
-                      "createdAt"
-                    );
+                    DateFunctions.sortItemsByDateTimeAttribute(messageList, "createdAt");
 
                     return messageList.map((m, index) => {
-                      let isMessageAuthor = m.senderId == user.id;
+                      let isMessageAuthor = m.senderId == user!.id;
 
                       return (
                         <div
-                          className={`message${
-                            isMessageAuthor ? " author" : ""
-                          }`}
+                          className={`message${isMessageAuthor ? " author" : ""}`}
                           key={m.id}
                         >
                           {index === 0 && (
                             <span className="message-date">
                               {HelperFunctions.getMessageTimeLabelAccordingToToday(
-                                m.createdAt
+                                m.createdAt!
                               )}
                             </span>
                           )}
@@ -269,10 +259,7 @@ const Chat = () => {
                             {!isMessageAuthor && (
                               <span
                                 className={`message-handle${
-                                  isLastMessageFromRecipientInSeries(
-                                    m,
-                                    messageList
-                                  )
+                                  isLastMessageFromRecipientInSeries(m, messageList)
                                     ? " show"
                                     : ""
                                 }`}
@@ -298,11 +285,8 @@ const Chat = () => {
                     }}
                     onKeyDown={(e) => handleKeyDown(e)}
                   />
-                  <span
-                    className="send-icon"
-                    onClick={() => handleMessageSend()}
-                  >
-                    {ICONS.SEND_ICON()}
+                  <span className="send-icon" onClick={() => handleMessageSend()}>
+                    {ICONS.SEND_ICON({})}
                   </span>
                 </div>
               </div>
@@ -319,5 +303,3 @@ const Chat = () => {
     </div>
   );
 };
-
-export default Chat;

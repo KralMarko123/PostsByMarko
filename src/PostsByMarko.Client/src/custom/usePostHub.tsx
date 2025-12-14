@@ -4,11 +4,14 @@ import { useAuth } from "./useAuth";
 import { createHubConnection } from "./useSignalRConnection";
 import { HubConnection } from "@microsoft/signalr";
 import { Post } from "@typeConfigs/post";
-import { PostHubEvents } from "@typeConfigs/signalr";
+import { PostHubEvents } from "../types/signalr";
 
 export const usePostHub = () => {
   const { user } = useAuth();
-  const connection: HubConnection = createHubConnection(ENDPOINT_URLS.POST_HUB, user?.token!);
+  const connection: HubConnection = createHubConnection(
+    ENDPOINT_URLS.POST_HUB,
+    user?.token!
+  );
   const [lastMessageRegistered, setLastMessageRegistered] = useState<string>("");
 
   useEffect(() => {

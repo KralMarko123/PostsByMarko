@@ -1,45 +1,44 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";
 import { FORMS } from "../../../constants/forms";
 import { HelperFunctions } from "../../../util/helperFunctions";
-import Button from "../../Helper/Button/Button";
+import { Button } from "../../Helper/Button/Button";
 import { AuthService } from "../../../api/AuthService";
+import { RegisterRequest } from "@typeConfigs/auth";
 import "./RegisterForm.css";
 import "../Form.css";
 
-const RegisterForm = () => {
+export const RegisterForm = () => {
+  const navigate = useNavigate();
   const registerForm = FORMS.REGISTER_FORM;
-  const [registerData, setRegisterData] = useState({
+  const [registerRequest, setRegisterRequest] = useState<RegisterRequest>({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const noEmptyFields = () => {
-    if (!HelperFunctions.noEmptyFields(registerData)) {
+    if (!HelperFunctions.noEmptyFields(registerRequest)) {
       setErrorMessage("Fields can't be empty");
       return false;
     } else return true;
   };
 
   const isValidEmail = () => {
-    if (!/^\S+@\S+\.\S+$/.test(registerData.email)) {
+    if (!/^\S+@\S+\.\S+$/.test(registerRequest.email)) {
       setErrorMessage("Email must be a valid email address");
       return false;
     } else return true;
   };
 
   const isValidPassword = () => {
-    const isValidPassword = HelperFunctions.isValidPassword(
-      registerData.password
-    );
+    const isValidPassword = HelperFunctions.isValidPassword(registerRequest.password);
 
     if (isValidPassword !== true) {
       setErrorMessage(isValidPassword);
@@ -47,7 +46,7 @@ const RegisterForm = () => {
   };
 
   const arePasswordMatching = () => {
-    if (registerData.password !== registerData.confirmPassword) {
+    if (registerRequest.password !== registerRequest.confirmPassword) {
       setErrorMessage("Passwords do not match");
       return false;
     } else return true;
@@ -55,17 +54,14 @@ const RegisterForm = () => {
 
   const handleRegister = async () => {
     let isValidRegistration =
-      noEmptyFields() &&
-      isValidEmail() &&
-      isValidPassword() &&
-      arePasswordMatching();
+      noEmptyFields() && isValidEmail() && isValidPassword() && arePasswordMatching();
 
     if (isValidRegistration) {
       setErrorMessage("");
       setIsLoading(true);
 
-      await AuthService.register(registerData)
-        .then((response) => setIsRegistered(true))
+      await AuthService.register(registerRequest)
+        .then(() => setIsRegistered(true))
         .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
@@ -83,22 +79,18 @@ const RegisterForm = () => {
             className="input"
             placeholder={group.placeholder}
             onChange={(e) =>
-              setRegisterData({
-                ...registerData,
+              setRegisterRequest({
+                ...registerRequest,
                 [`${group.id}`]: e.currentTarget.value,
               })
             }
           />
-          {group.icon}
+          {group.icon!({})}
         </div>
       ))}
 
       <div className="form-actions">
-        <Button
-          onButtonClick={() => handleRegister()}
-          text="Sign Up"
-          loading={isLoading}
-        />
+        <Button onButtonClick={handleRegister} text="Sign Up" loading={isLoading} />
       </div>
 
       <p className="link" onClick={() => navigate(ROUTES.LOGIN)}>
@@ -111,12 +103,10 @@ const RegisterForm = () => {
     <div className="form confirmational">
       <h1 className="form-title">Successfully Registered!</h1>
       <p className="form-desc">
-        Please check your email to confirm your account first. You can click on
-        the button below to sign in
+        Please check your email to confirm your account first. You can click on the button
+        below to sign in
       </p>
       <Button text={"Sign In"} onButtonClick={() => navigate(ROUTES.LOGIN)} />
     </div>
   );
 };
-
-export default RegisterForm;

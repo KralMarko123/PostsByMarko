@@ -1,15 +1,16 @@
-import { React, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import { ICONS } from "../../constants/icons";
+import { ICONS, EYE_ICON } from "../../constants/icons";
 import { DateFunctions } from "../../util/dateFunctions";
 import { PostService } from "../../api/PostService";
-import * as ROUTES from "../../constants/routes";
-import AppContext from "../../context/AppContext";
-import Card from "../Helper/Card/Card";
-import "./Post.css";
+import { ROUTES } from "../../constants/routes";
+import { AppContext } from "../../context/AppContext";
+import { Card } from "../Helper/Card/Card";
+import { Post, PostProps } from "@typeConfigs/post";
+import "./PostCard.css";
 
-const Post = ({
+export const PostCard = ({
   id,
   authorId,
   author,
@@ -19,11 +20,11 @@ const Post = ({
   createdAt,
   lastUpdatedAt,
   index,
-}) => {
+}: PostProps) => {
   let navigate = useNavigate();
-  const appContext = useContext(AppContext);
   const { user, isAdmin } = useAuth();
-  const [post, setPost] = useState({
+  const appContext = useContext(AppContext);
+  const [post, setPost] = useState<Post>({
     id: id,
     authorId: authorId,
     author: author,
@@ -33,24 +34,28 @@ const Post = ({
     createdAt: createdAt,
     lastUpdatedAt: lastUpdatedAt,
   });
-  const isAuthor = post.authorId === user.id;
-  const readableCreatedDate = DateFunctions.getReadableDateTime(post.createdAt);
+  const isAuthor: boolean = post.authorId === user?.id;
+  const readableCreatedDate: string = DateFunctions.getReadableDateTime(post.createdAt!);
 
   const handlePostClick = () => {
-    navigate(`.${ROUTES.DETAILS_PREFIX}/${id}`);
+    navigate(`.${ROUTES.DETAILS}/${id}`);
   };
 
-  const handleModalToggle = (e, modalToToggle) => {
+  const handleModalToggle = (
+    e: React.MouseEvent<HTMLSpanElement>,
+    modalToToggle: string
+  ) => {
     e.stopPropagation();
 
     appContext.dispatch({
       type: "MODIFYING_POST",
       post: post,
     });
+
     appContext.dispatch({ type: "SHOW_MODAL", modal: modalToToggle });
   };
 
-  const handleHiddenToggle = async (e) => {
+  const handleHiddenToggle = async (e: React.MouseEvent<HTMLSpanElement>) => {
     e.stopPropagation();
 
     appContext.dispatch({
@@ -60,9 +65,10 @@ const Post = ({
 
     let updateRequest = { title, content, hidden: !hidden };
 
-    await PostService.updatePost(id, updateRequest, user.token)
+    await PostService.updatePost(id!, updateRequest, user!.token!)
       .then((updatedPost) => {
         setPost(updatedPost);
+
         appContext.dispatch({
           type: "UPDATED_POST",
           post: updatedPost,
@@ -96,11 +102,8 @@ const Post = ({
         style={{ animationDelay: `${index * 0.15}s` }}
       >
         {(isAuthor || isAdmin) && (
-          <span
-            className="post-icon hide"
-            onClick={(e) => handleHiddenToggle(e)}
-          >
-            {ICONS.EYE_ICON(post.hidden)}
+          <span className="post-icon hide" onClick={(e) => handleHiddenToggle(e)}>
+            {EYE_ICON(post.hidden)}
           </span>
         )}
         {(isAuthor || isAdmin) && (
@@ -108,7 +111,7 @@ const Post = ({
             className="post-icon update"
             onClick={(e) => handleModalToggle(e, "updatePost")}
           >
-            {ICONS.PENCIL_ICON()}
+            {ICONS.PENCIL_ICON!({})}
           </span>
         )}
         {(isAuthor || isAdmin) && (
@@ -116,7 +119,7 @@ const Post = ({
             className="post-icon delete"
             onClick={(e) => handleModalToggle(e, "deletePost")}
           >
-            {ICONS.DELETE_ICON()}
+            {ICONS.DELETE_ICON!({})}
           </span>
         )}
 
@@ -127,5 +130,3 @@ const Post = ({
     </Card>
   );
 };
-
-export default Post;

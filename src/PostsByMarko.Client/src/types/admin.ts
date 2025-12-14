@@ -4,7 +4,7 @@ export interface AdminDashboardResponse {
   userId: string;
   email: string;
   numberOfPosts: number;
-  lastPostedAt: Date;
+  lastPostedAt: string;
   roles: string[];
 }
 

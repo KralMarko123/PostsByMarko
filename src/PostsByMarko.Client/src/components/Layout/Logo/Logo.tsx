@@ -1,10 +1,9 @@
-import React from "react";
 import { useNavigate } from "react-router";
 import logo from "../../../assets/images/POSM_icon.png";
 import { ROUTES } from "../../../constants/routes";
 import "./Logo.css";
 
-const Logo = () => {
+export const Logo = () => {
   const navigate = useNavigate();
 
   return (
@@ -16,5 +15,3 @@ const Logo = () => {
     />
   );
 };
-
-export default Logo;

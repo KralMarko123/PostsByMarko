@@ -1,3 +1,4 @@
+import { ActionDispatch } from "react";
 import { Chat, Message } from "./messaging";
 import { Post } from "./post";
 
@@ -12,6 +13,7 @@ export interface AppContextValue {
     index?: number | null;
   };
   chats: Chat[];
+  dispatch: ActionDispatch<[action: AppAction]>;
 }
 
 export type AppAction =

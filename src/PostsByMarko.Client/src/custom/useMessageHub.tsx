@@ -3,12 +3,15 @@ import { HubConnection } from "@microsoft/signalr";
 import { ENDPOINT_URLS } from "../constants/endpoints";
 import { useAuth } from "./useAuth";
 import { createHubConnection } from "./useSignalRConnection";
-import { MessageHubEvents } from "@typeConfigs/signalr";
+import { MessageHubEvents } from "../types/signalr";
 import { Chat, Message } from "@typeConfigs/messaging";
 
 export const useMessageHub = () => {
   const { user } = useAuth();
-  const connection: HubConnection = createHubConnection(ENDPOINT_URLS.POST_HUB, user?.token!);
+  const connection: HubConnection = createHubConnection(
+    ENDPOINT_URLS.POST_HUB,
+    user?.token!
+  );
   const [lastMessageRegistered, setLastMessageRegistered] = useState<string>("");
 
   useEffect(() => {

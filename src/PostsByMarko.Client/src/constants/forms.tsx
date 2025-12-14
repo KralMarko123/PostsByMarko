@@ -6,7 +6,7 @@ interface FormGroup {
   label?: string | null;
   type: string;
   placeholder: string;
-  icon?: IconType | null;
+  icon?: IconType;
 }
 
 export const FORMS: Record<string, Record<string, FormGroup[]>> = {

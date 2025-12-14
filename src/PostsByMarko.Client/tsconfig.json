@@ -25,7 +25,8 @@
       "@components/*": ["components/*", "pages/*"],
       "@hooks/*": ["custom/*"],
       "@context/*": ["context/*"],
-      "@typeConfigs/*": ["types/*"]
+      "@typeConfigs/*": ["types/*"],
+      "@assets/*": ["assets/*"]
     }
   },
 

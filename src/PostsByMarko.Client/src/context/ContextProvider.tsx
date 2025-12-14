@@ -23,12 +23,13 @@ export const defaultAppState: AppContextValue = {
     index: null,
   },
   chats: [],
+  dispatch: () => null,
 };
 
-const AppProvider = (props: AppProviderProps) => {
+export const AppProvider = (props: AppProviderProps) => {
   const [appState, dispatch] = useReducer(AppReducer, defaultAppState);
 
-  const appContext = {
+  const appContext: AppContextValue = {
     posts: appState.posts,
     modalVisibility: appState.modalVisibility,
     postBeingModified: appState.postBeingModified,
@@ -39,5 +40,3 @@ const AppProvider = (props: AppProviderProps) => {
 
   return <AppContext.Provider value={appContext}>{props.children}</AppContext.Provider>;
 };
-
-export default AppProvider;
