@@ -96,7 +96,7 @@ export const CreatePostForm = () => {
                 placeholder="What should the title for this post be?"
               />
             )}
-            {group.icon!({})}
+            {group.icon}
           </div>
         ))}
 

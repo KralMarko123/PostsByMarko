@@ -1,6 +1,7 @@
+export const POST_DETAILS_PREFIX = "/posts";
 export const ROUTES: Record<string, string> = {
   HOME: "/",
-  DETAILS: "/posts/:id",
+  DETAILS: `${POST_DETAILS_PREFIX}/:id`,
   CHAT: "/chat",
   LOGIN: `/login`,
   REGISTER: `/register`,

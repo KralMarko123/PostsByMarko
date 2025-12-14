@@ -1,12 +1,12 @@
-import { IconType } from "react-icons";
 import { ICONS } from "./icons";
+import { ReactNode } from "react";
 
 interface FormGroup {
   id: string;
   label?: string | null;
   type: string;
   placeholder: string;
-  icon?: IconType;
+  icon?: ReactNode;
 }
 
 export const FORMS: Record<string, Record<string, FormGroup[]>> = {
@@ -17,7 +17,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "First Name",
         type: "text",
         placeholder: "First name",
-        icon: ICONS.USER_INFO_ICON,
+        icon: <ICONS.USER_INFO_ICON />,
       },
 
       {
@@ -25,7 +25,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Last Name",
         type: "text",
         placeholder: "Last name",
-        icon: ICONS.USER_INFO_ICON,
+        icon: <ICONS.USER_INFO_ICON />,
       },
 
       {
@@ -33,7 +33,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Email",
         type: "text",
         placeholder: "Email",
-        icon: ICONS.USER_ICON,
+        icon: <ICONS.USER_ICON />,
       },
 
       {
@@ -41,7 +41,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Password",
         type: "password",
         placeholder: "Password",
-        icon: ICONS.PASSWORD_ICON,
+        icon: <ICONS.PASSWORD_ICON />,
       },
 
       {
@@ -49,7 +49,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Confirm Password",
         type: "password",
         placeholder: "Confirm password",
-        icon: ICONS.PASSWORD_ICON,
+        icon: <ICONS.PASSWORD_ICON />,
       },
     ],
   },
@@ -60,14 +60,14 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         id: "email",
         type: "text",
         placeholder: "Email",
-        icon: ICONS.USER_ICON,
+        icon: <ICONS.USER_ICON />,
       },
 
       {
         id: "password",
         type: "password",
         placeholder: "Password",
-        icon: ICONS.PASSWORD_ICON,
+        icon: <ICONS.PASSWORD_ICON />,
       },
     ],
   },
@@ -79,7 +79,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Title",
         type: "text",
         placeholder: "Title",
-        icon: ICONS.PIN_ICON,
+        icon: <ICONS.PIN_ICON />,
       },
 
       {
@@ -98,7 +98,7 @@ export const FORMS: Record<string, Record<string, FormGroup[]>> = {
         label: "Title",
         type: "text",
         placeholder: "Title",
-        icon: ICONS.PIN_ICON,
+        icon: <ICONS.PIN_ICON />,
       },
 
       {

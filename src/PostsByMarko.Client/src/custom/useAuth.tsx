@@ -22,6 +22,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
 
   const login = async (user: AuthUser) => {
     setUser(user);
+    console.log(ROUTES.HOME);
     navigate(ROUTES.HOME, { replace: true });
   };
 

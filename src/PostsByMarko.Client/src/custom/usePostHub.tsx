@@ -33,10 +33,6 @@ export const usePostHub = () => {
         })
         .catch((error) => console.error(`SignalR connection	failed with error: ${error}`));
     }
-
-    return () => {
-      connection.stop();
-    };
   }, [connection]);
 
   return lastMessageRegistered;

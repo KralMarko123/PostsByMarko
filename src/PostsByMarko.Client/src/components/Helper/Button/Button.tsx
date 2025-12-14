@@ -9,12 +9,18 @@ interface ButtonProps {
 }
 
 export const Button = (props: ButtonProps) => {
+  const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    props.onButtonClick();
+  };
+
   return (
     <button
       className={`button${
         props.additionalClassNames ? ` ${props.additionalClassNames}` : ""
       }`}
-      onClick={props.onButtonClick}
+      onClick={(e) => onClick(e)}
     >
       {props.loading ? <Loader /> : props.text}
     </button>

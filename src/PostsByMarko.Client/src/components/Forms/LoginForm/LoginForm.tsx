@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";
@@ -34,7 +34,11 @@ export const LoginForm = () => {
       setIsLoading(true);
 
       await AuthService.login(loginRequest)
-        .then((loginPayload) => login(loginPayload))
+        .then((loginPayload) => {
+          console.log("here");
+
+          login(loginPayload);
+        })
         .catch((error) => setErrorMessage(error.message))
         .finally(() => setIsLoading(false));
     }
@@ -58,12 +62,12 @@ export const LoginForm = () => {
               })
             }
           />
-          {group.icon!({})}
+          {group.icon}
         </div>
       ))}
 
       <div className="form-actions">
-        <Button onButtonClick={handleLogin} text="Sign In" loading={isLoading} />
+        <Button onButtonClick={() => handleLogin()} text="Sign In" loading={isLoading} />
       </div>
 
       <p className="link" onClick={() => navigate(ROUTES.REGISTER)}>

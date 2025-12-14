@@ -85,7 +85,7 @@ export const RegisterForm = () => {
               })
             }
           />
-          {group.icon!({})}
+          {group.icon}
         </div>
       ))}
 

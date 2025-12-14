@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
-import { ICONS, EYE_ICON } from "../../constants/icons";
+import { ICONS } from "../../constants/icons";
 import { DateFunctions } from "../../util/dateFunctions";
 import { PostService } from "../../api/PostService";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES, POST_DETAILS_PREFIX } from "../../constants/routes";
 import { AppContext } from "../../context/AppContext";
 import { Card } from "../Helper/Card/Card";
 import { Post, PostProps } from "@typeConfigs/post";
@@ -38,7 +38,7 @@ export const PostCard = ({
   const readableCreatedDate: string = DateFunctions.getReadableDateTime(post.createdAt!);
 
   const handlePostClick = () => {
-    navigate(`.${ROUTES.DETAILS}/${id}`);
+    navigate(`.${POST_DETAILS_PREFIX}/${id}`);
   };
 
   const handleModalToggle = (
@@ -103,7 +103,7 @@ export const PostCard = ({
       >
         {(isAuthor || isAdmin) && (
           <span className="post-icon hide" onClick={(e) => handleHiddenToggle(e)}>
-            {EYE_ICON(post.hidden)}
+            {post.hidden ? <ICONS.EYE_ICON_INVISIBLE /> : <ICONS.EYE_ICON />}
           </span>
         )}
         {(isAuthor || isAdmin) && (

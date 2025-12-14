@@ -14,20 +14,18 @@ import { IoMdSend } from "react-icons/io";
 import { IconType } from "react-icons";
 
 export const ICONS: Record<string, IconType> = {
-  USER_ICON: () => <FaUserAlt />,
-  USER_CIRCLE_ICON: () => <BsPersonCircle />,
-  USER_INFO_ICON: () => <BiSolidUserDetail />,
-  PASSWORD_ICON: () => <RiLockPasswordFill />,
-  EMAIL_ICON: () => <MdAlternateEmail />,
-  PIN_ICON: () => <AiFillPushpin />,
-  CONTENT_ICON: () => <AiFillFileText />,
-  PENCIL_ICON: () => <BiSolidPencil />,
-  DELETE_ICON: () => <MdDeleteForever />,
-  CLOCK_ICON: () => <BsClockFill />,
-  GITHUB_ICON: () => <FaGithub />,
-  SEND_ICON: () => <IoMdSend />,
+  USER_ICON: FaUserAlt,
+  USER_CIRCLE_ICON: BsPersonCircle,
+  USER_INFO_ICON: BiSolidUserDetail,
+  PASSWORD_ICON: RiLockPasswordFill,
+  EMAIL_ICON: MdAlternateEmail,
+  PIN_ICON: AiFillPushpin,
+  CONTENT_ICON: AiFillFileText,
+  PENCIL_ICON: BiSolidPencil,
+  DELETE_ICON: MdDeleteForever,
+  CLOCK_ICON: BsClockFill,
+  GITHUB_ICON: FaGithub,
+  SEND_ICON: IoMdSend,
+  EYE_ICON_INVISIBLE: AiFillEyeInvisible,
+  EYE_ICON: AiFillEye,
 };
-
-export function EYE_ICON(hidden: boolean) {
-  return hidden ? <AiFillEyeInvisible /> : <AiFillEye />;
-}

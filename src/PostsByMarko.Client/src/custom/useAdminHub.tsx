@@ -36,10 +36,6 @@ export const useAdminHub = () => {
         })
         .catch((error) => console.error(`SignalR connection	failed with error: ${error}`));
     }
-
-    return () => {
-      connection.stop();
-    };
   }, [connection]);
 
   return lastAdminAction;
