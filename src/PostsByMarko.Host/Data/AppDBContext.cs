@@ -20,32 +20,32 @@ namespace PostsByMarko.Host.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            SetupKeyGenerationStrategy(builder);
+            SetupKeyGenerationStrategy(builder, Database.IsNpgsql());
             SetupRelationshipStrategies(builder);
             SetupIndexes(builder);
 
             base.OnModelCreating(builder);
         }
 
-        private static void SetupKeyGenerationStrategy(ModelBuilder modelBuilder)
+        private static void SetupKeyGenerationStrategy(ModelBuilder modelBuilder, bool isNpg = false)
         {
-            const string pgGuidGenerationFunctionName = "gen_random_uuid()";
+            string guidGenerationProcedureName = isNpg ? "gen_random_uuid()" : "UUID()";
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Id)
-                .HasDefaultValueSql(pgGuidGenerationFunctionName);
+                .HasDefaultValueSql(guidGenerationProcedureName);
 
             modelBuilder.Entity<Post>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql(pgGuidGenerationFunctionName);
+                .HasDefaultValueSql(guidGenerationProcedureName);
 
             modelBuilder.Entity<Chat>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql(pgGuidGenerationFunctionName);
+                .HasDefaultValueSql(guidGenerationProcedureName);
 
             modelBuilder.Entity<Message>()
                 .Property(b => b.Id)
-                .HasDefaultValueSql(pgGuidGenerationFunctionName);
+                .HasDefaultValueSql(guidGenerationProcedureName);
         }
 
         private static void SetupRelationshipStrategies(ModelBuilder modelBuilder)

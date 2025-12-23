@@ -2,6 +2,7 @@ import { Endpoints } from "@typeConfigs/endpoints";
 
 const BASE_URL_DEVELOPMENT = "http://localhost:7171";
 const BASE_URL_DOCKER = "http://localhost:7171";
+const BASE_URL_PRODUCTION = "https://markosapps.mk";
 
 const ADMIN_CONTROLLER_PREFIX = "api/admin";
 const AUTH_CONTROLLER_PREFIX = "api/auth";
@@ -115,6 +116,41 @@ const dockerEndpoints: Endpoints = {
   ADMIN_HUB: `${BASE_URL_DOCKER}/${ENDPOINTS.ADMIN_HUB}`,
 };
 
+const productionEndpoints: Endpoints = {
+  // Admin
+  GET_ROLES_FOR_EMAIL: `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_ROLES_FOR_EMAIL}`,
+  GET_DASHBOARD: `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_DASHBOARD}`,
+  DELETE_USER: (id: string) => `${BASE_URL_PRODUCTION}/${ENDPOINTS.DELETE_USER(id)}`,
+  UPDATE_USER_ROLES: `${BASE_URL_PRODUCTION}/${ENDPOINTS.UPDATE_USER_ROLES}`,
+
+  // Auth
+  LOGIN: `${BASE_URL_PRODUCTION}/${ENDPOINTS.LOGIN}`,
+  REGISTER: `${BASE_URL_PRODUCTION}/${ENDPOINTS.REGISTER}`,
+  VALIDATE: `${BASE_URL_PRODUCTION}/${ENDPOINTS.VALIDATE}`,
+
+  // User
+  GET_USERS: `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_USERS}`,
+  GET_USER: (id: string) => `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_USER(id)}`,
+
+  // Posts
+  GET_POSTS: `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_POSTS}`,
+  GET_POST_BY_ID: (id: string) =>
+    `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_POST_BY_ID(id)}`,
+  CREATE_POST: `${BASE_URL_PRODUCTION}/${ENDPOINTS.CREATE_POST}`,
+  UPDATE_POST: (id: string) => `${BASE_URL_PRODUCTION}/${ENDPOINTS.UPDATE_POST(id)}`,
+  DELETE_POST: (id: string) => `${BASE_URL_PRODUCTION}/${ENDPOINTS.DELETE_POST(id)}`,
+
+  // Messaging
+  GET_CHATS: `${BASE_URL_PRODUCTION}/${ENDPOINTS.GET_CHATS}`,
+  START_CHAT: (id: string) => `${BASE_URL_PRODUCTION}/${ENDPOINTS.START_CHAT(id)}`,
+  SEND_MESSAGE: `${BASE_URL_PRODUCTION}/${ENDPOINTS.SEND_MESSAGE}`,
+
+  // Hubs
+  POST_HUB: `${BASE_URL_PRODUCTION}/${ENDPOINTS.POST_HUB}`,
+  MESSAGE_HUB: `${BASE_URL_PRODUCTION}/${ENDPOINTS.MESSAGE_HUB}`,
+  ADMIN_HUB: `${BASE_URL_PRODUCTION}/${ENDPOINTS.ADMIN_HUB}`,
+};
+
 let endpoints: Endpoints;
 
 switch (process.env.NODE_ENV) {
@@ -124,6 +160,10 @@ switch (process.env.NODE_ENV) {
 
   case "docker":
     endpoints = dockerEndpoints;
+    break;
+
+  case "production":
+    endpoints = productionEndpoints;
     break;
 
   default:

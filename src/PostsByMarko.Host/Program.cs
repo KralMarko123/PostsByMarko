@@ -1,9 +1,7 @@
-using DotNetEnv;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Constants;
-using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Mapping.Profiles;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Extensions;
@@ -23,6 +21,7 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfi
 builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var serverVersion = ServerVersion.AutoDetect(connectionString);
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
 #region ServicesConfiguration
@@ -44,7 +43,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.WriteIndented = true;
 });
 builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseNpgsql(connectionString!)
+    options.UseMySql(connectionString!, serverVersion)
 );
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -67,20 +66,27 @@ var app = builder.Build();
 
 #region ApplicationConfiguration
 
+app.WithSwaggerEnabled();
 
-
-if (isInLocalDevelopment || isInTest)
-{
-    app.WithSwaggerEnabled();
-    
-    await app.WithDatabaseReset();
-}
+await app.WithDatabaseReset();
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
 if (!isInLocalDevelopment && !isInTest)
 {
     app.UseHttpsRedirection();
+}
+
+// Enable the developer exception page only in the Development environment
+if (isInLocalDevelopment)
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Configure production error handling
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.WithMiddlewares();
@@ -91,7 +97,10 @@ app.MapControllers();
 
 #endregion
 
-if (isInLocalDevelopment) Console.WriteLine("App is running locally!");
+if (isInLocalDevelopment)
+{
+    Console.WriteLine("App is running locally!");
+}
 
 await app.RunAsync();
 
