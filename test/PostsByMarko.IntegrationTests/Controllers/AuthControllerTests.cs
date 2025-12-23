@@ -76,7 +76,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             token = WebUtility.UrlEncode(token);
 
             // Act
-            var response = await client.PostAsync($"{controllerPrefix}/confirm?email={unconfirmedUser.Email}&token={token}", null);
+            var response = await client.GetAsync($"{controllerPrefix}/confirm?email={unconfirmedUser.Email}&token={token}");
             var redirect = response.Headers.Location!.ToString();
 
             // Assert

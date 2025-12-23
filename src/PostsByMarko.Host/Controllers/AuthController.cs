@@ -42,14 +42,14 @@ public class AuthController : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpPost]
+    [HttpGet]
     [Route("confirm")]
     public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token )
     {
         await emailService.ConfirmEmailAsync(email, token);
         
         var jwtConfiguration = configuration.GetSection("JwtConfig");
-        var audiences = jwtConfiguration.GetSection("validAudiences").Get<List<string>>();
+        var audiences = jwtConfiguration.GetSection("ValidAudiences").Get<List<string>>();
         var urlToRedirectTo = $"{audiences![0]}/login";
 
         return Redirect(urlToRedirectTo);

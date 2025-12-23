@@ -18,11 +18,10 @@ namespace PostsByMarko.UnitTests
         private readonly Mock<IEmailHelper> emailHelperMock = new();
         private readonly Mock<IUserRepository> userRepositoryMock = new();
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
-        private readonly Mock<LinkGenerator> linkGeneratorMock = new();
 
         public EmailServiceTests()
         {
-            emailService = new EmailService(emailHelperMock.Object, userRepositoryMock.Object, linkGeneratorMock.Object, currentRequestAccessorMock.Object);
+            emailService = new EmailService(emailHelperMock.Object, userRepositoryMock.Object, currentRequestAccessorMock.Object);
         }
 
         [Fact]
@@ -41,20 +40,12 @@ namespace PostsByMarko.UnitTests
             defaultHttpContext.Request.Host = new HostString("example.com");
             var confirmationLink = $"https://example.com/api/auth/confirm?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
             var expectedSubject = $"Please confirm the registration for {user.Email}";
-            var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
+            var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
 
             currentRequestAccessorMock.Setup(c => c.Context).Returns(defaultHttpContext);
             userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
-            linkGeneratorMock
-                .Setup(lg => lg.GetUriByAddress(
-                    defaultHttpContext,
-                    "ConfirmEmail",
-                    dictionaryValues,
-                    null, null, null, default, default, null
-                ))
-                .Returns(confirmationLink);
-
+        
             // Act
             await emailService.SendEmailConfimationLinkAsync(user.Email);
 

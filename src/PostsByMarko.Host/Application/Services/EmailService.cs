@@ -10,13 +10,11 @@ namespace PostsByMarko.Host.Application.Services
         private readonly IEmailHelper emailHelper;
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
-        private readonly LinkGenerator linkGenerator;
 
-        public EmailService(IEmailHelper emailHelper, IUserRepository userRepository, LinkGenerator linkGenerator, ICurrentRequestAccessor currentRequestAccessor)
+        public EmailService(IEmailHelper emailHelper, IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor)
         {
             this.emailHelper = emailHelper;
             this.userRepository = userRepository;
-            this.linkGenerator = linkGenerator;
             this.currentRequestAccessor = currentRequestAccessor;
         }
 
@@ -26,7 +24,7 @@ namespace PostsByMarko.Host.Application.Services
             var token = await userRepository.GenerateEmailConfirmationTokenForUserAsync(user);
             var confirmationLink = GenerateEmailConfirmationLink(user.Email!, token);
             var subject = $"Please confirm the registration for {user.Email}";
-            var body = $"Your account has been successfully created. Please click on the following link to confirm your registration: {confirmationLink}";
+            var body = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
 
             await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, body);
         }
