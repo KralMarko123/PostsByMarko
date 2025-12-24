@@ -21,7 +21,7 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfi
 builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = ServerVersion.AutoDetect(connectionString);
+var serverVersion = new MariaDbServerVersion(new Version(10, 11, 13));
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
 #region ServicesConfiguration
@@ -56,6 +56,7 @@ builder.Services.AddHttpContextAccessor();
 builder.WithAppServices();
 builder.WithIdentity();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddProblemDetails();
 builder.WithSwagger();
 builder.WithAuthentication(jwtConfig);
 builder.WithAuthorization();
@@ -68,7 +69,16 @@ var app = builder.Build();
 
 app.WithSwaggerEnabled();
 
-await app.WithDatabaseReset();
+if (isInLocalDevelopment || isInTest)
+{
+    await app.WithDatabaseReset();
+}
+else
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);
 
