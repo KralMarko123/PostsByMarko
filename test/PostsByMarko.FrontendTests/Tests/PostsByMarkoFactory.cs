@@ -11,7 +11,7 @@ namespace PostsByMarko.FrontendTests.Tests
 {
     public class PostsByMarkoFactory : IAsyncLifetime
     {
-        private readonly int timeoutInMs = TimeSpan.FromSeconds(20).Milliseconds;
+        private readonly int timeoutInMs = (int)TimeSpan.FromSeconds(20).TotalMilliseconds;
 
         public BrowserDriver? driver;
         public IBrowser browser;

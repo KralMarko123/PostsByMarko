@@ -20,16 +20,16 @@ namespace PostsByMarko.Host.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            SetupKeyGenerationStrategy(builder, Database.IsNpgsql());
+            SetupKeyGenerationStrategy(builder);
             SetupRelationshipStrategies(builder);
             SetupIndexes(builder);
 
             base.OnModelCreating(builder);
         }
 
-        private static void SetupKeyGenerationStrategy(ModelBuilder modelBuilder, bool isNpg = false)
+        private static void SetupKeyGenerationStrategy(ModelBuilder modelBuilder)
         {
-            string guidGenerationProcedureName = isNpg ? "gen_random_uuid()" : "UUID()";
+            const string guidGenerationProcedureName = "UUID()";
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Id)

@@ -19,17 +19,29 @@ builder.Configuration.AddEnvironmentVariables();
 // Define configurations here
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
+builder.Services.Configure<ApplicationUrlConfig>(builder.Configuration.GetSection("ApplicationUrls"));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MariaDbServerVersion(new Version(10, 11, 13));
-var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()
+    ?? throw new InvalidOperationException("JwtConfig is required.");
+
+if (jwtConfig.Secret.Length < 32)
+{
+    throw new InvalidOperationException("JwtConfig:Secret must be supplied securely and contain at least 32 characters.");
+}
+
+if (jwtConfig.ValidIssuers.Count == 0 || jwtConfig.ValidAudiences.Count == 0)
+{
+    throw new InvalidOperationException("JwtConfig must define at least one issuer and audience.");
+}
 
 #region ServicesConfiguration
 
 builder.Host.UseSerilog();
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
-builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig!.ValidAudiences!);
+builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig.ValidAudiences);
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSignalR(options =>
 {
@@ -69,7 +81,7 @@ var app = builder.Build();
 
 app.WithSwaggerEnabled();
 
-if (isInLocalDevelopment || isInTest)
+if (isInTest)
 {
     await app.WithDatabaseReset();
 }

@@ -82,7 +82,7 @@ namespace PostsByMarko.Host.Application.Services
 
             var postDto = mapper.Map<PostDto>(post);
 
-            await postHub.Clients.All.PostCreated(postDto);
+            await postHub.Clients.All.PostCreated(new PostChangeDto(postDto.Id, postDto.CreatedAt));
 
             return postDto;
         }
@@ -109,7 +109,7 @@ namespace PostsByMarko.Host.Application.Services
 
             var result = mapper.Map<PostDto>(post);
 
-            await postHub.Clients.All.PostUpdated(result);
+            await postHub.Clients.All.PostUpdated(new PostChangeDto(result.Id, result.LastUpdatedAt));
 
             return result;
         }

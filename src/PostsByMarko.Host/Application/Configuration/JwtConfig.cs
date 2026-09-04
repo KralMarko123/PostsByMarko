@@ -5,6 +5,6 @@
         public List<string> ValidIssuers { get; set; } = new List<string>();
         public List<string> ValidAudiences { get; set; } = new List<string>();
         public string Secret { get; set; } = string.Empty;
-        public int ExpiresIn { get; set; } = 100;
+        public int ExpiresInMinutes { get; set; } = 100;
     }
 }

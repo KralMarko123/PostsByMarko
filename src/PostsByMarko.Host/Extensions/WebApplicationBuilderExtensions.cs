@@ -14,6 +14,7 @@ using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Host.Data.Repositories.Users;
 using PostsByMarko.Host.Middlewares;
 using System.Text;
+using System.Security.Claims;
 
 namespace PostsByMarko.Host.Extensions
 {
@@ -111,6 +112,19 @@ namespace PostsByMarko.Host.Extensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnTokenValidated = async context =>
+                    {
+                        var userId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var tokenSecurityStamp = context.Principal?.FindFirstValue("AspNet.Identity.SecurityStamp");
+                        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+                        var user = string.IsNullOrWhiteSpace(userId) ? null : await userManager.FindByIdAsync(userId);
+
+                        if (user is null || string.IsNullOrWhiteSpace(tokenSecurityStamp) ||
+                            !string.Equals(user.SecurityStamp, tokenSecurityStamp, StringComparison.Ordinal))
+                        {
+                            context.Fail("The token is no longer valid.");
+                        }
+                    },
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];

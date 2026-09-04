@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
+using PostsByMarko.Host.Application.Requests;
 
 namespace PostsByMarko.Host.Controllers
 {
@@ -37,9 +38,9 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpPost]
         [Route("send")]
-        public async Task<ActionResult<MessageDto>> SendMessage([FromBody] MessageDto messageDto, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<MessageDto>> SendMessage([FromBody] SendMessageRequest request, CancellationToken cancellationToken = default)
         {
-            var result = await messagingService.SendMessageAsync(messageDto, cancellationToken);
+            var result = await messagingService.SendMessageAsync(request, cancellationToken);
             
             return Ok(result);
         }

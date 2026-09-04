@@ -91,7 +91,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<IdentityResult> AddRoleToUserAsync(User user, string role)
         {
-            return await userManager.AddToRoleAsync(user, role);
+            var result = await userManager.AddToRoleAsync(user, role);
+
+            if (result.Succeeded)
+            {
+                result = await userManager.UpdateSecurityStampAsync(user);
+            }
+
+            return result;
         }
 
         public async Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
@@ -113,7 +120,14 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<IdentityResult> RemoveRoleFromUserAsync(User user, string role)
         {
-            return await userManager.RemoveFromRoleAsync(user, role);
+            var result = await userManager.RemoveFromRoleAsync(user, role);
+
+            if (result.Succeeded)
+            {
+                result = await userManager.UpdateSecurityStampAsync(user);
+            }
+
+            return result;
         }
 
         public async Task<IdentityResult> UpdateUserAsync(User user)

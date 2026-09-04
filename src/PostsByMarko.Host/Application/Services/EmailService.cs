@@ -2,6 +2,8 @@
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Data.Repositories.Users;
+using Microsoft.Extensions.Options;
+using PostsByMarko.Host.Application.Configuration;
 
 namespace PostsByMarko.Host.Application.Services
 {
@@ -9,13 +11,13 @@ namespace PostsByMarko.Host.Application.Services
     {
         private readonly IEmailHelper emailHelper;
         private readonly IUserRepository userRepository;
-        private readonly ICurrentRequestAccessor currentRequestAccessor;
+        private readonly ApplicationUrlConfig applicationUrls;
 
-        public EmailService(IEmailHelper emailHelper, IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor)
+        public EmailService(IEmailHelper emailHelper, IUserRepository userRepository, IOptions<ApplicationUrlConfig> applicationUrls)
         {
             this.emailHelper = emailHelper;
             this.userRepository = userRepository;
-            this.currentRequestAccessor = currentRequestAccessor;
+            this.applicationUrls = applicationUrls.Value;
         }
 
         public async Task SendEmailConfimationLinkAsync(string emailToSendTo)
@@ -42,13 +44,14 @@ namespace PostsByMarko.Host.Application.Services
 
         private string GenerateEmailConfirmationLink(string email, string token)
         {
-            var ctx = currentRequestAccessor.Context ?? throw new InvalidOperationException("HttpContext not available");
-            var scheme = ctx.Request.Scheme ?? "https";
-            var host = ctx.Request.Host.HasValue ? ctx.Request.Host.Value : throw new InvalidOperationException("Host not available");
-            var pathBase = ctx.Request.PathBase.HasValue ? ctx.Request.PathBase.Value : string.Empty;
+            if (!Uri.TryCreate(applicationUrls.ApiBaseUrl, UriKind.Absolute, out var apiBaseUrl))
+            {
+                throw new InvalidOperationException("ApplicationUrls:ApiBaseUrl must be an absolute URL.");
+            }
+
             var path = "/api/auth/confirm";
             var query = $"?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
-            var confirmationLink = $"{scheme}://{host}{pathBase}{path}{query}";
+            var confirmationLink = new Uri(apiBaseUrl, $"{path}{query}").ToString();
 
             return confirmationLink;
         }

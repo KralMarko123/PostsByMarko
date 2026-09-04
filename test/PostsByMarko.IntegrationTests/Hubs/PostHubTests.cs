@@ -49,15 +49,14 @@ namespace PostsByMarko.IntegrationTests.Hubs
         public async Task creating_a_post_notifies_clients()
         {
             // Arrange
-            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
             var createRequest = new CreatePostRequest
             {
                 Title = "Post created during SignalR test",
                 Content = "Content for SignalR test"
             };
 
-            PostDto? postCreated = null;
-            hubConnection!.On<PostDto>("PostCreated", post => postCreated = post);
+            PostChangeDto? postCreated = null;
+            hubConnection!.On<PostChangeDto>("PostCreated", notification => postCreated = notification);
 
             // Act
             await client.PostAsJsonAsync($"{controllerPrefix}", createRequest);
@@ -65,10 +64,8 @@ namespace PostsByMarko.IntegrationTests.Hubs
 
             // Assert
             postCreated.Should().NotBeNull();
-            postCreated.Title.Should().Be(createRequest.Title);
-            postCreated.Content.Should().Be(createRequest.Content);
-            postCreated.AuthorId.Should().Be(testAdmin.Id);
-            postCreated.Hidden.Should().BeFalse();
+            postCreated.Id.Should().NotBeEmpty();
+            postCreated.OccurredAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 
         [Fact]
@@ -85,8 +82,8 @@ namespace PostsByMarko.IntegrationTests.Hubs
                 Hidden = true
             };
 
-            PostDto? postUpdated = null;
-            hubConnection!.On<PostDto>("PostUpdated", post => postUpdated = post);
+            PostChangeDto? postUpdated = null;
+            hubConnection!.On<PostChangeDto>("PostUpdated", notification => postUpdated = notification);
 
             // Act
             await client.PutAsJsonAsync($"{controllerPrefix}/{postToUpdate.Id}", updateRequest );
@@ -94,9 +91,8 @@ namespace PostsByMarko.IntegrationTests.Hubs
 
             // Assert
             postUpdated.Should().NotBeNull();
-            postUpdated.Title.Should().Be(updateRequest.Title);
-            postUpdated.Content.Should().Be(updateRequest.Content);
-            postUpdated.Hidden.Should().Be(updateRequest.Hidden);
+            postUpdated.Id.Should().Be(postToUpdate.Id);
+            postUpdated.OccurredAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 
         [Fact]

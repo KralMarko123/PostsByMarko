@@ -2,7 +2,7 @@ import { useEffect, Dispatch, useRef } from "react";
 import { ENDPOINT_URLS } from "../constants/endpoints";
 import { createHubConnection } from "./useSignalRConnection";
 import { HubConnection } from "@microsoft/signalr";
-import { Post } from "@typeConfigs/post";
+import { PostChangeNotification } from "@typeConfigs/post";
 import { PostHubEvents } from "../types/signalr";
 import { AppAction } from "@typeConfigs/context";
 
@@ -32,17 +32,17 @@ export const usePostHub = (
       connection
         .start()
         .then(() => {
-          connection.on(PostHubEvents.PostCreated, (post: Post) =>
+          connection.on(PostHubEvents.PostCreated, (notification: PostChangeNotification) =>
             dispatch({
               type: "MESSAGE_REGISTERED",
-              message: `New Post created at ${post.createdAt}`,
+              message: `Post '${notification.id}' created at ${notification.occurredAt}`,
             })
           );
 
-          connection.on(PostHubEvents.PostUpdated, (post: Post) =>
+          connection.on(PostHubEvents.PostUpdated, (notification: PostChangeNotification) =>
             dispatch({
               type: "MESSAGE_REGISTERED",
-              message: `Post updated at ${post.lastUpdatedAt}`,
+              message: `Post '${notification.id}' updated at ${notification.occurredAt}`,
             })
           );
 

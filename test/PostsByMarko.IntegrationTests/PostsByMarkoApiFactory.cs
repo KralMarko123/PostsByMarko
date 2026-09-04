@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data;
@@ -14,6 +16,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PostsByMarko.IntegrationTests
@@ -33,6 +36,24 @@ namespace PostsByMarko.IntegrationTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Test");
+            builder.ConfigureAppConfiguration((_, configuration) =>
+            {
+                var testConfiguration = new Dictionary<string, string?>
+                {
+                    ["JwtConfig:Secret"] = "posts-by-marko-integration-tests-only-signing-key"
+                };
+
+                var databaseUser = Environment.GetEnvironmentVariable("DB_USER");
+                var databasePassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+                if (!string.IsNullOrWhiteSpace(databaseUser) && !string.IsNullOrWhiteSpace(databasePassword))
+                {
+                    testConfiguration["ConnectionStrings:DefaultConnection"] =
+                        $"server=localhost;port=3306;user={databaseUser};password={databasePassword};database=postsbymarko_test";
+                }
+
+                configuration.AddInMemoryCollection(testConfiguration);
+            });
         }
 
         public new Task DisposeAsync()
@@ -43,6 +64,7 @@ namespace PostsByMarko.IntegrationTests
         }
 
         public T Resolve<T>()
+            where T : notnull
         {
             var scope = Services.CreateScope();
 
@@ -61,6 +83,13 @@ namespace PostsByMarko.IntegrationTests
         {
             using var scope = Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var databaseName = db.Database.GetDbConnection().Database;
+
+            if (!databaseName.Contains("test", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    $"Refusing to reset database '{databaseName}' because its name is not test-scoped.");
+            }
 
             await db.Database.EnsureDeletedAsync();
             await db.Database.EnsureCreatedAsync();

@@ -1,5 +1,6 @@
 ﻿using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Data;
+using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Middlewares;
 
 namespace PostsByMarko.Host.Extensions
@@ -19,8 +20,19 @@ namespace PostsByMarko.Host.Extensions
 
         public static async Task WithDatabaseReset(this WebApplication app)
         {
+            if (!app.Environment.IsEnvironment("Test"))
+            {
+                throw new InvalidOperationException("Database reset is restricted to the Test environment.");
+            }
+
             using var scope = app.Services.CreateScope();
             var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var databaseName = appDbContext.Database.GetDbConnection().Database;
+
+            if (!databaseName.Contains("test", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Refusing to reset database '{databaseName}' because its name is not test-scoped.");
+            }
 
             await appDbContext.Database.EnsureDeletedAsync();
             await appDbContext.Database.EnsureCreatedAsync();

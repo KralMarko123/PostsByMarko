@@ -8,11 +8,12 @@ on:
   workflow_dispatch:
 
 env:
-  DB_USER: ${{ secrets.DB_USER }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  SQL_PORT: ${{ vars.SQL_PORT }}
-  HOST_PORT: ${{ vars.HOST_PORT }}
-  CLIENT_PORT: ${{ vars.CLIENT_PORT }}
+  DB_USER: postsbymarko
+  DB_PASSWORD: posts-by-marko-ci-tests-only
+  SQL_PORT: 3306
+  HOST_PORT: 7171
+  CLIENT_PORT: 3000
+  JWT_SECRET: posts-by-marko-ci-e2e-tests-only-signing-key
 
 jobs:
   run-tests:

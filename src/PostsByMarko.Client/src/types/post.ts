@@ -25,3 +25,8 @@ export interface UpdatePostRequest {
   content: string;
   hidden: boolean;
 }
+
+export interface PostChangeNotification {
+  id: string;
+  occurredAt: string;
+}

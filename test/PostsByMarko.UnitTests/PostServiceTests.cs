@@ -212,7 +212,7 @@ namespace PostsByMarko.UnitTests
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
             postsRepositoryMock.Setup(r => r.AddPostAsync(post, It.IsAny<CancellationToken>())).ReturnsAsync(post);
             postHubMock.Setup(p => p.Clients.All).Returns(postClientMock.Object);
-            postClientMock.Setup(p => p.PostCreated(postDto)).Returns(Task.CompletedTask);
+            postClientMock.Setup(p => p.PostCreated(It.IsAny<PostChangeDto>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await postService.CreatePostAsync(createRequest, CancellationToken.None);
@@ -223,7 +223,7 @@ namespace PostsByMarko.UnitTests
             result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
             result.LastUpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-            postClientMock.Verify(p => p.PostCreated(postDto), Times.Once);
+            postClientMock.Verify(p => p.PostCreated(It.Is<PostChangeDto>(n => n.Id == postDto.Id)), Times.Once);
         }
 
         [Fact]
@@ -281,7 +281,7 @@ namespace PostsByMarko.UnitTests
             postsRepositoryMock.Setup(r => r.GetPostByIdAsync(post.Id, It.IsAny<CancellationToken>())).ReturnsAsync(post);
             mapperMock.Setup(m => m.Map<PostDto>(post)).Returns(postDto);
             postHubMock.Setup(p => p.Clients.All).Returns(postClientMock.Object);
-            postClientMock.Setup(p => p.PostUpdated(postDto)).Returns(Task.CompletedTask);
+            postClientMock.Setup(p => p.PostUpdated(It.IsAny<PostChangeDto>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await postService.UpdatePostAsync(post.Id, updateRequest, CancellationToken.None);
@@ -297,7 +297,7 @@ namespace PostsByMarko.UnitTests
 
             postsRepositoryMock.Verify(r => r.UpdatePostAsync(post), Times.Once);
             postsRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-            postClientMock.Verify(p => p.PostUpdated(postDto), Times.Once);
+            postClientMock.Verify(p => p.PostUpdated(It.Is<PostChangeDto>(n => n.Id == postDto.Id)), Times.Once);
         }
 
         [Fact]

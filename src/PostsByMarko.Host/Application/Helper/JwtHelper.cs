@@ -24,6 +24,13 @@ namespace PostsByMarko.Host.Application.Helper
         {
             var userClaims = await usersRepository.GetClaimsAsync(user);
 
+            if (string.IsNullOrWhiteSpace(user.SecurityStamp))
+            {
+                throw new InvalidOperationException("Cannot create a token without a user security stamp.");
+            }
+
+            userClaims.Add(new Claim("AspNet.Identity.SecurityStamp", user.SecurityStamp));
+
             return GenerateToken(userClaims);
         }
 
@@ -40,7 +47,7 @@ namespace PostsByMarko.Host.Application.Helper
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtConfig.ExpiresIn)),
+                Expires = DateTime.UtcNow.AddMinutes(jwtConfig.ExpiresInMinutes),
                 Issuer = jwtConfig.ValidIssuers.FirstOrDefault(),
                 Audience = jwtConfig.ValidAudiences.FirstOrDefault(),
                 SigningCredentials = GetSigningCredentials()

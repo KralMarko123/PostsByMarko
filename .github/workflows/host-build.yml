@@ -8,11 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  DB_USER: ${{ secrets.DB_USER }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  SQL_PORT: ${{ vars.SQL_PORT }}
-  HOST_PORT: ${{ vars.HOST_PORT }}
-  CLIENT_PORT: ${{ vars.CLIENT_PORT }}
+  DB_USER: postsbymarko
+  DB_PASSWORD: posts-by-marko-ci-tests-only
 
 jobs:
   run-tests:
@@ -22,15 +19,16 @@ jobs:
     # Define database service
     services:
       database:
-        image: postgres:17
+        image: mariadb:10.11
         env: 
-          POSTGRES_DB: postsbymarko
-          POSTGRES_USER: ${{ env.DB_USER }}
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+          MARIADB_DATABASE: postsbymarko_test
+          MARIADB_USER: ${{ env.DB_USER }}
+          MARIADB_PASSWORD: ${{ env.DB_PASSWORD }}
+          MARIADB_RANDOM_ROOT_PASSWORD: 1
         ports: 
-          - 5432:5432
+          - 3306:3306
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -54,7 +52,7 @@ jobs:
     - name: Wait for database to be ready
       run: |
         for i in {1..10}; do
-          nc -z localhost 5432 && echo "Database is up" && exit 0
+          nc -z localhost 3306 && echo "Database is up" && exit 0
           echo "Waiting for database..."
           sleep 5
         done

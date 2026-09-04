@@ -75,7 +75,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             var newMessage = new MessageDto
             {
                 ChatId = chat.Id,
-                SenderId = testAdmin.Id,
+                SenderId = testUser.Id,
                 Content = "Hello, this is a test message!"
             };
 
@@ -88,7 +88,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             message.Should().NotBeNull();
             message.Content.Should().Be(newMessage.Content);
             message.ChatId.Should().Be(chat.Id);
-            message.SenderId.Should().Be(testAdmin.Id);
+            message.SenderId.Should().Be(testAdmin.Id, "the authenticated principal, not the request body, owns the message");
             message.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 

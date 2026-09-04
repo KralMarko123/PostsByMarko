@@ -4,8 +4,8 @@ namespace PostsByMarko.Host.Application.Hubs.Client
 {
     public interface IPostClient
     {
-        Task PostCreated(PostDto post);
-        Task PostUpdated(PostDto post);
+        Task PostCreated(PostChangeDto notification);
+        Task PostUpdated(PostChangeDto notification);
         Task PostDeleted(Guid id);
     }
 }

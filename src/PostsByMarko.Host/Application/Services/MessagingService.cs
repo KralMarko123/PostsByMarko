@@ -5,6 +5,7 @@ using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
+using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -76,17 +77,24 @@ namespace PostsByMarko.Host.Application.Services
             return chatDto;
         }
 
-        public async Task<MessageDto> SendMessageAsync(MessageDto messageDto, CancellationToken cancellationToken = default)
+        public async Task<MessageDto> SendMessageAsync(SendMessageRequest request, CancellationToken cancellationToken = default)
         {
-            var chat = await chatRepository.GetChatByIdAsync(messageDto.ChatId!.Value, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {messageDto.ChatId} was not found");
+            var currentUserId = currentRequestAccessor.Id;
+            var chat = await chatRepository.GetChatByIdAsync(request.ChatId, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {request.ChatId} was not found");
             var chatUserIds = chat.ChatUsers.Select(c => c.UserId);
 
-            if (!chatUserIds.Contains(messageDto.SenderId!.Value))
+            if (!chatUserIds.Contains(currentUserId))
             {
-                throw new AuthException("Sender is not a member of the chat.");
+                throw new AuthException("Current user is not a member of the chat.");
             }
 
-            var newMessage = mapper.Map<Message>(messageDto);
+            var newMessage = new Message
+            {
+                ChatId = chat.Id,
+                SenderId = currentUserId,
+                Content = request.Content,
+                CreatedAt = DateTime.UtcNow
+            };
             var createdMessage = await messageRepository.AddMessageAsync(newMessage, cancellationToken);
 
             await messageRepository.SaveChangesAsync(cancellationToken);

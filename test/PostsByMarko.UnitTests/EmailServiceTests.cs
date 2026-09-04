@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
+using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
@@ -17,11 +19,15 @@ namespace PostsByMarko.UnitTests
         private readonly EmailService emailService;
         private readonly Mock<IEmailHelper> emailHelperMock = new();
         private readonly Mock<IUserRepository> userRepositoryMock = new();
-        private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
 
         public EmailServiceTests()
         {
-            emailService = new EmailService(emailHelperMock.Object, userRepositoryMock.Object, currentRequestAccessorMock.Object);
+            var applicationUrls = Options.Create(new ApplicationUrlConfig
+            {
+                ApiBaseUrl = "https://example.com",
+                ClientBaseUrl = "https://client.example.com"
+            });
+            emailService = new EmailService(emailHelperMock.Object, userRepositoryMock.Object, applicationUrls);
         }
 
         [Fact]
@@ -42,7 +48,6 @@ namespace PostsByMarko.UnitTests
             var expectedSubject = $"Please confirm the registration for {user.Email}";
             var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
 
-            currentRequestAccessorMock.Setup(c => c.Context).Returns(defaultHttpContext);
             userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
         

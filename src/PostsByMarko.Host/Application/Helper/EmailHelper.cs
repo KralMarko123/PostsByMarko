@@ -8,14 +8,22 @@ namespace PostsByMarko.Host.Application.Helper
     public class EmailHelper : IEmailHelper
     {
         private readonly EmailConfig emailConfig;
+        private readonly ILogger<EmailHelper> logger;
 
-        public EmailHelper(IOptions<EmailConfig> emailConfig)
+        public EmailHelper(IOptions<EmailConfig> emailConfig, ILogger<EmailHelper> logger)
         {
             this.emailConfig = emailConfig.Value;
+            this.logger = logger;
         }
 
         public async Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body)
         {
+            if (!emailConfig.Enabled)
+            {
+                logger.LogInformation("Email delivery is disabled. Skipping message to {Recipient}.", emailToSendTo);
+                return;
+            }
+
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(emailConfig.SenderName, emailConfig.Username));
@@ -40,7 +48,8 @@ namespace PostsByMarko.Host.Application.Helper
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex, "Failed to send email to {Recipient}.", emailToSendTo);
+                throw;
             }
         }
     }

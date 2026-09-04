@@ -1,5 +1,3 @@
-version: "3.4"
-
 networks:
   beNetwork:
   feNetwork:
@@ -7,18 +5,19 @@ networks:
 services:
   #DATABASE
   database:
-    container_name: PostsByMarko.PostgresServer
-    image: postgres:17
+    container_name: PostsByMarko.MariaDb
+    image: mariadb:10.11
     environment: 
-      POSTGRES_DB: postsbymarko
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: postsbymarko_test
+      MARIADB_USER: ${DB_USER:-postsbymarko}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
     ports:
-      - ${SQL_PORT}:${SQL_PORT}
+      - ${SQL_PORT:-3306}:3306
     networks:
       - beNetwork
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +29,7 @@ services:
       context: .
       dockerfile: src/PostsByMarko.Host/Dockerfile
     ports:
-      - ${HOST_PORT}:${HOST_PORT}
+      - ${HOST_PORT:-7171}:${HOST_PORT:-7171}
     depends_on:
       database:
         condition: service_healthy
@@ -38,9 +37,15 @@ services:
       - beNetwork
       - feNetwork
     environment:
-      - ASPNETCORE_URLS=http://+:${HOST_PORT}
+      - ASPNETCORE_URLS=http://+:${HOST_PORT:-7171}
       - ASPNETCORE_ENVIRONMENT=Test
-      - ConnectionStrings__DefaultConnection=Host=database;Port=5432;Database=postsbymarko;Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Server=database;Port=3306;Database=postsbymarko_test;User=${DB_USER:-postsbymarko};Password=${DB_PASSWORD:?DB_PASSWORD must be set}
+      - JwtConfig__Secret=${JWT_SECRET:?JWT_SECRET must be set}
+      - JwtConfig__ValidIssuers__0=http://localhost:${HOST_PORT:-7171}
+      - JwtConfig__ValidAudiences__0=http://localhost:${CLIENT_PORT:-3000}
+      - ApplicationUrls__ApiBaseUrl=http://localhost:${HOST_PORT:-7171}
+      - ApplicationUrls__ClientBaseUrl=http://localhost:${CLIENT_PORT:-3000}
+      - EmailConfig__Enabled=false
 
   #CLIENT
   client:
@@ -49,7 +54,7 @@ services:
       context: .
       dockerfile: src/PostsByMarko.Client/Dockerfile
     ports:
-      - ${CLIENT_PORT}:${CLIENT_PORT}
+      - ${CLIENT_PORT:-3000}:${CLIENT_PORT:-3000}
     depends_on:
       - host
     volumes:

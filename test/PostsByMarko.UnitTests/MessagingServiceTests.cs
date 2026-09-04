@@ -8,6 +8,7 @@ using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -204,11 +205,13 @@ namespace PostsByMarko.UnitTests
             messageRepositoryMock.Setup(mr => mr.AddMessageAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>())).ReturnsAsync(message);
             mapperMock.Setup(m => m.Map<Message>(messageDto)).Returns(message);
             mapperMock.Setup(m => m.Map<MessageDto>(message)).Returns(messageDto);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             messageHubMock.Setup(m => m.Clients.Users(It.IsAny<List<string>>())).Returns(messageClientMock.Object);
             messageClientMock.Setup(m => m.MessageSent(messageDto)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
+            var request = new SendMessageRequest { ChatId = messageDto.ChatId.Value, Content = messageDto.Content };
+            var result = await messagingService.SendMessageAsync(request, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
@@ -234,7 +237,9 @@ namespace PostsByMarko.UnitTests
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
             // Act
-            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
+            var request = new SendMessageRequest { ChatId = messageDto.ChatId.Value, Content = messageDto.Content };
+            var result = async () => await messagingService.SendMessageAsync(request, CancellationToken.None);
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"Chat with Id: {messageDto.ChatId} was not found");
@@ -256,12 +261,14 @@ namespace PostsByMarko.UnitTests
 
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(messageDto.SenderId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             chatRepositoryMock.Setup(cr => cr.GetChatByIdAsync(messageDto.ChatId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
+            currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
 
             // Act
-            var result = async () => await messagingService.SendMessageAsync(messageDto, CancellationToken.None);
+            var request = new SendMessageRequest { ChatId = messageDto.ChatId.Value, Content = messageDto.Content };
+            var result = async () => await messagingService.SendMessageAsync(request, CancellationToken.None);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage("Sender is not a member of the chat.");
+            await result.Should().ThrowAsync<AuthException>().WithMessage("Current user is not a member of the chat.");
         }
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Responses;
+using Microsoft.Extensions.Options;
+using PostsByMarko.Host.Application.Configuration;
 
 namespace PostsByMarko.Host.Controllers;
 
@@ -12,13 +14,13 @@ public class AuthController : ControllerBase
 {
     private readonly IUserService usersService;
     private readonly IEmailService emailService;
-    private readonly IConfiguration configuration;  
+    private readonly ApplicationUrlConfig applicationUrls;
 
-    public AuthController(IUserService usersService, IEmailService emailService, IConfiguration configuration)
+    public AuthController(IUserService usersService, IEmailService emailService, IOptions<ApplicationUrlConfig> applicationUrls)
     {
         this.usersService = usersService;
         this.emailService = emailService;
-        this.configuration = configuration;
+        this.applicationUrls = applicationUrls.Value;
     }
     
     [AllowAnonymous]
@@ -48,9 +50,12 @@ public class AuthController : ControllerBase
     {
         await emailService.ConfirmEmailAsync(email, token);
         
-        var jwtConfiguration = configuration.GetSection("JwtConfig");
-        var audiences = jwtConfiguration.GetSection("ValidAudiences").Get<List<string>>();
-        var urlToRedirectTo = $"{audiences![0]}/login";
+        if (!Uri.TryCreate(applicationUrls.ClientBaseUrl, UriKind.Absolute, out var clientBaseUrl))
+        {
+            throw new InvalidOperationException("ApplicationUrls:ClientBaseUrl must be an absolute URL.");
+        }
+
+        var urlToRedirectTo = new Uri(clientBaseUrl, "/login").ToString();
 
         return Redirect(urlToRedirectTo);
     }
