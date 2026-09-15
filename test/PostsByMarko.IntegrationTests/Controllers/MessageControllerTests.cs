@@ -34,6 +34,19 @@ namespace PostsByMarko.IntegrationTests.Controllers
         public Task DisposeAsync() => Task.CompletedTask;
 
         [Fact]
+        public async Task simultaneous_chat_creation_returns_one_conversation()
+        {
+            var otherUser = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_USER_EMAIL);
+            var responses = await Task.WhenAll(
+                client.PostAsync($"{controllerPrefix}/chats/user/{otherUser.Id}", null),
+                client.PostAsync($"{controllerPrefix}/chats/user/{otherUser.Id}", null));
+            foreach (var response in responses) response.EnsureSuccessStatusCode();
+            var first = JsonConvert.DeserializeObject<ChatDto>(await responses[0].Content.ReadAsStringAsync());
+            var second = JsonConvert.DeserializeObject<ChatDto>(await responses[1].Content.ReadAsStringAsync());
+            first!.Id.Should().Be(second!.Id);
+        }
+
+        [Fact]
         public async Task should_get_chats()
         {
             // Arrange

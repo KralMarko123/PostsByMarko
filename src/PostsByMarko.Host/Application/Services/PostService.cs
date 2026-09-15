@@ -1,3 +1,4 @@
+using PostsByMarko.Host.Application.Helper;
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Constants;
@@ -65,7 +66,7 @@ namespace PostsByMarko.Host.Application.Services
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
 
-            if (request.Title.Length == 0 || request.Content.Length == 0)
+            if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
             {
                 throw new ArgumentException("Post title and content cannot be empty");
             }
@@ -82,7 +83,7 @@ namespace PostsByMarko.Host.Application.Services
 
             var postDto = mapper.Map<PostDto>(post);
 
-            await postHub.Clients.All.PostCreated(new PostChangeDto(postDto.Id, postDto.CreatedAt));
+            await NotificationDelivery.SendAsync(() => postHub.Clients.All.PostCreated(new PostChangeDto(postDto.Id, postDto.CreatedAt)));
 
             return postDto;
         }
@@ -99,6 +100,9 @@ namespace PostsByMarko.Host.Application.Services
                 throw new UnauthorizedAccessException("You are not authorized to update this post");
             }
 
+            if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
+                throw new ArgumentException("Post title and content cannot be empty");
+
             post.Title = request.Title;
             post.Content = request.Content;
             post.Hidden = request.Hidden;
@@ -109,7 +113,7 @@ namespace PostsByMarko.Host.Application.Services
 
             var result = mapper.Map<PostDto>(post);
 
-            await postHub.Clients.All.PostUpdated(new PostChangeDto(result.Id, result.LastUpdatedAt));
+            await NotificationDelivery.SendAsync(() => postHub.Clients.All.PostUpdated(new PostChangeDto(result.Id, result.LastUpdatedAt)));
 
             return result;
         }
@@ -128,7 +132,7 @@ namespace PostsByMarko.Host.Application.Services
             
             await postRepository.DeletePostAsync(post);
             await postRepository.SaveChangesAsync(cancellationToken);
-            await postHub.Clients.All.PostDeleted(Id);
+            await NotificationDelivery.SendAsync(() => postHub.Clients.All.PostDeleted(Id));
         }
     }
 }

@@ -22,6 +22,21 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Setup existing frontend runtime
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: npm
+        cache-dependency-path: src/PostsByMarko.Client/package-lock.json
+
+    - name: Install frontend dependencies
+      working-directory: src/PostsByMarko.Client
+      run: npm ci
+
+    - name: Run frontend regression tests
+      working-directory: src/PostsByMarko.Client
+      run: npm test -- --runInBand
     
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3

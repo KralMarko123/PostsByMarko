@@ -59,19 +59,19 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(userLogin.Email, cancellationToken) ?? throw new AuthException($"No account for '{userLogin.Email}', please check your credentials and try again");
+            var user = await userRepository.GetUserByEmailAsync(userLogin.Email, cancellationToken) ?? throw new AuthException("Invalid email or password.");
             var emailConfirmed = await userRepository.CheckIsEmailConfirmedForUserAsync(user);
             var validPassword = await userRepository.CheckPasswordForUserAsync(user, userLogin.Password!);
+
+            if (!validPassword)
+            {
+                throw new AuthException("Invalid email or password.");
+            }
 
             if (!emailConfirmed)
             {
                 await emailService.SendEmailConfimationLinkAsync(user.Email!);
                 throw new AuthException("Please check your email and confirm your account before logging in");
-            }
-
-            if (!validPassword)
-            {
-                throw new AuthException("Invalid password for the given account");
             }
 
             var userRoles = await userRepository.GetRolesForUserAsync(user);

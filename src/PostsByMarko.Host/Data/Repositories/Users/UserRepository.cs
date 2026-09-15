@@ -43,10 +43,6 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             var user = await userManager.Users
-                .Include(u => u.Posts)
-                .Include(u => u.Messages)
-                .Include(u => u.ChatUsers)
-                    .ThenInclude(cu => cu.Chat)
                 .SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
 
             return user;
@@ -55,10 +51,6 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         public async Task<User?> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var user = await userManager.Users
-                .Include(u => u.Posts)
-                .Include(u => u.Messages)
-                .Include(u => u.ChatUsers)
-                    .ThenInclude(cu => cu.Chat)
                 .SingleOrDefaultAsync(u => u.Id == Id, cancellationToken);
 
             return user;
@@ -66,7 +58,15 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<bool> CheckPasswordForUserAsync(User user, string password)
         {
-            return await userManager.CheckPasswordAsync(user, password);
+            if (await userManager.IsLockedOutAsync(user)) return false;
+
+            if (!await userManager.CheckPasswordAsync(user, password))
+            {
+                await userManager.AccessFailedAsync(user);
+                return false;
+            }
+
+            return (await userManager.ResetAccessFailedCountAsync(user)).Succeeded;
         }
 
         public async Task<bool> CheckIsEmailConfirmedForUserAsync(User user)
@@ -105,15 +105,8 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         {
             var result = await userManager.Users
                 .Include(u => u.Posts)
-                .Include(u => u.Messages)
-                .Include(u => u.ChatUsers)
-                    .ThenInclude(cu => cu.Chat)
+                .Where(user => !exceptId.HasValue || user.Id != exceptId.Value)
                 .ToListAsync(cancellationToken);
-
-            if(exceptId.HasValue)
-            {
-                result = [.. result.Where(u => u.Id != exceptId.Value)];
-            }
 
             return result;
         }

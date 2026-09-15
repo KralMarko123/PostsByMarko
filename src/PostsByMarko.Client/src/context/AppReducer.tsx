@@ -37,7 +37,9 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
       };
 
     case "CREATED_POST":
-      return { ...state, posts: [...state.posts, action.post] };
+      return { ...state, posts: state.posts.some(post => post.id === action.post.id)
+        ? state.posts.map(post => post.id === action.post.id ? action.post : post)
+        : [...state.posts, action.post] };
 
     // CHAT EVENTS
     case "LOAD_CHATS":
@@ -49,7 +51,8 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
       return {
         ...state,
         chats: state.chats.map((c) =>
-          c.id === newMessage.chatId ? { ...c, messages: [...c.messages, newMessage] } : c
+          c.id === newMessage.chatId && !c.messages.some(message => message.id === newMessage.id)
+            ? { ...c, messages: [...c.messages, newMessage] } : c
         ),
       };
 

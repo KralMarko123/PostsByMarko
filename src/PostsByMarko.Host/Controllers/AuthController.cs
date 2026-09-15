@@ -5,6 +5,7 @@ using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Responses;
 using Microsoft.Extensions.Options;
 using PostsByMarko.Host.Application.Configuration;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace PostsByMarko.Host.Controllers;
 
@@ -26,6 +27,7 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("register")]
+    [EnableRateLimiting("authentication")]
     public async Task<ActionResult> Register([FromBody] RegistrationDto registrationDto)
     {
         await usersService.CreateUserAsync(registrationDto);
@@ -36,6 +38,7 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("login")]
+    [EnableRateLimiting("authentication")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginDto loginDto, CancellationToken cancellationToken = default)
     {
         var result = await usersService.ValidateUserAsync(loginDto, cancellationToken);

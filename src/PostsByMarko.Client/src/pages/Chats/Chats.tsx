@@ -28,121 +28,105 @@ export const Chats = () => {
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
 
-  const getUsers = async () => {
-    await UserService.getUsers(user!.token!, user!.id)
-      .then((users) => {
-        setUsers(users);
-      })
-      .catch(async (error) => {
-        checkToken();
+  const [errorMessage, setErrorMessage] = useState("");
+  const selectedRecipient = useRef<string | null>(null);
+  const selectionVersion = useRef(0);
+  const fetchVersion = useRef(0);
+  const sending = useRef(false);
+  const latestChats = useRef<Chat[] | null>(null);
 
-        // TODO: Create global notification modal
-        console.log(error);
-      });
+  const mergeChat = (incoming: Chat, previous?: Chat): Chat => ({
+    ...incoming,
+    messages: Array.from(new Map([
+      ...(previous?.messages ?? []), ...incoming.messages,
+    ].map(message => [message.id, message])).values()),
+  });
+
+  const getUsers = async () => {
+    try { setUsers(await UserService.getUsers(user!.token!, user!.id)); }
+    catch (error) { setErrorMessage((error as Error).message); checkToken(); }
   };
 
   const getChats = async () => {
-    await MessagingService.getChats(user!.token!)
-      .then((chatsResponse) => {
-        checkForUnreadMessages(chatsResponse);
-        appContext.dispatch({ type: "LOAD_CHATS", chats: chatsResponse });
-      })
-      .catch(async (error) => {
-        checkToken();
-
-        // TODO: Create global notification modal
-        console.log(error);
-      });
-  };
-
-  const checkForUnreadMessages = (newChats: Chat[]) => {
-    appContext.chats.forEach((localChat) => {
-      let existingUnopenedChat = newChats.find(
-        (c) => c.id === localChat.id && c.id !== openChat?.id
-      );
-
-      if (
-        existingUnopenedChat &&
-        existingUnopenedChat.messages.length > localChat.messages.length
-      ) {
-        let userIdWithNewMessages = existingUnopenedChat!.users.find(
-          (u) => u.id !== user?.id
-        )?.id;
-
-        if (userIdWithNewMessages) {
-          setUnreadUserIds([...unreadUserIds, userIdWithNewMessages]);
-        }
-      }
-    });
-  };
-
-  const startChat = async (recipientId: string) => {
-    await MessagingService.startChat(recipientId, user!.token!)
-      .then((chat) => {
-        setOpenChat(chat);
-
-        appContext.dispatch({
-          type: "STARTED_CHAT",
-          chat: chat,
+    const version = ++fetchVersion.current;
+    try {
+      const response = await MessagingService.getChats(user!.token!);
+      if (version !== fetchVersion.current) return;
+      const previous = latestChats.current;
+      if (previous) {
+        const unread: string[] = [];
+        response.forEach(chat => {
+          const recipient = chat.users.find(member => member.id !== user!.id)?.id;
+          if (!recipient || recipient === selectedRecipient.current) return;
+          const knownIds = new Set(previous.find(item => item.id === chat.id)?.messages.map(message => message.id));
+          chat.messages.forEach(message => {
+            if (message.senderId !== user!.id && !knownIds.has(message.id)) unread.push(recipient);
+          });
         });
-      })
-      .catch((error) => {
-        // TODO: Create global notification modal
-        console.log(error);
+        setUnreadUserIds(current => [...current, ...unread]);
+      }
+      const chats = response.map(chat => mergeChat(chat, previous?.find(item => item.id === chat.id)));
+      latestChats.current = chats;
+      appContext.dispatch({ type: "LOAD_CHATS", chats });
+      setOpenChat(current => {
+        const incoming = chats.find(chat => chat.id === current?.id);
+        return current && incoming ? mergeChat(incoming, current) : null;
       });
+    } catch (error) {
+      if (version === fetchVersion.current) setErrorMessage((error as Error).message);
+      checkToken();
+    }
   };
 
-  const handleUserClick = (user: User) => {
-    if (newMessage.length > 0 && selectedUser !== user) {
-      setNewMessage("");
-      messageInputRef!.current!.value = "";
+  const startChat = async (recipientId: string, version: number) => {
+    try {
+      const response = await MessagingService.startChat(recipientId, user!.token!);
+      if (version !== selectionVersion.current || selectedRecipient.current !== recipientId) return;
+      const chat = mergeChat(response, latestChats.current?.find(item => item.id === response.id));
+      setOpenChat(chat);
+      appContext.dispatch({ type: "STARTED_CHAT", chat });
+    } catch (error) {
+      if (version === selectionVersion.current) setErrorMessage((error as Error).message);
     }
+  };
 
-    setSelectedUser(user);
-    startChat(user.id!);
-    setUnreadUserIds(unreadUserIds.filter((id) => id !== user.id));
+  const handleUserClick = (recipient: User) => {
+    if (selectedRecipient.current === recipient.id && openChat) return;
+    selectedRecipient.current = recipient.id!;
+    const version = ++selectionVersion.current;
+    setSelectedUser(recipient);
+    setOpenChat(null);
+    setNewMessage("");
+    setIsMessageEmpty(false);
+    setErrorMessage("");
+    setUnreadUserIds(current => current.filter(id => id !== recipient.id));
+    void startChat(recipient.id!, version);
   };
 
   const handleMessageSend = async () => {
-    if (newMessage.trim().length === 0) {
-      setIsMessageEmpty(true);
-      return;
-    } else if (messageIsSending) {
-      return;
-    }
-
+    if (!openChat || !selectedRecipient.current ||
+        !openChat.users.some(member => member.id === selectedRecipient.current) || sending.current) return;
+    if (!newMessage.trim()) { setIsMessageEmpty(true); return; }
+    const chatId = openChat.id;
+    const version = selectionVersion.current;
+    const content = newMessage;
+    sending.current = true;
     setMessageIsSending(true);
-
-    const messageToSend: Message = {
-      chatId: openChat!.id,
-      senderId: user!.id,
-      content: newMessage,
-    };
-
-    await MessagingService.sendMessage(messageToSend, user!.token!)
-      .then((newMessage) => {
-        messageInputRef.current!.value = "";
-        setNewMessage("");
-
-        setOpenChat({
-          ...openChat!,
-          messages: [...openChat!.messages, newMessage],
-        });
-
-        appContext.dispatch({
-          type: "SENT_MESSAGE",
-          message: newMessage,
-        });
-      })
-      .catch((error) => {
-        // TODO: Create global notification modal
-        console.log(error);
-      })
-      .finally(() => {
-        setTimeout(() => {
-          setMessageIsSending(false);
-        }, 800);
-      });
+    setErrorMessage("");
+    try {
+      const message = await MessagingService.sendMessage({ chatId, content }, user!.token!);
+      setOpenChat(current => current?.id === chatId
+        ? mergeChat({ ...current, messages: [message] }, current) : current);
+      latestChats.current = latestChats.current?.map(chat => chat.id === chatId
+        ? mergeChat({ ...chat, messages: [message] }, chat) : chat) ?? null;
+      if (selectionVersion.current === version) setNewMessage(current => current === content ? "" : current);
+      appContext.dispatch({ type: "SENT_MESSAGE", message });
+    } catch (error) {
+      if (selectionVersion.current === version) setErrorMessage((error as Error).message);
+    } finally {
+      sending.current = false;
+      setMessageIsSending(false);
+    }
   };
 
   const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -159,7 +143,7 @@ export const Chats = () => {
 
     DateFunctions.sortItemsByDateTimeAttribute(otherUserMessages, "createdAt");
 
-    if (otherUserMessages[otherUserMessages.length - 1].id === message.id) return true;
+    if (otherUserMessages[otherUserMessages.length - 1]?.id === message.id) return true;
     else return false;
   };
 
@@ -176,13 +160,13 @@ export const Chats = () => {
   };
 
   useEffect(() => {
-    getUsers();
-    getChats();
+    void getUsers();
+    return () => { selectionVersion.current++; fetchVersion.current++; };
+  }, [user?.token]);
 
-    if (selectedUser) {
-      startChat(selectedUser!.id!);
-    }
-  }, [appContext.lastMessageRegistered]);
+  useEffect(() => {
+    void getChats();
+  }, [appContext.lastMessageRegistered, user?.token]);
 
   useEffect(() => {
     scrollMessagesToBottom();
@@ -194,6 +178,7 @@ export const Chats = () => {
       <Nav />
 
       <Container>
+        {errorMessage && <p role="alert" className="error">{errorMessage}</p>}
         <div className="chat-container">
           <div className="user-list">
             {users?.map((u) => {
@@ -229,7 +214,7 @@ export const Chats = () => {
             {selectedUser && openChat ? (
               <div className="message-container">
                 <div className="handle">
-                  <span className="user-icon">{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                  <span className="user-icon">{`${selectedUser.firstName?.[0] ?? "?"}${selectedUser.lastName?.[0] ?? "?"}`}</span>
                   <span className="user-name">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
                 </div>
 
@@ -261,7 +246,7 @@ export const Chats = () => {
                                     ? " show"
                                     : ""
                                 }`}
-                              >{`${selectedUser.firstName[0]}${selectedUser.lastName[0]}`}</span>
+                              >{`${selectedUser.firstName?.[0] ?? "?"}${selectedUser.lastName?.[0] ?? "?"}`}</span>
                             )}
                             <div className="message-content">{m.content}</div>
                           </div>
@@ -276,6 +261,10 @@ export const Chats = () => {
                     type="text"
                     className={`message-input${isMessageEmpty ? " empty" : ""}`}
                     placeholder="Aa"
+                    aria-label="Message"
+                    maxLength={4000}
+                    value={newMessage}
+                    disabled={messageIsSending}
                     ref={messageInputRef}
                     onChange={(e) => {
                       setNewMessage(e.currentTarget.value);
@@ -283,14 +272,14 @@ export const Chats = () => {
                     }}
                     onKeyDown={(e) => handleKeyDown(e)}
                   />
-                  <span className="send-icon" onClick={() => handleMessageSend()}>
+                  <button type="button" aria-label="Send message" disabled={messageIsSending} className="send-icon" onClick={() => handleMessageSend()}>
                     {ICONS.SEND_ICON({})}
-                  </span>
+                  </button>
                 </div>
               </div>
             ) : (
               <span className="info-message">
-                Start chatting right away by clicking on another user
+                {selectedUser ? "Loading conversation…" : "Start chatting right away by clicking on another user"}
               </span>
             )}
           </div>

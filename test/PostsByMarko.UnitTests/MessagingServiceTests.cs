@@ -37,6 +37,28 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task saved_message_succeeds_even_if_live_notification_fails()
+        {
+            var userId = Guid.NewGuid();
+            var chat = new Chat { Id = Guid.NewGuid(), ChatUsers = [new ChatUser { UserId = userId }] };
+            var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = userId, Content = "Hello" };
+            var dto = new MessageDto { Id = message.Id, ChatId = chat.Id, SenderId = userId, Content = message.Content };
+            currentRequestAccessorMock.Setup(accessor => accessor.Id).Returns(userId);
+            chatRepositoryMock.Setup(repository => repository.GetChatByIdAsync(chat.Id, It.IsAny<CancellationToken>())).ReturnsAsync(chat);
+            messageRepositoryMock.Setup(repository => repository.AddMessageAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>())).ReturnsAsync(message);
+            mapperMock.Setup(mapper => mapper.Map<MessageDto>(message)).Returns(dto);
+            messageHubMock.Setup(hub => hub.Clients.Users(It.IsAny<List<string>>())).Returns(messageClientMock.Object);
+            messageClientMock.Setup(client => client.MessageSent(dto)).ThrowsAsync(new IOException("Connection lost"));
+
+            var result = await messagingService.SendMessageAsync(new SendMessageRequest { ChatId = chat.Id, Content = "Hello" });
+
+            result.Should().BeSameAs(dto);
+            messageRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            chatRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            messageClientMock.Verify(client => client.MessageSent(dto), Times.Once);
+        }
+
+        [Fact]
         public async Task get_user_chats_should_return_chats_of_user()
         {
             // Arrange
@@ -132,7 +154,7 @@ namespace PostsByMarko.UnitTests
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(otherUser.Id, It.IsAny<CancellationToken>())).ReturnsAsync(otherUser);
-            chatRepositoryMock.Setup(cr => cr.AddChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
+            chatRepositoryMock.Setup(cr => cr.GetOrCreateChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
             mapperMock.Setup(m => m.Map<ChatDto>(newChat)).Returns(chatDto);
             messageHubMock.Setup(m => m.Clients.Users(It.IsAny<List<string>>())).Returns(messageClientMock.Object);
             messageClientMock.Setup(m => m.ChatCreated(chatDto)).Returns(Task.CompletedTask);
@@ -143,7 +165,6 @@ namespace PostsByMarko.UnitTests
             // Assert
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(chatDto);
-            chatRepositoryMock.Verify(cr => cr.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             messageClientMock.Verify(m => m.ChatCreated(chatDto), Times.Once);
         }
 
@@ -195,6 +216,7 @@ namespace PostsByMarko.UnitTests
             var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = user.Id };
             var messageDto = new MessageDto
             {
+                Content = "Hello",
                 Id = message.Id,
                 SenderId = message.SenderId,
                 ChatId = message.ChatId,
@@ -229,6 +251,7 @@ namespace PostsByMarko.UnitTests
             var message = new Message { Id = Guid.NewGuid(), ChatId = Guid.NewGuid(), SenderId = user.Id };
             var messageDto = new MessageDto
             {
+                Content = "Hello",
                 Id = message.Id,
                 SenderId = message.SenderId,
                 ChatId = message.ChatId,
@@ -254,6 +277,7 @@ namespace PostsByMarko.UnitTests
             var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = user.Id };
             var messageDto = new MessageDto
             {
+                Content = "Hello",
                 Id = message.Id,
                 SenderId = message.SenderId,
                 ChatId = message.ChatId,
@@ -268,7 +292,7 @@ namespace PostsByMarko.UnitTests
             var result = async () => await messagingService.SendMessageAsync(request, CancellationToken.None);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage("Current user is not a member of the chat.");
+            await result.Should().ThrowAsync<UnauthorizedAccessException>().WithMessage("Current user is not a member of the chat.");
         }
     }
 }

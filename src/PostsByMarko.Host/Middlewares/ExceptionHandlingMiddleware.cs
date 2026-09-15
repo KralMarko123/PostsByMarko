@@ -1,6 +1,7 @@
 ﻿using PostsByMarko.Host.Application.Exceptions;
 using System.Net;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace PostsByMarko.Host.Middlewares
 {
@@ -19,7 +20,11 @@ namespace PostsByMarko.Host.Middlewares
             {
                 await next(context);
             }
-            catch (Exception ex)
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                // The caller disconnected; there is no response to send.
+            }
+            catch (Exception ex) when (!context.Response.HasStarted)
             {
                 logger.LogError(ex, "Unhandled exception occurred");
 
@@ -32,16 +37,16 @@ namespace PostsByMarko.Host.Middlewares
             var statusCode = ex switch
             {
                 KeyNotFoundException => HttpStatusCode.NotFound,
-                InvalidOperationException => HttpStatusCode.BadRequest,
+                ValidationException => HttpStatusCode.BadRequest,
                 ArgumentException => HttpStatusCode.BadRequest,
-                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
-                AuthException => HttpStatusCode.Forbidden,
+                UnauthorizedAccessException => HttpStatusCode.Forbidden,
+                AuthException => HttpStatusCode.Unauthorized,
                 _ => HttpStatusCode.InternalServerError
             };
 
             var problemDetails = new
             {
-                message = ex.Message,
+                message = statusCode == HttpStatusCode.InternalServerError ? "An unexpected error occurred." : ex.Message,
                 status = (int)statusCode,
                 traceId = context.TraceIdentifier
             };

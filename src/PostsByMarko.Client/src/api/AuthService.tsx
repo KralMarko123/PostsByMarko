@@ -16,7 +16,7 @@ export const AuthService = {
       body: request,
     }),
 
-  validate: async (userToken: string): Promise<AuthUser> =>
+  validate: async (userToken: string): Promise<boolean> =>
     await ApiClient.apiRequest(ENDPOINT_URLS.VALIDATE, {
       method: HttpMethod.GET,
       token: userToken,

@@ -29,6 +29,20 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
+        public async Task wrong_password_for_unconfirmed_user_must_not_send_email()
+        {
+            var login = new LoginDto { Email = "user@example.com", Password = "Wrong123" };
+            var user = new User { Id = Guid.NewGuid(), Email = login.Email };
+            usersRepositoryMock.Setup(repository => repository.GetUserByEmailAsync(login.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            usersRepositoryMock.Setup(repository => repository.CheckPasswordForUserAsync(user, login.Password)).ReturnsAsync(false);
+
+            await Assert.ThrowsAsync<AuthException>(() => userService.ValidateUserAsync(login));
+
+            emailServiceMock.Verify(service => service.SendEmailConfimationLinkAsync(It.IsAny<string>()), Times.Never);
+            jwtHelperMock.Verify(helper => helper.CreateTokenAsync(It.IsAny<User>()), Times.Never);
+        }
+
+        [Fact]
         public async Task get_current_user_should_return_the_current_user()
         {
             // Arrange
@@ -167,7 +181,7 @@ namespace PostsByMarko.UnitTests
             var result = async () => await userService.ValidateUserAsync(loginDto);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage($"No account for '{loginDto.Email}', please check your credentials and try again");
+            await result.Should().ThrowAsync<AuthException>().WithMessage($"Invalid email or password.");
         }
 
         [Fact]
@@ -214,7 +228,7 @@ namespace PostsByMarko.UnitTests
             var result = async () => await userService.ValidateUserAsync(loginDto);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage("Invalid password for the given account");
+            await result.Should().ThrowAsync<AuthException>().WithMessage("Invalid email or password.");
         }
 
         [Fact]

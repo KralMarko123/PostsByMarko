@@ -35,7 +35,7 @@ export const defaultAppState: AppContextValue = {
 };
 
 export const AppProvider = (props: AppProviderProps) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [appState, dispatch] = useReducer(AppReducer, defaultAppState);
 
   const appContext: AppContextValue = {
@@ -52,7 +52,7 @@ export const AppProvider = (props: AppProviderProps) => {
 
   usePostHub(user?.token, dispatch);
   useMessageHub(user?.token, dispatch);
-  useAdminHub(user?.token, dispatch);
+  useAdminHub(isAdmin ? user?.token : null, dispatch);
 
   return <AppContext.Provider value={appContext}>{props.children}</AppContext.Provider>;
 };

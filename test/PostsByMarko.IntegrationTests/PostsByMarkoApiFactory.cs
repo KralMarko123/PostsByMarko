@@ -40,7 +40,8 @@ namespace PostsByMarko.IntegrationTests
             {
                 var testConfiguration = new Dictionary<string, string?>
                 {
-                    ["JwtConfig:Secret"] = "posts-by-marko-integration-tests-only-signing-key"
+                    ["JwtConfig:Secret"] = "posts-by-marko-integration-tests-only-signing-key",
+                    ["Authentication:RequestsPerMinute"] = "1000"
                 };
 
                 var databaseUser = Environment.GetEnvironmentVariable("DB_USER");

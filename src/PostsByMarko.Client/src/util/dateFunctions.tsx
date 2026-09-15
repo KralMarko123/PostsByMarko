@@ -25,6 +25,15 @@ export const DateFunctions = {
     return moment(dateLocal).format(format);
   },
 
+  countPostsByDay(dates: string[], month = moment()) {
+    const counts = Array<number>(month.daysInMonth()).fill(0);
+    dates.forEach(value => {
+      const date = moment.utc(value, moment.ISO_8601, true).local();
+      if (date.isValid() && date.isSame(month, "month")) counts[date.date() - 1]++;
+    });
+    return counts;
+  },
+
   getCurrentMonthDayNumber() {
     return moment().daysInMonth();
   },

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { AppContext } from "../../context/AppContext";
+import { useEffect, useRef, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { PostService } from "../../api/PostService";
@@ -17,6 +18,7 @@ import "../Page.css";
 import "./Details.css";
 
 export const Details = () => {
+  const { lastMessageRegistered } = useContext(AppContext);
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
@@ -97,8 +99,8 @@ export const Details = () => {
   };
 
   useEffect(() => {
-    getPost();
-  }, []);
+    if (!isEditing) getPost();
+  }, [postId, user?.token, lastMessageRegistered, isEditing]);
 
   return (
     <div className="details page">

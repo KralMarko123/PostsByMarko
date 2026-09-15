@@ -1,3 +1,4 @@
+using PostsByMarko.Host.Application.Helper;
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.DTOs;
@@ -45,6 +46,9 @@ namespace PostsByMarko.Host.Application.Services
         {
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            if (otherUserId == currentUserId)
+                throw new ArgumentException("Cannot start a chat with yourself.");
+
             var otherUser = await userRepository.GetUserByIdAsync(otherUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {otherUserId} was not found");
             var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
@@ -65,14 +69,12 @@ namespace PostsByMarko.Host.Application.Services
                 }
             };
 
-            var createdChat = await chatRepository.AddChatAsync(newChat, cancellationToken);
-
-            await chatRepository.SaveChangesAsync(cancellationToken);
+            var createdChat = await chatRepository.GetOrCreateChatAsync(newChat, cancellationToken);
 
             var chatDto = mapper.Map<ChatDto>(createdChat);
             var chatUserIds = chatDto.Users.Select(u => u.Id.ToString());
 
-            await messageHub.Clients.Users(chatUserIds!).ChatCreated(chatDto);
+            await NotificationDelivery.SendAsync(() => messageHub.Clients.Users(chatUserIds!).ChatCreated(chatDto));
 
             return chatDto;
         }
@@ -80,12 +82,15 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<MessageDto> SendMessageAsync(SendMessageRequest request, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
+            if (string.IsNullOrWhiteSpace(request.Content) || request.Content.Length > 4000)
+                throw new ArgumentException("Message content must contain between 1 and 4000 characters.");
+
             var chat = await chatRepository.GetChatByIdAsync(request.ChatId, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {request.ChatId} was not found");
             var chatUserIds = chat.ChatUsers.Select(c => c.UserId);
 
             if (!chatUserIds.Contains(currentUserId))
             {
-                throw new AuthException("Current user is not a member of the chat.");
+                throw new UnauthorizedAccessException("Current user is not a member of the chat.");
             }
 
             var newMessage = new Message
@@ -97,15 +102,14 @@ namespace PostsByMarko.Host.Application.Services
             };
             var createdMessage = await messageRepository.AddMessageAsync(newMessage, cancellationToken);
 
-            await messageRepository.SaveChangesAsync(cancellationToken);
-
             chat.UpdatedAt = DateTime.UtcNow;
 
-            await chatRepository.SaveChangesAsync(cancellationToken);
+            // Both repositories share the request-scoped DbContext: commit the message and timestamp together.
+            await messageRepository.SaveChangesAsync(cancellationToken);
 
             var result = mapper.Map<MessageDto>(createdMessage);
 
-            await messageHub.Clients.Users(chat.ChatUsers.Select(c => c.UserId.ToString())).MessageSent(result);
+            await NotificationDelivery.SendAsync(() => messageHub.Clients.Users(chat.ChatUsers.Select(c => c.UserId.ToString())).MessageSent(result));
 
             return result;
         }

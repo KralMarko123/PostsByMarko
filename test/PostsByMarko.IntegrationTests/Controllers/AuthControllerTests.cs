@@ -31,7 +31,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         public async Task should_register()
         {
             // Arrange
-            var registrationDto = new RegistrationDto { Email = "some_user@somedomain.com", Password = "@SomePassword123" };
+            var registrationDto = new RegistrationDto { FirstName = "Some", LastName = "User", Email = "some_user@somedomain.com", Password = "@SomePassword123" };
 
             // Act
             var response = await client.PostAsJsonAsync($"{controllerPrefix}/register", registrationDto);

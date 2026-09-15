@@ -1,6 +1,13 @@
 import { HttpMethod } from "constants/enums";
 import { ApiError, ApiRequestOptions } from "types/api";
 
+export class HttpError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+    this.name = "HttpError";
+  }
+}
+
 export const ApiClient = {
   async apiRequest<TResponse>(
     path: string,
@@ -21,8 +28,8 @@ export const ApiClient = {
     });
 
     if (!response.ok) {
-      const error: ApiError = await response.json().catch((error: ApiError) => error);
-      throw new Error(error?.message || response.statusText);
+      const error: ApiError = await response.json().catch(() => null);
+      throw new HttpError(error?.message || response.statusText, response.status);
     }
 
     // Handle No content responses

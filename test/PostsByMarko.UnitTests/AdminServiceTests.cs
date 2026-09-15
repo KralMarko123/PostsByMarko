@@ -147,7 +147,7 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task update_user_roles_should_throw_if_user_was_not_found()
+        public async Task update_user_roles_should_throw_if_role_update_was_unsuccessful()
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
@@ -169,12 +169,14 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task update_user_roles_should_throw_if_role_update_was_unsuccessful()
+        public async Task update_user_roles_should_throw_if_user_was_not_found()
         {
             // Arrange
             var request = new UpdateUserRolesRequest
             {
                 UserId = Guid.NewGuid(),
+                ActionType = ActionType.Create,
+                Role = "Admin",
             };
 
             // Act

@@ -1,3 +1,4 @@
+import { useAuth } from "./custom/useAuth";
 import { Routes, Route } from "react-router-dom";
 import { ROUTES } from "./constants/routes";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
@@ -11,8 +12,9 @@ import { Chats } from "./pages/Chats/Chats";
 import { NotFound } from "./pages/NotFound/NotFound";
 
 export const App = () => {
+  const { user } = useAuth();
   return (
-    <AppProvider>
+    <AppProvider key={user?.token ?? "anonymous"}>
       <Routes>
         <Route
           path={ROUTES.HOME}

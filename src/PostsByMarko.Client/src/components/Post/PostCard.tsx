@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
@@ -21,6 +21,7 @@ export const PostCard = ({
   lastUpdatedAt,
   index,
 }: PostProps) => {
+  const updatingVisibility = useRef(false);
   let navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const appContext = useContext(AppContext);
@@ -63,7 +64,9 @@ export const PostCard = ({
       post: post,
     });
 
-    let updateRequest = { title, content, hidden: !hidden };
+    if (updatingVisibility.current) return;
+    updatingVisibility.current = true;
+    let updateRequest = { title: post.title, content: post.content, hidden: !post.hidden };
 
     await PostService.updatePost(id!, updateRequest, user!.token!)
       .then((updatedPost) => {
@@ -77,7 +80,8 @@ export const PostCard = ({
       .catch((error) => {
         // TODO: Create modal notification that something went wrong
         console.log(error);
-      });
+      })
+      .finally(() => { updatingVisibility.current = false; });
   };
 
   useEffect(() => {

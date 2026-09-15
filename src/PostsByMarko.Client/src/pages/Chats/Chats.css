@@ -219,6 +219,9 @@
 }
 
 .send-icon {
+  border: 0;
+  background: transparent;
+  color: inherit;
   display: grid;
   place-content: center;
   padding: 1em;
@@ -228,6 +231,11 @@
   font-size: var(--lg-text);
 
   cursor: pointer;
+}
+
+.send-icon:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .send-icon:hover {

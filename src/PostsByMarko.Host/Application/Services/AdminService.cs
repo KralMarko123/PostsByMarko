@@ -1,3 +1,4 @@
+using PostsByMarko.Host.Application.Helper;
 ﻿using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Enums;
 using PostsByMarko.Host.Application.Hubs;
@@ -47,7 +48,12 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(request.UserId!.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
+            if (request.UserId is null || request.UserId == Guid.Empty ||
+                request.ActionType is not (ActionType.Create or ActionType.Delete) ||
+                string.IsNullOrWhiteSpace(request.Role))
+                throw new ArgumentException("A user, role, and create or delete action are required.");
+
+            var user = await userRepository.GetUserByIdAsync(request.UserId.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
             var result = request.ActionType == ActionType.Create 
                 ? await userRepository.AddRoleToUserAsync(user, request.Role)
                 : await userRepository.RemoveRoleFromUserAsync(user, request.Role);
@@ -59,7 +65,7 @@ namespace PostsByMarko.Host.Application.Services
 
             var updatedRoles = await userRepository.GetRolesForUserAsync(user);
 
-            await adminHub.Clients.All.UpdatedUserRoles(user.Id, DateTime.UtcNow);
+            await NotificationDelivery.SendAsync(() => adminHub.Clients.All.UpdatedUserRoles(user.Id, DateTime.UtcNow));
 
             return [.. updatedRoles];
         }
@@ -79,7 +85,7 @@ namespace PostsByMarko.Host.Application.Services
 
             if (result.Succeeded) 
             {
-                await adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow);    
+                await NotificationDelivery.SendAsync(() => adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow));
             }
             else
             {

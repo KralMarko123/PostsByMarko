@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useMemo, useRef, useEffect, useContext } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { PostService } from "../../api/PostService";
 import { DateFunctions } from "../../util/dateFunctions";
@@ -10,20 +10,24 @@ import { AppContext } from "../../context/AppContext";
 import { Container } from "../../components/Layout/Container/Container";
 import { Footer } from "../../components/Layout/Footer/Footer";
 import { Logo } from "../../components/Layout/Logo/Logo";
-import { Post } from "@typeConfigs/post";
 import "../Page.css";
 import "./Home.css";
 
 export const Home = () => {
   const appContext = useContext(AppContext);
   const { user, checkToken } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const requestVersion = useRef(0);
+  const posts = useMemo(() => {
+    const sorted = [...appContext.posts];
+    DateFunctions.sortItemsByDateTimeAttribute(sorted, "createdAt");
+    return sorted;
+  }, [appContext.posts]);
 
   const getPosts = async () => {
+    const version = ++requestVersion.current;
     await PostService.getPosts(user!.token!)
       .then((posts) => {
-        DateFunctions.sortItemsByDateTimeAttribute(posts, "createdAt");
-        setPosts(posts);
+        if (version !== requestVersion.current) return;
         appContext.dispatch({ type: "LOAD_POSTS", posts: posts });
       })
       .catch(async (error) => {
@@ -36,7 +40,8 @@ export const Home = () => {
 
   useEffect(() => {
     getPosts();
-  }, [appContext.lastMessageRegistered, appContext.posts.length]);
+    return () => { requestVersion.current++; };
+  }, [appContext.lastMessageRegistered, user?.token]);
 
   return (
     <div className="home page">

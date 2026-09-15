@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo } from "react";
+import { HttpError } from "../api/ApiClient";
+import { createContext, useContext, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { useSessionStorage } from "./useSessionStorage";
@@ -18,26 +19,29 @@ const STORAGE_KEY = "authenticated_user";
 export const AuthProvider = (props: AuthProviderProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useSessionStorage<AuthUser | null>(STORAGE_KEY, null);
+  const currentToken = useRef(user?.token);
+  currentToken.current = user?.token;
   const isAdmin = user?.roles?.includes("Admin") ?? false;
 
-  const login = async (user: AuthUser) => {
+  const login = useCallback(async (user: AuthUser) => {
     setUser(user);
-    console.log(ROUTES.HOME);
     navigate(ROUTES.HOME, { replace: true });
-  };
+  }, [setUser, navigate]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     navigate(ROUTES.LOGIN, { replace: true });
-  };
+  }, [setUser, navigate]);
 
-  const checkToken = async () => {
+  const checkToken = useCallback(async () => {
+    const token = user?.token;
+    if (!token) return;
     try {
-      await AuthService.validate(user!.token!); // token is valid, do nothing
+      await AuthService.validate(token);
     } catch (error) {
-      logout(); // token is invalid or user does not exist, logout
+      if (currentToken.current === token && error instanceof HttpError && error.status === 401) logout();
     }
-  };
+  }, [user?.token, logout]);
 
   const value = useMemo(
     () => ({
@@ -47,7 +51,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
       logout,
       checkToken,
     }),
-    [user]
+    [user, isAdmin, login, logout, checkToken]
   );
 
   return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;

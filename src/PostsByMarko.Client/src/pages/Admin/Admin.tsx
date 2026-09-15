@@ -27,11 +27,8 @@ export const Admin = () => {
   const barChartLabels = [...Array(DateFunctions.getCurrentMonthDayNumber()).keys()].map(
     (i) => (i + 1).toString()
   );
-  const barChartData = barChartLabels.map(
-    (l) =>
-      posts.filter(
-        (p) => DateFunctions.getDayOfMonthFromDate(p.createdAt!) === l.toString()
-      ).length
+  const barChartData = DateFunctions.countPostsByDay(
+    posts.flatMap(post => post.createdAt ? [post.createdAt] : [])
   );
 
   const getAdminDashboard = async () => {

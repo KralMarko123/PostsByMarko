@@ -7,6 +7,8 @@ using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Extensions;
 using Serilog;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,11 +40,32 @@ if (jwtConfig.ValidIssuers.Count == 0 || jwtConfig.ValidAudiences.Count == 0)
 
 #region ServicesConfiguration
 
-builder.Host.UseSerilog();
-builder.Logging.ClearProviders();
-builder.Logging.SetMinimumLevel(LogLevel.Trace);
+builder.Host.UseSerilog((context, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console());
 builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig.ValidAudiences);
-builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(new
+    {
+        message = "One or more fields are invalid.",
+        status = 400,
+        traceId = context.HttpContext.TraceIdentifier,
+        errors = context.ModelState.Where(entry => entry.Value!.Errors.Count > 0)
+            .ToDictionary(entry => entry.Key, entry => entry.Value!.Errors.Select(error => error.ErrorMessage).ToArray())
+    }));
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("authentication", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = builder.Configuration.GetValue("Authentication:RequestsPerMinute", 10),
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
+});
 builder.Services.AddSignalR(options =>
 {
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
@@ -107,7 +130,6 @@ if (isInLocalDevelopment)
 else
 {
     // Configure production error handling
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
@@ -115,6 +137,7 @@ app.WithMiddlewares();
 app.WithHubs();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 
 #endregion
