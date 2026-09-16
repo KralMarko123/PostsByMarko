@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 env:
+  TEST_SQL_PORT: 3306
   DB_USER: postsbymarko
   DB_PASSWORD: posts-by-marko-ci-tests-only
 
@@ -40,7 +41,7 @@ jobs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Install dependencies
       run: dotnet restore

@@ -1,0 +1,69 @@
+name: postsbymarko-tests
+
+networks:
+  beNetwork:
+  feNetwork:
+  
+services:
+  #DATABASE
+  database:
+    container_name: PostsByMarko.Test.MariaDb
+    image: mariadb:10.11
+    environment: 
+      MARIADB_DATABASE: postsbymarko_test
+      MARIADB_USER: ${DB_USER:-postsbymarko}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    ports:
+      - 127.0.0.1:13306:3306
+    networks:
+      - beNetwork
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+   
+  #HOST
+  host:
+    container_name: PostsByMarko.Test.Host
+    build:
+      context: .
+      dockerfile: src/PostsByMarko.Host/Dockerfile
+    ports:
+      - 127.0.0.1:17171:7171
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - beNetwork
+      - feNetwork
+    environment:
+      - ASPNETCORE_URLS=http://+:7171
+      - ASPNETCORE_ENVIRONMENT=Test
+      - ConnectionStrings__DefaultConnection=Server=database;Port=3306;Database=postsbymarko_test;User=${DB_USER:-postsbymarko};Password=${DB_PASSWORD:?DB_PASSWORD must be set}
+      - JwtConfig__Secret=${JWT_SECRET:?JWT_SECRET must be set}
+      - JwtConfig__ValidIssuers__0=http://localhost:17171
+      - JwtConfig__ValidAudiences__0=http://localhost:13000
+      - ApplicationUrls__ApiBaseUrl=http://localhost:17171
+      - ApplicationUrls__ClientBaseUrl=http://localhost:13000
+      - EmailConfig__Enabled=false
+
+  #CLIENT
+  client:
+    container_name: PostsByMarko.Test.Client
+    build:
+      context: .
+      dockerfile: src/PostsByMarko.Client/Dockerfile
+    ports:
+      - 127.0.0.1:13000:3000
+    depends_on:
+      - host
+    networks:
+      - feNetwork
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_BASE_URL=http://localhost:17171
+

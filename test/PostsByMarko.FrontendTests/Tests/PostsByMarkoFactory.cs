@@ -11,7 +11,7 @@ namespace PostsByMarko.FrontendTests.Tests
 {
     public class PostsByMarkoFactory : IAsyncLifetime
     {
-        private readonly int timeoutInMs = (int)TimeSpan.FromSeconds(20).TotalMilliseconds;
+        private readonly int timeoutInMs = (int)TimeSpan.FromSeconds(90).TotalMilliseconds;
 
         public BrowserDriver? driver;
         public IBrowser browser;
@@ -48,7 +48,7 @@ namespace PostsByMarko.FrontendTests.Tests
         private void ReadComposeFiles()
         {
             var solutionPath = FileHelper.FindFileDirectory(Directory.GetCurrentDirectory(), "PostsByMarko.sln")!;
-            composeFiles = Directory.GetFiles(solutionPath, "*compose*.yml");
+            composeFiles = [Path.Combine(solutionPath, "docker-compose.test.yml")];
         }
 
         private void InitializeDockerContainersThroughCompose()
@@ -61,8 +61,8 @@ namespace PostsByMarko.FrontendTests.Tests
                     .FromFile(composeFiles)
                     .ForceBuild()
                     .ForceRecreate()
-                    .WaitForHttp("PostsByMarko.Host", "http://localhost:7171/index.html", timeoutInMs, (response, retryIn) => CheckSwaggerIsEnabled(response))
-                    .WaitForHttp("PostsByMarko.Client", "http://localhost:3000", timeoutInMs, (response, retryIn) => CheckForIconOnUI(response))
+                    .WaitForHttp("PostsByMarko.Test.Host", "http://localhost:17171/index.html", timeoutInMs, (response, retryIn) => CheckSwaggerIsEnabled(response))
+                    .WaitForHttp("PostsByMarko.Test.Client", "http://localhost:13000", timeoutInMs, (response, retryIn) => CheckForIconOnUI(response))
                     .Build();
 
                 dockerServices.Start();

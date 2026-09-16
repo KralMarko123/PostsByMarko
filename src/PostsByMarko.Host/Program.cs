@@ -23,7 +23,6 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfi
 builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
 builder.Services.Configure<ApplicationUrlConfig>(builder.Configuration.GetSection("ApplicationUrls"));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MariaDbServerVersion(new Version(10, 11, 13));
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()
     ?? throw new InvalidOperationException("JwtConfig is required.");
@@ -77,8 +76,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySql(connectionString!, serverVersion)
+builder.Services.AddDbContext<AppDbContext>((services, options) =>
+    options.UseMySql(services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection")!, serverVersion)
 );
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -113,6 +112,7 @@ else
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    await scope.ServiceProvider.InitializePersistentIdentityAsync(builder.Configuration, isInLocalDevelopment);
 }
 
 app.UseCors(MiscConstants.CORS_POLICY_NAME);

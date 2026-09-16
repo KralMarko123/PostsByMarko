@@ -9,5 +9,6 @@
         public string Password { get; set; } = string.Empty;
         public bool UseSsl { get; set; }
         public string SenderName { get; set; } = "PostsByMarko Mailer";
+        public string SenderAddress { get; set; } = string.Empty;
     }
 }

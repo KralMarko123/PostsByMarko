@@ -26,7 +26,9 @@ namespace PostsByMarko.Host.Application.Helper
 
             var message = new MimeMessage();
 
-            message.From.Add(new MailboxAddress(emailConfig.SenderName, emailConfig.Username));
+            var senderAddress = string.IsNullOrWhiteSpace(emailConfig.SenderAddress)
+                ? emailConfig.Username : emailConfig.SenderAddress;
+            message.From.Add(new MailboxAddress(emailConfig.SenderName, senderAddress));
             message.To.Add(new MailboxAddress($"{firstName} {lastName}", emailToSendTo));
             message.Subject = subject;
             message.Body = new TextPart("plain") { Text = body };
@@ -41,7 +43,10 @@ namespace PostsByMarko.Host.Application.Helper
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
                 // Note: only needed if the SMTP server requires authentication
-                await client.AuthenticateAsync(emailConfig.Username, emailConfig.Password);
+                if (!string.IsNullOrWhiteSpace(emailConfig.Username))
+                {
+                    await client.AuthenticateAsync(emailConfig.Username, emailConfig.Password);
+                }
 
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);

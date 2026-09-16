@@ -7,5 +7,7 @@
 **/bin
 **/node_modules
 **/obj
+**/TestResults
+**/*.log
 LICENSE
 README.md

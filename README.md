@@ -10,7 +10,41 @@
 
 ### Local configuration
 
-Copy `.env.example` to `.env`, replace the placeholder database password and JWT signing key, then run `docker compose up --build`. The signing key must contain at least 32 characters.
+Requires the .NET 10 SDK and Docker Desktop with Linux containers. React and Node versions are unchanged in this upgrade. EF Core and the Identity EF store remain on 9.0.20 because the stable [Pomelo MariaDB provider](https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql/9.0.0) supports EF Core 9. The application and all test projects target .NET 10.
+
+Copy `.env.example` to `.env` if it does not already exist. Replace the placeholder database password and JWT signing key (at least 32 characters).
+
+#### Persistent development
+
+```powershell
+docker compose up --build -d
+```
+
+Open the app at http://localhost:3000, API Swagger at http://localhost:7171, and the local email inbox at http://localhost:8025. Register an account, then follow the confirmation link in the inbox. Mailpit captures development email without delivering it externally.
+
+Development uses database migrations and named volumes; accounts, posts, chats, and email confirmation keys survive restarts. Application roles are created on first startup. For an optional administrator, set both `DEVELOPMENT_ADMIN_EMAIL` and `DEVELOPMENT_ADMIN_PASSWORD` in `.env` before starting. The password must satisfy Identity's password policy. This creates a confirmed administrator only in Development. Existing administrator passwords are never reset; an existing non-admin email is rejected. Remove these two settings after successful creation.
+
+```powershell
+docker compose down
+```
+
+Stopping development preserves its data. Do not add `--volumes` unless you deliberately want to delete it. The legacy cleanup script also now preserves development volumes. Data from the former disposable default stack is not automatically migrated into this new development database.
+
+#### Disposable testing
+
+```powershell
+docker compose -f docker-compose.test.yml up --build -d
+```
+
+Open the test app at http://localhost:13000 and API at http://localhost:17171. Test MariaDB uses port 13306. The test stack has separate project/container names, networks, and memory-backed database storage, so it can run alongside development. Its API resets and seeds the test database on startup, and stopping the database loses its contents. Email delivery is disabled.
+
+Seeded test-only accounts: administrator `testAdmin@test.com` and user `test@test.com`, both with password `@Marko123`.
+
+```powershell
+docker compose -f docker-compose.test.yml down --volumes --remove-orphans
+```
+
+The scripts `run_test_docker_compose.ps1` and `remove_test_docker_compose.ps1` perform these test-only operations from any working directory.
 
 For local development outside Docker, keep secrets out of `appsettings*.json` and provide them with ASP.NET Core user secrets or environment variables:
 
@@ -18,7 +52,7 @@ For local development outside Docker, keep secrets out of `appsettings*.json` an
 dotnet user-secrets --project src/PostsByMarko.Host set "JwtConfig:Secret" "replace-with-at-least-32-random-characters"
 ```
 
-Email delivery is disabled in Development and Test. Production must provide the `EmailConfig` values, including its password, through the deployment secret store.
+Outside Compose, email delivery is disabled by the Development and Test configuration files. Production must provide the `EmailConfig` values through the deployment secret store. `SenderAddress` optionally separates the sender email from the SMTP login; it defaults to `Username` when omitted. Configure `Username` and `Password` when SMTP requires authentication.
 
 ### Correctness and security checks
 
@@ -37,4 +71,23 @@ npm test -- --runInBand
 npm run build
 ```
 
-The integration suite requires MariaDB and includes concurrent chat creation coverage. The browser suite requires Docker. The existing default Compose stack is still a **disposable Test environment**: API startup resets its test database. Do not use it to retain real user data; persistent development and production deployment configuration must be set up separately before release.
+The integration suite requires only disposable MariaDB. Stop the test stack first if it is already running, then start its database:
+
+```powershell
+docker compose -f docker-compose.test.yml up -d --wait database
+$env:DB_USER = 'postsbymarko' # Match DB_USER in .env
+$env:DB_PASSWORD = '<your .env database password>'
+dotnet test test/PostsByMarko.IntegrationTests
+```
+
+Integration tests use port 13306 by default (`TEST_SQL_PORT` overrides it; CI uses 3306). They reset `postsbymarko_test`; run them separately from browser tests or manual use of the test app.
+
+The browser suite builds and starts only `docker-compose.test.yml`. Install its browsers first:
+
+```powershell
+dotnet build test/PostsByMarko.FrontendTests
+pwsh test/PostsByMarko.FrontendTests/bin/Debug/net10.0/playwright.ps1 install --with-deps
+dotnet test test/PostsByMarko.FrontendTests
+```
+
+Set `IsLocalDevelopment=true` only to reuse a manually started **test** stack at ports 13000/17171; the fixture then leaves its containers running. Keep DB credentials and JWT_SECRET in the root `.env` or environment for Compose. Persistent development is a local setup; production deployment hardening remains separate work.

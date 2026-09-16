@@ -13,6 +13,7 @@ using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Extensions;
 using PostsByMarko.Test.Shared.Constants;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -35,26 +36,28 @@ namespace PostsByMarko.IntegrationTests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            // Resolve at runtime: generated MVC test manifests can misquote paths containing apostrophes.
+            var solutionDirectory = PostsByMarko.Test.Shared.Helper.FileHelper.FindFileDirectory(
+                AppContext.BaseDirectory, "PostsByMarko.sln")
+                ?? throw new InvalidOperationException("Could not locate the solution directory.");
+            builder.UseContentRoot(Path.Combine(solutionDirectory, "src", "PostsByMarko.Host"));
             builder.UseEnvironment("Test");
-            builder.ConfigureAppConfiguration((_, configuration) =>
+            // Host settings are available while the minimal application's Program is executing.
+            builder.UseSetting("JwtConfig:Secret", "posts-by-marko-integration-tests-only-signing-key");
+            builder.UseSetting("Authentication:RequestsPerMinute", "1000");
+
+            var databaseUser = Environment.GetEnvironmentVariable("DB_USER");
+            var databasePort = Environment.GetEnvironmentVariable("TEST_SQL_PORT") ?? "13306";
+            var databasePassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+            if (!string.IsNullOrWhiteSpace(databaseUser) && !string.IsNullOrWhiteSpace(databasePassword))
             {
-                var testConfiguration = new Dictionary<string, string?>
-                {
-                    ["JwtConfig:Secret"] = "posts-by-marko-integration-tests-only-signing-key",
-                    ["Authentication:RequestsPerMinute"] = "1000"
-                };
-
-                var databaseUser = Environment.GetEnvironmentVariable("DB_USER");
-                var databasePassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-
-                if (!string.IsNullOrWhiteSpace(databaseUser) && !string.IsNullOrWhiteSpace(databasePassword))
-                {
-                    testConfiguration["ConnectionStrings:DefaultConnection"] =
-                        $"server=localhost;port=3306;user={databaseUser};password={databasePassword};database=postsbymarko_test";
-                }
-
-                configuration.AddInMemoryCollection(testConfiguration);
-            });
+                builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        ["ConnectionStrings:DefaultConnection"] =
+                            $"server=localhost;port={databasePort};user={databaseUser};password={databasePassword};database=postsbymarko_test"
+                    }));
+            }
         }
 
         public new Task DisposeAsync()
