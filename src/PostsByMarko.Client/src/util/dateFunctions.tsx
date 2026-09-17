@@ -44,7 +44,7 @@ export const DateFunctions = {
 
   getThisMonthsDates() {
     const dates = [];
-    let current = moment().startOf("month");
+    const current = moment().startOf("month");
     const end = moment().endOf("month");
 
     while (current.isSameOrBefore(end, "day")) {

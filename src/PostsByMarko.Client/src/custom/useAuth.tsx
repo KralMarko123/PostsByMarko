@@ -1,5 +1,5 @@
 import { HttpError } from "../api/ApiClient";
-import { createContext, useContext, useMemo, useRef, useCallback } from "react";
+import { createContext, useContext, useMemo, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { useSessionStorage } from "./useSessionStorage";
@@ -20,7 +20,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useSessionStorage<AuthUser | null>(STORAGE_KEY, null);
   const currentToken = useRef(user?.token);
-  currentToken.current = user?.token;
+  useEffect(() => {
+    currentToken.current = user?.token;
+  }, [user?.token]);
   const isAdmin = user?.roles?.includes("Admin") ?? false;
 
   const login = useCallback(async (user: AuthUser) => {

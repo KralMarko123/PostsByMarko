@@ -377,3 +377,4 @@ backend.txt
 
 appsettings.Production.json
 build
+dist

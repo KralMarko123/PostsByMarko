@@ -71,7 +71,7 @@ export const Details = () => {
   };
 
   const updatePostContent = async () => {
-    let updatePostRequest = {
+    const updatePostRequest = {
       title: post!.title,
       hidden: post!.hidden,
       content: updatedContent,
@@ -122,7 +122,7 @@ export const Details = () => {
                 <div className="box">
                   {ICONS.CLOCK_ICON({})}
                   <p className="date">
-                    {DateFunctions.getLocalDateInFormat(post?.createdAt!, "DD MMMM YYYY")}
+                    {DateFunctions.getLocalDateInFormat(post.createdAt!, "DD MMMM YYYY")}
                   </p>
                 </div>
               </div>

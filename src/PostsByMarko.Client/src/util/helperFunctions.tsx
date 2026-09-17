@@ -3,7 +3,7 @@ import { DateFunctions } from "./dateFunctions";
 import { Message } from "@typeConfigs/messaging";
 
 export const HelperFunctions = {
-  noEmptyFields(data: Object) {
+  noEmptyFields(data: object) {
     return Object.values(data).every(
       (field) => field.length > 0 || typeof field !== "string"
     );
@@ -22,7 +22,7 @@ export const HelperFunctions = {
   },
 
   groupMessagesByDay(messages: Message[]) {
-    let messagesByDay: Record<string, Message[]> = {};
+    const messagesByDay: Record<string, Message[]> = {};
 
     messages.forEach((m) => {
       const date = moment(m.createdAt);
@@ -39,8 +39,8 @@ export const HelperFunctions = {
 
   getMessageTimeLabelAccordingToToday(messageDate: string) {
     const now = moment();
-    let date = moment(messageDate);
-    let format = date.isSame(now, "day") ? "h:mm A" : "MMM Do YYYY, h:mm A";
+    const date = moment(messageDate);
+    const format = date.isSame(now, "day") ? "h:mm A" : "MMM Do YYYY, h:mm A";
 
     return DateFunctions.getLocalDateInFormat(date, format);
   },

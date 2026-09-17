@@ -53,7 +53,7 @@ export const RegisterForm = () => {
   };
 
   const handleRegister = async () => {
-    let isValidRegistration =
+    const isValidRegistration =
       noEmptyFields() && isValidEmail() && isValidPassword() && arePasswordMatching();
 
     if (isValidRegistration) {

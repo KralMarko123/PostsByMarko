@@ -45,8 +45,8 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
     case "LOAD_CHATS":
       return { ...state, chats: action.chats };
 
-    case "SENT_MESSAGE":
-      let newMessage = action.message;
+    case "SENT_MESSAGE": {
+      const newMessage = action.message;
 
       return {
         ...state,
@@ -55,8 +55,9 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
             ? { ...c, messages: [...c.messages, newMessage] } : c
         ),
       };
+    }
 
-    case "STARTED_CHAT":
+    case "STARTED_CHAT": {
       const newChat = action.chat;
       const alreadyExists = state.chats.some((c) => c.id === newChat.id);
 
@@ -66,6 +67,7 @@ export const AppReducer = (state: AppContextValue, action: AppAction) => {
           ? state.chats.map((c) => (c.id === newChat.id ? newChat : c))
           : [...state.chats, newChat],
       };
+    }
 
     // SIGNALR EVENTS
     case "MESSAGE_REGISTERED":

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";

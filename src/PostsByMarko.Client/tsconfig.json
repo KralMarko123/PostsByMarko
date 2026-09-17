@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
 
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "isolatedModules": true,
+    "types": ["vite/client", "vitest/globals"],
 
     "strict": true,
     "noImplicitAny": true,
@@ -18,15 +21,16 @@
     "forceConsistentCasingInFileNames": true,
 
     /* Paths */
-    "baseUrl": "src",
     "paths": {
-      "@api/*": ["api/*"],
-      "@auth/*": ["auth/*"],
-      "@components/*": ["components/*", "pages/*"],
-      "@hooks/*": ["custom/*"],
-      "@context/*": ["context/*"],
-      "@typeConfigs/*": ["types/*"],
-      "@assets/*": ["assets/*"]
+      "@api/*": ["./src/api/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@components/*": ["./src/components/*", "./src/pages/*"],
+      "@hooks/*": ["./src/custom/*"],
+      "@context/*": ["./src/context/*"],
+      "@typeConfigs/*": ["./src/types/*"],
+      "@assets/*": ["./src/assets/*"],
+      "types/*": ["./src/types/*"],
+      "constants/*": ["./src/constants/*"]
     }
   },
 

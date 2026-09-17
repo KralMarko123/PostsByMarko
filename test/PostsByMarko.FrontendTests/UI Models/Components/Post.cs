@@ -7,6 +7,7 @@ namespace PostsTesting.UI_Models.Components
     {
         public ILocator post;
         public readonly Modal modal;
+        private string? id;
 
         public Post(IPage page, ILocator post) : base(page)
         {
@@ -14,7 +15,7 @@ namespace PostsTesting.UI_Models.Components
             modal = new Modal(page);
         }
 
-        public string Id => post.GetAttributeAsync("id").Result!;
+        public string Id => id ??= post.GetAttributeAsync("id").GetAwaiter().GetResult()!;
         public ILocator title => post.Locator(".post-title");
         public ILocator content => post.Locator(".post-content");
         public ILocator updateIcon => post.Locator(".post-icon.update");
@@ -36,6 +37,7 @@ namespace PostsTesting.UI_Models.Components
 
         public async Task ClickOnPost()
         {
+            _ = Id;
             await post.ClickAsync();
         }
 

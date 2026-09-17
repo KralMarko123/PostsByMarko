@@ -139,7 +139,7 @@ export const Chats = () => {
   const isLastMessageFromRecipientInSeries = (message: Message, messages: Message[]) => {
     if (messages.length === 0) return false;
 
-    let otherUserMessages = messages.filter((m) => m.senderId !== user!.id);
+    const otherUserMessages = messages.filter((m) => m.senderId !== user!.id);
 
     DateFunctions.sortItemsByDateTimeAttribute(otherUserMessages, "createdAt");
 
@@ -182,14 +182,14 @@ export const Chats = () => {
         <div className="chat-container">
           <div className="user-list">
             {users?.map((u) => {
-              let isActiveChat = openChat?.users?.map((cu) => cu.id)?.includes(u.id);
-              let hasUnreadMessages = unreadUserIds?.some((id) => id == u.id);
-              let numberOfUnreadMessages = unreadUserIds?.filter(
+              const isActiveChat = openChat?.users?.map((cu) => cu.id)?.includes(u.id);
+              const hasUnreadMessages = unreadUserIds?.some((id) => id == u.id);
+              const numberOfUnreadMessages = unreadUserIds?.filter(
                 (id) => id == u.id
               ).length;
-              let unknownName = !u.firstName || !u.lastName;
-              let userInitials = unknownName ? "??" : `${u.firstName[0]}${u.lastName[0]}`;
-              let userName = unknownName ? u.email : `${u.firstName} ${u.lastName}`;
+              const unknownName = !u.firstName || !u.lastName;
+              const userInitials = unknownName ? "??" : `${u.firstName[0]}${u.lastName[0]}`;
+              const userName = unknownName ? u.email : `${u.firstName} ${u.lastName}`;
 
               return (
                 <div
@@ -223,7 +223,7 @@ export const Chats = () => {
                     DateFunctions.sortItemsByDateTimeAttribute(messageList, "createdAt");
 
                     return messageList.map((m, index) => {
-                      let isMessageAuthor = m.senderId == user!.id;
+                      const isMessageAuthor = m.senderId == user!.id;
 
                       return (
                         <div
@@ -279,7 +279,7 @@ export const Chats = () => {
               </div>
             ) : (
               <span className="info-message">
-                {selectedUser ? "Loading conversation…" : "Start chatting right away by clicking on another user"}
+                {selectedUser ? "Loading conversationâ€¦" : "Start chatting right away by clicking on another user"}
               </span>
             )}
           </div>

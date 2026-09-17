@@ -68,7 +68,7 @@ export const Admin = () => {
   };
 
   const handleUserRoleUpdate = async (userId: string, addRole: boolean = true) => {
-    let updateRolesRequest = {
+    const updateRolesRequest = {
       userId: userId,
       actionType: addRole ? ActionType.CREATE : ActionType.DELETE,
       role: "Admin",

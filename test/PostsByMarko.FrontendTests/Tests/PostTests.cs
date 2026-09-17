@@ -152,7 +152,7 @@ namespace PostsByMarko.FrontendTests.Tests
             await post.ClickOnPost();
 
             var detailsPage = new DetailsPage(page);
-            var newContent = $"{new Faker().Commerce.ProductDescription} with {new Faker().Commerce.Ean13()}";
+            var newContent = $"{new Faker().Commerce.ProductDescription()} with {new Faker().Commerce.Ean13()}";
 
             await detailsPage.editButton.ClickAsync();
             await detailsPage.textArea.FillAsync(newContent);
@@ -167,6 +167,7 @@ namespace PostsByMarko.FrontendTests.Tests
 
             await detailsPage.backButton.ClickAsync();
             post.Refresh();
+            await Assertions.Expect(post.content).ToHaveTextAsync(newContent);
 
             var postCardContent = await post.content.TextContentAsync();
 

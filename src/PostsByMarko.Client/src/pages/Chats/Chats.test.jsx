@@ -3,13 +3,14 @@ import { createRoot } from "react-dom/client";
 import { Chats } from "./Chats";
 import { MessagingService } from "../../api/MessagingService";
 import { UserService } from "../../api/UserService";
+import { vi } from "vitest";
 
-jest.mock("../../custom/useAuth", () => ({ useAuth: () => ({ user: { id: "me", token: "token" }, checkToken: jest.fn() }) }));
-jest.mock("../../api/MessagingService");
-jest.mock("../../api/UserService");
-jest.mock("../../components/Layout/Nav/Nav", () => ({ Nav: () => null }));
-jest.mock("../../components/Layout/Logo/Logo", () => ({ Logo: () => null }));
-jest.mock("../../components/Layout/Footer/Footer", () => ({ Footer: () => null }));
+vi.mock("../../custom/useAuth", () => ({ useAuth: () => ({ user: { id: "me", token: "token" }, checkToken: vi.fn() }) }));
+vi.mock("../../api/MessagingService");
+vi.mock("../../api/UserService");
+vi.mock("../../components/Layout/Nav/Nav", () => ({ Nav: () => null }));
+vi.mock("../../components/Layout/Logo/Logo", () => ({ Logo: () => null }));
+vi.mock("../../components/Layout/Footer/Footer", () => ({ Footer: () => null }));
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
 const alice = { id: "alice", firstName: "Alice", lastName: "A" };
@@ -17,7 +18,7 @@ const bob = { id: "bob", firstName: "Bob", lastName: "B" };
 const chat = recipient => ({ id: recipient.id, users: [{ id: "me" }, recipient], messages: [] });
 let container, root;
 beforeEach(async () => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   UserService.getUsers.mockResolvedValue([alice, bob]);
   MessagingService.getChats.mockResolvedValue([]);
   container = document.createElement("div");

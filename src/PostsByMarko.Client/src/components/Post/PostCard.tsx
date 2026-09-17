@@ -4,7 +4,7 @@ import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
 import { DateFunctions } from "../../util/dateFunctions";
 import { PostService } from "../../api/PostService";
-import { ROUTES, POST_DETAILS_PREFIX } from "../../constants/routes";
+import { POST_DETAILS_PREFIX } from "../../constants/routes";
 import { AppContext } from "../../context/AppContext";
 import { Card } from "../Helper/Card/Card";
 import { Post, PostProps } from "@typeConfigs/post";
@@ -22,7 +22,7 @@ export const PostCard = ({
   index,
 }: PostProps) => {
   const updatingVisibility = useRef(false);
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const appContext = useContext(AppContext);
   const [post, setPost] = useState<Post>({
@@ -66,7 +66,7 @@ export const PostCard = ({
 
     if (updatingVisibility.current) return;
     updatingVisibility.current = true;
-    let updateRequest = { title: post.title, content: post.content, hidden: !post.hidden };
+    const updateRequest = { title: post.title, content: post.content, hidden: !post.hidden };
 
     await PostService.updatePost(id!, updateRequest, user!.token!)
       .then((updatedPost) => {

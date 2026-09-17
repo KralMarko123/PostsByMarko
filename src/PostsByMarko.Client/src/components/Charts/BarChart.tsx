@@ -51,7 +51,7 @@ export const options: ChartOptions<"bar"> = {
       enabled: true,
       callbacks: {
         label: function (context: TooltipItem<"bar">) {
-          var numberOfPosts = context.parsed.y;
+          const numberOfPosts = context.parsed.y;
 
           return ` ${numberOfPosts} ${
             numberOfPosts === 1 ? "post was created" : "posts were created"

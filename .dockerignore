@@ -5,6 +5,8 @@
 **/.vs
 **/.vscode
 **/bin
+**/build
+**/dist
 **/node_modules
 **/obj
 **/TestResults

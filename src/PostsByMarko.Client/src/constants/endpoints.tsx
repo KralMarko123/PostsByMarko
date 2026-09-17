@@ -1,8 +1,8 @@
 import { Endpoints } from "@typeConfigs/endpoints";
 
-const BASE_URL_DEVELOPMENT = process.env.REACT_APP_API_BASE_URL || "http://localhost:7171";
-const BASE_URL_DOCKER = process.env.REACT_APP_API_BASE_URL || "http://localhost:7171";
-const BASE_URL_PRODUCTION = process.env.REACT_APP_API_BASE_URL || "https://markosapps.mk";
+const BASE_URL_DEVELOPMENT = import.meta.env.VITE_API_BASE_URL || "http://localhost:7171";
+const BASE_URL_DOCKER = import.meta.env.VITE_API_BASE_URL || "http://localhost:7171";
+const BASE_URL_PRODUCTION = import.meta.env.VITE_API_BASE_URL || "https://markosapps.mk";
 
 const ADMIN_CONTROLLER_PREFIX = "api/admin";
 const AUTH_CONTROLLER_PREFIX = "api/auth";
@@ -153,7 +153,7 @@ const productionEndpoints: Endpoints = {
 
 let endpoints: Endpoints;
 
-switch (process.env.NODE_ENV) {
+switch (import.meta.env.MODE) {
   case "development":
     endpoints = developmentEndpoints;
     break;

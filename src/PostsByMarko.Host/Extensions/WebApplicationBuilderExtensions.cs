@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
@@ -73,19 +73,9 @@ namespace PostsByMarko.Host.Extensions
                     In = ParameterLocation.Header,
                     Description = "JWT Authorization header using the Bearer scheme."
                 });
-                swaggerOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
+                swaggerOptions.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                },
-                Array.Empty<string>()
-                    }
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                 });
             });
         }

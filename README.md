@@ -10,7 +10,7 @@
 
 ### Local configuration
 
-Requires the .NET 10 SDK and Docker Desktop with Linux containers. React and Node versions are unchanged in this upgrade. EF Core and the Identity EF store remain on 9.0.20 because the stable [Pomelo MariaDB provider](https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql/9.0.0) supports EF Core 9. The application and all test projects target .NET 10.
+Requires the .NET 10 SDK, Node.js 24 LTS, and Docker Desktop with Linux containers. The client uses React 19, TypeScript 6, and Vite 8. EF Core and the Identity EF store remain on 9.0.20 because the stable [Pomelo MariaDB provider](https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql/9.0.0) supports EF Core 9. The application and all test projects target .NET 10.
 
 Copy `.env.example` to `.env` if it does not already exist. Replace the placeholder database password and JWT signing key (at least 32 characters).
 
@@ -67,7 +67,9 @@ Run focused checks with:
 ```powershell
 dotnet test test/PostsByMarko.UnitTests
 cd src/PostsByMarko.Client
-npm test -- --runInBand
+npm test
+npm run lint
+npm run typecheck
 npm run build
 ```
 
@@ -82,7 +84,7 @@ dotnet test test/PostsByMarko.IntegrationTests
 
 Integration tests use port 13306 by default (`TEST_SQL_PORT` overrides it; CI uses 3306). They reset `postsbymarko_test`; run them separately from browser tests or manual use of the test app.
 
-The browser suite builds and starts only `docker-compose.test.yml`. Install its browsers first:
+The browser suite invokes Docker Compose directly and starts only `docker-compose.test.yml`. Install its browsers first:
 
 ```powershell
 dotnet build test/PostsByMarko.FrontendTests
