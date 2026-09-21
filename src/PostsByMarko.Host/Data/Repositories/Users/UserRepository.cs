@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Data.Entities;
+using System.Data;
 using System.Security.Claims;
 
 namespace PostsByMarko.Host.Data.Repositories.Users
@@ -118,6 +120,75 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             if (result.Succeeded)
             {
                 result = await userManager.UpdateSecurityStampAsync(user);
+            }
+
+            return result;
+        }
+
+        public Task<IdentityResult> RemoveRoleFromUserUnlessLastMemberAsync(
+            User user, string role, CancellationToken cancellationToken = default) =>
+            ExecuteUnlessLastMemberInRoleAsync(
+                user,
+                role,
+                async () =>
+                {
+                    var result = await userManager.RemoveFromRoleAsync(user, role);
+                    if (result.Succeeded)
+                    {
+                        result = await userManager.UpdateSecurityStampAsync(user);
+                    }
+
+                    return result;
+                },
+                cancellationToken);
+
+        public Task<IdentityResult> DeleteUserUnlessLastMemberInRoleAsync(
+            User user, string role, CancellationToken cancellationToken = default) =>
+            ExecuteUnlessLastMemberInRoleAsync(
+                user,
+                role,
+                () => userManager.DeleteAsync(user),
+                cancellationToken);
+
+        private async Task<IdentityResult> ExecuteUnlessLastMemberInRoleAsync(
+            User user,
+            string role,
+            Func<Task<IdentityResult>> operation,
+            CancellationToken cancellationToken)
+        {
+            await using var transaction = await appDbContext.Database.BeginTransactionAsync(
+                IsolationLevel.Serializable, cancellationToken);
+
+            var normalizedRole = role.ToUpperInvariant();
+            var lockedRoles = await appDbContext.Roles
+                .FromSqlInterpolated($"SELECT * FROM AspNetRoles WHERE NormalizedName = {normalizedRole} FOR UPDATE")
+                .ToListAsync(cancellationToken);
+            var lockedRole = lockedRoles.SingleOrDefault();
+
+            if (lockedRole is null)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Code = "RoleNotFound",
+                    Description = $"Role '{role}' does not exist."
+                });
+            }
+
+            var memberCount = await appDbContext.UserRoles
+                .CountAsync(userRole => userRole.RoleId == lockedRole.Id, cancellationToken);
+            if (memberCount <= 1)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Code = IdentityErrorCodes.LastMemberInRole,
+                    Description = $"The last member of role '{role}' cannot be removed."
+                });
+            }
+
+            var result = await operation();
+            if (result.Succeeded)
+            {
+                await transaction.CommitAsync(cancellationToken);
             }
 
             return result;

@@ -41,6 +41,7 @@ namespace PostsByMarko.Host.Middlewares
                 ArgumentException => HttpStatusCode.BadRequest,
                 UnauthorizedAccessException => HttpStatusCode.Forbidden,
                 AuthException => HttpStatusCode.Unauthorized,
+                ConflictException => HttpStatusCode.Conflict,
                 _ => HttpStatusCode.InternalServerError
             };
 

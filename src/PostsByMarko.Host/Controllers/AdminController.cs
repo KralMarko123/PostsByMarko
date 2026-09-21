@@ -37,7 +37,7 @@ namespace PostsByMarko.Host.Controllers
         }
 
         [HttpDelete]
-        [Route("users/{id::guid}")]
+        [Route("users/{id:guid}")]
         public async Task<IActionResult> DeleteUser(Guid Id, CancellationToken cancellationToken = default)
         {
             await adminService.DeleteUserByIdAsync(Id, cancellationToken);

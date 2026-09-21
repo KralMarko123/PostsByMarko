@@ -1,6 +1,9 @@
 using PostsByMarko.Host.Application.Helper;
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Identity;
+using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Enums;
+using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
@@ -12,6 +15,12 @@ namespace PostsByMarko.Host.Application.Services
 {
     public class AdminService : IAdminService
     {
+        private static readonly Dictionary<string, string> allowedRoles = new(StringComparer.OrdinalIgnoreCase)
+        {
+            [RoleConstants.ADMIN] = RoleConstants.ADMIN,
+            [RoleConstants.USER] = RoleConstants.USER
+        };
+
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly IHubContext<AdminHub, IAdminClient> adminHub;
@@ -53,15 +62,23 @@ namespace PostsByMarko.Host.Application.Services
                 string.IsNullOrWhiteSpace(request.Role))
                 throw new ArgumentException("A user, role, and create or delete action are required.");
 
-            var user = await userRepository.GetUserByIdAsync(request.UserId.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
-            var result = request.ActionType == ActionType.Create 
-                ? await userRepository.AddRoleToUserAsync(user, request.Role)
-                : await userRepository.RemoveRoleFromUserAsync(user, request.Role);
+            if (!allowedRoles.TryGetValue(request.Role.Trim(), out var role))
+                throw new ArgumentException($"Role '{request.Role}' is not supported.");
 
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException($"Error while updating roles for user with Id: {request.UserId}");
-            }
+            if (request.ActionType == ActionType.Delete &&
+                role == RoleConstants.ADMIN &&
+                request.UserId.Value == currentRequestAccessor.Id)
+                throw new ArgumentException("You cannot remove your own administrator role.");
+
+            var user = await userRepository.GetUserByIdAsync(request.UserId.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
+            var result = request.ActionType == ActionType.Create
+                ? await userRepository.AddRoleToUserAsync(user, role)
+                : role == RoleConstants.ADMIN
+                    ? await userRepository.RemoveRoleFromUserUnlessLastMemberAsync(user, role, cancellationToken)
+                    : await userRepository.RemoveRoleFromUserAsync(user, role);
+
+            EnsureIdentityOperationSucceeded(result,
+                $"Error while updating roles for user with Id: {request.UserId}");
 
             var updatedRoles = await userRepository.GetRolesForUserAsync(user);
 
@@ -80,17 +97,27 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task DeleteUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
-            var result = await userRepository.DeleteUserAsync(user);
+            if (Id == currentRequestAccessor.Id)
+                throw new ArgumentException("You cannot delete your own administrator account.");
 
-            if (result.Succeeded) 
-            {
-                await NotificationDelivery.SendAsync(() => adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow));
-            }
-            else
-            {
-                throw new InvalidOperationException($"Failed to delete user with Id: {user.Id}");
-            }
+            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
+            var roles = await userRepository.GetRolesForUserAsync(user);
+            var result = roles.Contains(RoleConstants.ADMIN, StringComparer.OrdinalIgnoreCase)
+                ? await userRepository.DeleteUserUnlessLastMemberInRoleAsync(user, RoleConstants.ADMIN, cancellationToken)
+                : await userRepository.DeleteUserAsync(user);
+
+            EnsureIdentityOperationSucceeded(result, $"Failed to delete user with Id: {user.Id}");
+            await NotificationDelivery.SendAsync(() => adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow));
+        }
+
+        private static void EnsureIdentityOperationSucceeded(IdentityResult result, string failureMessage)
+        {
+            if (result.Succeeded) return;
+
+            if (result.Errors.Any(error => error.Code == IdentityErrorCodes.LastMemberInRole))
+                throw new ConflictException("At least one administrator account must remain.");
+
+            throw new InvalidOperationException(failureMessage);
         }
     }
 }

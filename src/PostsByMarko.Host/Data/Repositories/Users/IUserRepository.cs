@@ -19,6 +19,8 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         Task<IList<string>> GetRolesForUserAsync(User user);
         Task<IdentityResult> AddRoleToUserAsync(User user, string role);
         Task<IdentityResult> RemoveRoleFromUserAsync(User user, string role);
+        Task<IdentityResult> RemoveRoleFromUserUnlessLastMemberAsync(User user, string role, CancellationToken cancellationToken = default);
+        Task<IdentityResult> DeleteUserUnlessLastMemberInRoleAsync(User user, string role, CancellationToken cancellationToken = default);
         Task<IdentityResult> UpdateUserAsync(User user);
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
