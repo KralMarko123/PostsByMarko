@@ -17,14 +17,13 @@ namespace PostsByMarko.UnitTests
     {
         private readonly UserService userService;
         private readonly Mock<IUserRepository> usersRepositoryMock = new();
-        private readonly Mock<IEmailService> emailServiceMock = new();
         private readonly Mock<IJwtHelper> jwtHelperMock = new();
         private readonly Mock<IMapper> mapperMock = new();
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
 
         public UserServiceTests()
         {
-            userService = new UserService(usersRepositoryMock.Object, emailServiceMock.Object, jwtHelperMock.Object,
+            userService = new UserService(usersRepositoryMock.Object, jwtHelperMock.Object,
                 mapperMock.Object, currentRequestAccessorMock.Object);
         }
 
@@ -38,7 +37,8 @@ namespace PostsByMarko.UnitTests
 
             await Assert.ThrowsAsync<AuthException>(() => userService.ValidateUserAsync(login));
 
-            emailServiceMock.Verify(service => service.SendEmailConfimationLinkAsync(It.IsAny<string>()), Times.Never);
+            usersRepositoryMock.Verify(repository => repository.QueueConfirmationEmailAsync(
+                It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
             jwtHelperMock.Verify(helper => helper.CreateTokenAsync(It.IsAny<User>()), Times.Never);
         }
 
@@ -75,7 +75,7 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task create_user_should_map_and_create_user_and_send_email_confirmation_link()
+        public async Task create_user_should_create_user_and_queue_confirmation_email_atomically()
         {
             // Arrange
             var identityResult = IdentityResult.Success;
@@ -86,13 +86,15 @@ namespace PostsByMarko.UnitTests
             };
 
             mapperMock.Setup(m => m.Map<User>(registrationDto)).Returns(user);
-            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(user, registrationDto.Password)).ReturnsAsync(() => identityResult);
+            usersRepositoryMock.Setup(r => r.CreateUserWithConfirmationEmailAsync(
+                user, registrationDto.Password, It.IsAny<CancellationToken>())).ReturnsAsync(identityResult);
 
             // Act
             await userService.CreateUserAsync(registrationDto);
 
             // Assert
-            emailServiceMock.Verify(s => s.SendEmailConfimationLinkAsync(user.Email), Times.Once);
+            usersRepositoryMock.Verify(r => r.CreateUserWithConfirmationEmailAsync(
+                user, registrationDto.Password, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -127,7 +129,8 @@ namespace PostsByMarko.UnitTests
             };
 
             mapperMock.Setup(m => m.Map<User>(registrationDto)).Returns(user);
-            usersRepositoryMock.Setup(r => r.MapAndCreateUserAsync(user, registrationDto.Password)).ReturnsAsync(() => identityResult);
+            usersRepositoryMock.Setup(r => r.CreateUserWithConfirmationEmailAsync(
+                user, registrationDto.Password, It.IsAny<CancellationToken>())).ReturnsAsync(identityResult);
 
             // Act
             var result = async () => await userService.CreateUserAsync(registrationDto);
@@ -185,7 +188,7 @@ namespace PostsByMarko.UnitTests
         }
 
         [Fact]
-        public async Task validate_user_should_throw_and_send_confirmation_link_if_email_is_not_confirmed()
+        public async Task validate_user_should_throw_and_queue_confirmation_email_if_email_is_not_confirmed()
         {
             // Arrange
             var loginDto = new LoginDto
@@ -205,7 +208,8 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             await result.Should().ThrowAsync<AuthException>().WithMessage("Please check your email and confirm your account before logging in");
-            emailServiceMock.Verify(s => s.SendEmailConfimationLinkAsync(user.Email), Times.Once);
+            usersRepositoryMock.Verify(r => r.QueueConfirmationEmailAsync(
+                user, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]

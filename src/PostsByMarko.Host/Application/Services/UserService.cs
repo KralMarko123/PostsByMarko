@@ -13,15 +13,13 @@ namespace PostsByMarko.Host.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
-        private readonly IEmailService emailService;
         private readonly IJwtHelper jwtHelper;
         private readonly IMapper mapper;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
 
-        public UserService(IUserRepository userRepository, IEmailService emailService, IJwtHelper jwtHelper, IMapper mapper, ICurrentRequestAccessor currentRequestAccessor)
+        public UserService(IUserRepository userRepository, IJwtHelper jwtHelper, IMapper mapper, ICurrentRequestAccessor currentRequestAccessor)
         {
             this.userRepository = userRepository;
-            this.emailService = emailService;
             this.jwtHelper = jwtHelper;
             this.mapper = mapper;
             this.currentRequestAccessor = currentRequestAccessor;
@@ -35,9 +33,9 @@ namespace PostsByMarko.Host.Application.Services
             return user;
         }
 
-        public async Task CreateUserAsync(RegistrationDto userRegistration)
+        public async Task CreateUserAsync(RegistrationDto userRegistration, CancellationToken cancellationToken = default)
         {
-            var existingUser = await userRepository.GetUserByEmailAsync(userRegistration.Email);
+            var existingUser = await userRepository.GetUserByEmailAsync(userRegistration.Email, cancellationToken);
 
             if(existingUser != null)
             {
@@ -45,13 +43,10 @@ namespace PostsByMarko.Host.Application.Services
             }
 
             var newUser = mapper.Map<User>(userRegistration);
-            var result = await userRepository.MapAndCreateUserAsync(newUser, userRegistration.Password);
+            var result = await userRepository.CreateUserWithConfirmationEmailAsync(
+                newUser, userRegistration.Password, cancellationToken);
 
-            if (result.Succeeded)
-            {
-                await emailService.SendEmailConfimationLinkAsync(newUser.Email!);
-            }
-            else
+            if (!result.Succeeded)
             {
                 throw new ArgumentException("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
@@ -70,7 +65,7 @@ namespace PostsByMarko.Host.Application.Services
 
             if (!emailConfirmed)
             {
-                await emailService.SendEmailConfimationLinkAsync(user.Email!);
+                await userRepository.QueueConfirmationEmailAsync(user, cancellationToken);
                 throw new AuthException("Please check your email and confirm your account before logging in");
             }
 

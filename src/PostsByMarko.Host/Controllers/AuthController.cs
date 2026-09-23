@@ -28,9 +28,9 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Route("register")]
     [EnableRateLimiting("authentication")]
-    public async Task<ActionResult> Register([FromBody] RegistrationDto registrationDto)
+    public async Task<ActionResult> Register([FromBody] RegistrationDto registrationDto, CancellationToken cancellationToken = default)
     {
-        await usersService.CreateUserAsync(registrationDto);
+        await usersService.CreateUserAsync(registrationDto, cancellationToken);
 
         return Ok("Successfully registered, please check your email and confirm your account before logging in");
     }

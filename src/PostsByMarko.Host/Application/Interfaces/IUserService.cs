@@ -8,7 +8,7 @@ namespace PostsByMarko.Host.Application.Interfaces
     public interface IUserService
     {
         Task<User> GetCurrentUserAsync();
-        Task CreateUserAsync(RegistrationDto userRegistration);
+        Task CreateUserAsync(RegistrationDto userRegistration, CancellationToken cancellationToken = default);
         Task<UserDto> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default);
         Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);

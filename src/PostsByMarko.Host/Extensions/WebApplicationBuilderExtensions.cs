@@ -12,6 +12,7 @@ using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Host.Data.Repositories.Users;
+using PostsByMarko.Host.Data.Repositories.EmailOutbox;
 using PostsByMarko.Host.Middlewares;
 using System.Text;
 using System.Security.Claims;
@@ -145,13 +146,14 @@ namespace PostsByMarko.Host.Extensions
                 .Build());
         }
 
-        public static void WithAppServices(this WebApplicationBuilder builder)
+        public static void WithAppServices(this WebApplicationBuilder builder, bool enableBackgroundServices = true)
         {
             // Repositories
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IChatRepository, ChatRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+            builder.Services.AddScoped<IEmailOutboxRepository, EmailOutboxRepository>();
 
             // Services
             builder.Services.AddScoped<IAdminService, AdminService>();
@@ -160,6 +162,13 @@ namespace PostsByMarko.Host.Extensions
             builder.Services.AddScoped<IMessagingService, MessagingService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ICurrentRequestAccessor, CurrentRequestAccessor>();
+            builder.Services.AddScoped<EmailOutboxProcessor>();
+            builder.Services.AddSingleton(TimeProvider.System);
+
+            if (enableBackgroundServices)
+            {
+                builder.Services.AddHostedService<EmailOutboxWorker>();
+            }
 
             // Helpers
             builder.Services.AddScoped<IJwtHelper, JwtHelper>();

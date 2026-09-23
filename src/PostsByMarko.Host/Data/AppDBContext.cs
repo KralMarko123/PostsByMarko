@@ -10,6 +10,7 @@ namespace PostsByMarko.Host.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<EmailOutboxMessage> EmailOutboxMessages { get; set; }
 
         public readonly IHostEnvironment hostEnvironment;
 
@@ -45,6 +46,10 @@ namespace PostsByMarko.Host.Data
 
             modelBuilder.Entity<Message>()
                 .Property(b => b.Id)
+                .HasDefaultValueSql(guidGenerationProcedureName);
+
+            modelBuilder.Entity<EmailOutboxMessage>()
+                .Property(message => message.Id)
                 .HasDefaultValueSql(guidGenerationProcedureName);
         }
 
@@ -82,6 +87,12 @@ namespace PostsByMarko.Host.Data
                 .HasOne(m => m.Sender)
                 .WithMany(u => u.Messages)
                 .HasForeignKey(m => m.SenderId);
+
+            modelBuilder.Entity<EmailOutboxMessage>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(message => message.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void SetupIndexes(ModelBuilder modelBuilder)
@@ -94,6 +105,13 @@ namespace PostsByMarko.Host.Data
 
             modelBuilder.Entity<ChatUser>()
                 .HasIndex(cu => cu.UserId);
+
+            modelBuilder.Entity<EmailOutboxMessage>()
+                .HasIndex(message => message.UserId)
+                .IsUnique();
+
+            modelBuilder.Entity<EmailOutboxMessage>()
+                .HasIndex(message => new { message.SentAt, message.AvailableAt, message.LockedUntil });
         }
     }
 }

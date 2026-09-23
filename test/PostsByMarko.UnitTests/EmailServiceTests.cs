@@ -52,10 +52,11 @@ namespace PostsByMarko.UnitTests
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
         
             // Act
-            await emailService.SendEmailConfimationLinkAsync(user.Email);
+            await emailService.SendEmailConfirmationLinkAsync(user.Email);
 
             // Assert
-            emailHelperMock.Verify(e => e.SendEmailAsync(user.FirstName, user.LastName, user.Email, expectedSubject, expectedBody), Times.Once);
+            emailHelperMock.Verify(e => e.SendEmailAsync(
+                user.FirstName, user.LastName, user.Email, expectedSubject, expectedBody, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -65,10 +66,29 @@ namespace PostsByMarko.UnitTests
             var randomEmail = "test@test.com";
 
             // Act
-            var result = async () => await emailService.SendEmailConfimationLinkAsync(randomEmail);
+            var result = async () => await emailService.SendEmailConfirmationLinkAsync(randomEmail);
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with email '{randomEmail}' was not found");
+        }
+
+        [Fact]
+        public async Task send_email_confirmation_link_should_skip_already_confirmed_user()
+        {
+            var user = new User { Id = Guid.NewGuid(), Email = "test@test.com" };
+            userRepositoryMock.Setup(repository => repository.GetUserByEmailAsync(
+                user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            userRepositoryMock.Setup(repository => repository.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(true);
+
+            await emailService.SendEmailConfirmationLinkAsync(user.Email);
+
+            emailHelperMock.Verify(helper => helper.SendEmailAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]

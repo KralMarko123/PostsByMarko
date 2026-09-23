@@ -87,7 +87,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<MessagingProfile>();
 });
 builder.Services.AddHttpContextAccessor();
-builder.WithAppServices();
+builder.WithAppServices(enableBackgroundServices: !isInTest);
 builder.WithIdentity();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();

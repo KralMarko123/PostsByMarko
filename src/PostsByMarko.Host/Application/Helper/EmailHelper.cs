@@ -16,7 +16,7 @@ namespace PostsByMarko.Host.Application.Helper
             this.logger = logger;
         }
 
-        public async Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body)
+        public async Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body, CancellationToken cancellationToken = default)
         {
             if (!emailConfig.Enabled)
             {
@@ -36,7 +36,7 @@ namespace PostsByMarko.Host.Application.Helper
             try
             {
                 using var client = new SmtpClient();
-                await client.ConnectAsync(emailConfig.Host, emailConfig.Port, emailConfig.UseSsl);
+                await client.ConnectAsync(emailConfig.Host, emailConfig.Port, emailConfig.UseSsl, cancellationToken);
 
                 // Note: since we don't have an OAuth2 token, disable
                 // the XOAUTH2 authentication mechanism.
@@ -45,11 +45,11 @@ namespace PostsByMarko.Host.Application.Helper
                 // Note: only needed if the SMTP server requires authentication
                 if (!string.IsNullOrWhiteSpace(emailConfig.Username))
                 {
-                    await client.AuthenticateAsync(emailConfig.Username, emailConfig.Password);
+                    await client.AuthenticateAsync(emailConfig.Username, emailConfig.Password, cancellationToken);
                 }
 
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                await client.SendAsync(message, cancellationToken);
+                await client.DisconnectAsync(true, cancellationToken);
             }
             catch (Exception ex)
             {

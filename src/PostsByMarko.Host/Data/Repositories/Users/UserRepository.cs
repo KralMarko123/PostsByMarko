@@ -18,10 +18,63 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             this.userManager = userManager;
         }
 
-        public async Task<IdentityResult> MapAndCreateUserAsync(User userToCreate, string passwordForUser)
+        public async Task<IdentityResult> CreateUserWithConfirmationEmailAsync(
+            User userToCreate,
+            string passwordForUser,
+            CancellationToken cancellationToken = default)
         {
-            return await userManager.CreateAsync(userToCreate, passwordForUser);
+            await using var transaction = await appDbContext.Database.BeginTransactionAsync(cancellationToken);
+            var result = await userManager.CreateAsync(userToCreate, passwordForUser);
+
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+
+            appDbContext.EmailOutboxMessages.Add(CreateConfirmationMessage(userToCreate));
+            await appDbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return result;
         }
+
+        public async Task QueueConfirmationEmailAsync(User user, CancellationToken cancellationToken = default)
+        {
+            await using var transaction = await appDbContext.Database.BeginTransactionAsync(
+                IsolationLevel.Serializable, cancellationToken);
+
+            await appDbContext.Users
+                .FromSqlInterpolated($"SELECT * FROM AspNetUsers WHERE Id = {user.Id} FOR UPDATE")
+                .ToListAsync(cancellationToken);
+
+            var message = await appDbContext.EmailOutboxMessages
+                .SingleOrDefaultAsync(item => item.UserId == user.Id, cancellationToken);
+            var now = DateTime.UtcNow;
+
+            if (message is null)
+            {
+                appDbContext.EmailOutboxMessages.Add(CreateConfirmationMessage(user));
+            }
+            else if (message.SentAt.HasValue && message.SentAt.Value <= now.AddMinutes(-15))
+            {
+                message.RecipientEmail = user.Email!;
+                message.AvailableAt = now;
+                message.SentAt = null;
+                message.AttemptCount = 0;
+                message.LockId = null;
+                message.LockedUntil = null;
+                message.LastError = null;
+            }
+
+            await appDbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+        }
+
+        private static EmailOutboxMessage CreateConfirmationMessage(User user) => new()
+        {
+            UserId = user.Id,
+            RecipientEmail = user.Email!
+        };
 
         public async Task<List<Claim>> GetClaimsAsync(User user)
         {

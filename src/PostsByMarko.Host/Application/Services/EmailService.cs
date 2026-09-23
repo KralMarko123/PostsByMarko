@@ -20,15 +20,20 @@ namespace PostsByMarko.Host.Application.Services
             this.applicationUrls = applicationUrls.Value;
         }
 
-        public async Task SendEmailConfimationLinkAsync(string emailToSendTo)
+        public async Task SendEmailConfirmationLinkAsync(string emailToSendTo, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(emailToSendTo) ?? throw new KeyNotFoundException($"User with email '{emailToSendTo}' was not found");
+            var user = await userRepository.GetUserByEmailAsync(emailToSendTo, cancellationToken) ?? throw new KeyNotFoundException($"User with email '{emailToSendTo}' was not found");
+            if (await userRepository.CheckIsEmailConfirmedForUserAsync(user))
+            {
+                return;
+            }
+
             var token = await userRepository.GenerateEmailConfirmationTokenForUserAsync(user);
             var confirmationLink = GenerateEmailConfirmationLink(user.Email!, token);
             var subject = $"Please confirm the registration for {user.Email}";
             var body = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
 
-            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, body);
+            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, body, cancellationToken);
         }
 
         public async Task ConfirmEmailAsync(string email, string token)

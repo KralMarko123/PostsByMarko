@@ -9,7 +9,8 @@ namespace PostsByMarko.Host.Data.Repositories.Users
         Task<User?> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default);
         Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default);
-        Task<IdentityResult> MapAndCreateUserAsync(User userToCreate, string passwordForUser);
+        Task<IdentityResult> CreateUserWithConfirmationEmailAsync(User userToCreate, string passwordForUser, CancellationToken cancellationToken = default);
+        Task QueueConfirmationEmailAsync(User user, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);
         Task<IdentityResult> DeleteUserAsync(User user);
         Task<List<Claim>> GetClaimsAsync(User user);

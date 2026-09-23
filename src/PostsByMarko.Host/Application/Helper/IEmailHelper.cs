@@ -2,6 +2,6 @@
 {
     public interface IEmailHelper
     {
-        Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body);
+        Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body, CancellationToken cancellationToken = default);
     }
 }

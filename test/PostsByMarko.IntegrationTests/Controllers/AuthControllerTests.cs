@@ -1,9 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data;
 using PostsByMarko.Test.Shared.Constants;
 using System.Net;
 using System.Net.Http;
@@ -40,6 +43,13 @@ namespace PostsByMarko.IntegrationTests.Controllers
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             responseContent.Should().Be("Successfully registered, please check your email and confirm your account before logging in");
+
+            using var scope = postsByMarkoApiFactory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var user = await db.Users.SingleAsync(item => item.Email == registrationDto.Email);
+            var outboxMessage = await db.EmailOutboxMessages.SingleAsync(item => item.UserId == user.Id);
+            outboxMessage.RecipientEmail.Should().Be(registrationDto.Email);
+            outboxMessage.SentAt.Should().BeNull();
         }
 
         [Fact]
