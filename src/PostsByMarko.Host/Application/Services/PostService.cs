@@ -3,6 +3,7 @@ using PostsByMarko.Host.Application.Helper;
 using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
@@ -34,7 +35,7 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var allPosts = await postRepository.GetPostsAsync(cancellationToken);
 
@@ -49,13 +50,13 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"Post with Id: {Id} was not found");
             
             if (post.Hidden && !userRoles.Contains(RoleConstants.ADMIN) && post.AuthorId != currentUser.Id)
             {
-                throw new UnauthorizedAccessException("You are not authorized to view this post");
+                throw new ForbiddenException("You are not authorized to view this post");
             } 
 
             return mapper.Map<PostDto>(post);
@@ -64,11 +65,11 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<PostDto> CreatePostAsync(CreatePostRequest request, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
 
             if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
             {
-                throw new ArgumentException("Post title and content cannot be empty");
+                throw new BadRequestException("Post title and content cannot be empty");
             }
            
             var post = mapper.Map<Post>(request);
@@ -91,17 +92,17 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<PostDto> UpdatePostAsync(Guid Id, UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"Post with Id: {Id} was not found");
 
             if (currentUser.Id != post.AuthorId && !userRoles.Contains(RoleConstants.ADMIN))
             {
-                throw new UnauthorizedAccessException("You are not authorized to update this post");
+                throw new ForbiddenException("You are not authorized to update this post");
             }
 
             if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
-                throw new ArgumentException("Post title and content cannot be empty");
+                throw new BadRequestException("Post title and content cannot be empty");
 
             post.Title = request.Title;
             post.Content = request.Content;
@@ -121,13 +122,13 @@ namespace PostsByMarko.Host.Application.Services
         public async Task DeletePostByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"Post with Id: {Id} was not found");
+            var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"Post with Id: {Id} was not found");
 
             if (currentUser.Id != post.AuthorId && !userRoles.Contains(RoleConstants.ADMIN))
             {
-                throw new UnauthorizedAccessException("You are not authorized to delete this post");
+                throw new ForbiddenException("You are not authorized to delete this post");
             }
             
             await postRepository.DeletePostAsync(post);

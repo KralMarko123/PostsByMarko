@@ -103,6 +103,25 @@ namespace PostsByMarko.Host.Extensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+                        await ApiProblemDetailsFactory.WriteAsync(
+                            context.HttpContext,
+                            StatusCodes.Status401Unauthorized,
+                            "Authentication required",
+                            "A valid access token is required.",
+                            "authentication_required");
+                    },
+                    OnForbidden = async context =>
+                    {
+                        await ApiProblemDetailsFactory.WriteAsync(
+                            context.HttpContext,
+                            StatusCodes.Status403Forbidden,
+                            "Forbidden",
+                            "You are not allowed to perform this action.",
+                            "forbidden");
+                    },
                     OnTokenValidated = async context =>
                     {
                         var userId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);

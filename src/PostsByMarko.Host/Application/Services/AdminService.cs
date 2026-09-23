@@ -60,17 +60,17 @@ namespace PostsByMarko.Host.Application.Services
             if (request.UserId is null || request.UserId == Guid.Empty ||
                 request.ActionType is not (ActionType.Create or ActionType.Delete) ||
                 string.IsNullOrWhiteSpace(request.Role))
-                throw new ArgumentException("A user, role, and create or delete action are required.");
+                throw new BadRequestException("A user, role, and create or delete action are required.");
 
             if (!allowedRoles.TryGetValue(request.Role.Trim(), out var role))
-                throw new ArgumentException($"Role '{request.Role}' is not supported.");
+                throw new BadRequestException($"Role '{request.Role}' is not supported.");
 
             if (request.ActionType == ActionType.Delete &&
                 role == RoleConstants.ADMIN &&
                 request.UserId.Value == currentRequestAccessor.Id)
-                throw new ArgumentException("You cannot remove your own administrator role.");
+                throw new BadRequestException("You cannot remove your own administrator role.");
 
-            var user = await userRepository.GetUserByIdAsync(request.UserId.Value, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {request.UserId} was not found");
+            var user = await userRepository.GetUserByIdAsync(request.UserId.Value, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {request.UserId} was not found");
             var result = request.ActionType == ActionType.Create
                 ? await userRepository.AddRoleToUserAsync(user, role)
                 : role == RoleConstants.ADMIN
@@ -89,7 +89,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<List<string>> GetRolesForEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(email, cancellationToken) ?? throw new KeyNotFoundException($"User with email: '{email}' was not found");
+            var user = await userRepository.GetUserByEmailAsync(email, cancellationToken) ?? throw new ResourceNotFoundException($"User with email: '{email}' was not found");
             var roles = await userRepository.GetRolesForUserAsync(user);
 
             return [.. roles];
@@ -98,9 +98,9 @@ namespace PostsByMarko.Host.Application.Services
         public async Task DeleteUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
             if (Id == currentRequestAccessor.Id)
-                throw new ArgumentException("You cannot delete your own administrator account.");
+                throw new BadRequestException("You cannot delete your own administrator account.");
 
-            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
+            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {Id} was not found");
             var roles = await userRepository.GetRolesForUserAsync(user);
             var result = roles.Contains(RoleConstants.ADMIN, StringComparer.OrdinalIgnoreCase)
                 ? await userRepository.DeleteUserUnlessLastMemberInRoleAsync(user, RoleConstants.ADMIN, cancellationToken)

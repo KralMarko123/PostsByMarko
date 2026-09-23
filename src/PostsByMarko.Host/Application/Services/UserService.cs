@@ -28,7 +28,7 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<User> GetCurrentUserAsync()
         {
             var userId = currentRequestAccessor.Id;
-            var user = await userRepository.GetUserByIdAsync(userId) ?? throw new KeyNotFoundException($"User with Id: '{userId}' was not found");
+            var user = await userRepository.GetUserByIdAsync(userId) ?? throw new ResourceNotFoundException($"User with Id: '{userId}' was not found");
 
             return user;
         }
@@ -39,7 +39,7 @@ namespace PostsByMarko.Host.Application.Services
 
             if(existingUser != null)
             {
-                throw new ArgumentException(message: $"User with email '{existingUser.Email}' already exists");
+                throw new ConflictException("An account with this email already exists.");
             }
 
             var newUser = mapper.Map<User>(userRegistration);
@@ -48,7 +48,7 @@ namespace PostsByMarko.Host.Application.Services
 
             if (!result.Succeeded)
             {
-                throw new ArgumentException("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                ThrowRegistrationFailure(result);
             }
         }
 
@@ -85,7 +85,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByEmailAsync(email, cancellationToken) ?? throw new KeyNotFoundException($"User with email: '{email}' was not found");
+            var user = await userRepository.GetUserByEmailAsync(email, cancellationToken) ?? throw new ResourceNotFoundException($"User with email: '{email}' was not found");
 
             return user;
         }
@@ -110,7 +110,7 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task<UserDto> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {Id} was not found");
+            var user = await userRepository.GetUserByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {Id} was not found");
 
             return mapper.Map<UserDto>(user);
         }
@@ -122,12 +122,39 @@ namespace PostsByMarko.Host.Application.Services
 
             if (user == null)
             {
-                throw new AuthException($"User with Id: {userId} no longer exists!");
+                throw new AuthException("The authenticated account is no longer available.");
             }
             else
             {
                 return true;
             }
+        }
+
+        private static void ThrowRegistrationFailure(IdentityResult result)
+        {
+            if (result.Errors.Any(error => error.Code is "DuplicateEmail" or "DuplicateUserName"))
+            {
+                throw new ConflictException("An account with this email already exists.");
+            }
+
+            var safeErrors = result.Errors
+                .Select(error => error.Code switch
+                {
+                    "PasswordTooShort" => "The password is too short.",
+                    "PasswordRequiresDigit" => "The password must contain a number.",
+                    "PasswordRequiresLower" => "The password must contain a lowercase letter.",
+                    "PasswordRequiresUpper" => "The password must contain an uppercase letter.",
+                    "PasswordRequiresNonAlphanumeric" => "The password must contain a special character.",
+                    _ => null
+                })
+                .Where(message => message is not null)
+                .Distinct()
+                .ToList();
+
+            var message = safeErrors.Count > 0
+                ? string.Join(" ", safeErrors)
+                : "Unable to create an account with the supplied details.";
+            throw new BadRequestException(message);
         }
     }
 }

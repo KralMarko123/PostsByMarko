@@ -102,7 +102,8 @@ namespace PostsByMarko.UnitTests
             var result = async () => await emailService.ConfirmEmailAsync(randomEmail, token);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage($"No account for '{randomEmail}', please check your credentials and try again");
+            await result.Should().ThrowAsync<BadRequestException>()
+                .WithMessage("The confirmation link is invalid or has expired.");
         }
 
         [Fact]
@@ -120,7 +121,8 @@ namespace PostsByMarko.UnitTests
             var result = async () => await emailService.ConfirmEmailAsync(user.Email, token);
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage("Error during email confirmation");
+            await result.Should().ThrowAsync<BadRequestException>()
+                .WithMessage("The confirmation link is invalid or has expired.");
         }
     }
 }

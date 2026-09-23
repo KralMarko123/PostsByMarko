@@ -5,6 +5,7 @@ using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Mapping.Profiles;
 using PostsByMarko.Host.Data;
 using PostsByMarko.Host.Extensions;
+using PostsByMarko.Host.Middlewares;
 using Serilog;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -45,17 +46,30 @@ builder.Host.UseSerilog((context, configuration) => configuration
     .WriteTo.Console());
 builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig.ValidAudiences);
 builder.Services.Configure<ApiBehaviorOptions>(options =>
-    options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(new
+    options.InvalidModelStateResponseFactory = context =>
     {
-        message = "One or more fields are invalid.",
-        status = 400,
-        traceId = context.HttpContext.TraceIdentifier,
-        errors = context.ModelState.Where(entry => entry.Value!.Errors.Count > 0)
-            .ToDictionary(entry => entry.Key, entry => entry.Value!.Errors.Select(error => error.ErrorMessage).ToArray())
-    }));
+        var errors = context.ModelState
+            .Where(entry => entry.Value!.Errors.Count > 0)
+            .ToDictionary(
+                entry => entry.Key,
+                entry => entry.Value!.Errors.Select(error => error.ErrorMessage).ToArray());
+        var result = new BadRequestObjectResult(
+            ApiProblemDetailsFactory.CreateValidation(context.HttpContext, errors));
+        result.ContentTypes.Add("application/problem+json");
+        return result;
+    });
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (rejectedContext, cancellationToken) =>
+    {
+        await ApiProblemDetailsFactory.WriteAsync(
+            rejectedContext.HttpContext,
+            StatusCodes.Status429TooManyRequests,
+            "Too many requests",
+            "Too many requests were sent. Please try again later.",
+            "rate_limit_exceeded");
+    };
     options.AddPolicy("authentication", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions

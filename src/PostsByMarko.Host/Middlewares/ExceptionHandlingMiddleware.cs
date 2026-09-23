@@ -1,6 +1,4 @@
 ﻿using PostsByMarko.Host.Application.Exceptions;
-using System.Net;
-using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace PostsByMarko.Host.Middlewares
@@ -26,38 +24,40 @@ namespace PostsByMarko.Host.Middlewares
             }
             catch (Exception ex) when (!context.Response.HasStarted)
             {
-                logger.LogError(ex, "Unhandled exception occurred");
+                var error = MapException(ex);
+                if (error.Status >= StatusCodes.Status500InternalServerError)
+                {
+                    logger.LogError(ex, "Unhandled exception occurred for request {Method} {Path}",
+                        context.Request.Method, context.Request.Path);
+                }
+                else
+                {
+                    logger.LogInformation("Request {Method} {Path} failed with status {StatusCode} and error {ErrorCode}",
+                        context.Request.Method, context.Request.Path, error.Status, error.Code);
+                }
 
-                await HandleExceptionAsync(context, ex);
+                await ApiProblemDetailsFactory.WriteAsync(
+                    context, error.Status, error.Title, error.Detail, error.Code);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private static ApiError MapException(Exception exception)
         {
-            var statusCode = ex switch
+            return exception switch
             {
-                KeyNotFoundException => HttpStatusCode.NotFound,
-                ValidationException => HttpStatusCode.BadRequest,
-                ArgumentException => HttpStatusCode.BadRequest,
-                UnauthorizedAccessException => HttpStatusCode.Forbidden,
-                AuthException => HttpStatusCode.Unauthorized,
-                ConflictException => HttpStatusCode.Conflict,
-                _ => HttpStatusCode.InternalServerError
+                ResourceNotFoundException => new(404, "Resource not found", exception.Message, "resource_not_found"),
+                KeyNotFoundException => new(404, "Resource not found", "The requested resource was not found.", "resource_not_found"),
+                BadRequestException => new(400, "Invalid request", exception.Message, "invalid_request"),
+                ValidationException => new(400, "Invalid request", "One or more values are invalid.", "validation_failed"),
+                ArgumentException => new(400, "Invalid request", "The request is invalid.", "invalid_request"),
+                ForbiddenException => new(403, "Forbidden", exception.Message, "forbidden"),
+                UnauthorizedAccessException => new(403, "Forbidden", "You are not allowed to perform this action.", "forbidden"),
+                AuthException => new(401, "Authentication failed", exception.Message, "authentication_failed"),
+                ConflictException => new(409, "Conflict", exception.Message, "conflict"),
+                _ => new(500, "Server error", "An unexpected error occurred.", "internal_error")
             };
-
-            var problemDetails = new
-            {
-                message = statusCode == HttpStatusCode.InternalServerError ? "An unexpected error occurred." : ex.Message,
-                status = (int)statusCode,
-                traceId = context.TraceIdentifier
-            };
-
-            var responseBody = JsonSerializer.Serialize(problemDetails);
-
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)statusCode;
-
-            return context.Response.WriteAsync(responseBody);
         }
+
+        private sealed record ApiError(int Status, string Title, string Detail, string Code);
     }
 }

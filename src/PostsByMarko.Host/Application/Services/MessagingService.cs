@@ -36,7 +36,7 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var chats = await chatRepository.GetChatsForUserAsync(currentUser, cancellationToken);
 
             return mapper.Map<List<ChatDto>>(chats);
@@ -45,11 +45,11 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
         {
             var currentUserId = currentRequestAccessor.Id;
-            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {currentUserId} was not found");
+            var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             if (otherUserId == currentUserId)
-                throw new ArgumentException("Cannot start a chat with yourself.");
+                throw new BadRequestException("Cannot start a chat with yourself.");
 
-            var otherUser = await userRepository.GetUserByIdAsync(otherUserId, cancellationToken) ?? throw new KeyNotFoundException($"User with Id: {otherUserId} was not found");
+            var otherUser = await userRepository.GetUserByIdAsync(otherUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {otherUserId} was not found");
             var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
             if(existingChat != null)
@@ -83,14 +83,14 @@ namespace PostsByMarko.Host.Application.Services
         {
             var currentUserId = currentRequestAccessor.Id;
             if (string.IsNullOrWhiteSpace(request.Content) || request.Content.Length > 4000)
-                throw new ArgumentException("Message content must contain between 1 and 4000 characters.");
+                throw new BadRequestException("Message content must contain between 1 and 4000 characters.");
 
-            var chat = await chatRepository.GetChatByIdAsync(request.ChatId, cancellationToken) ?? throw new KeyNotFoundException($"Chat with Id: {request.ChatId} was not found");
+            var chat = await chatRepository.GetChatByIdAsync(request.ChatId, cancellationToken) ?? throw new ResourceNotFoundException($"Chat with Id: {request.ChatId} was not found");
             var chatUserIds = chat.ChatUsers.Select(c => c.UserId);
 
             if (!chatUserIds.Contains(currentUserId))
             {
-                throw new UnauthorizedAccessException("Current user is not a member of the chat.");
+                throw new ForbiddenException("Current user is not a member of the chat.");
             }
 
             var newMessage = new Message

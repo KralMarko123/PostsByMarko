@@ -114,7 +114,8 @@ namespace PostsByMarko.UnitTests
             var result = async () => await userService.CreateUserAsync(registrationDto);
 
             // Assert
-            await result.Should().ThrowAsync<ArgumentException>().WithMessage($"User with email '{registrationDto.Email}' already exists");
+            await result.Should().ThrowAsync<ConflictException>()
+                .WithMessage("An account with this email already exists.");
         }
 
         [Fact]
@@ -136,7 +137,8 @@ namespace PostsByMarko.UnitTests
             var result = async () => await userService.CreateUserAsync(registrationDto);
 
             // Assert
-            await result.Should().ThrowAsync<ArgumentException>().WithMessage($"User creation failed: {identityResult.Errors.First().Description}");
+            await result.Should().ThrowAsync<BadRequestException>()
+                .WithMessage("Unable to create an account with the supplied details.");
         }
 
         [Fact]
@@ -414,7 +416,8 @@ namespace PostsByMarko.UnitTests
             var result = async () => await userService.ValidateUserWithTokenExistsAsync();
 
             // Assert
-            await result.Should().ThrowAsync<AuthException>().WithMessage($"User with Id: {user.Id} no longer exists!");
+            await result.Should().ThrowAsync<AuthException>()
+                .WithMessage("The authenticated account is no longer available.");
         }
     }
 }

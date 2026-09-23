@@ -41,6 +41,23 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithMiddlewares(this WebApplication app)
         {
+            app.UseStatusCodePages(async statusCodeContext =>
+            {
+                var response = statusCodeContext.HttpContext.Response;
+                var error = response.StatusCode switch
+                {
+                    StatusCodes.Status404NotFound => ("Resource not found", "The requested endpoint was not found.", "endpoint_not_found"),
+                    StatusCodes.Status405MethodNotAllowed => ("Method not allowed", "This HTTP method is not supported for the requested endpoint.", "method_not_allowed"),
+                    _ => ("Request failed", "The request could not be completed.", "request_failed")
+                };
+
+                await ApiProblemDetailsFactory.WriteAsync(
+                    statusCodeContext.HttpContext,
+                    response.StatusCode,
+                    error.Item1,
+                    error.Item2,
+                    error.Item3);
+            });
             app.UseMiddleware<ExceptionHandlingMiddleware>();
         }
 

@@ -38,12 +38,12 @@ namespace PostsByMarko.Host.Application.Services
 
         public async Task ConfirmEmailAsync(string email, string token)
         {
-            var user = await userRepository.GetUserByEmailAsync(email) ?? throw new AuthException($"No account for '{email}', please check your credentials and try again");
+            var user = await userRepository.GetUserByEmailAsync(email) ?? throw new BadRequestException("The confirmation link is invalid or has expired.");
             var emailConfirmed = await userRepository.ConfirmEmailForUserAsync(user, token);
 
             if (!emailConfirmed.Succeeded)
             {
-                throw new AuthException("Error during email confirmation");
+                throw new BadRequestException("The confirmation link is invalid or has expired.");
             }
         }
 
