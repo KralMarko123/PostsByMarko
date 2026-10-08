@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -54,6 +55,10 @@ public static class ApiProblemDetailsFactory
     {
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/problem+json";
+        // Both JWT challenges and application authentication failures use this writer.
+        if (status == StatusCodes.Status401Unauthorized)
+            context.Response.Headers.WWWAuthenticate = JwtBearerDefaults.AuthenticationScheme;
+
         return JsonSerializer.SerializeAsync(
             context.Response.Body,
             Create(context, status, title, detail, code),

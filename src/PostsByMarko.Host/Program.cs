@@ -45,7 +45,8 @@ builder.Host.UseSerilog((context, configuration) => configuration
     .Enrich.FromLogContext()
     .WriteTo.Console());
 builder.WithCors(MiscConstants.CORS_POLICY_NAME, jwtConfig.ValidAudiences);
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+// Apply after MVC's defaults so they cannot replace the shared validation response.
+builder.Services.PostConfigure<ApiBehaviorOptions>(options =>
     options.InvalidModelStateResponseFactory = context =>
     {
         var errors = context.ModelState
