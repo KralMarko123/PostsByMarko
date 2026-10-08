@@ -2,13 +2,18 @@
 using PostsByMarko.Host.Data.Entities;
 using System.Security.Claims;
 
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
+
 namespace PostsByMarko.Host.Data.Repositories.Users
 {
     public interface IUserRepository
     {
         Task<User?> GetUserByIdAsync(Guid Id, CancellationToken cancellationToken = default);
         Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
-        Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default);
+        Task<PagedResult<UserDto>> GetUsersAsync(PageRequest page, Guid? exceptId = null, CancellationToken cancellationToken = default);
+        Task<PagedResult<AdminDashboardResponse>> GetAdminDashboardAsync(Guid exceptId, PageRequest page, CancellationToken cancellationToken = default);
         Task<IdentityResult> CreateUserWithConfirmationEmailAsync(User userToCreate, string passwordForUser, CancellationToken cancellationToken = default);
         Task QueueConfirmationEmailAsync(User user, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);

@@ -7,6 +7,7 @@ using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -33,13 +34,27 @@ namespace PostsByMarko.Host.Application.Services
             this.messageHub = messageHub;
         }
 
-        public async Task<List<ChatDto>> GetUserChatsAsync(CancellationToken cancellationToken = default)
+        public async Task<PagedResult<ChatDto>> GetUserChatsAsync(PageRequest page, CancellationToken cancellationToken = default)
         {
+            page.EnsureValid();
+
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
-            var chats = await chatRepository.GetChatsForUserAsync(currentUser, cancellationToken);
 
-            return mapper.Map<List<ChatDto>>(chats);
+            return await chatRepository.GetChatsForUserAsync(currentUser.Id, page, cancellationToken);
+        }
+
+        public async Task<PagedResult<MessageDto>> GetChatMessagesAsync(Guid chatId, PageRequest page, CancellationToken cancellationToken = default)
+        {
+            page.EnsureValid();
+
+            var chat = await chatRepository.GetChatByIdAsync(chatId, cancellationToken)
+                ?? throw new ResourceNotFoundException($"Chat with Id: {chatId} was not found");
+
+            if (!chat.ChatUsers.Any(member => member.UserId == currentRequestAccessor.Id))
+                throw new ForbiddenException("Current user is not a member of the chat.");
+
+            return await messageRepository.GetMessagesAsync(chatId, page, cancellationToken);
         }
 
         public async Task<ChatDto> StartChatAsync(Guid otherUserId, CancellationToken cancellationToken = default)
@@ -54,7 +69,8 @@ namespace PostsByMarko.Host.Application.Services
 
             if(existingChat != null)
             {
-                return mapper.Map<ChatDto>(existingChat);
+                return await chatRepository.GetChatDetailsAsync(existingChat.Id, cancellationToken)
+                    ?? throw new ResourceNotFoundException($"Chat with Id: {existingChat.Id} was not found");
             }
 
             var newChat = new Chat
@@ -71,7 +87,8 @@ namespace PostsByMarko.Host.Application.Services
 
             var createdChat = await chatRepository.GetOrCreateChatAsync(newChat, cancellationToken);
 
-            var chatDto = mapper.Map<ChatDto>(createdChat);
+            var chatDto = await chatRepository.GetChatDetailsAsync(createdChat.Id, cancellationToken)
+                ?? throw new ResourceNotFoundException($"Chat with Id: {createdChat.Id} was not found");
             var chatUserIds = chatDto.Users.Select(u => u.Id.ToString());
 
             await NotificationDelivery.SendAsync(() => messageHub.Clients.Users(chatUserIds!).ChatCreated(chatDto));

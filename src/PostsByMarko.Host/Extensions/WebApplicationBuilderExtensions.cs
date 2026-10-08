@@ -33,6 +33,7 @@ namespace PostsByMarko.Host.Extensions
                          .WithOrigins([.. allowedOrigins])
                          .AllowAnyHeader()
                          .AllowAnyMethod()
+                         .WithExposedHeaders(PaginationResponseExtensions.HeaderNames)
                          .AllowCredentials();
                     });
             });

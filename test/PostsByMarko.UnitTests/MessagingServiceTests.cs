@@ -9,6 +9,7 @@ using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Messaging;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -76,15 +77,15 @@ namespace PostsByMarko.UnitTests
 
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
-            chatRepositoryMock.Setup(cr => cr.GetChatsForUserAsync(user, It.IsAny<CancellationToken>())).ReturnsAsync(chats);
-            mapperMock.Setup(m => m.Map<List<ChatDto>>(chats)).Returns(chatDtos);
+            chatRepositoryMock.Setup(cr => cr.GetChatsForUserAsync(user.Id, It.IsAny<PageRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PagedResult<ChatDto>(chatDtos, 2, 1, 50));
 
             // Act
-            var result = await messagingService.GetUserChatsAsync(CancellationToken.None);
+            var result = await messagingService.GetUserChatsAsync(new PageRequest(), CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeEquivalentTo(chatDtos);
+            result.Items.Should().BeEquivalentTo(chatDtos);
         }
 
         [Fact]
@@ -96,7 +97,7 @@ namespace PostsByMarko.UnitTests
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(randomId);
 
             // Act
-            var result = async () => await messagingService.GetUserChatsAsync(CancellationToken.None);
+            var result = async () => await messagingService.GetUserChatsAsync(new PageRequest(), CancellationToken.None);
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");
@@ -116,7 +117,7 @@ namespace PostsByMarko.UnitTests
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(otherUser.Id, It.IsAny<CancellationToken>())).ReturnsAsync(otherUser);
             chatRepositoryMock.Setup(cr => cr.GetChatByUserIdsAsync(userIds, It.IsAny<CancellationToken>())).ReturnsAsync(existingChat);
-            mapperMock.Setup(m => m.Map<ChatDto>(existingChat)).Returns(chatDto);
+            chatRepositoryMock.Setup(repository => repository.GetChatDetailsAsync(existingChat.Id, It.IsAny<CancellationToken>())).ReturnsAsync(chatDto);
 
             // Act
             var result = await messagingService.StartChatAsync(otherUser.Id, CancellationToken.None);
@@ -155,7 +156,7 @@ namespace PostsByMarko.UnitTests
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(otherUser.Id, It.IsAny<CancellationToken>())).ReturnsAsync(otherUser);
             chatRepositoryMock.Setup(cr => cr.GetOrCreateChatAsync(It.IsAny<Chat>(), It.IsAny<CancellationToken>())).ReturnsAsync(newChat);
-            mapperMock.Setup(m => m.Map<ChatDto>(newChat)).Returns(chatDto);
+            chatRepositoryMock.Setup(repository => repository.GetChatDetailsAsync(newChat.Id, It.IsAny<CancellationToken>())).ReturnsAsync(chatDto);
             messageHubMock.Setup(m => m.Clients.Users(It.IsAny<List<string>>())).Returns(messageClientMock.Object);
             messageClientMock.Setup(m => m.ChatCreated(chatDto)).Returns(Task.CompletedTask);
 

@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Data.Entities;
 
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
+
 namespace PostsByMarko.Host.Data.Repositories.Posts
 {
     public class PostRepository : IPostRepository
@@ -12,14 +15,15 @@ namespace PostsByMarko.Host.Data.Repositories.Posts
             this.appDbContext = appDbContext;
         }
 
-        public async Task<List<Post>> GetPostsAsync(CancellationToken cancellationToken = default)
+        public Task<PagedResult<Post>> GetPostsAsync(PageRequest page, Guid viewerId, bool isAdmin, CancellationToken cancellationToken = default)
         {
-            var result = await appDbContext.Posts
+            return appDbContext.Posts
+                .Where(post => isAdmin || !post.Hidden || post.AuthorId == viewerId)
                 .Include(p => p.Author)
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
-
-            return result;
+                .OrderByDescending(post => post.CreatedAt)
+                .ThenByDescending(post => post.Id)
+                .ToPageAsync(page, cancellationToken);
         }
 
         public async Task<Post?> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default)

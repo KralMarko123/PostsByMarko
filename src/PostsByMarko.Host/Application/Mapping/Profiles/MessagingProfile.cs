@@ -17,6 +17,7 @@ namespace PostsByMarko.Host.Application.Mapping.Profiles
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
 
             CreateMap<Chat, ChatDto>()
+                .ForMember(dest => dest.MessageCount, opt => opt.MapFrom(src => src.Messages.Count))
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.ChatUsers));
         }
     }

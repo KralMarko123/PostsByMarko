@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Data.Entities;
 using System.Data;
 using System.Security.Claims;
+
+using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 
 namespace PostsByMarko.Host.Data.Repositories.Users
 {
@@ -149,12 +153,46 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             return await ExecuteRoleChangeAsync(user, () => userManager.AddToRoleAsync(user, role));
         }
 
-        public async Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
+        public Task<PagedResult<UserDto>> GetUsersAsync(PageRequest page, Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
-            var result = await userManager.Users
-                .Include(u => u.Posts)
+            return appDbContext.Users.AsNoTracking()
                 .Where(user => !exceptId.HasValue || user.Id != exceptId.Value)
-                .ToListAsync(cancellationToken);
+                .Select(user => new UserDto
+                {
+                    Id = user.Id, Email = user.Email!,
+                    FirstName = user.FirstName!, LastName = user.LastName!
+                })
+                .OrderBy(user => user.Email).ThenBy(user => user.Id)
+                .ToPageAsync(page, cancellationToken);
+        }
+
+        public async Task<PagedResult<AdminDashboardResponse>> GetAdminDashboardAsync(
+            Guid exceptId, PageRequest page, CancellationToken cancellationToken = default)
+        {
+            var result = await appDbContext.Users.AsNoTracking()
+                .Where(user => user.Id != exceptId)
+                .Select(user => new AdminDashboardResponse
+                {
+                    UserId = user.Id, Email = user.Email!,
+                    NumberOfPosts = user.Posts.Count(),
+                    LastPostedAt = user.Posts.Max(post => (DateTime?)post.LastUpdatedAt)
+                })
+                .OrderBy(user => user.Email).ThenBy(user => user.UserId)
+                .ToPageAsync(page, cancellationToken);
+
+            if (result.Items.Count == 0) return result;
+
+            // Fetch roles for this page together, rather than querying Identity once per user.
+            var userIds = result.Items.Select(user => user.UserId).ToArray();
+            var roles = await (from membership in appDbContext.UserRoles.AsNoTracking()
+                               join role in appDbContext.Roles.AsNoTracking() on membership.RoleId equals role.Id
+                               where userIds.Contains(membership.UserId)
+                               orderby role.Name
+                               select new { membership.UserId, role.Name }).ToListAsync(cancellationToken);
+            var rolesByUser = roles.ToLookup(role => role.UserId, role => role.Name!);
+
+            foreach (var user in result.Items)
+                user.Roles = rolesByUser[user.UserId].ToList();
 
             return result;
         }

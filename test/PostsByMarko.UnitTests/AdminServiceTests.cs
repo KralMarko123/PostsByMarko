@@ -9,6 +9,7 @@ using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -35,43 +36,18 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task get_admin_dashboard_should_return_dashboard_data()
         {
-            // Arrange
-            var admin = new User() { Id = Guid.NewGuid() };
-            var today = DateTime.Now;
-            var users = new List<User>()
-            {
-                new User { Id = Guid.NewGuid() },
-                new User
-                {
-                    Id = Guid.NewGuid(),
-                    Email = "test@test.com",
-                    Posts = new List<Post>
-                    {
-                        new Post { Id = Guid.NewGuid(), LastUpdatedAt = today },
-                        new Post { Id = Guid.NewGuid() }
-                    }
-                }
-            };
-            var userRoles = new List<string> { "Some role" };
+            var adminId = Guid.NewGuid();
+            var page = new PageRequest { Page = 2, PageSize = 10 };
+            var projected = new PagedResult<AdminDashboardResponse>(
+                [new() { UserId = Guid.NewGuid(), NumberOfPosts = 2, Roles = ["User"] }], 11, 2, 10);
+            currentRequestAccessorMock.Setup(accessor => accessor.Id).Returns(adminId);
+            usersRepositoryMock.Setup(repository => repository.GetAdminDashboardAsync(adminId, page, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(projected);
 
-            currentRequestAccessorMock.Setup(a => a.Id).Returns(admin.Id);
-            usersRepositoryMock.Setup(r => r.GetUsersAsync(admin.Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => users);
-            usersRepositoryMock.Setup(r => r.GetRolesForUserAsync(It.IsAny<User>())).ReturnsAsync(() => userRoles);
+            var result = await adminService.GetAdminDashboardAsync(page, CancellationToken.None);
 
-            // Act
-            var result = await adminService.GetAdminDashboardAsync(CancellationToken.None);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.Count.Should().Be(users.Count);
-
-            var userWithData = result[1];
-
-            userWithData.UserId.Should().Be(users[1].Id);
-            userWithData.Email.Should().Be(users[1].Email);
-            userWithData.NumberOfPosts.Should().Be(2);
-            userWithData.LastPostedAt.Should().BeWithin(TimeSpan.FromSeconds(5));
-            userWithData.Roles.Should().BeEquivalentTo(userRoles);
+            result.Should().BeSameAs(projected);
+            usersRepositoryMock.Verify(repository => repository.GetRolesForUserAsync(It.IsAny<User>()), Times.Never);
         }
 
         [Fact]

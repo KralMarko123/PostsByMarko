@@ -34,27 +34,10 @@ namespace PostsByMarko.Host.Application.Services
             this.connections = connections;
         }
 
-        public async Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
+        public Task<PagedResult<AdminDashboardResponse>> GetAdminDashboardAsync(PageRequest page, CancellationToken cancellationToken = default)
         {
-            var adminId = currentRequestAccessor.Id;
-            var users = await userRepository.GetUsersAsync(adminId, cancellationToken);
-            var result = new List<AdminDashboardResponse>();
-
-            foreach (var user in users)
-            {
-                var roles = await userRepository.GetRolesForUserAsync(user);
-
-                result.Add(new AdminDashboardResponse
-                {
-                    UserId = user.Id,
-                    Email = user.Email!,
-                    NumberOfPosts = user.Posts.Count,
-                    LastPostedAt = user.Posts.MaxBy(p => p.LastUpdatedAt)?.LastUpdatedAt,
-                    Roles = [.. roles]
-                });
-            }
-
-            return result;
+            page.EnsureValid();
+            return userRepository.GetAdminDashboardAsync(currentRequestAccessor.Id, page, cancellationToken);
         }
 
         public async Task<List<string>> UpdateUserRolesAsync(UpdateUserRolesRequest request, CancellationToken cancellationToken = default)

@@ -60,7 +60,23 @@ The API rejects empty/whitespace post and message content. Request limits are 20
 
 Login and registration share a per-IP limit of 10 requests per minute, configurable with `Authentication:RequestsPerMinute`. Test configuration raises this to 1,000 for automated suites. Identity account lockout is also enforced for lockout-enabled accounts. When deploying behind a proxy, configure trusted forwarded headers and the ingress rate limit explicitly; do not trust arbitrary forwarded IP headers.
 
-Database writes succeed independently of best-effort SignalR delivery. Missed events are reconciled when the client reconnects. Durable event delivery, request idempotency keys, and paginated history remain separate production-hardening work. Direct chat creation uses MariaDB row locks in a transaction to serialize concurrent creation for the same participants.
+Database writes succeed independently of best-effort SignalR delivery. Missed events are reconciled when the client reconnects. Durable event delivery and request idempotency keys remain separate production-hardening work. Direct chat creation uses MariaDB row locks in a transaction to serialize concurrent creation for the same participants.
+
+#### Pagination
+
+The following authenticated GET endpoints accept `page` (starting at 1) and `pageSize` (default 50, maximum 100). Responses remain JSON arrays and include `X-Page`, `X-Page-Size`, `X-Total-Count`, and `X-Has-Next-Page` headers, exposed through CORS. Invalid sizes, non-positive pages, and overflowing offsets return HTTP 400. Pages beyond the result count return an empty array.
+
+| Endpoint | Ordering and contents |
+| --- | --- |
+| `/api/post/all` | Newest creation first, then ID descending. Hidden posts are filtered in SQL before counting and paging; administrators and the author can see them. |
+| `/api/user/all` | Email, then ID ascending. Returns user details without loading posts. The optional `exceptId` filter still applies. |
+| `/api/admin/dashboard` | Email, then user ID ascending; excludes the caller. Post counts and latest update times are calculated in SQL, with roles fetched together for the page. Requires the existing administrator policy. |
+| `/api/messaging/chats` | Latest update first, then ID descending. Returns only the caller's chats, with the latest message and a total `messageCount`. |
+| `/api/messaging/chats/{chatId}/messages` | Page 1 selects the newest messages; each page is returned in chronological order. Only chat members can retrieve history (403 otherwise; 404 for a missing chat). |
+
+Opening a chat through `POST /api/messaging/chats/user/{userId}` returns its latest 50 messages in chronological order. Chat responses include `hasMoreMessages` when older messages exist. Offset pages can shift when new records are added; consumers should deduplicate messages by ID when combining pages.
+
+Backend paging is implemented. The current frontend still requests default pages and has no controls for subsequent pages or older message history. Those controls remain frontend work. Migration `20261008125240_AddPaginationIndexes` adds the supporting indexes; the persistent host applies migrations at startup.
 
 Run focused checks with:
 

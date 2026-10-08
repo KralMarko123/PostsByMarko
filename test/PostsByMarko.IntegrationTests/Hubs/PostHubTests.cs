@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Requests;
@@ -73,7 +73,7 @@ namespace PostsByMarko.IntegrationTests.Hubs
         {
             // Arrange
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
             var postToUpdate = allPosts.First();
             var updateRequest = new UpdatePostRequest
             {
@@ -100,7 +100,7 @@ namespace PostsByMarko.IntegrationTests.Hubs
         {
             // Arrange
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
             var postToDelete = allPosts.First();
 
             var deletedId = Guid.Empty;

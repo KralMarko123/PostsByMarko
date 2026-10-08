@@ -46,7 +46,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
 
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
             var allPostsDtos = mapper.Map<List<PostDto>>(allPosts);
 
             // Act
@@ -71,7 +71,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             var mapper = postsByMarkoApiFactory.Resolve<IMapper>();
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
 
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
             var postDto = mapper.Map<PostDto>(allPosts.First());
 
             // Act
@@ -118,7 +118,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         {
             // Arrange
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
 
             var postToUpdate = allPosts.First(); 
             var updateRequest = new UpdatePostRequest
@@ -148,7 +148,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         {
             // Arrange
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
-            var allPosts = await postRepository.GetPostsAsync(CancellationToken.None);
+            var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
             var postToDelete = allPosts.First();
 
             // Act

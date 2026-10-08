@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Extensions;
 
 namespace PostsByMarko.Host.Controllers
 {
@@ -19,11 +21,11 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("all")]
-        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] Guid? exceptId = null, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] PageRequest pagination, [FromQuery] Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
-            var users = await usersService.GetUsersAsync(exceptId, cancellationToken);
+            var users = await usersService.GetUsersAsync(pagination, exceptId, cancellationToken);
 
-            return Ok(users);
+            return this.PagedOk(users);
         }
 
         [HttpGet]

@@ -98,10 +98,19 @@ namespace PostsByMarko.Host.Data
         private static void SetupIndexes(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Post>()
-                .HasIndex(p => new { p.AuthorId });
+                .HasIndex(p => new { p.AuthorId, p.LastUpdatedAt });
+
+            modelBuilder.Entity<Post>()
+                .HasIndex(p => new { p.CreatedAt, p.Id });
+
+            modelBuilder.Entity<Chat>()
+                .HasIndex(c => new { c.UpdatedAt, c.Id });
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => new { u.Email, u.Id });
 
             modelBuilder.Entity<Message>()
-                .HasIndex(m => new { m.ChatId, m.CreatedAt });
+                .HasIndex(m => new { m.ChatId, m.CreatedAt, m.Id });
 
             modelBuilder.Entity<ChatUser>()
                 .HasIndex(cu => cu.UserId);

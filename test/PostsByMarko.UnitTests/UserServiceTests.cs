@@ -7,6 +7,8 @@ using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
+using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Users;
 using System;
@@ -282,17 +284,15 @@ namespace PostsByMarko.UnitTests
                 new UserDto() { Id = users[1].Id }
             };
 
-            mapperMock.Setup(m => m.Map<UserDto>(users[0])).Returns(usersDto[0]);
-            mapperMock.Setup(m => m.Map<UserDto>(users[1])).Returns(usersDto[1]);
-            usersRepositoryMock.Setup(r => r.GetUsersAsync(null, It.IsAny<CancellationToken>())).ReturnsAsync(() => users);
+            usersRepositoryMock.Setup(r => r.GetUsersAsync(It.IsAny<PageRequest>(), null, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PagedResult<UserDto>(usersDto, 2, 1, 50));
 
             // Act
-            var result = await userService.GetUsersAsync(null, CancellationToken.None);
+            var result = await userService.GetUsersAsync(new PageRequest(), null, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.Count.Should().Be(usersDto.Count);
-            result.Should().BeEquivalentTo(usersDto);
+            result.Items.Should().BeEquivalentTo(usersDto);
         }
 
         [Fact]
@@ -311,17 +311,15 @@ namespace PostsByMarko.UnitTests
                 new UserDto() { Id = users[1].Id }
             };
 
-            mapperMock.Setup(m => m.Map<UserDto>(users[0])).Returns(usersDto[0]);
-            mapperMock.Setup(m => m.Map<UserDto>(users[1])).Returns(usersDto[1]);
-            usersRepositoryMock.Setup(r => r.GetUsersAsync(users[1].Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => [users[0]]);
+            usersRepositoryMock.Setup(r => r.GetUsersAsync(It.IsAny<PageRequest>(), users[1].Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PagedResult<UserDto>([usersDto[0]], 1, 1, 50));
 
             // Act
-            var result = await userService.GetUsersAsync(users[1].Id, CancellationToken.None);
+            var result = await userService.GetUsersAsync(new PageRequest(), users[1].Id, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.Count.Should().Be(1);
-            result.Should().BeEquivalentTo([usersDto[0]]);
+            result.Items.Should().ContainSingle().Which.Should().BeEquivalentTo(usersDto[0]);
         }
 
         [Fact]

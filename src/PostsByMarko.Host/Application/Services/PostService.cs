@@ -8,6 +8,7 @@ using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Posts;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -32,19 +33,16 @@ namespace PostsByMarko.Host.Application.Services
             this.postHub = postHub;
         }
 
-        public async Task<List<PostDto>> GetAllPostsAsync(CancellationToken cancellationToken = default)
+        public async Task<PagedResult<PostDto>> GetAllPostsAsync(PageRequest page, CancellationToken cancellationToken = default)
         {
+            page.EnsureValid();
+            
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
-            var allPosts = await postRepository.GetPostsAsync(cancellationToken);
-
-            if (!userRoles.Contains(RoleConstants.ADMIN))
-            {
-                allPosts.RemoveAll(p => p.Hidden && p.AuthorId != currentUser.Id);
-            }
-
-            return mapper.Map<List<PostDto>>(allPosts);
+            var posts = await postRepository.GetPostsAsync(page, currentUserId, userRoles.Contains(RoleConstants.ADMIN), cancellationToken);
+            
+            return posts.Map(post => mapper.Map<PostDto>(post));
         }
 
         public async Task<PostDto> GetPostByIdAsync(Guid Id, CancellationToken cancellationToken = default)

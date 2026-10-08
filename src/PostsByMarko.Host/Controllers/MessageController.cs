@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Extensions;
 
 namespace PostsByMarko.Host.Controllers
 {
@@ -20,11 +21,20 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("chats")]
-        public async Task<ActionResult<List<ChatDto>>> GetChats(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<ChatDto>>> GetChats([FromQuery] PageRequest pagination, CancellationToken cancellationToken = default)
         {
-            var result = await messagingService.GetUserChatsAsync(cancellationToken);
-            
-            return Ok(result);
+            var result = await messagingService.GetUserChatsAsync(pagination, cancellationToken);
+
+            return this.PagedOk(result);
+        }
+
+        // Page 1 selects the newest messages; each page is returned in chronological order.
+        [HttpGet("chats/{chatId:guid}/messages")]
+        public async Task<ActionResult<List<MessageDto>>> GetMessages(Guid chatId, [FromQuery] PageRequest pagination, CancellationToken cancellationToken = default)
+        {
+            var result = await messagingService.GetChatMessagesAsync(chatId, pagination, cancellationToken);
+
+            return this.PagedOk(result);
         }
 
         [HttpPost]
@@ -41,7 +51,7 @@ namespace PostsByMarko.Host.Controllers
         public async Task<ActionResult<MessageDto>> SendMessage([FromBody] SendMessageRequest request, CancellationToken cancellationToken = default)
         {
             var result = await messagingService.SendMessageAsync(request, cancellationToken);
-            
+
             return Ok(result);
         }
     }

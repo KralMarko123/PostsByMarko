@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Extensions;
 
 namespace PostsByMarko.Host.Controllers
 {
@@ -20,11 +21,11 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("all")]
-        public async Task<ActionResult<List<PostDto>>> GetPosts(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<PostDto>>> GetPosts([FromQuery] PageRequest pagination, CancellationToken cancellationToken = default)
         {
-            var result = await postsService.GetAllPostsAsync(cancellationToken);
+            var result = await postsService.GetAllPostsAsync(pagination, cancellationToken);
 
-            return Ok(result);
+            return this.PagedOk(result);
         }
 
         [HttpGet]

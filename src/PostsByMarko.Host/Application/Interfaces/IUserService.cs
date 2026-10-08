@@ -3,6 +3,8 @@ using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Data.Entities;
 
+using PostsByMarko.Host.Application.Requests;
+
 namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IUserService
@@ -13,7 +15,7 @@ namespace PostsByMarko.Host.Application.Interfaces
         Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<IdentityResult> ConfirmEmailForUserAsync(User user, string token);
         Task<LoginResponse> ValidateUserAsync(LoginDto userLogin, CancellationToken cancellationToken = default);
-        Task<List<UserDto>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default);
+        Task<PagedResult<UserDto>> GetUsersAsync(PageRequest page, Guid? exceptId = null, CancellationToken cancellationToken = default);
         Task<string> GenerateEmailConfirmationTokenForUserAsync(User user);
         Task<bool> ValidateUserWithTokenExistsAsync(CancellationToken cancellationToken = default);
     }

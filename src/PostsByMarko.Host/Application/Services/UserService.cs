@@ -5,6 +5,7 @@ using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Users;
 
@@ -90,12 +91,11 @@ namespace PostsByMarko.Host.Application.Services
             return user;
         }
 
-        public async Task<List<UserDto>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
+        public Task<PagedResult<UserDto>> GetUsersAsync(PageRequest page, Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
-            var users = await userRepository.GetUsersAsync(exceptId, cancellationToken);
-            var userDtos = users.Select(u => mapper.Map<UserDto>(u)).ToList();
-
-            return userDtos;
+            page.EnsureValid();
+            
+            return userRepository.GetUsersAsync(page, exceptId, cancellationToken);
         }
 
         public async Task<string> GenerateEmailConfirmationTokenForUserAsync(User user)

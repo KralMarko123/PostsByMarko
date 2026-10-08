@@ -7,6 +7,7 @@ using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Hubs.Client;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Responses;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data.Entities;
 using PostsByMarko.Host.Data.Repositories.Posts;
@@ -53,16 +54,19 @@ namespace PostsByMarko.UnitTests
             currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
-            postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(posts);
-            mapperMock.Setup(m => m.Map<List<PostDto>>(posts)).Returns(postDtos);
+            postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<PageRequest>(), user.Id, true, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PagedResult<Post>(posts, 120, 1, 50));
+            mapperMock.Setup(m => m.Map<PostDto>(posts[0])).Returns(postDtos[0]);
+            mapperMock.Setup(m => m.Map<PostDto>(posts[1])).Returns(postDtos[1]);
 
             // Act
-            var result = await postService.GetAllPostsAsync(CancellationToken.None);
+            var result = await postService.GetAllPostsAsync(new PageRequest(), CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(2);
-            result.Should().BeEquivalentTo(postDtos);
+            result.Items.Should().BeEquivalentTo(postDtos);
+            result.TotalCount.Should().Be(120);
+            result.HasNextPage.Should().BeTrue();
         }
 
         [Fact]
@@ -85,16 +89,18 @@ namespace PostsByMarko.UnitTests
             currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(s => s.GetRolesForUserAsync(user)).ReturnsAsync(userRoles);
-            postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(posts);
-            mapperMock.Setup(m => m.Map<List<PostDto>>(posts)).Returns(postDtos.Where(p => !p.Hidden).ToList());
+            postsRepositoryMock.Setup(r => r.GetPostsAsync(It.IsAny<PageRequest>(), user.Id, false, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new PagedResult<Post>([posts[0]], 1, 1, 50));
+            mapperMock.Setup(m => m.Map<PostDto>(posts[0])).Returns(postDtos[0]);
 
             // Act
-            var result = await postService.GetAllPostsAsync(CancellationToken.None);
+            var result = await postService.GetAllPostsAsync(new PageRequest(), CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.Should().Contain(postDtos[0]);
+            result.Items.Should().ContainSingle().Which.Should().Be(postDtos[0]);
+            postsRepositoryMock.Verify(repository => repository.GetPostsAsync(
+                It.IsAny<PageRequest>(), user.Id, false, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -106,7 +112,7 @@ namespace PostsByMarko.UnitTests
             currentRequestAccessorMock.Setup(c => c.Id).Returns(randomId);
 
             // Act
-            var result = async () => await postService.GetAllPostsAsync(CancellationToken.None);
+            var result = async () => await postService.GetAllPostsAsync(new PageRequest(), CancellationToken.None);
 
             // Assert
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"User with Id: {randomId} was not found");

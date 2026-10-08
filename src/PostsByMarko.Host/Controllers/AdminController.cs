@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
+using PostsByMarko.Host.Extensions;
 
 namespace PostsByMarko.Host.Controllers
 {
@@ -29,11 +30,11 @@ namespace PostsByMarko.Host.Controllers
 
         [HttpGet]
         [Route("dashboard")]
-        public async Task<ActionResult<List<AdminDashboardResponse>>> GetAdminDashboard(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<AdminDashboardResponse>>> GetAdminDashboard([FromQuery] PageRequest pagination, CancellationToken cancellationToken = default)
         {
-            var result = await adminService.GetAdminDashboardAsync(cancellationToken);
+            var result = await adminService.GetAdminDashboardAsync(pagination, cancellationToken);
 
-            return Ok(result);
+            return this.PagedOk(result);
         }
 
         [HttpDelete]
