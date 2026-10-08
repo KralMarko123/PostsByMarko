@@ -146,14 +146,7 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<IdentityResult> AddRoleToUserAsync(User user, string role)
         {
-            var result = await userManager.AddToRoleAsync(user, role);
-
-            if (result.Succeeded)
-            {
-                result = await userManager.UpdateSecurityStampAsync(user);
-            }
-
-            return result;
+            return await ExecuteRoleChangeAsync(user, () => userManager.AddToRoleAsync(user, role));
         }
 
         public async Task<List<User>> GetUsersAsync(Guid? exceptId = null, CancellationToken cancellationToken = default)
@@ -168,14 +161,25 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<IdentityResult> RemoveRoleFromUserAsync(User user, string role)
         {
-            var result = await userManager.RemoveFromRoleAsync(user, role);
+            return await ExecuteRoleChangeAsync(user, () => userManager.RemoveFromRoleAsync(user, role));
+        }
 
+        private async Task<IdentityResult> ExecuteRoleChangeAsync(User user, Func<Task<IdentityResult>> changeRole)
+        {
+            await using var transaction = await appDbContext.Database.BeginTransactionAsync();
+            var result = await ChangeRoleAndStampAsync(user, changeRole);
             if (result.Succeeded)
             {
-                result = await userManager.UpdateSecurityStampAsync(user);
+                await transaction.CommitAsync();
             }
 
             return result;
+        }
+
+        private async Task<IdentityResult> ChangeRoleAndStampAsync(User user, Func<Task<IdentityResult>> changeRole)
+        {
+            var result = await changeRole();
+            return result.Succeeded ? await userManager.UpdateSecurityStampAsync(user) : result;
         }
 
         public Task<IdentityResult> RemoveRoleFromUserUnlessLastMemberAsync(
@@ -183,16 +187,7 @@ namespace PostsByMarko.Host.Data.Repositories.Users
             ExecuteUnlessLastMemberInRoleAsync(
                 user,
                 role,
-                async () =>
-                {
-                    var result = await userManager.RemoveFromRoleAsync(user, role);
-                    if (result.Succeeded)
-                    {
-                        result = await userManager.UpdateSecurityStampAsync(user);
-                    }
-
-                    return result;
-                },
+                () => ChangeRoleAndStampAsync(user, () => userManager.RemoveFromRoleAsync(user, role)),
                 cancellationToken);
 
         public Task<IdentityResult> DeleteUserUnlessLastMemberInRoleAsync(

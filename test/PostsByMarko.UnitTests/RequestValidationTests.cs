@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using PostsByMarko.Host.Application.Enums;
 using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Services;
@@ -34,7 +35,7 @@ public class RequestValidationTests
     public async Task invalid_role_action_never_mutates_roles(ActionType? action)
     {
         var repository = new Mock<IUserRepository>(MockBehavior.Strict);
-        var service = new AdminService(repository.Object, Mock.Of<ICurrentRequestAccessor>(), null!);
+        var service = new AdminService(repository.Object, Mock.Of<ICurrentRequestAccessor>(), null!, Mock.Of<IUserConnectionRegistry>());
         await Assert.ThrowsAsync<BadRequestException>(() => service.UpdateUserRolesAsync(new UpdateUserRolesRequest
         {
             UserId = Guid.NewGuid(), Role = "Admin", ActionType = action

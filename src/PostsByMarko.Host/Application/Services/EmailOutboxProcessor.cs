@@ -1,5 +1,7 @@
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Data.Repositories.EmailOutbox;
+using Microsoft.Extensions.Options;
+using PostsByMarko.Host.Application.Configuration;
 
 namespace PostsByMarko.Host.Application.Services;
 
@@ -7,13 +9,21 @@ public class EmailOutboxProcessor(
     IEmailOutboxRepository emailOutboxRepository,
     IEmailService emailService,
     TimeProvider timeProvider,
+    IOptions<EmailConfig> emailConfig,
     ILogger<EmailOutboxProcessor> logger)
 {
     private static readonly TimeSpan LeaseDuration = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan DeliveryTimeout = TimeSpan.FromMinutes(1);
     private const int MaxErrorLength = 2000;
 
     public async Task<bool> ProcessNextAsync(CancellationToken cancellationToken = default)
     {
+        // The sender uses the same options. A disabled sender must leave the queue untouched.
+        if (!emailConfig.Value.Enabled)
+        {
+            return false;
+        }
+
         var lockId = Guid.NewGuid().ToString("N");
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var message = await emailOutboxRepository.LeaseNextAsync(
@@ -26,7 +36,16 @@ public class EmailOutboxProcessor(
 
         try
         {
-            await emailService.SendEmailConfirmationLinkAsync(message.RecipientEmail, cancellationToken);
+            // End the SMTP attempt before another worker can acquire the expired lease.
+            var remainingTime = now.Add(DeliveryTimeout) - timeProvider.GetUtcNow().UtcDateTime;
+            if (remainingTime <= TimeSpan.Zero)
+            {
+                throw new TimeoutException("The email delivery deadline elapsed while acquiring the lease.");
+            }
+
+            using var timeout = new CancellationTokenSource(remainingTime, timeProvider);
+            using var delivery = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+            await emailService.SendEmailConfirmationLinkAsync(message.RecipientEmail, delivery.Token);
             await emailOutboxRepository.MarkSentAsync(
                 message.Id, lockId, timeProvider.GetUtcNow().UtcDateTime, cancellationToken);
         }

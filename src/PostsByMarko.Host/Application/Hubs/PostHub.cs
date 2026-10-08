@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Hubs.Client;
+using PostsByMarko.Host.Data;
 
 namespace PostsByMarko.Host.Application.Hubs
 {
     [Authorize]
-    public class PostHub : Hub<IPostClient>
-    {
-        // Later we can override OnConnectedAsync and join user groups if needed
-    }
+    public class PostHub(IUserConnectionRegistry connections, AppDbContext db)
+        : AuthenticatedHub<IPostClient>(connections, db) { }
 }

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Enums;
@@ -149,9 +150,10 @@ namespace PostsByMarko.IntegrationTests.Controllers
         [Fact]
         public async Task repository_should_preserve_last_admin()
         {
-            var repository = postsByMarkoApiFactory.Resolve<IUserRepository>();
-            var owner = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.OWNER_EMAIL);
-            var testAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
+            using var scope = postsByMarkoApiFactory.Services.CreateScope();
+            var repository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var owner = (await repository.GetUserByEmailAsync(TestingConstants.OWNER_EMAIL))!;
+            var testAdmin = (await repository.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL))!;
             (await repository.RemoveRoleFromUserAsync(owner, RoleConstants.ADMIN)).Succeeded.Should().BeTrue();
 
             var result = await repository.RemoveRoleFromUserUnlessLastMemberAsync(

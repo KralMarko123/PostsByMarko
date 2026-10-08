@@ -63,9 +63,9 @@ namespace PostsByMarko.Host.Extensions
 
         public static void WithHubs(this WebApplication app)
         {
-            app.MapHub<AdminHub>("/adminHub");
-            app.MapHub<PostHub>("/postHub");
-            app.MapHub<MessageHub>("/messageHub");
+            app.MapHub<AdminHub>("/adminHub", options => options.CloseOnAuthenticationExpiration = true);
+            app.MapHub<PostHub>("/postHub", options => options.CloseOnAuthenticationExpiration = true);
+            app.MapHub<MessageHub>("/messageHub", options => options.CloseOnAuthenticationExpiration = true);
         }
     }
 }

@@ -22,13 +22,14 @@ namespace PostsByMarko.UnitTests
         private readonly Mock<ICurrentRequestAccessor> currentRequestAccessorMock = new();
         private readonly Mock<IHubContext<AdminHub, IAdminClient>> adminHubMock = new();
         private readonly Mock<IAdminClient> adminClientMock = new();
+        private readonly Mock<IUserConnectionRegistry> connectionsMock = new();
 
         public AdminServiceTests()
         {
             usersRepositoryMock
                 .Setup(r => r.GetRolesForUserAsync(It.IsAny<User>()))
                 .ReturnsAsync([]);
-            adminService = new AdminService(usersRepositoryMock.Object, currentRequestAccessorMock.Object, adminHubMock.Object);
+            adminService = new AdminService(usersRepositoryMock.Object, currentRequestAccessorMock.Object, adminHubMock.Object, connectionsMock.Object);
         }
 
         [Fact]
@@ -118,6 +119,7 @@ namespace PostsByMarko.UnitTests
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(updatedRoles);
             usersRepositoryMock.Verify(r => r.AddRoleToUserAsync(user, request.Role), Times.Once);
+            connectionsMock.Verify(registry => registry.Revoke(user.Id), Times.Once);
             adminClientMock.Verify(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
@@ -148,6 +150,7 @@ namespace PostsByMarko.UnitTests
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(updatedRoles);
             usersRepositoryMock.Verify(r => r.RemoveRoleFromUserAsync(user, request.Role), Times.Once);
+            connectionsMock.Verify(registry => registry.Revoke(user.Id), Times.Once);
             adminClientMock.Verify(a => a.UpdatedUserRoles(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
@@ -171,6 +174,7 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             await result.Should().ThrowAsync<InvalidOperationException>().WithMessage($"Error while updating roles for user with Id: {user.Id}");
+            connectionsMock.Verify(registry => registry.Revoke(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -273,6 +277,7 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             usersRepositoryMock.Verify(r => r.DeleteUserAsync(user), Times.Once);
+            connectionsMock.Verify(registry => registry.Revoke(user.Id), Times.Once);
             adminClientMock.Verify(a => a.DeletedUser(user.Id, It.IsAny<DateTime>()), Times.Once);
         }
 
@@ -304,6 +309,7 @@ namespace PostsByMarko.UnitTests
 
             // Assert
             await result.Should().ThrowAsync<InvalidOperationException>().WithMessage($"Failed to delete user with Id: {user.Id}");
+            connectionsMock.Verify(registry => registry.Revoke(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]

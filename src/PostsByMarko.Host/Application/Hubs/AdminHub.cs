@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Hubs.Client;
+using PostsByMarko.Host.Data;
 
 namespace PostsByMarko.Host.Application.Hubs
 {
     [Authorize(Roles = "Admin")]
-    public class AdminHub : Hub<IAdminClient>
-    {
-        // Later we can override OnConnectedAsync and join user groups if needed
-    }
+    public class AdminHub(IUserConnectionRegistry connections, AppDbContext db)
+        : AuthenticatedHub<IAdminClient>(connections, db) { }
 }

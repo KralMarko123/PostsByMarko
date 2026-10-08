@@ -24,12 +24,14 @@ namespace PostsByMarko.Host.Application.Services
         private readonly IUserRepository userRepository;
         private readonly ICurrentRequestAccessor currentRequestAccessor;
         private readonly IHubContext<AdminHub, IAdminClient> adminHub;
+        private readonly IUserConnectionRegistry connections;
 
-        public AdminService(IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor, IHubContext<AdminHub, IAdminClient> adminHub)
+        public AdminService(IUserRepository userRepository, ICurrentRequestAccessor currentRequestAccessor, IHubContext<AdminHub, IAdminClient> adminHub, IUserConnectionRegistry connections)
         {
             this.userRepository = userRepository;
             this.currentRequestAccessor = currentRequestAccessor;
             this.adminHub = adminHub;
+            this.connections = connections;
         }
 
         public async Task<List<AdminDashboardResponse>> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
@@ -80,6 +82,8 @@ namespace PostsByMarko.Host.Application.Services
             EnsureIdentityOperationSucceeded(result,
                 $"Error while updating roles for user with Id: {request.UserId}");
 
+            connections.Revoke(user.Id);
+
             var updatedRoles = await userRepository.GetRolesForUserAsync(user);
 
             await NotificationDelivery.SendAsync(() => adminHub.Clients.All.UpdatedUserRoles(user.Id, DateTime.UtcNow));
@@ -107,6 +111,7 @@ namespace PostsByMarko.Host.Application.Services
                 : await userRepository.DeleteUserAsync(user);
 
             EnsureIdentityOperationSucceeded(result, $"Failed to delete user with Id: {user.Id}");
+            connections.Revoke(user.Id);
             await NotificationDelivery.SendAsync(() => adminHub.Clients.All.DeletedUser(user.Id, DateTime.UtcNow));
         }
 

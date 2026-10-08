@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using PostsByMarko.Host.Application.Configuration;
 using PostsByMarko.Host.Application.Helper;
+using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Services;
 using PostsByMarko.Host.Data;
@@ -176,6 +177,7 @@ namespace PostsByMarko.Host.Extensions
 
             // Services
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddSingleton<IUserConnectionRegistry, UserConnectionRegistry>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IMessagingService, MessagingService>();
