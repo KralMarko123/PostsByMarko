@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -9,7 +9,7 @@ namespace PostsByMarko.UnitTests
         private readonly Mock<ILogger> loggerMock = new();
         private readonly Mock<ILoggerFactory> loggerFactoryMock = new();
 
-        public MappingTests() 
+        public MappingTests()
         {
             loggerFactoryMock
                 .Setup(f => f.CreateLogger(It.IsAny<string>()))

@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Configuration
+namespace PostsByMarko.Host.Application.Configuration
 {
     public class EmailConfig
     {

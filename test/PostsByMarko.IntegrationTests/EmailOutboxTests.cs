@@ -26,6 +26,7 @@ public class EmailOutboxTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
     [Fact]
     public async Task disabled_delivery_preserves_pending_message_and_enabled_delivery_marks_it_sent()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var services = scope.ServiceProvider;
         var users = services.GetRequiredService<UserManager<User>>();
@@ -40,8 +41,10 @@ public class EmailOutboxTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         var processor = new EmailOutboxProcessor(services.GetRequiredService<IEmailOutboxRepository>(),
             email, System.TimeProvider.System, Options.Create(settings), NullLogger<EmailOutboxProcessor>.Instance);
 
+        // Act
         Assert.False(await processor.ProcessNextAsync());
         var pending = await db.EmailOutboxMessages.AsNoTracking().SingleAsync();
+        // Assert
         Assert.Equal(original.Id, pending.Id);
         Assert.Equal(original.AvailableAt, pending.AvailableAt);
         Assert.Equal(0, pending.AttemptCount);
@@ -58,20 +61,21 @@ public class EmailOutboxTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         Assert.Null(sent.LockId);
         Assert.Null(sent.LockedUntil);
         Assert.Equal(user.Email, sender.Recipient);
-        Assert.Contains("/api/auth/confirm?", sender.Body);
+        Assert.Contains("/api/auth/confirm?", sender.Content!.TextBody);
+        Assert.Contains("Confirm your email</a>", sender.Content.HtmlBody);
         Assert.False(await processor.ProcessNextAsync());
     }
 
     private sealed class RecordingEmailHelper : IEmailHelper
     {
         public string? Recipient { get; private set; }
-        public string Body { get; private set; } = string.Empty;
+        public EmailContent? Content { get; private set; }
 
         public Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject,
-            string body, CancellationToken cancellationToken = default)
+            EmailContent content, CancellationToken cancellationToken = default)
         {
             Recipient = emailToSendTo;
-            Body = body;
+            Content = content;
             return Task.CompletedTask;
         }
     }

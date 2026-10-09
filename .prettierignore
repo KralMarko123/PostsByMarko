@@ -1,2 +1,13 @@
-*.yaml
-*.yml
+**/node_modules/
+**/bin/
+**/obj/
+**/dist/
+**/build/
+**/coverage/
+artifacts/
+TestResults/
+**/package-lock.json
+**/appsettings.Development.json
+.env
+.env.*
+!.env.example

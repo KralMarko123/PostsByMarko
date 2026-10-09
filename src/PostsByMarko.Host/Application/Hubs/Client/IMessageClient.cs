@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.DTOs;
 
 namespace PostsByMarko.Host.Application.Hubs.Client
 {

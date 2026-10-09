@@ -39,6 +39,7 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
     [InlineData(true)]
     public async Task connection_start_rechecks_stamp_even_when_authentication_cached_the_user(bool delete)
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var user = (await users.FindByEmailAsync(TestingConstants.TEST_USER_EMAIL))!;
@@ -58,8 +59,10 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
 
         var registry = new UserConnectionRegistry();
         using var hub = new PostHub(registry, scope.ServiceProvider.GetRequiredService<AppDbContext>()) { Context = context };
+        // Act
         await hub.OnConnectedAsync();
 
+        // Assert
         Assert.Equal(1, context.AbortCount);
         registry.Revoke(user.Id);
         Assert.Equal(1, context.AbortCount); // Rejected connections must also be removed from the registry.
@@ -74,6 +77,7 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
     [InlineData("messageHub", true)]
     public async Task demotion_or_deletion_closes_existing_websocket_and_rejects_old_token(string hub, bool delete)
     {
+        // Arrange
         using var actor = factory.CreateClient();
         var actorToken = await LoginAsync(actor, TestingConstants.OWNER_EMAIL);
         actor.DefaultRequestHeaders.Authorization = new("Bearer", actorToken);
@@ -89,12 +93,16 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
         await targetConnection.StartAsync();
         await observer.StartAsync();
 
+        // Act
         using var response = delete
             ? await actor.DeleteAsync($"/api/admin/users/{target.Id}")
             : await actor.PutAsJsonAsync("/api/admin/roles", new UpdateUserRolesRequest
             {
-                UserId = target.Id, Role = "Admin", ActionType = ActionType.Delete
+                UserId = target.Id,
+                Role = "Admin",
+                ActionType = ActionType.Delete
             });
+        // Assert
         response.EnsureSuccessStatusCode();
 
         await closed.Task.WaitAsync(TimeSpan.FromSeconds(10));
@@ -110,6 +118,7 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
     [InlineData("messageHub")]
     public async Task jwt_expiration_closes_existing_websocket(string hub)
     {
+        // Arrange
         using var client = factory.CreateClient();
         var token = await LoginAsync(client, TestingConstants.TEST_ADMIN_EMAIL);
         using var scope = factory.Services.CreateScope();
@@ -124,9 +133,11 @@ public class ConnectionRevocationTests(PostsByMarkoApiFactory factory) : IAsyncL
         var closed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         connection.Closed += _ => { closed.TrySetResult(); return Task.CompletedTask; };
 
+        // Act
         await connection.StartAsync();
         await closed.Task.WaitAsync(TimeSpan.FromSeconds(10));
 
+        // Assert
         Assert.Equal(HubConnectionState.Disconnected, connection.State);
     }
 

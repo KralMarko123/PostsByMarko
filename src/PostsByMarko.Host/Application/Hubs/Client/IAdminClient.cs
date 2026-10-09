@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Hubs.Client
+namespace PostsByMarko.Host.Application.Hubs.Client
 {
     public interface IAdminClient
     {

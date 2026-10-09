@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Test.Shared.Helper
+namespace PostsByMarko.Test.Shared.Helper
 {
     public static class FileHelper
     {
@@ -6,9 +6,11 @@
         {
             while (true)
             {
-                if (startDirectory == null) return null;
+                if (startDirectory == null)
+                    return null;
 
-                if (File.Exists(Path.Combine(startDirectory, fileName))) return startDirectory;
+                if (File.Exists(Path.Combine(startDirectory, fileName)))
+                    return startDirectory;
 
                 var info = Directory.GetParent(startDirectory);
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -29,7 +29,7 @@ namespace PostsByMarko.IntegrationTests
 
         public async Task InitializeAsync()
         {
-            client = CreateClient( new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+            client = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
             await RecreateAndSeedDatabaseAsync();
         }
@@ -128,7 +128,7 @@ namespace PostsByMarko.IntegrationTests
                 .WithAutomaticReconnect()
                 .Build();
         }
-        
+
         public Task WaitForSignalRPropagation() => Task.Delay(150); // Small wait for SignalR messages to propagate
     }
 }

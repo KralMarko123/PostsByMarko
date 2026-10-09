@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using PostsTesting.UI_Models.Pages;
 
 namespace PostsByMarko.FrontendTests.UI_Models.Pages
@@ -8,7 +8,7 @@ namespace PostsByMarko.FrontendTests.UI_Models.Pages
         private static string url => $"{baseUrl}/admin";
 
         public AdminDashboardPage(IPage page) : base(page) { }
-        
+
         public ILocator tableHead => page.Locator("table thead");
         public ILocator tableHeaders => page.Locator("table thead th");
         public ILocator tableBody => page.Locator("table tbody");

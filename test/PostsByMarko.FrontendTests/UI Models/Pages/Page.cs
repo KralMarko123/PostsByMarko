@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using PostsByMarko.Test.Shared.Constants;
 
 namespace PostsTesting.UI_Models.Pages
@@ -7,7 +7,7 @@ namespace PostsTesting.UI_Models.Pages
     {
         protected static string baseUrl => $"{TestingConstants.DEV_CLIENT_ENDPOINT}";
 
-        public Page(IPage page) : base(page) 
+        public Page(IPage page) : base(page)
         {
             page.SetViewportSizeAsync(1920, 1080);
         }

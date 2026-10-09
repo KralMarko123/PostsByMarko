@@ -1,5 +1,5 @@
 using PostsByMarko.Host.Application.Helper;
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.DTOs;
@@ -36,12 +36,12 @@ namespace PostsByMarko.Host.Application.Services
         public async Task<PagedResult<PostDto>> GetAllPostsAsync(PageRequest page, CancellationToken cancellationToken = default)
         {
             page.EnsureValid();
-            
+
             var currentUserId = currentRequestAccessor.Id;
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var posts = await postRepository.GetPostsAsync(page, currentUserId, userRoles.Contains(RoleConstants.ADMIN), cancellationToken);
-            
+
             return posts.Map(post => mapper.Map<PostDto>(post));
         }
 
@@ -51,11 +51,11 @@ namespace PostsByMarko.Host.Application.Services
             var currentUser = await userRepository.GetUserByIdAsync(currentUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {currentUserId} was not found");
             var userRoles = await userRepository.GetRolesForUserAsync(currentUser);
             var post = await postRepository.GetPostByIdAsync(Id, cancellationToken) ?? throw new ResourceNotFoundException($"Post with Id: {Id} was not found");
-            
+
             if (post.Hidden && !userRoles.Contains(RoleConstants.ADMIN) && post.AuthorId != currentUser.Id)
             {
                 throw new ForbiddenException("You are not authorized to view this post");
-            } 
+            }
 
             return mapper.Map<PostDto>(post);
         }
@@ -69,7 +69,7 @@ namespace PostsByMarko.Host.Application.Services
             {
                 throw new BadRequestException("Post title and content cannot be empty");
             }
-           
+
             var post = mapper.Map<Post>(request);
 
             post.CreatedAt = DateTime.UtcNow;
@@ -128,7 +128,7 @@ namespace PostsByMarko.Host.Application.Services
             {
                 throw new ForbiddenException("You are not authorized to delete this post");
             }
-            
+
             await postRepository.DeletePostAsync(post);
             await postRepository.SaveChangesAsync(cancellationToken);
             await NotificationDelivery.SendAsync(() => postHub.Clients.All.PostDeleted(Id));

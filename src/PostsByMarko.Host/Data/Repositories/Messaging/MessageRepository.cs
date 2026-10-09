@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Data.Entities;
 
 using PostsByMarko.Host.Application.DTOs;
@@ -22,14 +22,17 @@ namespace PostsByMarko.Host.Data.Repositories.Messaging
                 .Where(message => message.ChatId == chatId)
                 .Select(message => new MessageDto
                 {
-                    Id = message.Id, ChatId = message.ChatId, SenderId = message.SenderId,
-                    Content = message.Content, CreatedAt = message.CreatedAt
+                    Id = message.Id,
+                    ChatId = message.ChatId,
+                    SenderId = message.SenderId,
+                    Content = message.Content,
+                    CreatedAt = message.CreatedAt
                 })
                 .OrderByDescending(message => message.CreatedAt).ThenByDescending(message => message.Id)
                 .ToPageAsync(page, cancellationToken);
-            
+
             result.Items.Reverse();
-            
+
             return result;
         }
 

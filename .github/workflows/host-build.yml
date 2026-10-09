@@ -48,6 +48,9 @@ jobs:
 
     - name: Install dependencies
       run: dotnet restore
+
+    - name: Check C# formatting
+      run: dotnet format whitespace PostsByMarko.sln --no-restore --verify-no-changes --exclude src/PostsByMarko.Host/Data/Migrations
     
     - name: Build projects
       run: dotnet build --no-restore

@@ -6,12 +6,5 @@ import "./Logo.css";
 export const Logo = () => {
   const navigate = useNavigate();
 
-  return (
-    <img
-      src={logo}
-      className="logo"
-      alt="posm-logo"
-      onClick={() => navigate(ROUTES.HOME)}
-    />
-  );
+  return <img src={logo} className="logo" alt="posm-logo" onClick={() => navigate(ROUTES.HOME)} />;
 };

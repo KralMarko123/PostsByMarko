@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Test.Shared.Constants
+namespace PostsByMarko.Test.Shared.Constants
 {
     public static class TestingConstants
     {

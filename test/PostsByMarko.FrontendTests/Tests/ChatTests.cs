@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.UI_Models.Pages;
 using PostsByMarko.Test.Shared.Constants;
@@ -41,18 +41,22 @@ namespace PostsByMarko.FrontendTests.Tests
         // Teardown
         public async Task DisposeAsync()
         {
-            if (page != null) await page.CloseAsync();
+            if (page != null)
+                await page.CloseAsync();
         }
 
         [Fact]
         public async Task should_view_chats()
         {
+            // Arrange
             await LoginWithEmail(testUserEmail, loginPage, homePage);
+            // Act
             await NavigateToChatPage(homePage, chatPage);
 
             var infoMessageText = await chatPage.infoMessage.TextContentAsync();
             var userListShown = await chatPage.userList.IsVisibleAsync();
 
+            // Assert
             userListShown.Should().BeTrue();
             infoMessageText.Should().Be("Start chatting right away by clicking on another user");
         }
@@ -60,6 +64,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_send_a_message()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail, loginPage, homePage);
             await NavigateToChatPage(homePage, chatPage);
 
@@ -67,6 +72,7 @@ namespace PostsByMarko.FrontendTests.Tests
 
             await userCard.ClickAsync();
             await chatPage.messageList.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            // Act
             await chatPage.messageInput.FillAsync("Hello from admin!");
             await chatPage.sendButton.ClickAsync();
             await chatPage.WaitForNumberOfMessagesToChange();
@@ -74,6 +80,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var lastMessageSent = new Message(page, chatPage.message.Last);
             var messageText = await lastMessageSent.content.TextContentAsync();
 
+            // Assert
             await Assertions.Expect(lastMessageSent.message).ToContainClassAsync("author");
             messageText.Should().Be("Hello from admin!");
         }
@@ -81,6 +88,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task shoild_not_send_empty_message()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail, loginPage, homePage);
             await NavigateToChatPage(homePage, chatPage);
 
@@ -92,10 +100,12 @@ namespace PostsByMarko.FrontendTests.Tests
 
             var sentMessages = await chatPage.message.CountAsync();
 
+            // Act
             await chatPage.sendButton.ClickAsync();
 
             var sentMessagesAfterClick = await chatPage.message.CountAsync();
 
+            // Assert
             await Assertions.Expect(chatPage.messageInput).ToContainClassAsync("empty");
             sentMessagesAfterClick.Should().Be(sentMessages);
         }
@@ -103,6 +113,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_receive_a_message()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail, loginPage, homePage);
             await NavigateToChatPage(homePage, chatPage);
 
@@ -117,6 +128,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var adminUserCard = secondChatPage.GetUserCard(testAdminFullname);
 
             await adminUserCard.ClickAsync();
+            // Act
             await secondChatPage.messageInput.FillAsync("Hello from test user!");
             await secondChatPage.sendButton.ClickAsync();
 
@@ -132,6 +144,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var lastMessageReceived = new Message(page, chatPage.message.Last);
             var messageText = await lastMessageReceived.content.TextContentAsync();
 
+            // Assert
             unreadMessages.Should().NotBeNullOrEmpty();
             messageText.Should().Be("Hello from test user!");
         }

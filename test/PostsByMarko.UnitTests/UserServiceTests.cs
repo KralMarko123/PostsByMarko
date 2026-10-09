@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
@@ -32,13 +32,16 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task wrong_password_for_unconfirmed_user_must_not_send_email()
         {
+            // Arrange
             var login = new LoginDto { Email = "user@example.com", Password = "Wrong123" };
             var user = new User { Id = Guid.NewGuid(), Email = login.Email };
             usersRepositoryMock.Setup(repository => repository.GetUserByEmailAsync(login.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             usersRepositoryMock.Setup(repository => repository.CheckPasswordForUserAsync(user, login.Password)).ReturnsAsync(false);
 
+            // Act
             await Assert.ThrowsAsync<AuthException>(() => userService.ValidateUserAsync(login));
 
+            // Assert
             usersRepositoryMock.Verify(repository => repository.QueueConfirmationEmailAsync(
                 It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
             jwtHelperMock.Verify(helper => helper.CreateTokenAsync(It.IsAny<User>()), Times.Never);

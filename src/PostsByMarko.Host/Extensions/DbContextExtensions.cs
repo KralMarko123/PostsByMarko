@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Application.Constants;
@@ -96,7 +96,7 @@ namespace PostsByMarko.Host.Extensions
                     userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = appRoles[0].Id });
                 }
 
-                userRoles.Add(new IdentityUserRole<Guid> {UserId = user.Id, RoleId = appRoles[1].Id });
+                userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = appRoles[1].Id });
             }
 
             await appDbContext.UserRoles.AddRangeAsync(userRoles);

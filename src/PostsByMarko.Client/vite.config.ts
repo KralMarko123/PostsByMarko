@@ -13,8 +13,8 @@ export default defineConfig({
       "@context": fileURLToPath(new URL("./src/context", import.meta.url)),
       "@typeConfigs": fileURLToPath(new URL("./src/types", import.meta.url)),
       "@assets": fileURLToPath(new URL("./src/assets", import.meta.url)),
-      "types": fileURLToPath(new URL("./src/types", import.meta.url)),
-      "constants": fileURLToPath(new URL("./src/constants", import.meta.url)),
+      types: fileURLToPath(new URL("./src/types", import.meta.url)),
+      constants: fileURLToPath(new URL("./src/constants", import.meta.url)),
     },
   },
   server: {

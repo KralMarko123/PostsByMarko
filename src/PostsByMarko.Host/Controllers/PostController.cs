@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
@@ -34,7 +34,7 @@ namespace PostsByMarko.Host.Controllers
         {
             var post = await postsService.GetPostByIdAsync(id, cancellationToken);
 
-            return Ok(post);        
+            return Ok(post);
         }
 
         [HttpPost]
@@ -42,7 +42,7 @@ namespace PostsByMarko.Host.Controllers
         public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostRequest createRequest, CancellationToken cancellationToken = default)
         {
             var post = await postsService.CreatePostAsync(createRequest, cancellationToken);
-            
+
             return Ok(post);
         }
 
@@ -51,7 +51,7 @@ namespace PostsByMarko.Host.Controllers
         public async Task<ActionResult<PostDto>> UpdatePost(Guid id, [FromBody] UpdatePostRequest request, CancellationToken cancellationToken = default)
         {
             var updatedPost = await postsService.UpdatePostAsync(id, request, cancellationToken);
-            
+
             return Ok(updatedPost);
         }
 

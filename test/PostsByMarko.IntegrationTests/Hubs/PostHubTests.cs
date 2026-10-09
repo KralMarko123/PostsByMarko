@@ -86,7 +86,7 @@ namespace PostsByMarko.IntegrationTests.Hubs
             hubConnection!.On<PostChangeDto>("PostUpdated", notification => postUpdated = notification);
 
             // Act
-            await client.PutAsJsonAsync($"{controllerPrefix}/{postToUpdate.Id}", updateRequest );
+            await client.PutAsJsonAsync($"{controllerPrefix}/{postToUpdate.Id}", updateRequest);
             await postsByMarkoApiFactory.WaitForSignalRPropagation();
 
             // Assert

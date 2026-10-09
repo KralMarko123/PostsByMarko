@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.DTOs;
+using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
 

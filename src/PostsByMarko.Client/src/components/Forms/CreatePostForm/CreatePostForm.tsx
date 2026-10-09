@@ -66,10 +66,7 @@ export const CreatePostForm = () => {
         <p className="form-desc">Build & share with your friends</p>
 
         {createPostForm.formGroups.map((group) => (
-          <div
-            key={group.id}
-            className={`form-group ${group.type === "textarea" ? "text" : ""}`}
-          >
+          <div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
             {group.type === "textarea" ? (
               <textarea
                 id={group.id}

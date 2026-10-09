@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Data.Entities;
 
 using System.Linq.Expressions;
@@ -11,7 +11,7 @@ namespace PostsByMarko.Host.Data.Repositories.Messaging
     public class ChatRepository : IChatRepository
     {
         private readonly AppDbContext appDbContext;
-        
+
         public ChatRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
@@ -57,18 +57,25 @@ namespace PostsByMarko.Host.Data.Repositories.Messaging
 
         private static Expression<Func<Chat, ChatDto>> ChatProjection(int messageLimit) => chat => new ChatDto
         {
-            Id = chat.Id, CreatedAt = chat.CreatedAt, UpdatedAt = chat.UpdatedAt,
+            Id = chat.Id,
+            CreatedAt = chat.CreatedAt,
+            UpdatedAt = chat.UpdatedAt,
             MessageCount = chat.Messages.Count(),
             Users = chat.ChatUsers.OrderBy(member => member.UserId).Select(member => new UserDto
             {
-                Id = member.UserId, Email = member.User.Email!,
-                FirstName = member.User.FirstName!, LastName = member.User.LastName!
+                Id = member.UserId,
+                Email = member.User.Email!,
+                FirstName = member.User.FirstName!,
+                LastName = member.User.LastName!
             }).ToList(),
             Messages = chat.Messages.OrderByDescending(message => message.CreatedAt).ThenByDescending(message => message.Id)
                 .Take(messageLimit).Select(message => new MessageDto
                 {
-                    Id = message.Id, ChatId = message.ChatId, SenderId = message.SenderId,
-                    Content = message.Content, CreatedAt = message.CreatedAt
+                    Id = message.Id,
+                    ChatId = message.ChatId,
+                    SenderId = message.SenderId,
+                    Content = message.Content,
+                    CreatedAt = message.CreatedAt
                 }).ToList()
         };
 

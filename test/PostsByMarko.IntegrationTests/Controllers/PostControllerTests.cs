@@ -81,7 +81,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            
+
             post.Should().NotBeNull();
             post.Should().BeEquivalentTo(postDto);
         }
@@ -120,7 +120,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             var postRepository = postsByMarkoApiFactory.Resolve<IPostRepository>();
             var allPosts = (await postRepository.GetPostsAsync(new PageRequest(), Guid.Empty, true, CancellationToken.None)).Items;
 
-            var postToUpdate = allPosts.First(); 
+            var postToUpdate = allPosts.First();
             var updateRequest = new UpdatePostRequest
             {
                 Title = "Updated Title",

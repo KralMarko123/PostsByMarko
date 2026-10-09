@@ -40,7 +40,9 @@ export const Home = () => {
 
   useEffect(() => {
     getPosts();
-    return () => { requestVersion.current++; };
+    return () => {
+      requestVersion.current++;
+    };
   }, [appContext.lastMessageRegistered, user?.token]);
 
   return (

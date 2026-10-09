@@ -40,17 +40,24 @@ public class DatabaseInitializationTests
     [Fact]
     public async Task Production_ignores_development_administrator_settings()
     {
+        // Arrange
+        // The shared fixture supplies the initialized test dependencies.
+        // Act
         await Initialize(false);
+        // Assert
         users.Verify(u => u.FindByEmailAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
     public async Task Existing_administrator_is_not_recreated_or_given_a_new_password()
     {
+        // Arrange
         var existing = new User { Email = "admin@example.test" };
         users.Setup(u => u.FindByEmailAsync(existing.Email)).ReturnsAsync(existing);
         users.Setup(u => u.IsInRoleAsync(existing, RoleConstants.ADMIN)).ReturnsAsync(true);
+        // Act
         await Initialize(true);
+        // Assert
         users.Verify(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
         users.Verify(u => u.ResetPasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
@@ -58,19 +65,25 @@ public class DatabaseInitializationTests
     [Fact]
     public async Task Existing_regular_account_cannot_be_promoted_by_bootstrap()
     {
+        // Arrange
         users.Setup(u => u.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(new User());
+        // Act
         await Assert.ThrowsAsync<InvalidOperationException>(() => Initialize(true));
+        // Assert
         users.Verify(u => u.AddToRolesAsync(It.IsAny<User>(), It.IsAny<IEnumerable<string>>()), Times.Never);
     }
 
     [Fact]
     public async Task Fresh_development_creates_roles_and_confirmed_administrator()
     {
+        // Arrange
         roles.Setup(r => r.RoleExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
         roles.Setup(r => r.CreateAsync(It.IsAny<IdentityRole<Guid>>())).ReturnsAsync(IdentityResult.Success);
         users.Setup(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
         users.Setup(u => u.AddToRolesAsync(It.IsAny<User>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(IdentityResult.Success);
+        // Act
         await Initialize(true);
+        // Assert
         roles.Verify(r => r.CreateAsync(It.IsAny<IdentityRole<Guid>>()), Times.Exactly(2));
         users.Verify(u => u.CreateAsync(It.Is<User>(u => u.EmailConfirmed && u.Email == "admin@example.test"),
             "Test-password-123!"), Times.Once);

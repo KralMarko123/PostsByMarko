@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.DTOs
+namespace PostsByMarko.Host.Application.DTOs
 {
     public class UserDto
     {

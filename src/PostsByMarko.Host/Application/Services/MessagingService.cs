@@ -1,5 +1,5 @@
 using PostsByMarko.Host.Application.Helper;
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Exceptions;
@@ -67,7 +67,7 @@ namespace PostsByMarko.Host.Application.Services
             var otherUser = await userRepository.GetUserByIdAsync(otherUserId, cancellationToken) ?? throw new ResourceNotFoundException($"User with Id: {otherUserId} was not found");
             var existingChat = await chatRepository.GetChatByUserIdsAsync([currentUser.Id, otherUserId], cancellationToken);
 
-            if(existingChat != null)
+            if (existingChat != null)
             {
                 return await chatRepository.GetChatDetailsAsync(existingChat.Id, cancellationToken)
                     ?? throw new ResourceNotFoundException($"Chat with Id: {existingChat.Id} was not found");

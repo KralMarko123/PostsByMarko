@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Application.Requests;
@@ -51,7 +51,7 @@ namespace PostsByMarko.Host.Controllers
         public async Task<ActionResult<List<string>>> UpdateUserRoles([FromBody] UpdateUserRolesRequest request, CancellationToken cancellationToken = default)
         {
             var result = await adminService.UpdateUserRolesAsync(request, cancellationToken);
-            
+
             return Ok(result);
         }
     }

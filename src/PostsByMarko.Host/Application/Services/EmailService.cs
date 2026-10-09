@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Exceptions;
 using PostsByMarko.Host.Application.Helper;
 using PostsByMarko.Host.Application.Interfaces;
 using PostsByMarko.Host.Data.Repositories.Users;
@@ -31,9 +31,9 @@ namespace PostsByMarko.Host.Application.Services
             var token = await userRepository.GenerateEmailConfirmationTokenForUserAsync(user);
             var confirmationLink = GenerateEmailConfirmationLink(user.Email!, token);
             var subject = $"Please confirm the registration for {user.Email}";
-            var body = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
+            var content = ConfirmationEmailTemplate.Create(user.FirstName!, confirmationLink);
 
-            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, body, cancellationToken);
+            await emailHelper.SendEmailAsync(user.FirstName!, user.LastName!, user.Email!, subject, content, cancellationToken);
         }
 
         public async Task ConfirmEmailAsync(string email, string token)

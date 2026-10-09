@@ -37,8 +37,10 @@ public class PostsByMarkoFactory : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        if (driver is not null) await driver.DestroyPlaywrightAsync();
-        if (startedCompose) await RunComposeAsync("down", "--volumes", "--remove-orphans");
+        if (driver is not null)
+            await driver.DestroyPlaywrightAsync();
+        if (startedCompose)
+            await RunComposeAsync("down", "--volumes", "--remove-orphans");
     }
 
     private static async Task RunComposeAsync(params string[] arguments)
@@ -53,7 +55,8 @@ public class PostsByMarkoFactory : IAsyncLifetime
         startInfo.ArgumentList.Add("compose");
         startInfo.ArgumentList.Add("-f");
         startInfo.ArgumentList.Add("docker-compose.test.yml");
-        foreach (var argument in arguments) startInfo.ArgumentList.Add(argument);
+        foreach (var argument in arguments)
+            startInfo.ArgumentList.Add(argument);
 
         using var process = Process.Start(startInfo)
             ?? throw new InvalidOperationException("Could not start Docker Compose.");
@@ -78,7 +81,8 @@ public class PostsByMarkoFactory : IAsyncLifetime
             {
                 using var response = await httpClient.GetAsync(url);
                 var body = await response.Content.ReadAsStringAsync();
-                if (ready((response.StatusCode, body))) return;
+                if (ready((response.StatusCode, body)))
+                    return;
             }
             catch (Exception exception)
             {

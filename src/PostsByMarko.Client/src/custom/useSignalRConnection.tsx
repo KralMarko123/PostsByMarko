@@ -15,22 +15,30 @@ export const startHubConnection = (connection: HubConnection, onReady: () => voi
   let attempts = 0;
   const scheduleStart = () => {
     if (disposed || retryTimer !== undefined) return;
-    retryTimer = setTimeout(() => {
-      retryTimer = undefined;
-      void start();
-    }, Math.min(1000 * 2 ** Math.min(attempts++, 5), 30000));
+    retryTimer = setTimeout(
+      () => {
+        retryTimer = undefined;
+        void start();
+      },
+      Math.min(1000 * 2 ** Math.min(attempts++, 5), 30000),
+    );
   };
   const start = async () => {
     try {
       await connection.start();
-      if (disposed) { await connection.stop(); return; }
+      if (disposed) {
+        await connection.stop();
+        return;
+      }
       attempts = 0;
       onReady();
     } catch {
       scheduleStart();
     }
   };
-  connection.onreconnected(() => { if (!disposed) onReady(); });
+  connection.onreconnected(() => {
+    if (!disposed) onReady();
+  });
   connection.onclose(scheduleStart);
   void start();
   return () => {
@@ -45,18 +53,19 @@ export const useSignalRHub = (
   token: string | null | undefined,
   dispatch: Dispatch<AppAction>,
   events: readonly string[],
-  actionType: "MESSAGE_REGISTERED" | "ADMIN_ACTION_REGISTERED"
+  actionType: "MESSAGE_REGISTERED" | "ADMIN_ACTION_REGISTERED",
 ) => {
   useEffect(() => {
     if (!token) return;
     const connection = createHubConnection(url, token);
     let revision = 0;
-    const notify = () => dispatch({ type: actionType, message: `${url}:${++revision}:${Date.now()}` });
+    const notify = () =>
+      dispatch({ type: actionType, message: `${url}:${++revision}:${Date.now()}` });
     // Subscribe before connecting, then refresh after connection/reconnection to cover missed events.
-    events.forEach(event => connection.on(event, notify));
+    events.forEach((event) => connection.on(event, notify));
     const stop = startHubConnection(connection, notify);
     return () => {
-      events.forEach(event => connection.off(event, notify));
+      events.forEach((event) => connection.off(event, notify));
       stop();
     };
   }, [url, token, dispatch, events, actionType]);

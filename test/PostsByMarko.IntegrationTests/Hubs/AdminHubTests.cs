@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using PostsByMarko.Host.Application.Enums;
 using PostsByMarko.Host.Application.Requests;

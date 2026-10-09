@@ -22,6 +22,7 @@ public class DatabaseInitializationTests(PostsByMarkoApiFactory factory) : IAsyn
     [Fact]
     public async Task Persistent_initialization_migrates_and_preserves_existing_accounts()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Equal("postsbymarko_test", db.Database.GetDbConnection().Database);
@@ -33,9 +34,11 @@ public class DatabaseInitializationTests(PostsByMarkoApiFactory factory) : IAsyn
             ["DevelopmentAdmin:Email"] = "bootstrap@example.test",
             ["DevelopmentAdmin:Password"] = "Local-Test-123!"
         }).Build();
+        // Act
         await scope.ServiceProvider.InitializePersistentIdentityAsync(settings, true);
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var admin = await users.FindByEmailAsync("bootstrap@example.test");
+        // Assert
         Assert.NotNull(admin);
         Assert.True(await users.IsInRoleAsync(admin, RoleConstants.ADMIN));
         var originalId = admin.Id;

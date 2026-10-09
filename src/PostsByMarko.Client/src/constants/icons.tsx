@@ -2,12 +2,7 @@ import { FaUserAlt } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa6";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdAlternateEmail, MdDeleteForever } from "react-icons/md";
-import {
-  AiFillFileText,
-  AiFillEye,
-  AiFillEyeInvisible,
-  AiFillPushpin,
-} from "react-icons/ai";
+import { AiFillFileText, AiFillEye, AiFillEyeInvisible, AiFillPushpin } from "react-icons/ai";
 import { BiSolidUserDetail, BiSolidPencil } from "react-icons/bi";
 import { BsPersonCircle, BsClockFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";

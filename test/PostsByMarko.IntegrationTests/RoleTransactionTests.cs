@@ -29,6 +29,7 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
     [InlineData("guarded-remove", true)]
     public async Task stamp_failure_rolls_back_role_and_user_changes(string operation, bool throwException)
     {
+        // Arrange
         Guid userId;
         string? originalStamp;
         string? originalConcurrencyStamp;
@@ -44,6 +45,7 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
             originalRoles = (await users.GetRolesAsync(user)).OrderBy(role => role).ToArray();
             var repository = new UserRepository(scope.ServiceProvider.GetRequiredService<AppDbContext>(), users);
 
+            // Act
             if (throwException)
             {
                 await Assert.ThrowsAsync<InvalidOperationException>(() => ChangeRole(repository, user, operation));
@@ -54,6 +56,7 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
             }
         }
 
+        // Assert
         // Use another context so EF's tracked entities cannot hide a partial database write.
         using var verification = factory.Services.CreateScope();
         var persistedUsers = verification.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -69,6 +72,7 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
     [InlineData("guarded-remove")]
     public async Task successful_role_change_commits_membership_and_new_stamp(string operation)
     {
+        // Arrange
         Guid userId;
         string? originalStamp;
         using (var scope = factory.Services.CreateScope())
@@ -78,9 +82,14 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
                 ? TestingConstants.TEST_ADMIN_EMAIL : TestingConstants.TEST_USER_EMAIL))!;
             userId = user.Id;
             originalStamp = user.SecurityStamp;
-            Assert.True((await ChangeRole(scope.ServiceProvider.GetRequiredService<IUserRepository>(), user, operation)).Succeeded);
+            // Act
+            var result = await ChangeRole(scope.ServiceProvider.GetRequiredService<IUserRepository>(), user, operation);
+
+            // Assert
+            Assert.True(result.Succeeded);
         }
 
+        // Assert
         using var verification = factory.Services.CreateScope();
         var persistedUsers = verification.ServiceProvider.GetRequiredService<UserManager<User>>();
         var persistedUser = (await persistedUsers.FindByIdAsync(userId.ToString()))!;
@@ -111,7 +120,8 @@ public class RoleTransactionTests(PostsByMarkoApiFactory factory) : IAsyncLifeti
     {
         public override Task<IdentityResult> UpdateSecurityStampAsync(User user)
         {
-            if (throwException) throw new InvalidOperationException("Injected security-stamp failure.");
+            if (throwException)
+                throw new InvalidOperationException("Injected security-stamp failure.");
             return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = "InjectedStampFailure" }));
         }
     }

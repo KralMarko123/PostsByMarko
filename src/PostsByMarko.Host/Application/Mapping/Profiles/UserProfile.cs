@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Data.Entities;
 

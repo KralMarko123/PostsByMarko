@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using PostsByMarko.Host.Application.Configuration;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
@@ -16,7 +16,7 @@ namespace PostsByMarko.Host.Application.Helper
             this.logger = logger;
         }
 
-        public async Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body, CancellationToken cancellationToken = default)
+        public async Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, EmailContent content, CancellationToken cancellationToken = default)
         {
             if (!emailConfig.Enabled)
             {
@@ -31,7 +31,11 @@ namespace PostsByMarko.Host.Application.Helper
             message.From.Add(new MailboxAddress(emailConfig.SenderName, senderAddress));
             message.To.Add(new MailboxAddress($"{firstName} {lastName}", emailToSendTo));
             message.Subject = subject;
-            message.Body = new TextPart("plain") { Text = body };
+            message.Body = new BodyBuilder
+            {
+                TextBody = content.TextBody,
+                HtmlBody = content.HtmlBody
+            }.ToMessageBody();
 
             try
             {

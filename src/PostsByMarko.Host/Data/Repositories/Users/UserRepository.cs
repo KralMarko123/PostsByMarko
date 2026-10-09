@@ -117,7 +117,8 @@ namespace PostsByMarko.Host.Data.Repositories.Users
 
         public async Task<bool> CheckPasswordForUserAsync(User user, string password)
         {
-            if (await userManager.IsLockedOutAsync(user)) return false;
+            if (await userManager.IsLockedOutAsync(user))
+                return false;
 
             if (!await userManager.CheckPasswordAsync(user, password))
             {
@@ -159,8 +160,10 @@ namespace PostsByMarko.Host.Data.Repositories.Users
                 .Where(user => !exceptId.HasValue || user.Id != exceptId.Value)
                 .Select(user => new UserDto
                 {
-                    Id = user.Id, Email = user.Email!,
-                    FirstName = user.FirstName!, LastName = user.LastName!
+                    Id = user.Id,
+                    Email = user.Email!,
+                    FirstName = user.FirstName!,
+                    LastName = user.LastName!
                 })
                 .OrderBy(user => user.Email).ThenBy(user => user.Id)
                 .ToPageAsync(page, cancellationToken);
@@ -173,14 +176,16 @@ namespace PostsByMarko.Host.Data.Repositories.Users
                 .Where(user => user.Id != exceptId)
                 .Select(user => new AdminDashboardResponse
                 {
-                    UserId = user.Id, Email = user.Email!,
+                    UserId = user.Id,
+                    Email = user.Email!,
                     NumberOfPosts = user.Posts.Count(),
                     LastPostedAt = user.Posts.Max(post => (DateTime?)post.LastUpdatedAt)
                 })
                 .OrderBy(user => user.Email).ThenBy(user => user.UserId)
                 .ToPageAsync(page, cancellationToken);
 
-            if (result.Items.Count == 0) return result;
+            if (result.Items.Count == 0)
+                return result;
 
             // Fetch roles for this page together, rather than querying Identity once per user.
             var userIds = result.Items.Select(user => user.UserId).ToArray();

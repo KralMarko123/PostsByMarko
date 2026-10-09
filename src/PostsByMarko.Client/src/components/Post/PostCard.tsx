@@ -42,10 +42,7 @@ export const PostCard = ({
     navigate(`.${POST_DETAILS_PREFIX}/${id}`);
   };
 
-  const handleModalToggle = (
-    e: React.MouseEvent<HTMLSpanElement>,
-    modalToToggle: string
-  ) => {
+  const handleModalToggle = (e: React.MouseEvent<HTMLSpanElement>, modalToToggle: string) => {
     e.stopPropagation();
 
     appContext.dispatch({
@@ -81,7 +78,9 @@ export const PostCard = ({
         // TODO: Create modal notification that something went wrong
         console.log(error);
       })
-      .finally(() => { updatingVisibility.current = false; });
+      .finally(() => {
+        updatingVisibility.current = false;
+      });
   };
 
   useEffect(() => {
@@ -111,18 +110,12 @@ export const PostCard = ({
           </span>
         )}
         {(isAuthor || isAdmin) && (
-          <span
-            className="post-icon update"
-            onClick={(e) => handleModalToggle(e, "updatePost")}
-          >
+          <span className="post-icon update" onClick={(e) => handleModalToggle(e, "updatePost")}>
             {ICONS.PENCIL_ICON!({})}
           </span>
         )}
         {(isAuthor || isAdmin) && (
-          <span
-            className="post-icon delete"
-            onClick={(e) => handleModalToggle(e, "deletePost")}
-          >
+          <span className="post-icon delete" onClick={(e) => handleModalToggle(e, "deletePost")}>
             {ICONS.DELETE_ICON!({})}
           </span>
         )}

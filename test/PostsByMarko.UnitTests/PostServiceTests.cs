@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
@@ -27,8 +27,8 @@ namespace PostsByMarko.UnitTests
 
         public PostServiceTests()
         {
-            postService = new PostService(postsRepositoryMock.Object, 
-                userRepositoryMock.Object, 
+            postService = new PostService(postsRepositoryMock.Object,
+                userRepositoryMock.Object,
                 currentRequestAccessorMock.Object,
                 mapperMock.Object,
                 postHubMock.Object);
@@ -174,7 +174,7 @@ namespace PostsByMarko.UnitTests
             var result = async () => await postService.GetPostByIdAsync(randomId, CancellationToken.None);
 
             // Assert
-            
+
             await result.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"Post with Id: {randomId} was not found");
         }
 
@@ -209,7 +209,7 @@ namespace PostsByMarko.UnitTests
                 Content = "Content created during unit test"
             };
             var post = new Post { Id = Guid.NewGuid(), Title = createRequest.Title, Content = createRequest.Content };
-            var postDto = new PostDto { Id = post.Id, Title = post.Title, Content = post.Content, Hidden = post.Hidden};
+            var postDto = new PostDto { Id = post.Id, Title = post.Title, Content = post.Content, Hidden = post.Hidden };
 
             currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
@@ -278,8 +278,14 @@ namespace PostsByMarko.UnitTests
                 Content = "Updated Content",
                 Hidden = false
             };
-            var postDto = new PostDto { Id = post.Id, Title = updateRequest.Title, Content = updateRequest.Content,
-                Hidden = updateRequest.Hidden, LastUpdatedAt = DateTime.UtcNow };
+            var postDto = new PostDto
+            {
+                Id = post.Id,
+                Title = updateRequest.Title,
+                Content = updateRequest.Content,
+                Hidden = updateRequest.Hidden,
+                LastUpdatedAt = DateTime.UtcNow
+            };
 
             currentRequestAccessorMock.Setup(c => c.Id).Returns(user.Id);
             userRepositoryMock.Setup(s => s.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);

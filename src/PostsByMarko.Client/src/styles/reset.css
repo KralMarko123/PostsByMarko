@@ -1,15 +1,15 @@
 @import url(./variables.css);
 
 html {
-	box-sizing: border-box;
-	font-family: var(--text-font);
-	font-size: var(--base-font-size);
+  box-sizing: border-box;
+  font-family: var(--text-font);
+  font-size: var(--base-font-size);
 }
 
 *,
 *:before,
 *:after {
-	box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 body,
@@ -18,10 +18,10 @@ ol,
 ul,
 input,
 textarea {
-	margin: 0;
-	padding: 0;
-	font-weight: normal;
-	font-family: inherit;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+  font-family: inherit;
 }
 
 h1,
@@ -30,18 +30,18 @@ h3,
 h4,
 h5,
 h6 {
-	margin: 0;
-	padding: 0;
-	font-weight: normal;
-	font-family: var(--header-font);
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+  font-family: var(--header-font);
 }
 
 ol,
 ul {
-	list-style: none;
+  list-style: none;
 }
 
 img {
-	max-width: 100%;
-	height: auto;
+  max-width: 100%;
+  height: auto;
 }

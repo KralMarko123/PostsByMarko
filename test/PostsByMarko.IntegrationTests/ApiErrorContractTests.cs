@@ -33,12 +33,15 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     [Fact]
     public async Task rejected_tokens_return_a_bearer_challenge_and_generic_problem_details()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var user = (await users.FindByEmailAsync(TestingConstants.TEST_USER_EMAIL))!;
         var config = scope.ServiceProvider.GetRequiredService<IOptions<JwtConfig>>().Value;
         using var client = await LoginAsync(TestingConstants.TEST_USER_EMAIL);
+        // Act
         using (var valid = await client.GetAsync("/api/auth/validate"))
+            // Assert
             Assert.Equal(HttpStatusCode.OK, valid.StatusCode);
         client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken(user, config));
         using (var generated = await client.GetAsync("/api/auth/validate"))
@@ -81,13 +84,17 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     [Fact]
     public async Task invalid_login_credentials_also_return_a_bearer_challenge()
     {
+        // Arrange
         using var client = factory.CreateClient();
+        // Act
         foreach (var email in new[] { TestingConstants.TEST_USER_EMAIL, "missing@example.test" })
         {
             using var response = await client.PostAsJsonAsync("/api/auth/login", new LoginDto
             {
-                Email = email, Password = "Invalid-password-123"
+                Email = email,
+                Password = "Invalid-password-123"
             });
+            // Assert
             var problem = await AssertProblemAsync(response, HttpStatusCode.Unauthorized, "authentication_failed", "/api/auth/login");
             Assert.Equal("Invalid email or password.", problem.GetProperty("detail").GetString());
         }
@@ -96,9 +103,12 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     [Fact]
     public async Task validation_and_service_errors_share_the_400_contract()
     {
+        // Arrange
         using var client = await LoginAsync(TestingConstants.TEST_ADMIN_EMAIL);
+        // Act
         using (var invalid = await client.PostAsJsonAsync("/api/post", new { title = "", content = "" }))
         {
+            // Assert
             var problem = await AssertProblemAsync(invalid, HttpStatusCode.BadRequest, "validation_failed", "/api/post");
             Assert.True(problem.GetProperty("errors").EnumerateObject().Any());
         }
@@ -117,8 +127,11 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     [Fact]
     public async Task authorization_resource_and_routing_failures_preserve_their_status_and_headers()
     {
+        // Arrange
         using var client = await LoginAsync(TestingConstants.TEST_USER_EMAIL);
+        // Act
         using (var forbidden = await client.GetAsync("/api/admin/dashboard"))
+            // Assert
             await AssertProblemAsync(forbidden, HttpStatusCode.Forbidden, "forbidden", "/api/admin/dashboard");
 
         using var scope = factory.Services.CreateScope();
@@ -143,12 +156,17 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     [Fact]
     public async Task duplicate_registration_returns_a_409_problem_without_identity_internals()
     {
+        // Arrange
         using var client = factory.CreateClient();
+        // Act
         using var response = await client.PostAsJsonAsync("/api/auth/register", new RegistrationDto
         {
-            FirstName = "Test", LastName = "User", Email = TestingConstants.TEST_USER_EMAIL,
+            FirstName = "Test",
+            LastName = "User",
+            Email = TestingConstants.TEST_USER_EMAIL,
             Password = TestingConstants.TEST_PASSWORD
         });
+        // Assert
         var problem = await AssertProblemAsync(response, HttpStatusCode.Conflict, "conflict", "/api/auth/register");
         Assert.Equal("An account with this email already exists.", problem.GetProperty("detail").GetString());
     }
@@ -157,9 +175,12 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
     public async Task authentication_rate_limit_returns_a_429_problem_across_login_and_registration()
     {
         // This host has a small limit and uses the same disposable database. Collection execution is serial.
+        // Arrange
         using var limitedFactory = new RateLimitedApiFactory();
         using var client = limitedFactory.CreateClient();
+        // Act
         using (var login = await client.PostAsJsonAsync("/api/auth/login", new { }))
+            // Assert
             await AssertProblemAsync(login, HttpStatusCode.BadRequest, "validation_failed", "/api/auth/login");
         using (var registration = await client.PostAsJsonAsync("/api/auth/register", new { }))
             await AssertProblemAsync(registration, HttpStatusCode.BadRequest, "validation_failed", "/api/auth/register");
@@ -184,13 +205,17 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.PrimarySid, user.Id.ToString())
         };
-        if (includeStamp) claims.Add(new("AspNet.Identity.SecurityStamp", stamp ?? user.SecurityStamp!));
+        if (includeStamp)
+            claims.Add(new("AspNet.Identity.SecurityStamp", stamp ?? user.SecurityStamp!));
         var expiration = expires ?? DateTime.UtcNow.AddMinutes(30);
         var descriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(claims), Issuer = issuer ?? config.ValidIssuers.First(),
-            Audience = audience ?? config.ValidAudiences.First(), Expires = expiration,
-            NotBefore = expiration.AddMinutes(-30), IssuedAt = expiration.AddMinutes(-30),
+            Subject = new ClaimsIdentity(claims),
+            Issuer = issuer ?? config.ValidIssuers.First(),
+            Audience = audience ?? config.ValidAudiences.First(),
+            Expires = expiration,
+            NotBefore = expiration.AddMinutes(-30),
+            IssuedAt = expiration.AddMinutes(-30),
             SigningCredentials = new(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? config.Secret)), SecurityAlgorithms.HmacSha256)
         };
         var handler = new JwtSecurityTokenHandler();
@@ -221,7 +246,8 @@ public class ApiErrorContractTests(PostsByMarkoApiFactory factory) : IAsyncLifet
             Assert.Equal("Bearer", challenge.Scheme);
             Assert.Null(challenge.Parameter);
         }
-        else Assert.Empty(response.Headers.WwwAuthenticate);
+        else
+            Assert.Empty(response.Headers.WwwAuthenticate);
         return problem.Clone();
     }
 

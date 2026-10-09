@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using PostsByMarko.Host.Application.DTOs;

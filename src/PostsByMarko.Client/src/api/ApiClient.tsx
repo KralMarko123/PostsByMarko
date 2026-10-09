@@ -2,7 +2,10 @@ import { HttpMethod } from "constants/enums";
 import { ApiError, ApiRequestOptions } from "types/api";
 
 export class HttpError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
     super(message);
     this.name = "HttpError";
   }
@@ -11,7 +14,7 @@ export class HttpError extends Error {
 export const ApiClient = {
   async apiRequest<TResponse>(
     path: string,
-    { method = HttpMethod.GET, body, token }: ApiRequestOptions
+    { method = HttpMethod.GET, body, token }: ApiRequestOptions,
   ) {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

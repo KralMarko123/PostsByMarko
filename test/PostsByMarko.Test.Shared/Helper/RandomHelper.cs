@@ -1,4 +1,4 @@
-﻿
+
 namespace PostsByMarko.Test.Shared.Helper
 {
     public static class RandomHelper

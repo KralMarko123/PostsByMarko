@@ -22,10 +22,15 @@ public class RequestValidationTests
     [InlineData("   ")]
     public void empty_post_and_message_content_is_invalid(string? content)
     {
+        // Arrange
         var message = new SendMessageRequest { Content = content! };
-        Assert.False(Validator.TryValidateObject(message, new ValidationContext(message), [], true));
         var post = new UpdatePostRequest { Title = "Title", Content = content! };
-        Assert.False(Validator.TryValidateObject(post, new ValidationContext(post), [], true));
+        // Act
+        var messageIsValid = Validator.TryValidateObject(message, new ValidationContext(message), [], true);
+        var postIsValid = Validator.TryValidateObject(post, new ValidationContext(post), [], true);
+        // Assert
+        Assert.False(messageIsValid);
+        Assert.False(postIsValid);
     }
 
     [Theory]
@@ -34,22 +39,30 @@ public class RequestValidationTests
     [InlineData((ActionType)999)]
     public async Task invalid_role_action_never_mutates_roles(ActionType? action)
     {
+        // Arrange
         var repository = new Mock<IUserRepository>(MockBehavior.Strict);
         var service = new AdminService(repository.Object, Mock.Of<ICurrentRequestAccessor>(), null!, Mock.Of<IUserConnectionRegistry>());
+        // Act
         await Assert.ThrowsAsync<BadRequestException>(() => service.UpdateUserRolesAsync(new UpdateUserRolesRequest
         {
-            UserId = Guid.NewGuid(), Role = "Admin", ActionType = action
+            UserId = Guid.NewGuid(),
+            Role = "Admin",
+            ActionType = action
         }));
+        // Assert
         repository.VerifyNoOtherCalls();
     }
 
     [Fact]
     public async Task unexpected_errors_do_not_expose_internal_details()
     {
+        // Arrange
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
         var middleware = new ExceptionHandlingMiddleware(NullLogger<ExceptionHandlingMiddleware>.Instance);
+        // Act
         await middleware.InvokeAsync(context, _ => throw new InvalidOperationException("private connection detail"));
+        // Assert
         Assert.Equal(500, context.Response.StatusCode);
         context.Response.Body.Position = 0;
         var response = await new StreamReader(context.Response.Body).ReadToEndAsync();
@@ -61,13 +74,16 @@ public class RequestValidationTests
     [Fact]
     public async Task expected_api_errors_use_problem_details_and_keep_client_message_compatibility()
     {
+        // Arrange
         var context = new DefaultHttpContext();
         context.Request.Path = "/api/example";
         context.Response.Body = new MemoryStream();
         var middleware = new ExceptionHandlingMiddleware(NullLogger<ExceptionHandlingMiddleware>.Instance);
 
+        // Act
         await middleware.InvokeAsync(context, _ => throw new BadRequestException("Public validation message."));
 
+        // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
         context.Response.Body.Position = 0;
         using var response = await JsonDocument.ParseAsync(context.Response.Body);
@@ -83,14 +99,17 @@ public class RequestValidationTests
     [Fact]
     public async Task arbitrary_argument_errors_do_not_expose_internal_details()
     {
+        // Arrange
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
         var middleware = new ExceptionHandlingMiddleware(NullLogger<ExceptionHandlingMiddleware>.Instance);
 
+        // Act
         await middleware.InvokeAsync(context, _ => throw new ArgumentException("private library detail"));
 
         context.Response.Body.Position = 0;
         var response = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
         Assert.DoesNotContain("private library detail", response);
         Assert.Contains("The request is invalid.", response);

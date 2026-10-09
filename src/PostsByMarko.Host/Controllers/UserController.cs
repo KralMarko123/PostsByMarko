@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
@@ -33,7 +33,7 @@ namespace PostsByMarko.Host.Controllers
         public async Task<ActionResult<UserDto>> GetUser(Guid id, CancellationToken cancellationToken = default)
         {
             var user = await usersService.GetUserByIdAsync(id, cancellationToken);
-         
+
             return Ok(user);
         }
     }

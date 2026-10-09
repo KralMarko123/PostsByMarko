@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
@@ -40,6 +40,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task saved_message_succeeds_even_if_live_notification_fails()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var chat = new Chat { Id = Guid.NewGuid(), ChatUsers = [new ChatUser { UserId = userId }] };
             var message = new Message { Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = userId, Content = "Hello" };
@@ -51,8 +52,10 @@ namespace PostsByMarko.UnitTests
             messageHubMock.Setup(hub => hub.Clients.Users(It.IsAny<List<string>>())).Returns(messageClientMock.Object);
             messageClientMock.Setup(client => client.MessageSent(dto)).ThrowsAsync(new IOException("Connection lost"));
 
+            // Act
             var result = await messagingService.SendMessageAsync(new SendMessageRequest { ChatId = chat.Id, Content = "Hello" });
 
+            // Assert
             result.Should().BeSameAs(dto);
             messageRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             chatRepositoryMock.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -136,7 +139,7 @@ namespace PostsByMarko.UnitTests
             Guid[] userIds = [user.Id, otherUser.Id];
             var newChat = new Chat
             {
-                Id = Guid.NewGuid(),    
+                Id = Guid.NewGuid(),
                 ChatUsers = new List<ChatUser>
                 {
                     new ChatUser { UserId = user.Id },
@@ -144,8 +147,9 @@ namespace PostsByMarko.UnitTests
                 }
             };
             var chatDto = new ChatDto
-            { 
-                Id = newChat.Id, Users = new List<UserDto>
+            {
+                Id = newChat.Id,
+                Users = new List<UserDto>
                 {
                     new UserDto { Id = user.Id },
                     new UserDto { Id = otherUser.Id }
@@ -190,7 +194,7 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
             var randomId = Guid.NewGuid();
-                
+
             currentRequestAccessorMock.Setup(cr => cr.Id).Returns(user.Id);
             userRepositoryMock.Setup(us => us.GetUserByIdAsync(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 

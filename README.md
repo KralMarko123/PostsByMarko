@@ -20,7 +20,7 @@ Copy `.env.example` to `.env` if it does not already exist. Replace the placehol
 docker compose up --build -d
 ```
 
-Open the app at http://localhost:3000, API Swagger at http://localhost:7171, and the local email inbox at http://localhost:8025. Register an account, then follow the confirmation link in the inbox. Mailpit captures development email without delivering it externally.
+Open the app at http://localhost:3000, API Swagger at http://localhost:7171, and the local email inbox at http://localhost:8025. Register an account, then use the **Confirm your email** button in the inbox. Confirmation email includes an HTML layout, a copyable link, and a plain-text alternative. Mailpit captures development email without delivering it externally.
 
 Development uses database migrations and named volumes; accounts, posts, chats, and email confirmation keys survive restarts. Application roles are created on first startup. For an optional administrator, set both `DEVELOPMENT_ADMIN_EMAIL` and `DEVELOPMENT_ADMIN_PASSWORD` in `.env` before starting. The password must satisfy Identity's password policy. This creates a confirmed administrator only in Development. Existing administrator passwords are never reset; an existing non-admin email is rejected. Remove these two settings after successful creation.
 
@@ -73,6 +73,10 @@ Before migrations, seeding, or background workers start, configuration validatio
 - `EmailConfig`, when enabled: a hostname or IP address, a valid port, a sender email address (falling back to `Username`), and both login fields when authentication is configured. Disabled email does not require SMTP settings; unauthenticated Mailpit remains supported.
 
 Validation failures identify the configuration keys to fix without echoing secrets or connection strings.
+
+### Formatting and test conventions
+
+The root `.editorconfig` defines shared whitespace and C# style rules. Prettier formats frontend files, and CI checks both C# and frontend formatting. See [CONTRIBUTING.md](CONTRIBUTING.md) for format/check commands and the required Arrange, Act, Assert comments in every test, including browser and Vitest tests.
 
 ### Correctness and security checks
 

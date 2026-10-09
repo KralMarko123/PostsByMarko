@@ -8,7 +8,8 @@ public sealed class JwtConfigValidator : IValidateOptions<JwtConfig>
 {
     public ValidateOptionsResult Validate(string? name, JwtConfig options)
     {
-        if (name is not null && name != Options.DefaultName) return ValidateOptionsResult.Skip;
+        if (name is not null && name != Options.DefaultName)
+            return ValidateOptionsResult.Skip;
         var errors = new List<string>();
         if (string.IsNullOrWhiteSpace(options.Secret) || options.Secret.Length < 32)
             errors.Add("JwtConfig:Secret must be supplied securely and contain at least 32 characters.");
@@ -28,8 +29,10 @@ public sealed class EmailConfigValidator : IValidateOptions<EmailConfig>
 {
     public ValidateOptionsResult Validate(string? name, EmailConfig options)
     {
-        if (name is not null && name != Options.DefaultName) return ValidateOptionsResult.Skip;
-        if (!options.Enabled) return ValidateOptionsResult.Success;
+        if (name is not null && name != Options.DefaultName)
+            return ValidateOptionsResult.Skip;
+        if (!options.Enabled)
+            return ValidateOptionsResult.Success;
         var errors = new List<string>();
         if (string.IsNullOrWhiteSpace(options.Host) || Uri.CheckHostName(options.Host) == UriHostNameType.Unknown)
             errors.Add("EmailConfig:Host must be a hostname or IP address when email delivery is enabled.");
@@ -51,7 +54,8 @@ public sealed class ApplicationUrlConfigValidator : IValidateOptions<Application
 {
     public ValidateOptionsResult Validate(string? name, ApplicationUrlConfig options)
     {
-        if (name is not null && name != Options.DefaultName) return ValidateOptionsResult.Skip;
+        if (name is not null && name != Options.DefaultName)
+            return ValidateOptionsResult.Skip;
         var errors = new List<string>();
         if (!ConfigurationUrlValidation.IsHttpUrl(options.ApiBaseUrl))
             errors.Add("ApplicationUrls:ApiBaseUrl must be an absolute HTTP(S) URL without credentials, a query, or a fragment.");
@@ -65,9 +69,11 @@ public sealed class DatabaseConfigValidator : IValidateOptions<DatabaseConfig>
 {
     public ValidateOptionsResult Validate(string? name, DatabaseConfig options)
     {
-        if (name is not null && name != Options.DefaultName) return ValidateOptionsResult.Skip;
+        if (name is not null && name != Options.DefaultName)
+            return ValidateOptionsResult.Skip;
         const string error = "ConnectionStrings:DefaultConnection must be a valid MariaDB connection string with a server, database, user, and port between 1 and 65535.";
-        if (string.IsNullOrWhiteSpace(options.DefaultConnection)) return ValidateOptionsResult.Fail(error);
+        if (string.IsNullOrWhiteSpace(options.DefaultConnection))
+            return ValidateOptionsResult.Fail(error);
         try
         {
             var connection = new MySqlConnectionStringBuilder(options.DefaultConnection);

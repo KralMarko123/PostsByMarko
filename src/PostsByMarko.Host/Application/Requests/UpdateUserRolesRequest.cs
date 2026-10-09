@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-﻿using PostsByMarko.Host.Application.Enums;
+using PostsByMarko.Host.Application.Enums;
 
 namespace PostsByMarko.Host.Application.Requests
 {

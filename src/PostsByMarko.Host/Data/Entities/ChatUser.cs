@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Data.Entities
+namespace PostsByMarko.Host.Data.Entities
 {
     public class ChatUser
     {

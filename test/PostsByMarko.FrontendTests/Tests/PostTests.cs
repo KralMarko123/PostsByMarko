@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.Test.Shared.Constants;
@@ -35,23 +35,27 @@ namespace PostsByMarko.FrontendTests.Tests
         // Teardown
         public async Task DisposeAsync()
         {
-            if (page != null) await page.CloseAsync();
+            if (page != null)
+                await page.CloseAsync();
         }
 
         [Fact]
         public async Task should_create_post()
         {
+            // Arrange
             await LoginWithUser(testUserEmail);
 
             var expectedTitle = new Faker().Commerce.Product();
             var expectedContent = new Faker().Commerce.ProductDescription();
 
+            // Act
             await CreatePost(expectedTitle, expectedContent);
 
             var createdPost = new Post(page, homePage.postCard.Filter(new() { HasText = expectedTitle }).First);
             var title = await createdPost.title.TextContentAsync();
             var content = await createdPost.content.TextContentAsync();
 
+            // Assert
             title.Should().Be(expectedTitle);
             content.Should().Be(expectedContent);
         }
@@ -59,6 +63,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_update_a_post()
         {
+            // Arrange
             await LoginWithUser(testAdminEmail);
 
             var post = new Post(page, homePage.postCard.First);
@@ -69,6 +74,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var oldPostTitle = await post.title.TextContentAsync();
             var oldPostContent = await post.content.TextContentAsync();
 
+            // Act
             await post.ClickOnUpdateIcon();
             await homePage.modalComponent.FillInTitleInput(newTitle);
             await homePage.modalComponent.FillInContentInput(newContent);
@@ -80,6 +86,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var updatedTitle = await post.title.TextContentAsync();
             var updatedContent = await post.content.TextContentAsync();
 
+            // Assert
             updatedTitle.Should().NotBe(oldPostTitle);
             updatedTitle.Should().Be(newTitle);
             updatedContent.Should().NotBe(oldPostContent);
@@ -89,37 +96,44 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_delete_a_post()
         {
+            // Arrange
             await LoginWithUser(testAdminEmail);
 
             var post = new Post(page, homePage.postCard.First);
 
+            // Act
             await post.ClickOnDeleteIcon();
             await homePage.modalComponent.deleteButton.ClickAsync();
             await homePage.WaitForPostListSizeToChange();
 
             var postWithIdCount = await homePage.postCard.Locator($"#{post.Id}").CountAsync();
 
+            // Assert
             postWithIdCount.Should().Be(0);
         }
 
         [Fact]
         public async Task should_hide_a_post()
         {
+            // Arrange
             await LoginWithUser(testAdminEmail);
 
             var visiblePost = new Post(page, homePage.page.Locator(".post:not(.hidden)").First);
 
+            // Act
             await visiblePost.ClickOnHideIcon();
             await visiblePost.WaitForPostVisibilityToToggle();
 
             var postClassnames = await visiblePost.post.GetAttributeAsync("class");
 
+            // Assert
             postClassnames.Should().Contain("hidden");
         }
 
         [Fact]
         public async Task should_view_post_details()
         {
+            // Arrange
             await LoginWithUser(testAdminEmail);
 
             var post = new Post(page, homePage.postCard.First);
@@ -127,6 +141,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var postContent = await post.content.TextContentAsync();
             var postId = post.Id[5..];
 
+            // Act
             await post.ClickOnPost();
 
             var detailsPage = new DetailsPage(page);
@@ -136,6 +151,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var detailsTitle = await detailsPage.title.TextContentAsync();
             var detailsContent = await detailsPage.content.TextContentAsync();
 
+            // Assert
             detailsPage.page.Url.Should().Contain(postId);
             detailsTitle.Should().Be(postTitle);
             detailsContent.Should().Be(postContent);
@@ -144,6 +160,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_edit_a_post()
         {
+            // Arrange
             await LoginWithUser(testAdminEmail);
 
             var post = new Post(page, homePage.postCard.Last);
@@ -154,6 +171,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var detailsPage = new DetailsPage(page);
             var newContent = $"{new Faker().Commerce.ProductDescription()} with {new Faker().Commerce.Ean13()}";
 
+            // Act
             await detailsPage.editButton.ClickAsync();
             await detailsPage.textArea.FillAsync(newContent);
             await detailsPage.saveButton.ClickAsync();
@@ -162,6 +180,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var successMessageText = await detailsPage.successMessage.TextContentAsync();
             var detailsContent = await detailsPage.content.TextContentAsync();
 
+            // Assert
             successMessageText.Should().Be("Successfully updated Post!");
             detailsContent.Should().Be(newContent);
 

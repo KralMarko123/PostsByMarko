@@ -1,5 +1,5 @@
 using PostsByMarko.Host.Application.Helper;
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
 using PostsByMarko.Host.Application.Constants;
 using PostsByMarko.Host.Application.Enums;
@@ -100,7 +100,8 @@ namespace PostsByMarko.Host.Application.Services
 
         private static void EnsureIdentityOperationSucceeded(IdentityResult result, string failureMessage)
         {
-            if (result.Succeeded) return;
+            if (result.Succeeded)
+                return;
 
             if (result.Errors.Any(error => error.Code == IdentityErrorCodes.LastMemberInRole))
                 throw new ConflictException("At least one administrator account must remain.");

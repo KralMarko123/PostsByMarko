@@ -1,7 +1,5 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using PostsByMarko.Host.Application.Configuration;
@@ -36,27 +34,29 @@ namespace PostsByMarko.UnitTests
             // Arrange
             var user = new User { Id = Guid.NewGuid(), Email = "test@test.com", FirstName = "Test", LastName = "Test" };
             var token = "some_token";
-            var dictionaryValues = new RouteValueDictionary
-            {
-                { "email", user.Email },
-                { "token", token }
-            };
-            var defaultHttpContext = new DefaultHttpContext();
-            defaultHttpContext.Request.Scheme = "https";
-            defaultHttpContext.Request.Host = new HostString("example.com");
             var confirmationLink = $"https://example.com/api/auth/confirm?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
             var expectedSubject = $"Please confirm the registration for {user.Email}";
-            var expectedBody = $"Your account has been successfully created. Please click on the following link to confirm your registration and sign in: {confirmationLink}";
+            EmailContent? delivered = null;
 
             userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.GenerateEmailConfirmationTokenForUserAsync(user)).ReturnsAsync(token);
-        
+            emailHelperMock.Setup(helper => helper.SendEmailAsync(
+                user.FirstName, user.LastName, user.Email, expectedSubject,
+                It.IsAny<EmailContent>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, string, string, EmailContent, CancellationToken>(
+                    (_, _, _, _, content, _) => delivered = content)
+                .Returns(Task.CompletedTask);
+
             // Act
             await emailService.SendEmailConfirmationLinkAsync(user.Email);
 
             // Assert
             emailHelperMock.Verify(e => e.SendEmailAsync(
-                user.FirstName, user.LastName, user.Email, expectedSubject, expectedBody, It.IsAny<CancellationToken>()), Times.Once);
+                user.FirstName, user.LastName, user.Email, expectedSubject, It.IsAny<EmailContent>(), It.IsAny<CancellationToken>()), Times.Once);
+            delivered.Should().NotBeNull();
+            delivered!.TextBody.Should().Contain(confirmationLink);
+            delivered.HtmlBody.Should().Contain("Confirm your email</a>");
+            delivered.HtmlBody.Should().Contain(System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmationLink));
         }
 
         [Fact]
@@ -75,19 +75,22 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task send_email_confirmation_link_should_skip_already_confirmed_user()
         {
+            // Arrange
             var user = new User { Id = Guid.NewGuid(), Email = "test@test.com" };
             userRepositoryMock.Setup(repository => repository.GetUserByEmailAsync(
                 user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(repository => repository.CheckIsEmailConfirmedForUserAsync(user)).ReturnsAsync(true);
 
+            // Act
             await emailService.SendEmailConfirmationLinkAsync(user.Email);
 
+            // Assert
             emailHelperMock.Verify(helper => helper.SendEmailAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(),
+                It.IsAny<EmailContent>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         }
 
@@ -116,7 +119,7 @@ namespace PostsByMarko.UnitTests
 
             userRepositoryMock.Setup(u => u.GetUserByEmailAsync(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
             userRepositoryMock.Setup(u => u.ConfirmEmailForUserAsync(user, token)).ReturnsAsync(failed);
-            
+
             // Act
             var result = async () => await emailService.ConfirmEmailAsync(user.Email, token);
 

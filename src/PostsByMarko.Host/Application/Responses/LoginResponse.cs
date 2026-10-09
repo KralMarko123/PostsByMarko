@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Responses
+namespace PostsByMarko.Host.Application.Responses
 {
     public class LoginResponse
     {

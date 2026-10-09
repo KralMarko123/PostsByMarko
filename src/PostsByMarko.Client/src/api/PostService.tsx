@@ -23,7 +23,11 @@ export const PostService = {
       token: userToken,
     }),
 
-  updatePost: async (postId: string, request: UpdatePostRequest, userToken: string): Promise<Post> =>
+  updatePost: async (
+    postId: string,
+    request: UpdatePostRequest,
+    userToken: string,
+  ): Promise<Post> =>
     await ApiClient.apiRequest(ENDPOINT_URLS.UPDATE_POST(postId), {
       method: HttpMethod.PUT,
       body: request,

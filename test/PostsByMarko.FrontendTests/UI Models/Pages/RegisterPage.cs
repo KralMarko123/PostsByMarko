@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Playwright;
 
 namespace PostsTesting.UI_Models.Pages

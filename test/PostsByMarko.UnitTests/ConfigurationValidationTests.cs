@@ -39,9 +39,12 @@ public class ConfigurationValidationTests
     [InlineData("ConnectionStrings:DefaultConnection", "server=localhost;database=test;user=test;port=0;password=configuration-validation-secret", "ConnectionStrings:DefaultConnection")]
     public void invalid_settings_fail_startup_without_echoing_secrets(string key, string value, string expectedKey)
     {
+        // Arrange
         var settings = ValidSettings();
         settings[key] = value;
+        // Act
         var exception = Assert.Throws<OptionsValidationException>(() => ValidateStartup(settings));
+        // Assert
         Assert.Contains(expectedKey, exception.Message);
         Assert.DoesNotContain(SecretMarker, exception.ToString());
     }
@@ -49,34 +52,53 @@ public class ConfigurationValidationTests
     [Fact]
     public void disabled_email_does_not_require_smtp_settings()
     {
+        // Arrange
         var settings = ValidSettings();
         settings["EmailConfig:Enabled"] = "false";
         settings["EmailConfig:Host"] = "";
         settings["EmailConfig:Port"] = "0";
         settings["EmailConfig:SenderAddress"] = "";
-        ValidateStartup(settings);
+        // Act
+        var exception = Record.Exception(() => ValidateStartup(settings));
+        // Assert
+        Assert.Null(exception);
     }
 
     [Fact]
-    public void mailpit_without_authentication_and_local_http_urls_are_supported() => ValidateStartup(ValidSettings());
+    public void mailpit_without_authentication_and_local_http_urls_are_supported()
+    {
+        // Arrange
+        var settings = ValidSettings();
+
+        // Act
+        var exception = Record.Exception(() => ValidateStartup(settings));
+
+        // Assert
+        Assert.Null(exception);
+    }
 
     [Theory]
     [InlineData("sender@example.test", "")]
     [InlineData("smtp-login", "sender@example.test")]
     public void authenticated_smtp_supports_sender_fallback_or_separate_sender(string username, string sender)
     {
+        // Arrange
         var settings = ValidSettings();
         settings["EmailConfig:Username"] = username;
         settings["EmailConfig:Password"] = SecretMarker;
         settings["EmailConfig:SenderAddress"] = sender;
-        ValidateStartup(settings);
+        // Act
+        var exception = Record.Exception(() => ValidateStartup(settings));
+        // Assert
+        Assert.Null(exception);
     }
 
     private static void ValidateStartup(Dictionary<string, string?> settings)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            EnvironmentName = "Test", ContentRootPath = AppContext.BaseDirectory
+            EnvironmentName = "Test",
+            ContentRootPath = AppContext.BaseDirectory
         });
         builder.Configuration.Sources.Clear();
         builder.Configuration.AddInMemoryCollection(settings);

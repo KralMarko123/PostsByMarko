@@ -25,10 +25,13 @@ export const AuthProvider = (props: AuthProviderProps) => {
   }, [user?.token]);
   const isAdmin = user?.roles?.includes("Admin") ?? false;
 
-  const login = useCallback(async (user: AuthUser) => {
-    setUser(user);
-    navigate(ROUTES.HOME, { replace: true });
-  }, [setUser, navigate]);
+  const login = useCallback(
+    async (user: AuthUser) => {
+      setUser(user);
+      navigate(ROUTES.HOME, { replace: true });
+    },
+    [setUser, navigate],
+  );
 
   const logout = useCallback(() => {
     setUser(null);
@@ -41,7 +44,8 @@ export const AuthProvider = (props: AuthProviderProps) => {
     try {
       await AuthService.validate(token);
     } catch (error) {
-      if (currentToken.current === token && error instanceof HttpError && error.status === 401) logout();
+      if (currentToken.current === token && error instanceof HttpError && error.status === 401)
+        logout();
     }
   }, [user?.token, logout]);
 
@@ -53,7 +57,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
       logout,
       checkToken,
     }),
-    [user, isAdmin, login, logout, checkToken]
+    [user, isAdmin, login, logout, checkToken],
   );
 
   return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;

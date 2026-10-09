@@ -1,15 +1,15 @@
 .loader {
-	display: flex;
-	align-items: center;
-	gap: var(--small-gap);
+  display: flex;
+  align-items: center;
+  gap: var(--small-gap);
 }
 
 .dot {
-	width: 0.5em;
-	height: 0.5em;
+  width: 0.5em;
+  height: 0.5em;
 
-	background-color: var(--text-color);
-	border-radius: 50%;
+  background-color: var(--text-color);
+  border-radius: 50%;
 
-	animation: dot-buffer 1s ease-out infinite;
+  animation: dot-buffer 1s ease-out infinite;
 }

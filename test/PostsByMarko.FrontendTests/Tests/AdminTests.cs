@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.UI_Models.Components;
 using PostsByMarko.FrontendTests.UI_Models.Pages;
@@ -38,13 +38,16 @@ namespace PostsByMarko.FrontendTests.Tests
         // Teardown
         public async Task DisposeAsync()
         {
-            if (page != null) await page.CloseAsync();
+            if (page != null)
+                await page.CloseAsync();
         }
 
         [Fact]
         public async Task should_view_dashboard_data()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail);
+            // Act
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.dashboard.ClickAsync();
             await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
@@ -54,6 +57,7 @@ namespace PostsByMarko.FrontendTests.Tests
             var userTableHeaderTexts = await adminDashboardPage.GetHeaders();
             var chartsCount = await adminDashboardPage.charts.CountAsync();
 
+            // Assert
             dashboardTitle.Should().Be("Admin Dashboard");
             dashboardDescription.Should().Be("Manage users and view statistics");
             userTableHeaderTexts.Should().Contain("User", "Number of Posts", "Last Posted", "Roles", "Actions");
@@ -63,6 +67,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_toggle_user_admin_privileges()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail);
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.dashboard.ClickAsync();
@@ -78,10 +83,12 @@ namespace PostsByMarko.FrontendTests.Tests
 
             adminBadgeShown.Should().Be(false);
 
+            // Act
             await userRow.makeAdminButton.ClickAsync();
             await userRow.WaitForSuccessMessageToShowAndDisappear();
 
             adminBadgeShown = await userRow.adminBadge.IsVisibleAsync();
+            // Assert
             adminBadgeShown.Should().Be(true);
 
             await userRow.removeAdminButton.ClickAsync();
@@ -94,6 +101,7 @@ namespace PostsByMarko.FrontendTests.Tests
         [Fact]
         public async Task should_delete_a_user()
         {
+            // Arrange
             await LoginWithEmail(testAdminEmail);
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.dashboard.ClickAsync();
@@ -106,11 +114,13 @@ namespace PostsByMarko.FrontendTests.Tests
 
             var userRow = new UserTableRow(page, emails[new Random().Next(emails.Count)]);
 
+            // Act
             await userRow.deleteButton.ClickAsync();
             await userRow.WaitForSuccessMessageToShowAndDisappear();
-            
+
             var isUserRowVisible = await userRow.userTableRow.IsVisibleAsync();
 
+            // Assert
             isUserRowVisible.Should().Be(false);
         }
 

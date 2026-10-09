@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using PostsTesting.UI_Models.Components;
 
 namespace PostsByMarko.FrontendTests.UI_Models.Components

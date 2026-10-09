@@ -1,27 +1,27 @@
 .login {
-	align-items: center;
-	justify-content: center;
-	position: relative;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .login .container {
-	width: 30%;
+  width: 30%;
 }
 
 .login .form {
-	background-color: var(--dark-accent);
+  background-color: var(--dark-accent);
 }
 
 /**TABLET*/
 @media (max-width: 1199px) {
-	.login .container {
-		width: 50%;
-	}
+  .login .container {
+    width: 50%;
+  }
 }
 
 /**MOBILE*/
 @media (max-width: 767px) {
-	.login .container {
-		width: 90%;
-	}
+  .login .container {
+    width: 90%;
+  }
 }

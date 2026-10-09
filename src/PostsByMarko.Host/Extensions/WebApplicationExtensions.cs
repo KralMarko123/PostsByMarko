@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.Hubs;
+using PostsByMarko.Host.Application.Hubs;
 using PostsByMarko.Host.Data;
 using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Middlewares;

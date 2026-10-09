@@ -16,11 +16,13 @@ public static class DatabaseInitializationExtensions
                 EnsureSuccess(await roles.CreateAsync(new IdentityRole<Guid>(role)), "Create application role");
         }
 
-        if (!isDevelopment) return;
+        if (!isDevelopment)
+            return;
 
         var email = configuration["DevelopmentAdmin:Email"];
         var password = configuration["DevelopmentAdmin:Password"];
-        if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(password)) return;
+        if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(password))
+            return;
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             throw new InvalidOperationException("DevelopmentAdmin requires both Email and Password.");
 
@@ -35,8 +37,11 @@ public static class DatabaseInitializationExtensions
 
         var user = new User
         {
-            UserName = email, Email = email, EmailConfirmed = true,
-            FirstName = "Local", LastName = "Admin"
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true,
+            FirstName = "Local",
+            LastName = "Admin"
         };
         EnsureSuccess(await users.CreateAsync(user, password), "Create development administrator");
         EnsureSuccess(await users.AddToRolesAsync(user, [RoleConstants.ADMIN, RoleConstants.USER]),

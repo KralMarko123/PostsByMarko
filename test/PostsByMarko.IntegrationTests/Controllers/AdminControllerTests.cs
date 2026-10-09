@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -106,7 +106,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         public async Task should_get_admin_dashboard_data()
         {
             // Arrange
-           
+
             // Act
             var response = await client.GetAsync($"{controllerPrefix}/dashboard");
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -122,10 +122,13 @@ namespace PostsByMarko.IntegrationTests.Controllers
         [Fact]
         public async Task should_reject_deleting_current_admin()
         {
+            // Arrange
             var currentAdmin = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL);
 
+            // Act
             var response = await client.DeleteAsync($"{controllerPrefix}/users/{currentAdmin.Id}");
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             (await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL))
                 .Should().NotBeNull();
@@ -134,6 +137,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         [Fact]
         public async Task should_reject_unknown_role()
         {
+            // Arrange
             var user = await postsByMarkoApiFactory.GetUserByEmailAsync(TestingConstants.TEST_USER_EMAIL);
             var request = new UpdateUserRolesRequest
             {
@@ -142,23 +146,28 @@ namespace PostsByMarko.IntegrationTests.Controllers
                 Role = "SuperAdmin"
             };
 
+            // Act
             var response = await client.PutAsJsonAsync($"{controllerPrefix}/roles", request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
         public async Task repository_should_preserve_last_admin()
         {
+            // Arrange
             using var scope = postsByMarkoApiFactory.Services.CreateScope();
             var repository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
             var owner = (await repository.GetUserByEmailAsync(TestingConstants.OWNER_EMAIL))!;
             var testAdmin = (await repository.GetUserByEmailAsync(TestingConstants.TEST_ADMIN_EMAIL))!;
             (await repository.RemoveRoleFromUserAsync(owner, RoleConstants.ADMIN)).Succeeded.Should().BeTrue();
 
+            // Act
             var result = await repository.RemoveRoleFromUserUnlessLastMemberAsync(
                 testAdmin, RoleConstants.ADMIN, CancellationToken.None);
 
+            // Assert
             result.Succeeded.Should().BeFalse();
             result.Errors.Should().ContainSingle(error => error.Code == IdentityErrorCodes.LastMemberInRole);
         }

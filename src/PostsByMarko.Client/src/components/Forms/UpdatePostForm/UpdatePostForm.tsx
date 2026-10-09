@@ -19,7 +19,7 @@ export const UpdatePostForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [postId, setUpdatedPostId] = useState<string | null | undefined>(
-    appContext.postBeingModified.id
+    appContext.postBeingModified.id,
   );
   const [updatePostRequest, setUpdatedPostRequest] = useState<UpdatePostRequest>({
     title: appContext.postBeingModified.title,
@@ -90,10 +90,7 @@ export const UpdatePostForm = () => {
         <p className="form-desc">Make changes and keep things interesting</p>
 
         {updatePostForm.formGroups.map((group) => (
-          <div
-            key={group.id}
-            className={`form-group ${group.type === "textarea" ? "text" : ""}`}
-          >
+          <div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
             {group.type === "textarea" ? (
               <textarea
                 id={group.id}

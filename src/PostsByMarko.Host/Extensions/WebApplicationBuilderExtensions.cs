@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -144,8 +144,8 @@ namespace PostsByMarko.Host.Extensions
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
 
-                        if (!string.IsNullOrEmpty(accessToken) && 
-                        (path.StartsWithSegments("/postHub") 
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                        (path.StartsWithSegments("/postHub")
                         || path.StartsWithSegments("/messageHub")
                         || path.StartsWithSegments("/adminHub")))
                         {

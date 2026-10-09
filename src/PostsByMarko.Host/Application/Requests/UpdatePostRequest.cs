@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-﻿namespace PostsByMarko.Host.Application.Requests
+namespace PostsByMarko.Host.Application.Requests
 {
     public class UpdatePostRequest
     {

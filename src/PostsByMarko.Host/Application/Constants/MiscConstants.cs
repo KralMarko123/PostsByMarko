@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Constants
+namespace PostsByMarko.Host.Application.Constants
 {
     public static class MiscConstants
     {

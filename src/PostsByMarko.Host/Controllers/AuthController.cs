@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Interfaces;
@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
         this.emailService = emailService;
         this.applicationUrls = applicationUrls.Value;
     }
-    
+
     [AllowAnonymous]
     [HttpPost]
     [Route("register")]
@@ -49,10 +49,10 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpGet]
     [Route("confirm")]
-    public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token )
+    public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
     {
         await emailService.ConfirmEmailAsync(email, token);
-        
+
         if (!Uri.TryCreate(applicationUrls.ClientBaseUrl, UriKind.Absolute, out var clientBaseUrl))
         {
             throw new InvalidOperationException("ApplicationUrls:ClientBaseUrl must be an absolute URL.");

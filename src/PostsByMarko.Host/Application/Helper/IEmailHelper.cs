@@ -1,7 +1,7 @@
-﻿namespace PostsByMarko.Host.Application.Helper
+namespace PostsByMarko.Host.Application.Helper
 {
     public interface IEmailHelper
     {
-        Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, string body, CancellationToken cancellationToken = default);
+        Task SendEmailAsync(string firstName, string lastName, string emailToSendTo, string subject, EmailContent content, CancellationToken cancellationToken = default);
     }
 }

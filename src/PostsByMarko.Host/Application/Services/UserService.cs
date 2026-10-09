@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Application.Exceptions;
@@ -38,7 +38,7 @@ namespace PostsByMarko.Host.Application.Services
         {
             var existingUser = await userRepository.GetUserByEmailAsync(userRegistration.Email, cancellationToken);
 
-            if(existingUser != null)
+            if (existingUser != null)
             {
                 throw new ConflictException("An account with this email already exists.");
             }
@@ -94,7 +94,7 @@ namespace PostsByMarko.Host.Application.Services
         public Task<PagedResult<UserDto>> GetUsersAsync(PageRequest page, Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
             page.EnsureValid();
-            
+
             return userRepository.GetUsersAsync(page, exceptId, cancellationToken);
         }
 

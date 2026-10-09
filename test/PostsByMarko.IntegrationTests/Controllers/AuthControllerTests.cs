@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +26,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
         public AuthControllerTests(PostsByMarkoApiFactory postsByMarkoApiFactory)
         {
             this.postsByMarkoApiFactory = postsByMarkoApiFactory;
-            
+
             client = postsByMarkoApiFactory.client!;
         }
 
@@ -63,7 +63,7 @@ namespace PostsByMarko.IntegrationTests.Controllers
             var response = await client.PostAsJsonAsync($"{controllerPrefix}/login", loginDto);
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<LoginResponse>(content);
-            
+
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 

@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.Requests;
+using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
 
 namespace PostsByMarko.Host.Application.Interfaces

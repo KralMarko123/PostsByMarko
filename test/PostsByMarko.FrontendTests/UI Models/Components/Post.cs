@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Helpers;
 
 namespace PostsTesting.UI_Models.Components
@@ -31,8 +31,10 @@ namespace PostsTesting.UI_Models.Components
         {
             Refresh();
 
-            if (isHidden) await PlaywrightHelpers.WaitForClassToBeRemoved(post, "hidden");
-            else await PlaywrightHelpers.WaitForClassToBePresent(post, "hidden");
+            if (isHidden)
+                await PlaywrightHelpers.WaitForClassToBeRemoved(post, "hidden");
+            else
+                await PlaywrightHelpers.WaitForClassToBePresent(post, "hidden");
         }
 
         public async Task ClickOnPost()

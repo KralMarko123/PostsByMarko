@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
@@ -36,6 +36,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task get_admin_dashboard_should_return_dashboard_data()
         {
+            // Arrange
             var adminId = Guid.NewGuid();
             var page = new PageRequest { Page = 2, PageSize = 10 };
             var projected = new PagedResult<AdminDashboardResponse>(
@@ -44,8 +45,10 @@ namespace PostsByMarko.UnitTests
             usersRepositoryMock.Setup(repository => repository.GetAdminDashboardAsync(adminId, page, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(projected);
 
+            // Act
             var result = await adminService.GetAdminDashboardAsync(page, CancellationToken.None);
 
+            // Assert
             result.Should().BeSameAs(projected);
             usersRepositoryMock.Verify(repository => repository.GetRolesForUserAsync(It.IsAny<User>()), Times.Never);
         }
@@ -174,6 +177,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task update_user_roles_should_reject_unknown_role()
         {
+            // Arrange
             var request = new UpdateUserRolesRequest
             {
                 UserId = Guid.NewGuid(),
@@ -181,8 +185,10 @@ namespace PostsByMarko.UnitTests
                 Role = "SuperAdmin"
             };
 
+            // Act
             var result = async () => await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
 
+            // Assert
             await result.Should().ThrowAsync<ArgumentException>()
                 .WithMessage("Role 'SuperAdmin' is not supported.");
             usersRepositoryMock.Verify(
@@ -193,6 +199,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task update_user_roles_should_reject_removing_own_admin_role()
         {
+            // Arrange
             var adminId = Guid.NewGuid();
             currentRequestAccessorMock.Setup(accessor => accessor.Id).Returns(adminId);
             var request = new UpdateUserRolesRequest
@@ -202,8 +209,10 @@ namespace PostsByMarko.UnitTests
                 Role = RoleConstants.ADMIN
             };
 
+            // Act
             var result = async () => await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
 
+            // Assert
             await result.Should().ThrowAsync<ArgumentException>()
                 .WithMessage("You cannot remove your own administrator role.");
         }
@@ -211,6 +220,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task update_user_roles_should_preserve_last_admin()
         {
+            // Arrange
             var user = new User { Id = Guid.NewGuid() };
             var request = new UpdateUserRolesRequest
             {
@@ -230,8 +240,10 @@ namespace PostsByMarko.UnitTests
                     user, RoleConstants.ADMIN, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(protectedResult);
 
+            // Act
             var result = async () => await adminService.UpdateUserRolesAsync(request, CancellationToken.None);
 
+            // Assert
             await result.Should().ThrowAsync<ConflictException>()
                 .WithMessage("At least one administrator account must remain.");
         }
@@ -291,11 +303,14 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task delete_user_should_reject_deleting_own_account()
         {
+            // Arrange
             var adminId = Guid.NewGuid();
             currentRequestAccessorMock.Setup(accessor => accessor.Id).Returns(adminId);
 
+            // Act
             var result = async () => await adminService.DeleteUserByIdAsync(adminId, CancellationToken.None);
 
+            // Assert
             await result.Should().ThrowAsync<ArgumentException>()
                 .WithMessage("You cannot delete your own administrator account.");
             usersRepositoryMock.Verify(repository => repository.DeleteUserAsync(It.IsAny<User>()), Times.Never);
@@ -304,6 +319,7 @@ namespace PostsByMarko.UnitTests
         [Fact]
         public async Task delete_user_should_preserve_last_admin()
         {
+            // Arrange
             var admin = new User { Id = Guid.NewGuid() };
             var protectedResult = IdentityResult.Failed(new IdentityError
             {
@@ -320,8 +336,10 @@ namespace PostsByMarko.UnitTests
                     admin, RoleConstants.ADMIN, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(protectedResult);
 
+            // Act
             var result = async () => await adminService.DeleteUserByIdAsync(admin.Id, CancellationToken.None);
 
+            // Assert
             await result.Should().ThrowAsync<ConflictException>()
                 .WithMessage("At least one administrator account must remain.");
         }

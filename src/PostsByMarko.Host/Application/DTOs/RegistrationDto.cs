@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-﻿namespace PostsByMarko.Host.Application.DTOs
+namespace PostsByMarko.Host.Application.DTOs
 {
     public class RegistrationDto
     {

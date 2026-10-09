@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Entities;
 
 namespace PostsByMarko.Host.Application.Helper
 {

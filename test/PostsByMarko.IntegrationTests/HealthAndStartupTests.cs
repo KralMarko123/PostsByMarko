@@ -25,10 +25,13 @@ public class HealthAndStartupTests(PostsByMarkoApiFactory factory)
     [Fact]
     public async Task probes_are_anonymous_and_uncached_while_the_api_remains_protected()
     {
+        // Arrange
         using var client = factory.CreateClient();
+        // Act
         foreach (var path in new[] { "/health/live", "/health/ready" })
         {
             using var response = await client.GetAsync(path);
+            // Assert
             await AssertProbeAsync(response, HttpStatusCode.OK, "Healthy");
         }
         using var apiResponse = await client.GetAsync("/api/user/all");
@@ -38,6 +41,7 @@ public class HealthAndStartupTests(PostsByMarkoApiFactory factory)
     [Fact]
     public async Task unavailable_database_fails_readiness_but_liveness_survives_and_readiness_recovers()
     {
+        // Arrange
         var state = new DatabaseAvailability();
         using var probeFactory = factory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
@@ -55,7 +59,9 @@ public class HealthAndStartupTests(PostsByMarkoApiFactory factory)
             services.AddScoped(provider => new DatabaseReadinessHealthCheck(provider.GetRequiredService<ProbeDbContext>()));
         }));
         using var client = probeFactory.CreateClient();
+        // Act
         using (var ready = await client.GetAsync("/health/ready"))
+            // Assert
             await AssertProbeAsync(ready, HttpStatusCode.OK, "Healthy");
         state.Unavailable = true;
         using (var unavailable = await client.GetAsync("/health/ready"))
@@ -77,6 +83,7 @@ public class HealthAndStartupTests(PostsByMarkoApiFactory factory)
     [InlineData("JwtConfig:ExpiresInMinutes", "0")]
     public async Task invalid_startup_settings_are_rejected_before_database_initialization(string key, string value)
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var author = await db.Users.FirstAsync(user => user.Email == TestingConstants.TEST_ADMIN_EMAIL);
@@ -95,7 +102,9 @@ public class HealthAndStartupTests(PostsByMarkoApiFactory factory)
         }
         using var invalidFactory = factory.WithWebHostBuilder(builder =>
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(settings)));
+        // Act
         var exception = Assert.Throws<OptionsValidationException>(() => invalidFactory.CreateClient());
+        // Assert
         Assert.Contains(key, exception.Message);
         Assert.DoesNotContain("startup-validation-secret", exception.ToString());
         using var verification = factory.Services.CreateScope();

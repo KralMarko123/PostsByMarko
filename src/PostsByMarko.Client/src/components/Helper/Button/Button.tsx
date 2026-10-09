@@ -32,9 +32,7 @@ export const Button = (props: ButtonProps) => {
       type="button"
       disabled={Boolean(props.disabled || props.loading || pending)}
       aria-busy={Boolean(props.loading || pending)}
-      className={`button${
-        props.additionalClassNames ? ` ${props.additionalClassNames}` : ""
-      }`}
+      className={`button${props.additionalClassNames ? ` ${props.additionalClassNames}` : ""}`}
       onClick={(e) => onClick(e)}
     >
       {props.loading ? <Loader /> : props.text}

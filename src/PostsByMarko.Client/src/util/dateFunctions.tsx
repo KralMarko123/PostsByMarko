@@ -27,7 +27,7 @@ export const DateFunctions = {
 
   countPostsByDay(dates: string[], month = moment()) {
     const counts = Array<number>(month.daysInMonth()).fill(0);
-    dates.forEach(value => {
+    dates.forEach((value) => {
       const date = moment.utc(value, moment.ISO_8601, true).local();
       if (date.isValid() && date.isSame(month, "month")) counts[date.date() - 1]++;
     });
@@ -78,8 +78,7 @@ export const DateFunctions = {
 
   sortItemsByDateTimeAttribute(items: any[], attributeName = "") {
     items.sort(
-      (a, b) =>
-        moment(a[`${attributeName}`]).valueOf() - moment(b[`${attributeName}`]).valueOf()
+      (a, b) => moment(a[`${attributeName}`]).valueOf() - moment(b[`${attributeName}`]).valueOf(),
     );
   },
 };

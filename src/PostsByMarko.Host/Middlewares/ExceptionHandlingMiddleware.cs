@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.Exceptions;
+using PostsByMarko.Host.Application.Exceptions;
 using System.ComponentModel.DataAnnotations;
 
 namespace PostsByMarko.Host.Middlewares

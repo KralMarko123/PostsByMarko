@@ -29,6 +29,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task disabled_delivery_should_leave_queue_untouched_and_resume_when_enabled()
     {
+        // Arrange
         var message = new EmailOutboxMessage { Id = Guid.NewGuid(), RecipientEmail = "user@example.com" };
         outboxRepositoryMock.Setup(repository => repository.LeaseNextAsync(
             It.IsAny<string>(), now.UtcDateTime, It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
@@ -36,7 +37,9 @@ public class EmailOutboxProcessorTests
         emailConfig.Enabled = false;
         var processor = CreateProcessor();
 
+        // Act
         (await processor.ProcessNextAsync()).Should().BeFalse();
+        // Assert
         outboxRepositoryMock.VerifyNoOtherCalls();
         emailServiceMock.VerifyNoOtherCalls();
 
@@ -49,6 +52,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task delivery_timeout_should_cancel_smtp_and_schedule_retry_before_lease_expires()
     {
+        // Arrange
         var message = new EmailOutboxMessage { Id = Guid.NewGuid(), RecipientEmail = "user@example.com" };
         outboxRepositoryMock.Setup(repository => repository.LeaseNextAsync(
             It.IsAny<string>(), now.UtcDateTime, TimeSpan.FromMinutes(2), It.IsAny<CancellationToken>()))
@@ -72,8 +76,10 @@ public class EmailOutboxProcessorTests
                 await Task.Delay(Timeout.InfiniteTimeSpan, token);
             });
 
+        // Act
         (await CreateProcessor().ProcessNextAsync()).Should().BeTrue();
 
+        // Assert
         outboxRepositoryMock.Verify(repository => repository.MarkFailedAsync(
             message.Id, It.IsAny<string>(), now.UtcDateTime.AddMinutes(1),
             It.Is<string>(error => error.Contains("CanceledException")), It.IsAny<CancellationToken>()), Times.Once);
@@ -84,6 +90,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task slow_lease_acquisition_should_not_start_smtp_after_the_delivery_deadline()
     {
+        // Arrange
         var message = new EmailOutboxMessage { Id = Guid.NewGuid(), RecipientEmail = "user@example.com" };
         outboxRepositoryMock.Setup(repository => repository.LeaseNextAsync(
                 It.IsAny<string>(), now.UtcDateTime, It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
@@ -91,8 +98,10 @@ public class EmailOutboxProcessorTests
         timeProviderMock.SetupSequence(provider => provider.GetUtcNow())
             .Returns(now).Returns(now.AddSeconds(61)).Returns(now.AddSeconds(61));
 
+        // Act
         (await CreateProcessor().ProcessNextAsync()).Should().BeTrue();
 
+        // Assert
         emailServiceMock.VerifyNoOtherCalls();
         outboxRepositoryMock.Verify(repository => repository.MarkFailedAsync(
             message.Id, It.IsAny<string>(), now.UtcDateTime.AddSeconds(121),
@@ -102,6 +111,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task shutdown_cancellation_should_propagate_without_marking_sent_or_failed()
     {
+        // Arrange
         using var shutdown = new CancellationTokenSource();
         var message = new EmailOutboxMessage { Id = Guid.NewGuid(), RecipientEmail = "user@example.com" };
         outboxRepositoryMock.Setup(repository => repository.LeaseNextAsync(
@@ -115,7 +125,9 @@ public class EmailOutboxProcessorTests
                 await Task.Delay(Timeout.InfiniteTimeSpan, token);
             });
 
+        // Act
         var process = () => CreateProcessor().ProcessNextAsync(shutdown.Token);
+        // Assert
         await process.Should().ThrowAsync<OperationCanceledException>();
         outboxRepositoryMock.Verify(repository => repository.MarkSentAsync(
             It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -126,6 +138,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task process_next_should_send_and_mark_message_as_sent()
     {
+        // Arrange
         var message = new EmailOutboxMessage
         {
             Id = Guid.NewGuid(),
@@ -137,8 +150,10 @@ public class EmailOutboxProcessorTests
             .ReturnsAsync(message);
         var processor = CreateProcessor();
 
+        // Act
         var processed = await processor.ProcessNextAsync();
 
+        // Assert
         processed.Should().BeTrue();
         emailServiceMock.Verify(service => service.SendEmailConfirmationLinkAsync(
             message.RecipientEmail, It.IsAny<CancellationToken>()), Times.Once);
@@ -151,6 +166,7 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task process_next_should_schedule_retry_when_delivery_fails()
     {
+        // Arrange
         var message = new EmailOutboxMessage
         {
             Id = Guid.NewGuid(),
@@ -166,8 +182,10 @@ public class EmailOutboxProcessorTests
             .ThrowsAsync(new InvalidOperationException("SMTP unavailable"));
         var processor = CreateProcessor();
 
+        // Act
         var processed = await processor.ProcessNextAsync();
 
+        // Assert
         processed.Should().BeTrue();
         outboxRepositoryMock.Verify(repository => repository.MarkFailedAsync(
             message.Id,
@@ -182,11 +200,14 @@ public class EmailOutboxProcessorTests
     [Fact]
     public async Task process_next_should_return_false_when_queue_is_empty()
     {
+        // Arrange
         timeProviderMock.Setup(provider => provider.GetUtcNow()).Returns(now);
         var processor = CreateProcessor();
 
+        // Act
         var processed = await processor.ProcessNextAsync();
 
+        // Assert
         processed.Should().BeFalse();
         emailServiceMock.Verify(service => service.SendEmailConfirmationLinkAsync(
             It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);

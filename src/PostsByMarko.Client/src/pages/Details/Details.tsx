@@ -173,9 +173,7 @@ export const Details = () => {
         )}
 
         {errorMessage && <p className="error">{errorMessage}</p>}
-        {confirmationalMessage && (
-          <p className="success fade-out">{confirmationalMessage}</p>
-        )}
+        {confirmationalMessage && <p className="success fade-out">{confirmationalMessage}</p>}
       </Container>
 
       <Footer />

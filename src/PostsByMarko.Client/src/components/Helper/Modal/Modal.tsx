@@ -39,6 +39,6 @@ export const Modal = ({ onClose, children, isShown }: ModalProps) => {
       </div>
     </CSSTransition>,
 
-    document.getElementById("app")!
+    document.getElementById("app")!,
   );
 };

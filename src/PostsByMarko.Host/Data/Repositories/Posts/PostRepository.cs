@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PostsByMarko.Host.Data.Entities;
 
 using PostsByMarko.Host.Application.Requests;
@@ -36,14 +36,14 @@ namespace PostsByMarko.Host.Data.Repositories.Posts
         public async Task<Post> AddPostAsync(Post postToCreate, CancellationToken cancellationToken = default)
         {
             var result = await appDbContext.Posts.AddAsync(postToCreate, cancellationToken);
-            
+
             return result.Entity;
         }
 
         public async Task UpdatePostAsync(Post postToUpdate)
         {
             appDbContext.Posts.Update(postToUpdate);
-            
+
             await Task.CompletedTask;
         }
 

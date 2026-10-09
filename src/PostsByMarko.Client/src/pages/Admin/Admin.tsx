@@ -24,11 +24,11 @@ export const Admin = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [confirmationalMessage, setConfirmationalMessage] = useState("");
 
-  const barChartLabels = [...Array(DateFunctions.getCurrentMonthDayNumber()).keys()].map(
-    (i) => (i + 1).toString()
+  const barChartLabels = [...Array(DateFunctions.getCurrentMonthDayNumber()).keys()].map((i) =>
+    (i + 1).toString(),
   );
   const barChartData = DateFunctions.countPostsByDay(
-    posts.flatMap(post => post.createdAt ? [post.createdAt] : [])
+    posts.flatMap((post) => (post.createdAt ? [post.createdAt] : [])),
   );
 
   const getAdminDashboard = async () => {
@@ -89,11 +89,7 @@ export const Admin = () => {
   useEffect(() => {
     getAdminDashboard();
     getPosts();
-  }, [
-    appContext.lastMessageRegistered,
-    appContext.lastAdminAction,
-    appContext.posts.length,
-  ]);
+  }, [appContext.lastMessageRegistered, appContext.lastAdminAction, appContext.posts.length]);
 
   return (
     <div className="admin page">
@@ -124,9 +120,7 @@ export const Admin = () => {
                     <td>{row.email}</td>
                     <td>{row.numberOfPosts}</td>
                     <td>
-                      {row.lastPostedAt
-                        ? DateFunctions.getReadableDateTime(row.lastPostedAt)
-                        : ""}
+                      {row.lastPostedAt ? DateFunctions.getReadableDateTime(row.lastPostedAt) : ""}
                     </td>
                     <td>
                       {row.roles.map((r) => (
@@ -139,27 +133,21 @@ export const Admin = () => {
                       {row.roles.includes("Admin") ? (
                         <span
                           className="table-button warning"
-                          onClick={async () =>
-                            await handleUserRoleUpdate(row.userId, false)
-                          }
+                          onClick={async () => await handleUserRoleUpdate(row.userId, false)}
                         >
                           Remove Admin
                         </span>
                       ) : (
                         <span
                           className="table-button success"
-                          onClick={async () =>
-                            await handleUserRoleUpdate(row.userId, true)
-                          }
+                          onClick={async () => await handleUserRoleUpdate(row.userId, true)}
                         >
                           Make Admin
                         </span>
                       )}
                       <span
                         className="table-button error"
-                        onClick={async () =>
-                          await handleUserDelete(row.userId, row.email)
-                        }
+                        onClick={async () => await handleUserDelete(row.userId, row.email)}
                       >
                         Delete
                       </span>
@@ -180,11 +168,7 @@ export const Admin = () => {
 
         <div className="charts-container">
           <div className="chart">
-            <BarChart
-              title={"Posts this month"}
-              labels={barChartLabels}
-              data={barChartData}
-            />
+            <BarChart title={"Posts this month"} labels={barChartLabels} data={barChartData} />
           </div>
         </div>
       </Container>

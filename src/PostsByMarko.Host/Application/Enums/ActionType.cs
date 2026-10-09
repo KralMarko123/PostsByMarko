@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Enums
+namespace PostsByMarko.Host.Application.Enums
 {
     public enum ActionType
     {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using PostsByMarko.Host.Application.DTOs;
 using PostsByMarko.Host.Data.Entities;
 
@@ -6,7 +6,7 @@ namespace PostsByMarko.Host.Application.Mapping.Profiles
 {
     public class MessagingProfile : Profile
     {
-        public MessagingProfile() 
+        public MessagingProfile()
         {
             CreateMap<Message, MessageDto>().ReverseMap();
 

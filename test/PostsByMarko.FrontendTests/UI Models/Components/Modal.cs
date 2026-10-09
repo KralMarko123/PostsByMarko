@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using PostsByMarko.FrontendTests.Helpers;
 
 namespace PostsTesting.UI_Models.Components
@@ -17,7 +17,7 @@ namespace PostsTesting.UI_Models.Components
         public ILocator updateButton => button.GetByText("Update");
         public ILocator deleteButton => button.GetByText("Delete");
         public ILocator cancelButton => button.GetByText("Cancel");
-        
+
 
         public async Task FillInTitleInput(string titleToBeEntered)
         {

@@ -1,4 +1,4 @@
-﻿namespace PostsByMarko.Host.Application.Interfaces
+namespace PostsByMarko.Host.Application.Interfaces
 {
     public interface IEmailService
     {

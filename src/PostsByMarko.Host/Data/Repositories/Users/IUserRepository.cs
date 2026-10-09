@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using PostsByMarko.Host.Data.Entities;
 using System.Security.Claims;
 

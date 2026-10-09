@@ -44,6 +44,7 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
     [Fact]
     public async Task post_visibility_is_filtered_before_paging_and_counts_exclude_hidden_posts()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -53,8 +54,12 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         var date = new DateTime(2026, 10, 1, 12, 0, 0, DateTimeKind.Utc);
         var posts = Enumerable.Range(0, 120).Select(index => new Post
         {
-            Id = Guid.NewGuid(), AuthorId = admin.Id, Title = $"Post {index}", Content = "Content",
-            CreatedAt = date.AddSeconds(index / 3), LastUpdatedAt = date
+            Id = Guid.NewGuid(),
+            AuthorId = admin.Id,
+            Title = $"Post {index}",
+            Content = "Content",
+            CreatedAt = date.AddSeconds(index / 3),
+            LastUpdatedAt = date
         }).ToList();
         posts.Add(new Post { Id = Guid.NewGuid(), AuthorId = admin.Id, Hidden = true, Title = "Private", Content = "Private", CreatedAt = date.AddHours(1) });
         posts.Add(new Post { Id = Guid.NewGuid(), AuthorId = viewer.Id, Hidden = true, Title = "Own private", Content = "Own", CreatedAt = date.AddHours(2) });
@@ -65,9 +70,11 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
             .OrderByDescending(post => post.CreatedAt).ThenByDescending(post => post.Id.ToString(), StringComparer.Ordinal)
             .Select(post => post.Id).ToArray();
         var received = new List<Guid>();
+        // Act
         for (var page = 1; page <= 3; page++)
         {
             using var response = await client.GetAsync($"/api/post/all?page={page}");
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal("121", response.Headers.GetValues("X-Total-Count").Single());
             Assert.Equal("50", response.Headers.GetValues("X-Page-Size").Single());
@@ -89,6 +96,7 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
     [Fact]
     public async Task user_and_dashboard_pages_are_projected_without_loading_post_graphs_or_querying_roles_per_user()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var services = scope.ServiceProvider;
         var db = services.GetRequiredService<AppDbContext>();
@@ -108,7 +116,9 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         await using var queryDb = CreateQueryContext(services, commands);
         var repository = new UserRepository(queryDb, manager);
 
+        // Act
         var dashboard = await repository.GetAdminDashboardAsync(admin.Id, new PageRequest { PageSize = 2 });
+        // Assert
         Assert.Equal(total, dashboard.TotalCount);
         Assert.Equal(2, dashboard.Items.Count);
         var empty = Assert.Single(dashboard.Items, row => row.UserId == noPosts.Id);
@@ -144,6 +154,7 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
     [Fact]
     public async Task chat_summaries_and_recent_windows_are_bounded_and_history_is_paged_for_members_only()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var services = scope.ServiceProvider;
         var db = services.GetRequiredService<AppDbContext>();
@@ -156,7 +167,9 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         var date = new DateTime(2026, 10, 1, 12, 0, 0, DateTimeKind.Utc);
         Chat CreateChat(Guid first, Guid second) => new()
         {
-            Id = Guid.NewGuid(), CreatedAt = date, UpdatedAt = date,
+            Id = Guid.NewGuid(),
+            CreatedAt = date,
+            UpdatedAt = date,
             ChatUsers = [new() { UserId = first }, new() { UserId = second }]
         };
         var chat = CreateChat(admin.Id, recipient.Id);
@@ -164,7 +177,11 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         var privateChat = CreateChat(recipient.Id, unconfirmed.Id);
         chat.Messages = Enumerable.Range(0, 103).Select(index => new Message
         {
-            Id = Guid.NewGuid(), ChatId = chat.Id, SenderId = admin.Id, Content = $"Message {index}", CreatedAt = date.AddSeconds(index / 3)
+            Id = Guid.NewGuid(),
+            ChatId = chat.Id,
+            SenderId = admin.Id,
+            Content = $"Message {index}",
+            CreatedAt = date.AddSeconds(index / 3)
         }).ToList();
         db.Chats.AddRange(chat, otherChat, privateChat);
         await db.SaveChangesAsync();
@@ -173,8 +190,10 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         var commands = new CommandCapture();
         await using var queryDb = CreateQueryContext(services, commands);
         var repository = new ChatRepository(queryDb);
+        // Act
         var firstPage = await repository.GetChatsForUserAsync(admin.Id, new PageRequest { PageSize = 1 }, default);
         var secondPage = await repository.GetChatsForUserAsync(admin.Id, new PageRequest { Page = 2, PageSize = 1 }, default);
+        // Assert
         Assert.Equal(2, firstPage.TotalCount);
         Assert.Equal(new[] { chat.Id, otherChat.Id }.OrderByDescending(id => id.ToString(), StringComparer.Ordinal),
             firstPage.Items.Concat(secondPage.Items).Select(item => item.Id));
@@ -217,13 +236,17 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
     [Fact]
     public async Task every_list_rejects_invalid_paging_and_exposes_metadata_to_the_browser()
     {
+        // Arrange
+        // The shared fixture supplies the initialized test dependencies.
+        // Act
         foreach (var endpoint in new[] { "/api/post/all", "/api/user/all", "/api/admin/dashboard", "/api/messaging/chats" })
-        foreach (var query in new[] { "page=0", "pageSize=0", "pageSize=101", "page=2147483647&pageSize=100", "page=bad" })
-        {
-            using var response = await factory.client!.GetAsync($"{endpoint}?{query}");
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Equal("application/problem+json", response.Content.Headers.ContentType!.MediaType);
-        }
+            foreach (var query in new[] { "page=0", "pageSize=0", "pageSize=101", "page=2147483647&pageSize=100", "page=bad" })
+            {
+                using var response = await factory.client!.GetAsync($"{endpoint}?{query}");
+                // Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                Assert.Equal("application/problem+json", response.Content.Headers.ContentType!.MediaType);
+            }
         using var scope = factory.Services.CreateScope();
         var origin = scope.ServiceProvider.GetRequiredService<IOptions<JwtConfig>>().Value.ValidAudiences.First();
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/user/all?pageSize=1");
@@ -231,12 +254,14 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         using var result = await factory.client!.SendAsync(request);
         result.EnsureSuccessStatusCode();
         var exposed = string.Join(",", result.Headers.GetValues("Access-Control-Expose-Headers"));
-        foreach (var header in PaginationResponseExtensions.HeaderNames) Assert.Contains(header, exposed);
+        foreach (var header in PaginationResponseExtensions.HeaderNames)
+            Assert.Contains(header, exposed);
     }
 
     [Fact]
     public async Task pagination_indexes_migrate_up_and_down_without_losing_existing_data()
     {
+        // Arrange
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Equal("postsbymarko_test", db.Database.GetDbConnection().Database);
@@ -247,7 +272,9 @@ public class PaginationTests(PostsByMarkoApiFactory factory) : IAsyncLifetime
         await db.Seed();
         var userCount = await db.Users.CountAsync();
         var postCount = await db.Posts.CountAsync();
+        // Act
         await db.Database.MigrateAsync();
+        // Assert
         Assert.Equal(userCount, await db.Users.CountAsync());
         Assert.Equal(postCount, await db.Posts.CountAsync());
         Assert.False(db.Database.HasPendingModelChanges());

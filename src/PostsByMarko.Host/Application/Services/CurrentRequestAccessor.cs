@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Application.Interfaces;
+using PostsByMarko.Host.Application.Interfaces;
 using System.Security.Claims;
 
 namespace PostsByMarko.Host.Application.Services

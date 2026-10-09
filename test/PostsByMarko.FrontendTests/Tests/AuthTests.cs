@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Playwright;
 using PostsByMarko.Test.Shared.Constants;
 using PostsByMarko.Test.Shared.Helper;
@@ -35,37 +35,48 @@ namespace PostsByMarko.FrontendTests.Tests
         // Teardown
         public async Task DisposeAsync()
         {
-            if (page != null) await page.CloseAsync();
+            if (page != null)
+                await page.CloseAsync();
         }
 
         [Fact]
         public async Task should_login()
         {
+            // Arrange
+            // The shared fixture supplies the initialized test dependencies.
+            // Act
             await LoginWithEmail(testUserEmail);
 
             var homePageTitleText = await homePage.containerTitle.TextContentAsync();
 
+            // Assert
             homePageTitleText.Should().Be("Today's Posts");
         }
 
         [Fact]
         public async Task should_register()
         {
+            // Arrange
             await registerPage.Visit();
+            // Act
             await registerPage.Register("Test", $"{RandomHelper.GetRandomString(8)}", $"test_{RandomHelper.GetRandomString(5)}@domain.com", "@Test123");
             await registerPage.confirmationalForm.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
             var successfulRegisterText = await registerPage.formTitle.TextContentAsync();
+            // Assert
             successfulRegisterText.Should().Be("Successfully Registered!");
         }
 
         [Fact]
         public async Task should_logout()
         {
+            // Arrange
             await LoginWithEmail(testUserEmail);
 
+            // Act
             await homePage.navComponent.dropdownMenu.HoverAsync();
             await homePage.navComponent.logout.ClickAsync();
+            // Assert
             await loginPage.loginButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
         }
 

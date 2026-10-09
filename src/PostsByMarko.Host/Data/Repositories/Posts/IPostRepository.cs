@@ -1,4 +1,4 @@
-﻿using PostsByMarko.Host.Data.Entities;
+using PostsByMarko.Host.Data.Entities;
 
 using PostsByMarko.Host.Application.Requests;
 using PostsByMarko.Host.Application.Responses;
