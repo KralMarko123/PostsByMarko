@@ -23,7 +23,7 @@ namespace PostsTesting.UI_Models.Pages
         public ILocator backButton => button.GetByText("Back");
         public ILocator saveButton => button.GetByText("Save");
         public ILocator cancelButton => button.GetByText("Cancel");
-        public ILocator textArea => page.Locator("textarea[style*='display: block']").Filter(new LocatorFilterOptions { Visible = true });
+        public ILocator textArea => page.GetByRole(AriaRole.Textbox, new PageGetByRoleOptions { Name = "Post content" });
         public ILocator successMessage => page.Locator(".success.fade-out");
 
         public async Task Visit(string postId)

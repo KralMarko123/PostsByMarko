@@ -1,3 +1,4 @@
+import { PageLayout } from "../../components/Layout/PageLayout/PageLayout";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../custom/useAuth";
 import { ICONS } from "../../constants/icons";
@@ -5,15 +6,10 @@ import { HelperFunctions } from "../../util/helperFunctions";
 import { DateFunctions } from "../../util/dateFunctions";
 import { UserService } from "../../api/UserService";
 import { MessagingService } from "../../api/MessagingService";
-import { Nav } from "../../components/Layout/Nav/Nav";
 import { Container } from "../../components/Layout/Container/Container";
-import { Footer } from "../../components/Layout/Footer/Footer";
-import { Logo } from "../../components/Layout/Logo/Logo";
 import { AppContext } from "../../context/AppContext";
 import { User } from "@typeConfigs/user";
 import { Chat, Message } from "@typeConfigs/messaging";
-import "../Page.css";
-import "./Chats.css";
 
 export const Chats = () => {
   const appContext = useContext(AppContext);
@@ -207,18 +203,19 @@ export const Chats = () => {
   }, [openChat?.messages?.length]);
 
   return (
-    <div className="page chat">
-      <Logo />
-      <Nav />
-
-      <Container>
+    <PageLayout className="chat">
+      <Container title="Chat" desc="A place to keep the conversation going.">
         {errorMessage && (
           <p role="alert" className="error">
             {errorMessage}
           </p>
         )}
-        <div className="chat-container">
-          <div className="user-list">
+        <div className="chat-container grid min-w-0 gap-4 md:grid-cols-[16rem_minmax(0,1fr)]">
+          <div
+            className="user-list flex gap-2 overflow-x-auto rounded-2xl border border-line/70 bg-surface p-2 md:max-h-[70dvh] md:flex-col md:overflow-y-auto"
+            aria-label="People"
+          >
+            {users.length === 0 && <p className="p-4 text-sm text-muted">No other users yet.</p>}
             {users?.map((u) => {
               const isActiveChat = openChat?.users?.map((cu) => cu.id)?.includes(u.id);
               const hasUnreadMessages = unreadUserIds?.some((id) => id == u.id);
@@ -228,33 +225,50 @@ export const Chats = () => {
               const userName = unknownName ? u.email : `${u.firstName} ${u.lastName}`;
 
               return (
-                <div
-                  className={`user-card${isActiveChat ? " active" : ""}${
-                    hasUnreadMessages ? " unread" : ""
-                  }`}
+                <button
+                  type="button"
+                  aria-pressed={Boolean(isActiveChat)}
+                  className={`user-card flex min-h-16 w-56 shrink-0 items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-elevated md:w-full ${isActiveChat ? "active bg-elevated" : ""} ${hasUnreadMessages ? "unread font-semibold" : ""}`}
                   key={u.id}
                   onClick={() => handleUserClick(u)}
                 >
-                  <span className="user-icon">{userInitials}</span>
-                  <span className="user-name">{userName}</span>
+                  <span
+                    className="user-icon grid size-10 shrink-0 place-items-center rounded-full bg-page text-sm text-mint"
+                    aria-hidden="true"
+                  >
+                    {userInitials}
+                  </span>
+                  <span className="user-name min-w-0 flex-1 truncate text-sm">{userName}</span>
                   {hasUnreadMessages && (
-                    <span className="user-unreads">
+                    <span
+                      className="user-unreads grid size-6 shrink-0 place-items-center rounded-full bg-brand text-xs text-white"
+                      aria-label={`${numberOfUnreadMessages} unread messages`}
+                    >
                       {numberOfUnreadMessages > 4 ? `+4` : numberOfUnreadMessages}
                     </span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
-          <div className="messages">
+          <div className="messages flex h-[65dvh] min-h-80 min-w-0 flex-col overflow-hidden rounded-2xl border border-line/70 bg-surface md:h-[70dvh]">
             {selectedUser && openChat ? (
-              <div className="message-container">
-                <div className="handle">
-                  <span className="user-icon">{`${selectedUser.firstName?.[0] ?? "?"}${selectedUser.lastName?.[0] ?? "?"}`}</span>
-                  <span className="user-name">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
+              <div className="message-container flex min-h-0 flex-1 flex-col">
+                <div className="handle flex shrink-0 items-center gap-3 border-b border-line/60 p-4">
+                  <span
+                    className="user-icon grid size-10 shrink-0 place-items-center rounded-full bg-elevated text-sm text-mint"
+                    aria-hidden="true"
+                  >{`${selectedUser.firstName?.[0] ?? "?"}${selectedUser.lastName?.[0] ?? "?"}`}</span>
+                  <span className="user-name text-sm font-semibold">{`${selectedUser.firstName} ${selectedUser.lastName}`}</span>
                 </div>
 
-                <div className="message-list" ref={messageListRef}>
+                <div
+                  className="message-list flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:p-6"
+                  ref={messageListRef}
+                  role="log"
+                  aria-label="Conversation"
+                  aria-relevant="additions"
+                >
                   {getMessagesGroupedByDay().map((messageList) => {
                     DateFunctions.sortItemsByDateTimeAttribute(messageList, "createdAt");
 
@@ -262,22 +276,28 @@ export const Chats = () => {
                       const isMessageAuthor = m.senderId == user!.id;
 
                       return (
-                        <div className={`message${isMessageAuthor ? " author" : ""}`} key={m.id}>
+                        <div
+                          className={`message flex w-full flex-col gap-2 ${isMessageAuthor ? "author items-end" : "items-start"}`}
+                          key={m.id}
+                        >
                           {index === 0 && (
-                            <span className="message-date">
+                            <span className="message-date self-center py-2 text-xs text-muted">
                               {HelperFunctions.getMessageTimeLabelAccordingToToday(m.createdAt!)}
                             </span>
                           )}
 
-                          <div className="message-box">
+                          <div className="message-box flex max-w-[90%] items-end gap-2">
                             {!isMessageAuthor && (
                               <span
-                                className={`message-handle${
-                                  isLastMessageFromRecipientInSeries(m, messageList) ? " show" : ""
-                                }`}
+                                className={`message-handle grid size-7 shrink-0 place-items-center rounded-full bg-elevated text-xs text-mint ${isLastMessageFromRecipientInSeries(m, messageList) ? "show visible" : "invisible"}`}
+                                aria-hidden="true"
                               >{`${selectedUser.firstName?.[0] ?? "?"}${selectedUser.lastName?.[0] ?? "?"}`}</span>
                             )}
-                            <div className="message-content">{m.content}</div>
+                            <div
+                              className={`message-content min-w-0 rounded-2xl px-4 py-2 text-sm break-words whitespace-pre-wrap ${isMessageAuthor ? "bg-elevated" : "bg-brand/25"}`}
+                            >
+                              {m.content}
+                            </div>
                           </div>
                         </div>
                       );
@@ -285,12 +305,13 @@ export const Chats = () => {
                   })}
                 </div>
 
-                <div className="message-area">
+                <div className="message-area flex shrink-0 items-center gap-3 border-t border-line/60 p-4">
                   <input
                     type="text"
-                    className={`message-input${isMessageEmpty ? " empty" : ""}`}
-                    placeholder="Aa"
+                    className={`message-input min-h-11 min-w-0 flex-1 rounded-lg border bg-page px-4 py-2 text-base text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-mint/30 disabled:opacity-50 ${isMessageEmpty ? "empty border-danger" : "border-line focus:border-mint"}`}
+                    placeholder="Write a message…"
                     aria-label="Message"
+                    aria-invalid={isMessageEmpty}
                     maxLength={4000}
                     value={newMessage}
                     disabled={messageIsSending}
@@ -305,7 +326,7 @@ export const Chats = () => {
                     type="button"
                     aria-label="Send message"
                     disabled={messageIsSending}
-                    className="send-icon"
+                    className="send-icon grid size-11 shrink-0 place-items-center rounded-lg bg-brand text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
                     onClick={() => handleMessageSend()}
                   >
                     {ICONS.SEND_ICON({})}
@@ -313,7 +334,10 @@ export const Chats = () => {
                 </div>
               </div>
             ) : (
-              <span className="info-message">
+              <span
+                className="info-message m-auto max-w-sm p-6 text-center text-muted"
+                role="status"
+              >
                 {selectedUser
                   ? "Loading conversation…"
                   : "Start chatting right away by clicking on another user"}
@@ -322,8 +346,6 @@ export const Chats = () => {
           </div>
         </div>
       </Container>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 };

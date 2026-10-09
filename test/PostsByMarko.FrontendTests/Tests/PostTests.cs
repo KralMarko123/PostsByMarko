@@ -118,16 +118,18 @@ namespace PostsByMarko.FrontendTests.Tests
             // Arrange
             await LoginWithUser(testAdminEmail);
 
-            var visiblePost = new Post(page, homePage.page.Locator(".post:not(.hidden)").First);
+            var visiblePost = new Post(page, homePage.page.Locator(".post[data-hidden='false']").First);
 
             // Act
             await visiblePost.ClickOnHideIcon();
             await visiblePost.WaitForPostVisibilityToToggle();
 
-            var postClassnames = await visiblePost.post.GetAttributeAsync("class");
+            var hiddenState = await visiblePost.post.GetAttributeAsync("data-hidden");
 
             // Assert
-            postClassnames.Should().Contain("hidden");
+            hiddenState.Should().Be("true");
+            (await visiblePost.post.IsVisibleAsync()).Should().BeTrue();
+            (await visiblePost.post.EvaluateAsync<double>("element => Number(getComputedStyle(element).opacity)")).Should().BeInRange(0.1, 0.99);
         }
 
         [Fact]
@@ -195,7 +197,7 @@ namespace PostsByMarko.FrontendTests.Tests
 
         private async Task CreatePost(string title, string content)
         {
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.createPost.ClickAsync();
             await homePage.modalComponent.FillInTitleInput(title);
             await homePage.modalComponent.FillInContentInput(content);

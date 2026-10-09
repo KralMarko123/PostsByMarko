@@ -74,7 +74,7 @@ namespace PostsByMarko.FrontendTests.Tests
             await LoginWithEmail(testUserEmail);
 
             // Act
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.logout.ClickAsync();
             // Assert
             await loginPage.loginButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });

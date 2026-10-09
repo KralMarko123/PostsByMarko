@@ -1,3 +1,5 @@
+import { FormField } from "../FormField";
+import { FormLayout } from "../FormLayout";
 import { useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
@@ -7,8 +9,6 @@ import { Modal } from "../../Helper/Modal/Modal";
 import { AppContext } from "../../../context/AppContext";
 import { HelperFunctions } from "../../../util/helperFunctions";
 import { CreatePostRequest } from "@typeConfigs/post";
-import "./CreatePostForm.css";
-import "../Form.css";
 
 export const CreatePostForm = () => {
   const appContext = useContext(AppContext);
@@ -60,51 +60,46 @@ export const CreatePostForm = () => {
   };
 
   return (
-    <Modal isShown={appContext.modalVisibility.createPost} onClose={() => onClose()}>
-      <form method="POST" className="form create-post">
-        <h1 className="form-title">Create post</h1>
-        <p className="form-desc">Build & share with your friends</p>
-
+    <Modal title="Create post" isShown={appContext.modalVisibility.createPost} onClose={onClose}>
+      <FormLayout
+        title="Create post"
+        description="Build & share with your friends"
+        className="create-post"
+        onSubmit={onSubmit}
+      >
         {createPostForm.formGroups.map((group) => (
-          <div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
-            {group.type === "textarea" ? (
-              <textarea
-                id={group.id}
-                className="input input-text"
-                onChange={(e) =>
-                  setNewPost({
-                    ...newPost,
-                    [`${group.id}`]: e.currentTarget.value,
-                  })
-                }
-                placeholder={`What do you want to share, ${user!.firstName}?`}
-              />
-            ) : (
-              <input
-                id={group.id}
-                type={group.type}
-                className="input"
-                onChange={(e) =>
-                  setNewPost({
-                    ...newPost,
-                    [`${group.id}`]: e.currentTarget.value,
-                  })
-                }
-                placeholder="What should the title for this post be?"
-              />
-            )}
-            {group.icon}
-          </div>
+          <FormField
+            key={group.id}
+            name={group.id}
+            label={group.label ?? group.placeholder}
+            type={group.type}
+            icon={group.icon}
+            placeholder={
+              group.type === "textarea"
+                ? `What do you want to share, ${user!.firstName}?`
+                : "What should the title for this post be?"
+            }
+            value={newPost[group.id as "title" | "content"]}
+            disabled={isLoading}
+            maxLength={group.type === "textarea" ? 20000 : 200}
+            onChange={(value) => setNewPost({ ...newPost, [group.id]: value })}
+          />
         ))}
-
-        <div className="form-actions">
-          <Button onButtonClick={onSubmit} text="Create" loading={isLoading} />
-          <Button onButtonClick={onClose} text="Cancel" />
+        <div className="form-actions flex flex-wrap gap-3">
+          <Button type="submit" text="Create" loading={isLoading} />
+          <Button onButtonClick={onClose} text="Cancel" variant="secondary" />
         </div>
-
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
-      </form>{" "}
+        {errorMessage && (
+          <p className="error text-sm" role="alert">
+            {errorMessage}
+          </p>
+        )}
+        {confirmationalMessage && (
+          <p className="success text-sm" role="status">
+            {confirmationalMessage}
+          </p>
+        )}
+      </FormLayout>
     </Modal>
   );
 };

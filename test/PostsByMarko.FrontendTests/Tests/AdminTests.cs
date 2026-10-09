@@ -48,7 +48,7 @@ namespace PostsByMarko.FrontendTests.Tests
             // Arrange
             await LoginWithEmail(testAdminEmail);
             // Act
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.dashboard.ClickAsync();
             await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
@@ -69,7 +69,7 @@ namespace PostsByMarko.FrontendTests.Tests
         {
             // Arrange
             await LoginWithEmail(testAdminEmail);
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.dashboard.ClickAsync();
             await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
@@ -103,7 +103,7 @@ namespace PostsByMarko.FrontendTests.Tests
         {
             // Arrange
             await LoginWithEmail(testAdminEmail);
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.dashboard.ClickAsync();
             await adminDashboardPage.containerTitle.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 

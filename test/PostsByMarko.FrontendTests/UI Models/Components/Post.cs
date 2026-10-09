@@ -31,16 +31,13 @@ namespace PostsTesting.UI_Models.Components
         {
             Refresh();
 
-            if (isHidden)
-                await PlaywrightHelpers.WaitForClassToBeRemoved(post, "hidden");
-            else
-                await PlaywrightHelpers.WaitForClassToBePresent(post, "hidden");
+            await Assertions.Expect(post).ToHaveAttributeAsync("data-hidden", isHidden ? "false" : "true");
         }
 
         public async Task ClickOnPost()
         {
             _ = Id;
-            await post.ClickAsync();
+            await post.GetByRole(AriaRole.Link).ClickAsync();
         }
 
         public async Task ClickOnUpdateIcon()

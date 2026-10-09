@@ -7,12 +7,12 @@ namespace PostsTesting.UI_Models.Components
     {
         public Modal(IPage page) : base(page) { }
 
-        public ILocator modalContainer => page.Locator(".modal");
-        public ILocator title => page.Locator(".modal__title");
-        public ILocator titleInput => page.Locator("#title");
-        public ILocator contentInput => page.Locator("#content");
-        public ILocator messageFailure => page.Locator(".modal__message.fail");
-        public ILocator messageSuccess => page.Locator(".modal__message.success");
+        public ILocator modalContainer => page.GetByRole(AriaRole.Dialog);
+        public ILocator title => modalContainer.GetByRole(AriaRole.Heading);
+        public ILocator titleInput => modalContainer.GetByLabel("Title", new LocatorGetByLabelOptions { Exact = true });
+        public ILocator contentInput => modalContainer.GetByLabel("Content", new LocatorGetByLabelOptions { Exact = true });
+        public ILocator messageFailure => modalContainer.GetByRole(AriaRole.Alert);
+        public ILocator messageSuccess => modalContainer.GetByRole(AriaRole.Status);
         public ILocator createButton => button.GetByText("Create");
         public ILocator updateButton => button.GetByText("Update");
         public ILocator deleteButton => button.GetByText("Delete");

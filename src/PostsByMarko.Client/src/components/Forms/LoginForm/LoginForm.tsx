@@ -1,19 +1,18 @@
+import { FormField } from "../FormField";
+import { FormLayout } from "../FormLayout";
 import { useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
-import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import { ROUTES } from "../../../constants/routes";
 import { FORMS } from "../../../constants/forms";
 import { HelperFunctions } from "../../../util/helperFunctions";
 import { Button } from "../../Helper/Button/Button";
 import { AuthService } from "../../../api/AuthService";
 import { LoginRequest } from "@typeConfigs/auth";
-import "./LoginForm.css";
-import "../Form.css";
 
 export const LoginForm = () => {
   const { login } = useAuth();
   const loginForm = FORMS.LOGIN_FORM;
-  const navigate = useNavigate();
   const [loginRequest, setLoginRequest] = useState<LoginRequest>({
     email: "",
     password: "",
@@ -35,8 +34,6 @@ export const LoginForm = () => {
 
       await AuthService.login(loginRequest)
         .then((loginPayload) => {
-          console.log("here");
-
           login(loginPayload);
         })
         .catch((error) => setErrorMessage(error.message))
@@ -45,36 +42,36 @@ export const LoginForm = () => {
   };
 
   return (
-    <form action="POST" className="form">
-      <h1 className="form-title">Sign In</h1>
-      <p className="form-desc">Stay updated with the newest posts</p>
+    <FormLayout
+      title="Sign In"
+      description="Stay updated with the newest posts"
+      onSubmit={handleLogin}
+    >
       {loginForm.formGroups.map((group) => (
-        <div key={group.id} className="form-group">
-          <input
-            id={group.id}
-            type={group.type}
-            className="input"
-            placeholder={group.placeholder}
-            onChange={(e) =>
-              setLoginRequest({
-                ...loginRequest,
-                [`${group.id}`]: e.currentTarget.value,
-              })
-            }
-          />
-          {group.icon}
-        </div>
+        <FormField
+          key={group.id}
+          name={group.id}
+          label={group.label ?? group.placeholder}
+          type={group.id === "email" ? "email" : group.type}
+          placeholder={group.placeholder}
+          icon={group.icon}
+          autoComplete={group.id === "password" ? "current-password" : "email"}
+          value={loginRequest[group.id as keyof LoginRequest]}
+          disabled={isLoading}
+          onChange={(value) => setLoginRequest({ ...loginRequest, [group.id]: value })}
+        />
       ))}
-
-      <div className="form-actions">
-        <Button onButtonClick={() => handleLogin()} text="Sign In" loading={isLoading} />
+      <div className="form-actions flex flex-col gap-3">
+        <Button type="submit" text="Sign In" loading={isLoading} />
       </div>
-
-      <p className="link" onClick={() => navigate(ROUTES.REGISTER)}>
+      <Link className="link text-sm" to={ROUTES.REGISTER}>
         Haven't registered yet? Click here to create an account
-      </p>
-
-      {errorMessage && <p className="error">{errorMessage}</p>}
-    </form>
+      </Link>
+      {errorMessage && (
+        <p className="error text-sm" role="alert">
+          {errorMessage}
+        </p>
+      )}
+    </FormLayout>
   );
 };

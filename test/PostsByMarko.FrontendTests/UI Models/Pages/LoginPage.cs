@@ -8,8 +8,8 @@ namespace PostsTesting.UI_Models.Pages
         private static string url => $"{baseUrl}/login";
         public LoginPage(IPage page) : base(page) { }
 
-        public ILocator email => page.Locator("#email");
-        public ILocator password => page.Locator("#password");
+        public ILocator email => page.GetByLabel("Email", new PageGetByLabelOptions { Exact = true });
+        public ILocator password => page.GetByLabel("Password", new PageGetByLabelOptions { Exact = true });
         public ILocator loginButton => button;
         public ILocator registerLink => link;
 

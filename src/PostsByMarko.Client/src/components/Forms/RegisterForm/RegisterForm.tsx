@@ -1,3 +1,6 @@
+import { FormField } from "../FormField";
+import { FormLayout } from "../FormLayout";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../../../constants/routes";
@@ -6,8 +9,6 @@ import { HelperFunctions } from "../../../util/helperFunctions";
 import { Button } from "../../Helper/Button/Button";
 import { AuthService } from "../../../api/AuthService";
 import { RegisterRequest } from "@typeConfigs/auth";
-import "./RegisterForm.css";
-import "../Form.css";
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
@@ -68,45 +69,49 @@ export const RegisterForm = () => {
   };
 
   return !isRegistered ? (
-    <form action="POST" className="form">
-      <h1 className="form-title">Sign Up</h1>
-      <p className="form-desc">Start sharing today</p>
+    <FormLayout title="Sign Up" description="Start sharing today" onSubmit={handleRegister}>
       {registerForm.formGroups.map((group) => (
-        <div key={group.id} className="form-group">
-          <input
-            id={group.id}
-            type={group.type}
-            className="input"
-            placeholder={group.placeholder}
-            onChange={(e) =>
-              setRegisterRequest({
-                ...registerRequest,
-                [`${group.id}`]: e.currentTarget.value,
-              })
-            }
-          />
-          {group.icon}
-        </div>
+        <FormField
+          key={group.id}
+          name={group.id}
+          label={group.label ?? group.placeholder}
+          type={group.id === "email" ? "email" : group.type}
+          placeholder={group.placeholder}
+          icon={group.icon}
+          autoComplete={
+            group.type === "password"
+              ? "new-password"
+              : group.id === "firstName"
+                ? "given-name"
+                : group.id === "lastName"
+                  ? "family-name"
+                  : "email"
+          }
+          value={registerRequest[group.id as keyof RegisterRequest]}
+          disabled={isLoading}
+          onChange={(value) => setRegisterRequest({ ...registerRequest, [group.id]: value })}
+        />
       ))}
-
-      <div className="form-actions">
-        <Button onButtonClick={handleRegister} text="Sign Up" loading={isLoading} />
+      <div className="form-actions flex flex-col gap-3">
+        <Button type="submit" text="Sign Up" loading={isLoading} />
       </div>
-
-      <p className="link" onClick={() => navigate(ROUTES.LOGIN)}>
+      <Link className="link text-sm" to={ROUTES.LOGIN}>
         Already have an account? Click here to sign in
-      </p>
-
-      {errorMessage && <p className="error">{errorMessage}</p>}
-    </form>
+      </Link>
+      {errorMessage && (
+        <p className="error text-sm" role="alert">
+          {errorMessage}
+        </p>
+      )}
+    </FormLayout>
   ) : (
-    <div className="form confirmational">
-      <h1 className="form-title">Successfully Registered!</h1>
-      <p className="form-desc">
+    <div className="form confirmational flex flex-col gap-5 p-6 sm:p-8" role="status">
+      <h1 className="form-title font-display text-3xl font-medium">Successfully Registered!</h1>
+      <p className="form-desc text-muted">
         Please check your email to confirm your account first. You can click on the button below to
         sign in
       </p>
-      <Button text={"Sign In"} onButtonClick={() => navigate(ROUTES.LOGIN)} />
+      <Button text="Sign In" onButtonClick={() => navigate(ROUTES.LOGIN)} />
     </div>
   );
 };

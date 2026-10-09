@@ -1,3 +1,5 @@
+import { FormField } from "../FormField";
+import { FormLayout } from "../FormLayout";
 import { useContext, useState, useEffect } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { FORMS } from "../../../constants/forms";
@@ -7,8 +9,6 @@ import { Button } from "../../Helper/Button/Button";
 import { Modal } from "../../Helper/Modal/Modal";
 import { AppContext } from "../../../context/AppContext";
 import { UpdatePostRequest } from "@typeConfigs/post";
-import "./UpdatePostForm.css";
-import "../Form.css";
 
 export const UpdatePostForm = () => {
   const { user } = useAuth();
@@ -34,13 +34,12 @@ export const UpdatePostForm = () => {
       content: appContext.postBeingModified.content,
       hidden: appContext.postBeingModified.hidden,
     });
-  }, [appContext.postBeingModified]);
+  }, [appContext.postBeingModified, appContext.modalVisibility.updatePost]);
 
   const onClose = () => {
     appContext.dispatch({ type: "CLOSE_MODAL", modal: "updatePost" });
     setErrorMessage("");
     setConfirmationalMessage("");
-    setUpdatedPostId(null);
   };
 
   const notSameData = () => {
@@ -84,53 +83,46 @@ export const UpdatePostForm = () => {
   };
 
   return (
-    <Modal isShown={appContext.modalVisibility.updatePost} onClose={onClose}>
-      <form method="POST" className="form update-post">
-        <h1 className="form-title">Update post</h1>
-        <p className="form-desc">Make changes and keep things interesting</p>
-
+    <Modal title="Update post" isShown={appContext.modalVisibility.updatePost} onClose={onClose}>
+      <FormLayout
+        title="Update post"
+        description="Make changes and keep things interesting"
+        className="update-post"
+        onSubmit={onSubmit}
+      >
         {updatePostForm.formGroups.map((group) => (
-          <div key={group.id} className={`form-group ${group.type === "textarea" ? "text" : ""}`}>
-            {group.type === "textarea" ? (
-              <textarea
-                id={group.id}
-                className="input input-text"
-                onChange={(e) =>
-                  setUpdatedPostRequest({
-                    ...updatePostRequest,
-                    [`${group.id}`]: e.currentTarget.value,
-                  })
-                }
-                defaultValue={appContext.postBeingModified.content}
-                placeholder={`What do you want to share, ${user!.firstName}?`}
-              />
-            ) : (
-              <input
-                id={group.id}
-                type={group.type}
-                className="input"
-                onChange={(e) =>
-                  setUpdatedPostRequest({
-                    ...updatePostRequest,
-                    [`${group.id}`]: e.currentTarget.value,
-                  })
-                }
-                defaultValue={appContext.postBeingModified.title}
-                placeholder="What should the title for this post be?"
-              />
-            )}
-            {group.icon}
-          </div>
+          <FormField
+            key={group.id}
+            name={group.id}
+            label={group.label ?? group.placeholder}
+            type={group.type}
+            icon={group.icon}
+            placeholder={
+              group.type === "textarea"
+                ? `What do you want to share, ${user!.firstName}?`
+                : "What should the title for this post be?"
+            }
+            value={updatePostRequest[group.id as "title" | "content"]}
+            disabled={isLoading}
+            maxLength={group.type === "textarea" ? 20000 : 200}
+            onChange={(value) => setUpdatedPostRequest({ ...updatePostRequest, [group.id]: value })}
+          />
         ))}
-
-        <div className="form-actions">
-          <Button onButtonClick={onSubmit} text="Update" loading={isLoading} />
-          <Button onButtonClick={onClose} text="Cancel" />
+        <div className="form-actions flex flex-wrap gap-3">
+          <Button type="submit" text="Update" loading={isLoading} />
+          <Button onButtonClick={onClose} text="Cancel" variant="secondary" />
         </div>
-
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
-      </form>
+        {errorMessage && (
+          <p className="error text-sm" role="alert">
+            {errorMessage}
+          </p>
+        )}
+        {confirmationalMessage && (
+          <p className="success text-sm" role="status">
+            {confirmationalMessage}
+          </p>
+        )}
+      </FormLayout>
     </Modal>
   );
 };

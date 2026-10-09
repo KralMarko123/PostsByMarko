@@ -1,11 +1,10 @@
+import { FormLayout } from "../FormLayout";
 import { useContext, useState } from "react";
 import { useAuth } from "../../../custom/useAuth";
 import { PostService } from "../../../api/PostService";
 import { Button } from "../../Helper/Button/Button";
 import { Modal } from "../../Helper/Modal/Modal";
 import { AppContext } from "../../../context/AppContext";
-import "../Form.css";
-import "./DeletePostForm.css";
 
 export const DeletePostForm = () => {
   const appContext = useContext(AppContext);
@@ -43,20 +42,27 @@ export const DeletePostForm = () => {
   };
 
   return (
-    <Modal isShown={appContext.modalVisibility.deletePost} onClose={onClose}>
-      <form method="DELETE" className="form">
-        <h1 className="form-title">Are you sure?</h1>
-        <p className="form-desc">Deleting this post cannot be undone</p>
-        <div className="form-actions">
-          <Button onButtonClick={onDelete} text="Delete" loading={isLoading} />
-          <Button onButtonClick={onClose} text="Cancel" />
+    <Modal title="Delete post" isShown={appContext.modalVisibility.deletePost} onClose={onClose}>
+      <FormLayout
+        title="Are you sure?"
+        description="Deleting this post cannot be undone"
+        onSubmit={onDelete}
+      >
+        <div className="form-actions flex flex-wrap gap-3">
+          <Button type="submit" text="Delete" loading={isLoading} variant="danger" />
+          <Button onButtonClick={onClose} text="Cancel" variant="secondary" />
         </div>
-
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {confirmationalMessage && <p className="success">{confirmationalMessage}</p>}
-      </form>
+        {errorMessage && (
+          <p className="error text-sm" role="alert">
+            {errorMessage}
+          </p>
+        )}
+        {confirmationalMessage && (
+          <p className="success text-sm" role="status">
+            {confirmationalMessage}
+          </p>
+        )}
+      </FormLayout>
     </Modal>
   );
 };
-
-export default DeletePostForm;

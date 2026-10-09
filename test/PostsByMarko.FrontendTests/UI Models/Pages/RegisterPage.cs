@@ -9,11 +9,11 @@ namespace PostsTesting.UI_Models.Pages
         public RegisterPage(IPage page) : base(page) { }
 
 
-        public ILocator firstName => page.Locator("#firstName");
-        public ILocator lastName => page.Locator("#lastName");
-        public ILocator email => page.Locator("#email");
-        public ILocator password => page.Locator("#password");
-        public ILocator confirmPassword => page.Locator("#confirmPassword");
+        public ILocator firstName => page.GetByLabel("First Name", new PageGetByLabelOptions { Exact = true });
+        public ILocator lastName => page.GetByLabel("Last Name", new PageGetByLabelOptions { Exact = true });
+        public ILocator email => page.GetByLabel("Email", new PageGetByLabelOptions { Exact = true });
+        public ILocator password => page.GetByLabel("Password", new PageGetByLabelOptions { Exact = true });
+        public ILocator confirmPassword => page.GetByLabel("Confirm Password", new PageGetByLabelOptions { Exact = true });
         public ILocator confirmationalForm => page.Locator(".form.confirmational");
         public ILocator formTitle => page.Locator(".register .form .form-title");
         public ILocator registerButton => button;

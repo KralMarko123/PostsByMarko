@@ -159,7 +159,7 @@ namespace PostsByMarko.FrontendTests.Tests
 
         private static async Task NavigateToChatPage(HomePage homePage, ChatPage chatPage)
         {
-            await homePage.navComponent.dropdownMenu.HoverAsync();
+            await homePage.navComponent.dropdownMenu.ClickAsync();
             await homePage.navComponent.chat.ClickAsync();
             await chatPage.chatContainer.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
             await chatPage.userList.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });

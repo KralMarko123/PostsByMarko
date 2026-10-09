@@ -1,44 +1,52 @@
 import { useEffect, useRef } from "react";
-import { CSSTransition } from "react-transition-group";
-import { modalTransitionDurationInMilliseconds } from "../../../constants/misc";
-import ReactDOM from "react-dom";
-import "./Modal.css";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   isShown: boolean;
+  title: string;
 }
 
-export const Modal = ({ onClose, children, isShown }: ModalProps) => {
-  const nodeRef = useRef<HTMLDivElement>(null);
+export const Modal = ({ onClose, children, isShown, title }: ModalProps) => {
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const closeOnEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", closeOnEscapeKey);
-
+    const dialog = dialogRef.current!;
+    if (isShown && !dialog.open) {
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>("input, textarea, button")?.focus();
+    } else if (!isShown && dialog.open) {
+      dialog.close();
+    }
     return () => {
-      document.removeEventListener("keydown", closeOnEscapeKey);
+      if (dialog.open) dialog.close();
     };
-  }, [onClose]);
+  }, [isShown]);
 
-  return ReactDOM.createPortal(
-    <CSSTransition
-      in={isShown}
-      nodeRef={nodeRef}
-      unmountOnExit
-      timeout={{ enter: 0, exit: modalTransitionDurationInMilliseconds }}
+  return createPortal(
+    <dialog
+      ref={dialogRef}
+      aria-label={title}
+      className="modal fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl border border-line bg-surface p-0 text-ink shadow-card backdrop:bg-black/70"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target !== event.currentTarget) return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          onClose();
+      }}
     >
-      <div ref={nodeRef} className="modal" onClick={onClose}>
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-          {children}
-        </div>
-      </div>
-    </CSSTransition>,
-
-    document.getElementById("app")!,
+      {isShown && children}
+    </dialog>,
+    document.body,
   );
 };

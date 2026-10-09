@@ -1,20 +1,13 @@
 import { RegisterForm } from "../../components/Forms/RegisterForm/RegisterForm";
 import { Card } from "../../components/Helper/Card/Card";
-import { Container } from "../../components/Layout/Container/Container";
-import { Logo } from "../../components/Layout/Logo/Logo";
-import "../Page.css";
-import "./Register.css";
+import { PageLayout } from "../../components/Layout/PageLayout/PageLayout";
 
-export const Register = () => {
-  return (
-    <div className="register page">
-      <Logo />
-
-      <Container>
-        <Card>
-          <RegisterForm />
-        </Card>
-      </Container>
+export const Register = () => (
+  <PageLayout className="register" authenticated={false}>
+    <div className="mx-auto flex w-full max-w-lg flex-1 items-center px-5 py-10 sm:px-8">
+      <Card className="w-full">
+        <RegisterForm />
+      </Card>
     </div>
-  );
-};
+  </PageLayout>
+);

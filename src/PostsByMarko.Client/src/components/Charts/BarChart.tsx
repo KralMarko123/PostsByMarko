@@ -20,6 +20,7 @@ ChartJS.defaults.color = "#f9f5eb"; // Font color
 
 export const options: ChartOptions<"bar"> = {
   responsive: true,
+  maintainAspectRatio: false,
   scales: {
     y: {
       ticks: {
