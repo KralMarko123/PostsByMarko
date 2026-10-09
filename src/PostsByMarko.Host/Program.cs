@@ -10,6 +10,7 @@ using Serilog;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,24 +20,8 @@ var isInTest = environment.IsEnvironment("Test");
 
 builder.Configuration.AddEnvironmentVariables();
 
-// Define configurations here
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
-builder.Services.Configure<ApplicationUrlConfig>(builder.Configuration.GetSection("ApplicationUrls"));
-
+var jwtConfig = builder.WithValidatedConfiguration();
 var serverVersion = new MariaDbServerVersion(new Version(10, 11, 13));
-var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()
-    ?? throw new InvalidOperationException("JwtConfig is required.");
-
-if (jwtConfig.Secret.Length < 32)
-{
-    throw new InvalidOperationException("JwtConfig:Secret must be supplied securely and contain at least 32 characters.");
-}
-
-if (jwtConfig.ValidIssuers.Count == 0 || jwtConfig.ValidAudiences.Count == 0)
-{
-    throw new InvalidOperationException("JwtConfig must define at least one issuer and audience.");
-}
 
 #region ServicesConfiguration
 
@@ -92,8 +77,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.WriteIndented = true;
 });
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
-    options.UseMySql(services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection")!, serverVersion)
+    options.UseMySql(services.GetRequiredService<IOptions<DatabaseConfig>>().Value.DefaultConnection, serverVersion)
 );
+builder.WithHealthChecks();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<RegistrationProfile>();
@@ -113,6 +99,8 @@ builder.WithAuthorization();
 #endregion
 
 var app = builder.Build();
+// Validate every configuration group before migrations, seeding, or background workers can run.
+app.Services.GetRequiredService<IStartupValidator>().Validate();
 
 #region ApplicationConfiguration
 
@@ -154,6 +142,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
+app.MapApplicationHealthChecks();
 
 #endregion
 

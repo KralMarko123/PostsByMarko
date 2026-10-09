@@ -54,6 +54,26 @@ dotnet user-secrets --project src/PostsByMarko.Host set "JwtConfig:Secret" "repl
 
 Outside Compose, email delivery is disabled by the Development and Test configuration files. Production must provide the `EmailConfig` values through the deployment secret store. `SenderAddress` optionally separates the sender email from the SMTP login; it defaults to `Username` when omitted. Configure `Username` and `Password` when SMTP requires authentication.
 
+### Health checks and startup validation
+
+The API exposes two anonymous, uncached probes with a plain-text status only:
+
+| Endpoint | Meaning | Response |
+| --- | --- | --- |
+| `GET /health/live` | The process can serve requests; does not contact MariaDB. | HTTP 200, `Healthy` |
+| `GET /health/ready` | The API can connect to MariaDB. The check has a five-second timeout. | HTTP 200, `Healthy`, or HTTP 503, `Unhealthy` |
+
+For the development stack, use `http://localhost:7171/health/live` and `http://localhost:7171/health/ready`. Production probes must use the deployment's HTTPS endpoint. Readiness detects database outages after startup; the host still needs the database available for its existing startup migrations or test seeding. These probes do not check SMTP delivery or database schema compatibility.
+
+Before migrations, seeding, or background workers start, configuration validation checks:
+
+- `JwtConfig`: a non-whitespace signing secret of at least 32 characters, non-empty issuers, a positive token lifetime, and HTTP(S) audience origins without paths or trailing slashes. Audiences also configure CORS.
+- `ConnectionStrings:DefaultConnection`: a parseable MariaDB connection string with a server, database, user, and valid port. Credentials and connectivity are verified when the database is accessed.
+- `ApplicationUrls:ApiBaseUrl` and `ApplicationUrls:ClientBaseUrl`: absolute HTTP(S) URLs without credentials, query strings, or fragments.
+- `EmailConfig`, when enabled: a hostname or IP address, a valid port, a sender email address (falling back to `Username`), and both login fields when authentication is configured. Disabled email does not require SMTP settings; unauthenticated Mailpit remains supported.
+
+Validation failures identify the configuration keys to fix without echoing secrets or connection strings.
+
 ### Correctness and security checks
 
 The API rejects empty/whitespace post and message content. Request limits are 200 characters for titles, 20,000 for posts, and 4,000 for messages. Registration requires first and last names. Invalid requests return HTTP 400; failed authentication returns 401; denied access returns 403. Unexpected errors return a generic message and a trace ID.
